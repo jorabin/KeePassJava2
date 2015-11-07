@@ -1,7 +1,7 @@
 package org.linguafranca.keepass.kdb;
 
 import com.google.common.io.LittleEndianDataInputStream;
-import org.linguafranca.keepass.db.Group;
+import org.linguafranca.keepass.Group;
 import org.linguafranca.keepass.encryption.Encryption;
 
 import java.io.DataInput;

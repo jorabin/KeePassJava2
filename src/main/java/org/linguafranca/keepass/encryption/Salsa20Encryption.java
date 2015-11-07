@@ -3,12 +3,16 @@ package org.linguafranca.keepass.encryption;
 import org.bouncycastle.crypto.engines.Salsa20Engine;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
-import org.linguafranca.keepass.db.DatabaseProvider;
+import org.linguafranca.keepass.DatabaseProvider;
 
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 
 /**
+ * A helper class for Salsa20 encryption. This is used for memory
+ * protection in KeePass, i.e. sensitive information is stored
+ * encrypted and is decrypted only on demand.
+ *
  * @author jo
  */
 public class Salsa20Encryption implements DatabaseProvider.Encryption {
@@ -18,6 +22,13 @@ public class Salsa20Encryption implements DatabaseProvider.Encryption {
 
     private static final byte[] SALSA20_IV = DatatypeConverter.parseHexBinary("E830094B97205D2A");
 
+    /**
+     * Creates a Salsa20 engine ready for encryption or decryption, as specified.
+     *
+     * @param forEncryption true to create an encryption engine, false for decryption
+     * @param key           the key to use
+     * @return an initialized Salsa20 engine
+     */
     public static Salsa20Engine createSalsa20(boolean forEncryption, byte[] key) {
         MessageDigest md = Encryption.getMessageDigestInstance();
         KeyParameter keyParameter = new KeyParameter(md.digest(key));
@@ -27,6 +38,11 @@ public class Salsa20Encryption implements DatabaseProvider.Encryption {
         return engine;
     }
 
+    /**
+     * Constructor creates appropriate encryption and decryption encgines
+     *
+     * @param key the key to use
+     */
     public Salsa20Encryption(byte[] key) {
         this.key = key;
         decrypt = createSalsa20(false, key);

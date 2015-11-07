@@ -1,9 +1,9 @@
 package org.linguafranca.keepass.kdb;
 
-import org.linguafranca.keepass.db.Entry;
-import org.linguafranca.keepass.db.Group;
-import org.linguafranca.keepass.db.Icon;
-import org.linguafranca.keepass.db.base.AbstractGroup;
+import org.linguafranca.keepass.Entry;
+import org.linguafranca.keepass.Group;
+import org.linguafranca.keepass.Icon;
+import org.linguafranca.keepass.AbstractGroup;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,9 +16,9 @@ import java.util.UUID;
 public class KdbGroup extends AbstractGroup {
     private boolean root;
     private KdbGroup parent;
-    private UUID uuid;
-    private String name;
-    private Icon icon;
+    private UUID uuid = UUID.randomUUID();
+    private String name = "";
+    private Icon icon = new KdbIcon(0);
     private List<Group> groups = new ArrayList<>();
     private List<Entry> entries = new ArrayList<>();
     private Date creationTime;
@@ -27,16 +27,16 @@ public class KdbGroup extends AbstractGroup {
     private Date expiryTime;
     private int flags;
 
-    public KdbGroup () {
+    KdbGroup () {
         creationTime = new Date();
         lastModificationTime = creationTime;
-        lastAccessTime = creationTime;
+        lastAccessTime = new Date(Long.MIN_VALUE);
         expiryTime = new Date(Long.MAX_VALUE);
     }
 
     @Override
     public Group addGroup(Group group) {
-        getGroups().add(group);
+        groups.add(group);
         if (group.getParent() != null) {
             group.getParent().removeGroup(group);
         }
@@ -53,7 +53,7 @@ public class KdbGroup extends AbstractGroup {
 
     @Override
     public List<Entry> getEntries() {
-        return entries;
+        return new ArrayList<>(entries);
     }
 
     @Override
@@ -137,7 +137,7 @@ public class KdbGroup extends AbstractGroup {
 
     @Override
     public List<Group> getGroups() {
-        return groups;
+        return new ArrayList<>(groups);
     }
 
     int getFlags() {
@@ -170,6 +170,6 @@ public class KdbGroup extends AbstractGroup {
 
     public String toString() {
         String time = KdbDatabase.isoDateFormat.format(creationTime);
-        return String.format("\"%s\" (%s) %s [%d]", name, uuid.toString(), time, flags);
+        return getPath() + String.format("\"%s\" (%s) %s [%d]", name, uuid.toString(), time, flags);
     }
 }

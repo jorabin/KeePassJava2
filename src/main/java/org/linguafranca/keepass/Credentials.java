@@ -1,4 +1,4 @@
-package org.linguafranca.keepass.db;
+package org.linguafranca.keepass;
 
 /**
  * @author jo
@@ -18,11 +18,11 @@ public interface Credentials {
     }
 
     class Password implements Credentials {
+        private byte [] password;
 
         public Password(String password) {
             this.password = password.getBytes();
         }
-        byte [] password;
         @Override
         public byte[] getPassword() {
             return password;
@@ -33,6 +33,7 @@ public interface Credentials {
             return new byte[0];
         }
     }
+
     byte [] getPassword();
     byte [] getKey();
 }

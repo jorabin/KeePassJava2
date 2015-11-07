@@ -1,6 +1,6 @@
 package org.linguafranca.keepass.dom;
 
-import org.linguafranca.keepass.db.Icon;
+import org.linguafranca.keepass.Icon;
 import org.w3c.dom.Element;
 
 /**
@@ -22,5 +22,16 @@ public class DomIconWrapper implements Icon {
     @Override
     public void setIndex(int index) {
         element.setTextContent(String.valueOf(index));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DomIconWrapper that = (DomIconWrapper) o;
+
+        return this.getIndex() == that.getIndex();
+
     }
 }

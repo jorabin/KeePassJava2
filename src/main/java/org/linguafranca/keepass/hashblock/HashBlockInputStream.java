@@ -11,18 +11,22 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 
 /**
- * Takes an underlying input stream formatted as Hashed Blocks and provides the content of the blocks as an input stream
- * <p/>
- * A Hashed block consists of:
+ * Takes an underlying input stream formatted as Hashed Blocks
+ * and provides the content of the blocks as an input stream
+ *
+ * <p>A Hashed block consists of:
+ *
  * <ol>
- * <li>A 4 byte block sequence number, increments from 0</li>
- * <li>A 32 byte MD5 hash of the content</li>
- * <li>A 4 byte length field</li>
- * <li>Content</li>
+ * <li>A 4 byte block sequence number, increments from 0
+ * <li>A 32 byte MD5 hash of the content
+ * <li>A 4 byte length field
+ * <li>Content
  * </ol>
- * The stream of blocks is terminated with a 0 length 0 hash block.
- * <p/>
- * A Keepass hash block stream is little endian, i.e. the sequence number and length fields are low order byte first.
+ *
+ * <p>The stream of blocks is terminated with a 0 length 0 hash block.
+ *
+ * <p>A KeePass hash block stream is little endian, i.e. the sequence
+ * number and length fields are low order byte first.
  *
  * @author Jo
  */
@@ -109,7 +113,8 @@ public class HashBlockInputStream extends InputStream {
         // read the sequence number of the block
         long sequenceNumber = readUInt();
         if (sequenceNumber != expectedSequenceNumber) {
-            throw new IllegalStateException("Expected sequence number " + expectedSequenceNumber + " got " + sequenceNumber);
+            throw new IllegalStateException("Expected sequence number " +
+                    expectedSequenceNumber + " got " + sequenceNumber);
         }
         expectedSequenceNumber++;
 

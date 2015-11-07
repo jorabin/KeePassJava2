@@ -1,8 +1,8 @@
 package org.linguafranca.keepass.kdbx;
 
-import org.linguafranca.keepass.db.Credentials;
-import org.linguafranca.keepass.db.DatabaseProvider;
-import org.linguafranca.keepass.db.Formatter;
+import org.linguafranca.keepass.Credentials;
+import org.linguafranca.keepass.DatabaseProvider;
+import org.linguafranca.keepass.Formatter;
 import org.linguafranca.keepass.encryption.Salsa20Encryption;
 
 import java.io.IOException;

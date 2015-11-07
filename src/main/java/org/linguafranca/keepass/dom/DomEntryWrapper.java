@@ -1,17 +1,13 @@
 package org.linguafranca.keepass.dom;
 
-import org.linguafranca.keepass.db.Group;
-import org.linguafranca.keepass.db.Icon;
-import org.linguafranca.keepass.db.base.AbstractEntry;
+import org.linguafranca.keepass.Group;
+import org.linguafranca.keepass.Icon;
+import org.linguafranca.keepass.AbstractEntry;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
-import javax.xml.bind.DatatypeConverter;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.linguafranca.keepass.dom.DomHelper.*;
 
@@ -79,6 +75,16 @@ public class DomEntryWrapper extends AbstractEntry {
         }
         setElementContent(VALUE_ELEMENT_NAME, property, value);
         touchElement(LAST_MODIFICATION_TIME_ELEMENT_NAME, element);
+    }
+
+    @Override
+    public List<String> getPropertyNames() {
+        ArrayList<String> result = new ArrayList<>();
+        List<Element> list = getElements("String", element);
+        for (Element listElement: list) {
+            result.add(getElementContent("Key", listElement));
+        }
+        return result;
     }
 
     private void ensureProperty(String name){
@@ -198,5 +204,23 @@ public class DomEntryWrapper extends AbstractEntry {
         } catch (ParseException e) {
             return new Date(0);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DomEntryWrapper that = (DomEntryWrapper) o;
+
+        return element.equals(that.element) && database.equals(that.database);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = element.hashCode();
+        result = 31 * result + database.hashCode();
+        return result;
     }
 }

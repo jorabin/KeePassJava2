@@ -1,30 +1,31 @@
-package org.linguafranca.keepass.db.base;
-
-import org.linguafranca.keepass.db.Entry;
-import org.linguafranca.keepass.db.Group;
-
-import java.util.Stack;
+package org.linguafranca.keepass;
 
 /**
  * @author Jo
  */
 public abstract class AbstractEntry implements Entry {
+
+    @Override
     public  boolean matchTitle(String text){
         return (getTitle().toLowerCase().contains(text.toLowerCase()));
     }
 
+    @Override
     public  boolean matchNote(String text){
         return (getNotes().toLowerCase().contains(text.toLowerCase()));
     }
 
+    @Override
     public boolean match(String text) {
         return matchTitle(text) || matchNote(text);
     }
 
+    @Override
     public boolean match(Entry.Matcher matcher) {
         return matcher.matches(this);
     }
 
+    @Override
     public String getPath() {
         Group parent = this.getParent();
         String result = "";

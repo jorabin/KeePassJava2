@@ -1,4 +1,4 @@
-package org.linguafranca.keepass.db;
+package org.linguafranca.keepass;
 
 /**
  * @author Jo

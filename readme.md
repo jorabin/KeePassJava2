@@ -13,7 +13,7 @@ It is written for Java 1.7.
 
 ## Java Cryptography Extensions
 
-Java Cryptography Extensions are required for 256 bit encryption.
+Java Cryptography Extensions are required, as 256 bit encryption is used.
 
 Java 7 http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html
 
@@ -27,7 +27,7 @@ need to go.
 Aside from the JRE the API depends on Bouncy Castle
 (license https://www.bouncycastle.org/licence.html)
 and Google Guava (license https://github.com/google/guava/blob/master/COPYING).
-It also depends on Junit for tests.
+It also depends on SLF4J and Junit for tests.
 
 ## Build
 

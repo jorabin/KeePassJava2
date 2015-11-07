@@ -11,15 +11,17 @@ import java.io.UnsupportedEncodingException;
 import java.security.*;
 
 /**
- * A number of utilities whose partial purpose is to wrap Checked Exceptions into
- * unchecked {@link IllegalStateException}s to allow for more readable code.
+ * A number of utilities whose partial purpose is to wrap Checked Exceptions into unchecked {@link
+ * IllegalStateException}s to allow for more readable code. There is no point in cluttering up calling classes with
+ * checked exception handling for repeated calls that have previously succeeded.
  *
  * @author jo
  */
 public class Encryption {
 
     /**
-     * Get a Cipher instance
+     * Gets a Cipher instance
+     *
      * @param type a string representing the type
      * @return an instance
      */
@@ -35,7 +37,8 @@ public class Encryption {
     }
 
     /**
-     * Get a digest for a UTF-8 encoded string
+     * Gets a digest for a UTF-8 encoded string
+     *
      * @param string the string
      * @return a digest as a byte array
      */
@@ -44,7 +47,8 @@ public class Encryption {
     }
 
     /**
-     * Get a digest for string
+     * Gets a digest for a string
+     *
      * @param string the string
      * @param encoding the encoding of the String
      * @return a digest as a byte array
@@ -60,7 +64,7 @@ public class Encryption {
 
         try {
             byte[] bytes = string.getBytes(encoding);
-            md.update(bytes, 0, bytes.length );
+            md.update(bytes, 0, bytes.length);
             return md.digest();
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException(encoding + " is not supported");
@@ -68,7 +72,8 @@ public class Encryption {
     }
 
     /**
-     * Get a SHA-256 message digest instance
+     * Gets a SHA-256 message digest instance
+     *
      * @return A MessageDigest
      */
     public static MessageDigest getMessageDigestInstance() {
@@ -80,7 +85,8 @@ public class Encryption {
     }
 
     /**
-     * Get a digest for a string transformed according to the parameters
+     * Gets a digest for a string transformed according to the parameters
+     *
      * @param password a UTF-8 encoded string which is the key
      * @param masterSeed the master seed
      * @param transformSeed the transform seed
@@ -92,8 +98,11 @@ public class Encryption {
     }
 
     /**
-     * Get a digest for a digest transformed according to the parameters
-     * @param passwordDigest a key digest
+     * Gets a digest for a digest transformed according to the parameters.
+     *
+     * <p>For kdb files the key is used directly, for KDBX files the key is a digest.
+     *
+     * @param passwordDigest a key or key digest
      * @param masterSeed the master seed
      * @param transformSeed the transform seed
      * @param transformRounds the number of transform rounds
@@ -101,17 +110,16 @@ public class Encryption {
      */
     public static byte[] getFinalKeyDigest(byte[] passwordDigest, byte[] masterSeed, byte[] transformSeed, long transformRounds) {
 
-        // get a digest of the digest
         MessageDigest md = getMessageDigestInstance();
         md.update(passwordDigest);
-        byte [] hashedPassword = md.digest();
+        byte[] hashedPassword = md.digest();
 
         Cipher cipher = getCipherInstance("AES/ECB/NoPadding");
 
         try {
             cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(transformSeed, "AES"));
         } catch (InvalidKeyException e) {
-            throw new IllegalArgumentException("Invalid password");
+            throw new IllegalArgumentException("Invalid password", e);
         }
 
         // Encrypt the key transformRounds times
@@ -130,7 +138,7 @@ public class Encryption {
         // md.digest() resets the digest, but just in case get a new one
         md = getMessageDigestInstance();
         md.update(outputKey);
-        byte [] transformedPassword = md.digest();
+        byte[] transformedPassword = md.digest();
 
         md = getMessageDigestInstance();
         md.update(masterSeed);
@@ -139,7 +147,8 @@ public class Encryption {
     }
 
     /**
-     * Get and initialize a Cipher instance using AES/CBC/PKCS5Padding
+     * Gets and initializes a Cipher instance using AES/CBC/PKCS5Padding
+     *
      * @param mode {@link javax.crypto.Cipher.ENCRYPT_MODE} {@link javax.crypto.Cipher.DECRYPT_MODE} etc
      * @param finalKey a finalKey
      * @param encryptionIv an encryptionIv
@@ -150,6 +159,16 @@ public class Encryption {
         return initCipher(Encryption.getCipherInstance("AES/CBC/PKCS5Padding"), mode, finalKey, encryptionIv);
     }
 
+    /**
+     * Gets and initializes a Cipher instance using specified Cipher
+     *
+     * @param cipher a Cipher instance
+     * @param mode {@link javax.crypto.Cipher.ENCRYPT_MODE} {@link javax.crypto.Cipher.DECRYPT_MODE} etc
+     * @param finalKey a finalKey
+     * @param encryptionIv an encryptionIv
+     * @return initialized Cipher
+     */
+    @SuppressWarnings("JavadocReference")
     public static Cipher initCipher(Cipher cipher, int mode, byte[] finalKey, byte[] encryptionIv) {
         Key aesKey = new SecretKeySpec(finalKey, "AES");
         IvParameterSpec iv = new IvParameterSpec(encryptionIv);

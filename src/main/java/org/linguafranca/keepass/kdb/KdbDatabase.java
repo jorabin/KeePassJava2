@@ -1,12 +1,10 @@
 package org.linguafranca.keepass.kdb;
 
-import org.linguafranca.keepass.db.Entry;
-import org.linguafranca.keepass.db.Group;
-import org.linguafranca.keepass.db.Icon;
-import org.linguafranca.keepass.db.base.AbstractDatabase;
+import org.linguafranca.keepass.Entry;
+import org.linguafranca.keepass.Group;
+import org.linguafranca.keepass.Icon;
+import org.linguafranca.keepass.AbstractDatabase;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
@@ -70,11 +68,6 @@ public class KdbDatabase extends AbstractDatabase {
     }
 
     @Override
-    public String getFilename() {
-        return null;
-    }
-
-    @Override
     public String getDescription() {
         return description;
     }
@@ -84,27 +77,7 @@ public class KdbDatabase extends AbstractDatabase {
         this.description = description;
     }
 
-    @Override
-    public void setPassword(String password) {
-
-    }
-
-    @Override
-    public void save(String filename) throws IOException {
-
-    }
-
-    @Override
-    public void save(Path pathname) throws IOException {
-
-    }
-
-    @Override
-    public void save() throws IOException {
-
-    }
-
-    class GroupFinder extends DefaultVisitor {
+    static class GroupFinder extends DefaultVisitor {
         Group foundGroup = null;
         UUID uuid;
 

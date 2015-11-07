@@ -1,11 +1,9 @@
-package org.linguafranca.keepass.db;
+package org.linguafranca.keepass;
 
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Interface for Database facade through which password databases may be accessed
+ * Interface for a password database
  */
 public interface Database {
     /**
@@ -73,16 +71,47 @@ public interface Database {
     Group getRootGroup();
 
     /**
-     * Create  a new Group
+     * Create a new Group
      * @return the group created
      */
     Group newGroup();
+
+    /**
+     * Create a new named Group
+     * @param name the name of the group
+     * @return the group created
+     */
+    Group newGroup(String name);
+
+    /**
+     * Create a new Group copying the details of the supplied group, but not copying its children
+     *
+     * <p>Used for copying a group from one database to another
+     * @param group the group to copy
+     * @return the group created
+     */
+    Group newGroup(Group group);
 
     /**
      * Create a new Entry
      * @return the entry created
      */
     Entry newEntry();
+
+    /**
+     * Create a new Entry with a title
+     * @return the entry created
+     */
+    Entry newEntry(String title);
+
+    /**
+     * Create a new Entry copying the details of the supplied entry
+     *
+     * <p>Used for copying an entry from one database to another
+     * @param entry the entry to copy
+     * @return the entry created
+     */
+    Entry newEntry(Entry entry);
 
     /**
      * Create a new default icon
@@ -119,17 +148,15 @@ public interface Database {
      */
     List<Entry> findEntries(Entry.Matcher matcher);
 
-    String getFilename();
-
+    /**
+     * Gets the database description, if there is one
+     * @return the description or null if not supported
+     */
     String getDescription();
 
+    /**
+     * Sets the database description if it is supported
+     * @param description a description of the database
+     */
     void setDescription(String description);
-
-    void setPassword(String password);
-
-    void save(String filename) throws IOException;
-
-    void save(Path pathname) throws IOException;
-
-    void save() throws IOException;
 }

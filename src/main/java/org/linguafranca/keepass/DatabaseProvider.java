@@ -1,4 +1,4 @@
-package org.linguafranca.keepass.db;
+package org.linguafranca.keepass;
 
 import java.io.IOException;
 import java.io.InputStream;

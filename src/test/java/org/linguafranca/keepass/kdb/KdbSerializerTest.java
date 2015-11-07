@@ -1,11 +1,9 @@
 package org.linguafranca.keepass.kdb;
 
 import org.junit.Test;
-import org.linguafranca.keepass.db.Database;
+import org.linguafranca.keepass.Database;
 
 import java.io.InputStream;
-
-import static org.junit.Assert.*;
 
 /**
  * @author jo

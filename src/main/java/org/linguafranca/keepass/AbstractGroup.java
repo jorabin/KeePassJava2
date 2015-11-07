@@ -1,7 +1,4 @@
-package org.linguafranca.keepass.db.base;
-
-import org.linguafranca.keepass.db.Entry;
-import org.linguafranca.keepass.db.Group;
+package org.linguafranca.keepass;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +8,8 @@ import java.util.Stack;
  * @author Jo
  */
 public abstract class AbstractGroup implements Group {
+
+    @Override
     public List<Group> findGroups(String group1) {
         ArrayList<Group> result = new ArrayList<>();
         for (Group g: getGroups()) {
@@ -21,6 +20,7 @@ public abstract class AbstractGroup implements Group {
         return result;
     }
 
+    @Override
     public Group findGroup(Group group) {
         for (Group g: getGroups()) {
             if (g.getUuid().equals(group.getUuid())) {
@@ -30,6 +30,7 @@ public abstract class AbstractGroup implements Group {
         return null;
     }
 
+    @Override
     public List<Entry> findEntries(String entry1) {
         List <Entry> result = new ArrayList<>(getEntries().size());
         for (Entry entry: getEntries()){
@@ -40,6 +41,7 @@ public abstract class AbstractGroup implements Group {
         return result;
     }
 
+    @Override
     public List<Entry> findEntries(Entry.Matcher matcher, boolean recursive) {
         List <Entry> result = new ArrayList<>(getEntries().size());
         for (Entry entry: getEntries()){
@@ -47,11 +49,10 @@ public abstract class AbstractGroup implements Group {
                 result.add(entry);
             }
         }
-        if (!recursive) {
-            return result;
-        }
-        for (Group group: getGroups()){
-            result.addAll(group.findEntries(matcher, recursive));
+        if (recursive) {
+            for (Group group : getGroups()) {
+                result.addAll(group.findEntries(matcher, true));
+            }
         }
         return result;
     }
@@ -71,6 +72,7 @@ public abstract class AbstractGroup implements Group {
         return result;
     }
 
+    @Override
     public String toString() {
         return this.getPath();
     }

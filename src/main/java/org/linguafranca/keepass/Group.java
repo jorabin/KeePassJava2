@@ -1,4 +1,4 @@
-package org.linguafranca.keepass.db;
+package org.linguafranca.keepass;
 
 import java.util.List;
 import java.util.UUID;
@@ -23,25 +23,35 @@ public interface Group {
 
     void setIcon(Icon icon);
 
+    /**
+     * Returns a list of groups that are the children of this group.
+     * <p>The list returned is modifiable by the caller without affecting the status of the database.
+     * @return a modifiable list of groups
+     */
     List<Group> getGroups();
 
     Group addGroup(Group group);
 
-    List<Group> findGroups(String group1);
+    /**
+     *
+     * @param group
+     * @return
+     */
+    List<Group> findGroups(String group);
 
     Group findGroup(Group group);
 
-    Group removeGroup(Group g1);
+    Group removeGroup(Group group);
 
     List<Entry> getEntries();
 
-    List<Entry> findEntries(String entry1);
+    List<Entry> findEntries(String entry);
 
     List<Entry> findEntries(Entry.Matcher matcher, boolean recursive);
 
     Entry addEntry(Entry entry);
 
-    Entry removeEntry(Entry e12);
+    Entry removeEntry(Entry entry);
 
     String getPath();
 

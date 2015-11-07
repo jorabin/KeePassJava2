@@ -1,8 +1,7 @@
 package org.linguafranca.keepass.dom;
 
-import org.jetbrains.annotations.NotNull;
-import org.linguafranca.keepass.db.*;
-import org.linguafranca.keepass.db.base.AbstractDatabase;
+import org.linguafranca.keepass.*;
+import org.linguafranca.keepass.AbstractDatabase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -12,9 +11,9 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Path;
 
 import static org.linguafranca.keepass.dom.DomHelper.*;
+
 /**
  * @author jo
  */
@@ -114,29 +113,5 @@ public class DomDatabaseWrapper extends AbstractDatabase {
     public void setDescription(String description) {
         setElementContent("DatabaseDescription", dbMeta, description);
         touchElement("DatabaseDescriptionChanged", dbMeta);
-    }
-
-    @Override
-    public String getFilename() {
-        return null;
-    }
-
-    @Override
-    public void setPassword(String password) {
-
-    }
-
-    @Override
-    public void save(String filename) throws IOException {
-
-    }
-
-    @Override
-    public void save(Path pathname) throws IOException {
-
-    }
-
-    @Override
-    public void save() throws IOException {
     }
 }

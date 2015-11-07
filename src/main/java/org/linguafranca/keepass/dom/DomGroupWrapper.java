@@ -1,10 +1,10 @@
 package org.linguafranca.keepass.dom;
 
 import org.jetbrains.annotations.Nullable;
-import org.linguafranca.keepass.db.Entry;
-import org.linguafranca.keepass.db.Group;
-import org.linguafranca.keepass.db.Icon;
-import org.linguafranca.keepass.db.base.AbstractGroup;
+import org.linguafranca.keepass.Entry;
+import org.linguafranca.keepass.Group;
+import org.linguafranca.keepass.Icon;
+import org.linguafranca.keepass.AbstractGroup;
 import org.w3c.dom.Element;
 
 import java.util.*;
@@ -19,7 +19,7 @@ public class DomGroupWrapper extends AbstractGroup {
 
     static Map<String, ValueCreator> mandatoryGroupElements = new HashMap<String, ValueCreator>() {{
         put(UUID_ELEMENT_NAME, new UuidValueCreator());
-        put(NAME_ELEMENT_NAME, new ConstantValueCreator("New Group"));
+        put(NAME_ELEMENT_NAME, new ConstantValueCreator(""));
         put(NOTES_ELEMENT_NAME, new ConstantValueCreator(""));
         put(ICON_ELEMENT_NAME, new ConstantValueCreator("2"));
         put(TIMES_ELEMENT_NAME, new ConstantValueCreator(""));
@@ -145,5 +145,23 @@ public class DomGroupWrapper extends AbstractGroup {
     public Entry removeEntry(Entry e12) {
         element.removeChild(((DomEntryWrapper) e12).element);
         return e12;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DomGroupWrapper that = (DomGroupWrapper) o;
+
+        return element.equals(that.element) && database.equals(that.database);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = element.hashCode();
+        result = 31 * result + database.hashCode();
+        return result;
     }
 }

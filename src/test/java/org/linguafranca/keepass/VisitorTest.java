@@ -1,10 +1,11 @@
-package org.linguafranca.keepass.droid;
+package org.linguafranca.keepass;
 
 import org.junit.Test;
-import org.linguafranca.keepass.db.Database;
-import org.linguafranca.keepass.db.Entry;
-import org.linguafranca.keepass.db.Group;
+import org.linguafranca.keepass.dom.DomDatabaseWrapper;
+import org.linguafranca.keepass.kdbx.KdbxFormatter;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import static org.junit.Assert.assertTrue;
  * @author Jo
  */
 public class VisitorTest {
-    List<org.linguafranca.keepass.db.Entry> visitorList = new ArrayList<>();
+    List<Entry> visitorList = new ArrayList<>();
     Database.Visitor visitor = new Database.Visitor() {
         StringBuffer indentation = new StringBuffer();
         @Override
@@ -34,7 +35,7 @@ public class VisitorTest {
         }
 
         @Override
-        public void visit(org.linguafranca.keepass.db.Entry entry) {
+        public void visit(Entry entry) {
             System.out.println(indentation.toString() + "= " + entry.getTitle());
             visitorList.add(entry);
         }
@@ -43,13 +44,14 @@ public class VisitorTest {
     @Test
     public void testLoadDB() {
         try {
-            org.linguafranca.keepass.db.Database db = DatabaseWrapper.load("loadsavetest.kdbx", "mypass");
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
+            DomDatabaseWrapper db = new DomDatabaseWrapper(new KdbxFormatter(), new Credentials.Password("123"), inputStream);
             db.visit(visitor);
 
-            List<org.linguafranca.keepass.db.Entry> matched = db.findEntries(new org.linguafranca.keepass.db.Entry.Matcher() {
+            List<Entry> matched = db.findEntries(new Entry.Matcher() {
                 String matchee = "";
                 @Override
-                public boolean matches(org.linguafranca.keepass.db.Entry entry) {
+                public boolean matches(Entry entry) {
                     return entry.getTitle().toLowerCase().contains(matchee) ||
                             entry.getNotes().toLowerCase().contains(matchee) ||
                             entry.getUsername().toLowerCase().contains(matchee);

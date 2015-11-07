@@ -1,11 +1,7 @@
 package org.linguafranca.keepass.dom;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
 import org.junit.Test;
-import org.linguafranca.keepass.db.Credentials;
-import org.linguafranca.keepass.db.Entry;
-import org.linguafranca.keepass.db.Formatter;
-import org.linguafranca.keepass.db.Group;
+import org.linguafranca.keepass.*;
 import org.linguafranca.keepass.kdbx.KdbxFormatter;
 
 import java.io.*;
@@ -17,7 +13,11 @@ import static org.junit.Assert.*;
 /**
  * @author jo
  */
-public class DomDatabaseWrapperTest {
+public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
+
+    public DomDatabaseWrapperTest() throws IOException {
+        super(new DomDatabaseWrapper());
+    }
 
     @Test
     public void saveNewDatabase () throws IOException {
@@ -31,7 +31,7 @@ public class DomDatabaseWrapperTest {
     public void inspectNewDatabase () throws IOException {
         DomDatabaseWrapper database = createNewDatabase();
 
-        ByteOutputStream outputStream = new ByteOutputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         database.save(new Formatter.NoOp(), new Credentials.NoOp(), outputStream);
         System.out.println(outputStream.toString());
     }
@@ -41,7 +41,7 @@ public class DomDatabaseWrapperTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
         DomDatabaseWrapper database = new DomDatabaseWrapper(new KdbxFormatter(), new Credentials.Password("123"), inputStream);
 
-        ByteOutputStream outputStream = new ByteOutputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         database.save(new Formatter.NoOp(), new Credentials.NoOp(), outputStream);
         System.out.println(outputStream.toString());
     }
@@ -51,7 +51,7 @@ public class DomDatabaseWrapperTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test1234.kdbx");
         DomDatabaseWrapper database = new DomDatabaseWrapper(new KdbxFormatter(), new Credentials.Password("1234"), inputStream);
 
-        ByteOutputStream outputStream = new ByteOutputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         database.save(new Formatter.NoOp(), new Credentials.NoOp(), outputStream);
         System.out.println(outputStream.toString());
     }
@@ -68,11 +68,13 @@ public class DomDatabaseWrapperTest {
 
         assertEquals(1, entries.size());
         assertEquals("pass", entries.get(0).getPassword());
-        ByteOutputStream outputStream = new ByteOutputStream();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         database.save(new Formatter.NoOp(), new Credentials.NoOp(), outputStream);
         System.out.println(outputStream.toString());
     }
 
+    // create a new database for messing aorund with
+    // the asserions here somewhat duplicate those in BasicDatabaseChecks
     private DomDatabaseWrapper createNewDatabase() throws IOException {
         DomDatabaseWrapper database = new DomDatabaseWrapper();
         Group root = database.getRootGroup();
@@ -92,7 +94,7 @@ public class DomDatabaseWrapperTest {
         database.setDescription("Test Database");
         assertEquals("Test Database", database.getDescription());
 
-        Group newGroup = database.newGroup();
+        Group newGroup = database.newGroup("New Group");
         UUID newGroupUUID = newGroup.getUuid();
 
         root.addGroup(newGroup);

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Class stores the encryption details of a KDB file and provides a method to create
+ * This class stores the encryption details of a KDB file and provides a method to create
  * a decrypted inputStream from an encrypted one.
  *
  * @author jo
@@ -35,7 +35,7 @@ public class KdbHeader {
     /**
      * Create a decrypted stream from an encrypted one
      *
-     * @param password    credentials
+     * @param password credentials
      * @param inputStream an encrypted stream
      * @return a decrypted stream
      * @throws IOException
@@ -47,7 +47,7 @@ public class KdbHeader {
         } else if ((flags & FLAG_TWOFISH) != 0) {
             cipher = Encryption.getCipherInstance("TWOFISH/CBC/PKCS7PADDING");
         } else {
-            throw new IOException("Encryption algorithm is not supported");
+            throw new IllegalStateException("Encryption algorithm is not supported");
         }
 
         byte[] finalKeyDigest = Encryption.getFinalKeyDigest(password.getBytes(), masterSeed, transformSeed, transformRounds);

@@ -1,6 +1,6 @@
 package org.linguafranca.keepass.dom;
 
-import org.linguafranca.keepass.db.DatabaseProvider;
+import org.linguafranca.keepass.DatabaseProvider;
 import org.linguafranca.keepass.encryption.Salsa20Encryption;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

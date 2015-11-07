@@ -1,6 +1,6 @@
 package org.linguafranca.keepass.kdb;
 
-import org.linguafranca.keepass.db.Icon;
+import org.linguafranca.keepass.Icon;
 
 /**
  * Contains the index of an icon
@@ -10,7 +10,7 @@ import org.linguafranca.keepass.db.Icon;
 public class KdbIcon implements Icon {
     int index = 0;
 
-    public KdbIcon(int index) {
+    KdbIcon(int index) {
         this.index = index;
     }
 
