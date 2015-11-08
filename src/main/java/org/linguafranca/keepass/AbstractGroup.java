@@ -31,11 +31,16 @@ public abstract class AbstractGroup implements Group {
     }
 
     @Override
-    public List<Entry> findEntries(String entry1) {
+    public List<Entry> findEntries(String find, boolean recursive) {
         List <Entry> result = new ArrayList<>(getEntries().size());
         for (Entry entry: getEntries()){
-            if (entry.match(entry1)){
+            if (entry.match(find)){
                 result.add(entry);
+            }
+        }
+        if (recursive) {
+            for (Group group : getGroups()) {
+                result.addAll(group.findEntries(find, true));
             }
         }
         return result;

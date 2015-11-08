@@ -86,6 +86,8 @@ public interface Entry {
      */
     void setUsername(String username);
 
+    boolean matchUsername(String username);
+
     String getPassword();
 
     void setPassword(String pass);
@@ -93,6 +95,8 @@ public interface Entry {
     String getUrl();
 
     void setUrl(String url);
+
+    boolean matchUrl(String url);
 
     String getTitle();
 
@@ -110,6 +114,14 @@ public interface Entry {
 
     void setIcon(Icon icon);
 
+    /**
+     * Determines if an entry matches the text supplied. A match is recorded if
+     * the text matches the Url, Title, Username or Notes. Match means that any
+     * portion of the field to lower case contains the field supplied, to lowercase.
+     *
+     * @param text the text to find
+     * @return true if this entry matches the text
+     */
     boolean match(String text);
 
     boolean match(Matcher matcher);

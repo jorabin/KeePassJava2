@@ -42,6 +42,11 @@ public abstract class AbstractDatabase implements Database {
     }
 
     @Override
+    public List<Entry> findEntries(String find) {
+        return getRootGroup().findEntries(find, true);
+    }
+
+    @Override
     public Group newGroup(String name) {
         Group result = newGroup();
         result.setName(name);

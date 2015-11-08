@@ -9,44 +9,49 @@ import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 
 /**
- * A helper class for Salsa20 encryption. This is used for memory
- * protection in KeePass, i.e. sensitive information is stored
- * encrypted and is decrypted only on demand.
+ * A helper class for Salsa20 encryption.
+ *
+ * <p>Salsa20 doesn't quite fit the memory model
+ * supposed by DatabaseProvider.Encryption - all encrypted
+ * items have to be decrypted in order of encryption,
+ * essentially in document order and at the same time.
+ *
+ * <p>The encrypt and decrypt methods
+ * actually do the same thing. They are here
+ * only to fulfill the interface contract.
  *
  * @author jo
  */
 public class Salsa20Encryption implements DatabaseProvider.Encryption {
-    private final Salsa20Engine decrypt;
-    private final Salsa20Engine encrypt;
+
+    private final Salsa20Engine salsa20;
     private final byte[] key;
 
     private static final byte[] SALSA20_IV = DatatypeConverter.parseHexBinary("E830094B97205D2A");
 
     /**
-     * Creates a Salsa20 engine ready for encryption or decryption, as specified.
+     * Creates a Salsa20 engine
      *
-     * @param forEncryption true to create an encryption engine, false for decryption
-     * @param key           the key to use
+     * @param key the key to use
      * @return an initialized Salsa20 engine
      */
-    public static Salsa20Engine createSalsa20(boolean forEncryption, byte[] key) {
+    public static Salsa20Engine createSalsa20(byte[] key) {
         MessageDigest md = Encryption.getMessageDigestInstance();
         KeyParameter keyParameter = new KeyParameter(md.digest(key));
         ParametersWithIV ivParameter = new ParametersWithIV(keyParameter, SALSA20_IV);
         Salsa20Engine engine = new Salsa20Engine();
-        engine.init(forEncryption, ivParameter);
+        engine.init(true, ivParameter);
         return engine;
     }
 
     /**
-     * Constructor creates appropriate encryption and decryption encgines
+     * Constructor creates engine used for both encryption and decryption
      *
      * @param key the key to use
      */
     public Salsa20Encryption(byte[] key) {
         this.key = key;
-        decrypt = createSalsa20(false, key);
-        encrypt = createSalsa20(true, key);
+        salsa20 = createSalsa20(key);
     }
 
     @Override
@@ -57,14 +62,14 @@ public class Salsa20Encryption implements DatabaseProvider.Encryption {
     @Override
     public byte[] decrypt(byte[] encryptedText) {
         byte[] output = new byte[encryptedText.length];
-        decrypt.processBytes(encryptedText, 0, encryptedText.length, output, 0);
+        salsa20.processBytes(encryptedText, 0, encryptedText.length, output, 0);
         return output;
     }
 
     @Override
     public byte[] encrypt(byte[] decryptedText) {
         byte[] output = new byte[decryptedText.length];
-        encrypt.processBytes(decryptedText, 0, decryptedText.length, output, 0);
+        salsa20.processBytes(decryptedText, 0, decryptedText.length, output, 0);
         return output;
     }
 }

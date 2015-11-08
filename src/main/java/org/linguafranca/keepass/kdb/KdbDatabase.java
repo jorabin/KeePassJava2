@@ -1,10 +1,9 @@
 package org.linguafranca.keepass.kdb;
 
-import org.linguafranca.keepass.Entry;
-import org.linguafranca.keepass.Group;
-import org.linguafranca.keepass.Icon;
-import org.linguafranca.keepass.AbstractDatabase;
+import org.linguafranca.keepass.*;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
@@ -26,6 +25,10 @@ public class KdbDatabase extends AbstractDatabase {
         rootGroup.setName("Root");
         rootGroup.setIcon(new KdbIcon(1));
         rootGroup.setUuid(UUID.randomUUID());
+    }
+
+    public static KdbDatabase load(Credentials credentials, InputStream inputStream) throws IOException {
+        return KdbSerializer.createKdbDatabase(new String(credentials.getPassword(), "UTF-8"), new KdbHeader(), inputStream);
     }
 
     /**

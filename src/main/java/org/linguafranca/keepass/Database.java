@@ -55,12 +55,12 @@ public interface Database {
     class PrintVisitor extends DefaultVisitor {
         @Override
         public void startVisit(Group group) {
-            System.out.println(group.getPath() + ": " + group.toString());
+            System.out.println(group.toString());
         }
 
         @Override
         public void visit(Entry entry) {
-            System.out.println(entry.getPath() + ": " + entry.toString());
+            System.out.println(entry.toString());
         }
     }
 
@@ -147,6 +147,14 @@ public interface Database {
      * @return a list of entries
      */
     List<Entry> findEntries(Entry.Matcher matcher);
+
+    /**
+     * Find all entries that match {@link Entry#match(String)}
+     *
+     * @param find string to find
+     * @return a list of entries
+     */
+    List<Entry> findEntries(String find);
 
     /**
      * Gets the database description, if there is one

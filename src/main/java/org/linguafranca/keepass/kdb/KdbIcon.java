@@ -23,4 +23,15 @@ public class KdbIcon implements Icon {
     public void setIndex(int index) {
         this.index = index;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || !(o instanceof Icon)) return false;
+
+        Icon icon = (Icon) o;
+
+        return index == icon.getIndex();
+
+    }
 }

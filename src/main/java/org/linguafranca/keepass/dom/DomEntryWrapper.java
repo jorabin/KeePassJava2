@@ -49,14 +49,6 @@ public class DomEntryWrapper extends AbstractEntry {
         if (property == null) {
             return null;
         }
-        boolean protect = false;
-        Element valueElement = getElement(VALUE_ELEMENT_NAME, property, false);
-        if (valueElement != null && valueElement.hasAttribute("Protected")) {
-            protect = Boolean.valueOf(valueElement.getAttribute("Protected"));
-        }
-        if (protect) {
-            return database.decrypt(getElementContent(VALUE_ELEMENT_NAME, property));
-        }
         return getElementContent(VALUE_ELEMENT_NAME, property);
     }
 
@@ -66,12 +58,6 @@ public class DomEntryWrapper extends AbstractEntry {
         if (property == null) {
             property = newElement("String", element);
             setElementContent("Key", property, name);
-        }
-
-        if (database.isProtected(name)) {
-            value = database.encrypt(value);
-            Element valueElement = getElement(VALUE_ELEMENT_NAME, property, true);
-            valueElement.setAttribute("Protected", "True");
         }
         setElementContent(VALUE_ELEMENT_NAME, property, value);
         touchElement(LAST_MODIFICATION_TIME_ELEMENT_NAME, element);

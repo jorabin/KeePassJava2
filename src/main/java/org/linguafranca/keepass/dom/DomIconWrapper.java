@@ -27,9 +27,9 @@ public class DomIconWrapper implements Icon {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || !(o instanceof Icon)) return false;
 
-        DomIconWrapper that = (DomIconWrapper) o;
+        Icon that = (Icon) o;
 
         return this.getIndex() == that.getIndex();
 

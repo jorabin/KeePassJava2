@@ -182,6 +182,11 @@ public class KdbEntry extends AbstractEntry {
 
     public String toString() {
         String time = KdbDatabase.isoDateFormat.format(creationTime);
-        return getPath() + String.format("(%s, %s, %s) %s [%s]", url, username, notes.substring(0,Math.min(notes.length(), 24)), time, binaryDescription);
+        return getPath() + String.format(" (%s, %s, %s) %s [%s]", url, username, notes.substring(0,Math.min(notes.length(), 24)), time, binaryDescription);
+    }
+
+    @Override
+    public boolean match(String text) {
+        return super.match(text) || this.getBinaryDescription().toLowerCase().contains(text.toLowerCase());
     }
 }

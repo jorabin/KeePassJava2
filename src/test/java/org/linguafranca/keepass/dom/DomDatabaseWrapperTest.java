@@ -4,7 +4,12 @@ import org.junit.Test;
 import org.linguafranca.keepass.*;
 import org.linguafranca.keepass.kdbx.KdbxFormatter;
 
-import java.io.*;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +29,7 @@ public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
         DomDatabaseWrapper database = createNewDatabase();
 
         FileOutputStream outputStream = new FileOutputStream("test.kdbx");
-        database.save(new KdbxFormatter(), new Credentials.Password("123"), outputStream);
+        database.save(new Credentials.Password("123"), outputStream);
     }
 
     @Test
@@ -37,19 +42,9 @@ public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
     }
 
     @Test
-    public void inspectExistingDatabase () throws IOException {
+    public void inspectExistingDatabase2() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
         DomDatabaseWrapper database = new DomDatabaseWrapper(new KdbxFormatter(), new Credentials.Password("123"), inputStream);
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        database.save(new Formatter.NoOp(), new Credentials.NoOp(), outputStream);
-        System.out.println(outputStream.toString());
-    }
-
-    @Test
-    public void inspectExistingDatabase2() throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test1234.kdbx");
-        DomDatabaseWrapper database = new DomDatabaseWrapper(new KdbxFormatter(), new Credentials.Password("1234"), inputStream);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         database.save(new Formatter.NoOp(), new Credentials.NoOp(), outputStream);
@@ -74,7 +69,7 @@ public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
     }
 
     // create a new database for messing aorund with
-    // the asserions here somewhat duplicate those in BasicDatabaseChecks
+    // the assertions here somewhat duplicate those in BasicDatabaseChecks
     private DomDatabaseWrapper createNewDatabase() throws IOException {
         DomDatabaseWrapper database = new DomDatabaseWrapper();
         Group root = database.getRootGroup();
@@ -82,9 +77,9 @@ public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
         assertEquals(0, root.getGroups().size());
         assertEquals(0, root.getEntries().size());
 
-        assertTrue(database.isProtected("Password"));
-        assertFalse(database.isProtected("Title"));
-        assertFalse(database.isProtected("Bogus"));
+        assertTrue(database.shouldProtect("Password"));
+        assertFalse(database.shouldProtect("Title"));
+        assertFalse(database.shouldProtect("Bogus"));
 
         assertEquals("New Database", database.getName());
         database.setName("Modified Database");
@@ -147,6 +142,12 @@ public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
 
         entry1.setPassword("pass");
         assertEquals("pass", entry1.getPassword());
+
+        Entry entry2 = database.newEntry(entry1);
+        entry2.setPassword("pass2");
+        assertEquals("pass2", entry2.getPassword());
+        group2.addEntry(entry2);
+
         return database;
     }
 

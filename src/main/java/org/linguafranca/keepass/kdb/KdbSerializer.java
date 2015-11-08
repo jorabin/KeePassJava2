@@ -232,7 +232,7 @@ public class KdbSerializer {
                     entry.setUrl(readString(dataInput));
                     break;
                 case 0x0006:
-                    entry.setUrl(readString(dataInput));
+                    entry.setUsername(readString(dataInput));
                     break;
                 case 0x0007:
                     entry.setPassword(readString(dataInput));

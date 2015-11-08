@@ -41,7 +41,7 @@ public class DomKeepassDatabase implements DatabaseProvider {
         try {
             // replace all placeholder dates with now
             String now = dateFormatter.format(new Date());
-            NodeList list = (NodeList) xpath.evaluate("//*[contains(text(),'${creationDate}')]",result.doc.getDocumentElement(), XPathConstants.NODESET);
+            NodeList list = (NodeList) xpath.evaluate("//*[contains(text(),'${creationDate}')]", result.doc.getDocumentElement(), XPathConstants.NODESET);
             for (int i = 0; i < list.getLength(); i++) {
                 list.item(i).setTextContent(now);
             }
@@ -61,16 +61,57 @@ public class DomKeepassDatabase implements DatabaseProvider {
         try {
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             doc = dBuilder.parse(inputStream);
+
+            // we need to decrypt all protected fields
+            // TODO we assume they are all strings, which is wrong
+            NodeList protectedContent = (NodeList) xpath.evaluate("//*[@Protected='True']", doc, XPathConstants.NODESET);
+            for (int i = 0; i < protectedContent.getLength(); i++){
+                Element element = ((Element) protectedContent.item(i));
+                String base64 = getElementContent(".", element);
+                byte[] encrypted = DatatypeConverter.parseBase64Binary(base64);
+                String decrypted = new String(encryption.decrypt(encrypted), "UTF-8");
+                setElementContent(".", element, decrypted);
+                element.removeAttribute("Protected");
+            }
+
             return this;
         } catch (ParserConfigurationException e) {
             throw new IllegalStateException("Instantiating Document Builder", e);
         } catch (SAXException e) {
             throw new IllegalStateException("Parsing exception", e);
+        } catch (XPathExpressionException e) {
+            throw new IllegalStateException("XPath Exception", e);
         }
     }
 
     @Override
     public void save(OutputStream outputStream) {
+
+        try {
+            // check whether protection is required and if so mark the element with @Protected='True'
+            prepareProtection("Title");
+            prepareProtection("UserName");
+            prepareProtection("Password");
+            prepareProtection("Notes");
+            prepareProtection("URL");
+
+            // encrypt and base64 every element marked as protected
+            NodeList protectedContent = (NodeList) xpath.evaluate("//*[@Protected='True']", doc, XPathConstants.NODESET);
+            for (int i = 0; i < protectedContent.getLength(); i++){
+                Element element = ((Element) protectedContent.item(i));
+                String decrypted = getElementContent(".", element);
+                if (decrypted == null) {
+                    decrypted = "";
+                }
+                byte[] encrypted = encryption.encrypt(decrypted.getBytes());
+                String base64 = DatatypeConverter.printBase64Binary(encrypted);
+                setElementContent(".", element, base64);
+            }
+
+        } catch (XPathExpressionException e) {
+            throw new IllegalStateException(e);
+        }
+
         Source xmlSource = new DOMSource(doc);
         Result outputTarget = new StreamResult(outputStream);
         try {
@@ -82,6 +123,23 @@ public class DomKeepassDatabase implements DatabaseProvider {
             transformer.transform(xmlSource, outputTarget);
         } catch (TransformerException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    private static final String protectQuery = "//Meta/MemoryProtection/Protect%s";
+    private static final String pattern = "//String/Key[text()='%s']/following-sibling::Value";
+    private void prepareProtection(String protect) throws XPathExpressionException {
+        // does this require encryption
+        String query = String.format(protectQuery, protect);
+        if (!((String) xpath.evaluate(query, doc, XPathConstants.STRING)).toLowerCase().equals("true")) {
+            return;
+        }
+        // mark the field as Protected but don't actually encrypt yet, that comes later
+        String path = String.format(pattern, protect);
+        NodeList nodelist = (NodeList) xpath.evaluate(path, doc, XPathConstants.NODESET);
+        for (int i = 0; i < nodelist.getLength(); i++) {
+            Element element = (Element) nodelist.item(i);
+            element.setAttribute("Protected", "True");
         }
     }
 

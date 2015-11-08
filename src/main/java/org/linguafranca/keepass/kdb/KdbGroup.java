@@ -170,6 +170,6 @@ public class KdbGroup extends AbstractGroup {
 
     public String toString() {
         String time = KdbDatabase.isoDateFormat.format(creationTime);
-        return getPath() + String.format("\"%s\" (%s) %s [%d]", name, uuid.toString(), time, flags);
+        return getPath() + String.format(" (%s) %s [%d]", uuid.toString(), time, flags);
     }
 }

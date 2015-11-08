@@ -2,6 +2,7 @@ package org.linguafranca.keepass.dom;
 
 import org.linguafranca.keepass.*;
 import org.linguafranca.keepass.AbstractDatabase;
+import org.linguafranca.keepass.kdbx.KdbxFormatter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -35,6 +36,10 @@ public class DomDatabaseWrapper extends AbstractDatabase {
         init();
     }
 
+    public static DomDatabaseWrapper load (Credentials credentials, InputStream inputStream) throws IOException {
+        return new DomDatabaseWrapper(new KdbxFormatter(), credentials, inputStream);
+    }
+
     private void init() {
         document = domDatabase.getDoc();
         try {
@@ -45,27 +50,20 @@ public class DomDatabaseWrapper extends AbstractDatabase {
         }
     }
 
+    public void save(Credentials credentials, OutputStream outputStream) throws IOException {
+        new KdbxFormatter().save(domDatabase, credentials, outputStream);
+    }
+
     public void save(Formatter formatter, Credentials credentials, OutputStream outputStream) throws IOException {
         formatter.save(domDatabase, credentials, outputStream);
     }
 
-    public boolean isProtected (String name) {
+    public boolean shouldProtect(String name) {
         Element protectionElement = getElement("MemoryProtection/Protect" + name, dbMeta, false);
         if (protectionElement == null) {
             return false;
         }
         return Boolean.valueOf(protectionElement.getTextContent());
-    }
-
-    public String decrypt(String value) {
-        byte[] binaryValue =  DatatypeConverter.parseBase64Binary(value);
-        byte[] decrypted = domDatabase.getEncryption().decrypt(binaryValue);
-        return new String(decrypted);
-    }
-
-    public String encrypt(String value) {
-        byte[] encypted = domDatabase.getEncryption().encrypt(value.getBytes());
-        return DatatypeConverter.printBase64Binary(encypted);
     }
 
     @Override

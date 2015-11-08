@@ -45,7 +45,7 @@ public interface Group {
 
     List<Entry> getEntries();
 
-    List<Entry> findEntries(String entry);
+    List<Entry> findEntries(String entry, boolean recursive);
 
     List<Entry> findEntries(Entry.Matcher matcher, boolean recursive);
 

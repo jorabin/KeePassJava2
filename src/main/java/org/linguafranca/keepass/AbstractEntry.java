@@ -16,8 +16,18 @@ public abstract class AbstractEntry implements Entry {
     }
 
     @Override
+    public  boolean matchUsername(String text){
+        return (getUsername().toLowerCase().contains(text.toLowerCase()));
+    }
+
+    @Override
+    public  boolean matchUrl(String text){
+        return (getUrl().toLowerCase().contains(text.toLowerCase()));
+    }
+
+    @Override
     public boolean match(String text) {
-        return matchTitle(text) || matchNote(text);
+        return matchTitle(text) || matchNote(text) || matchUrl(text) || matchUsername(text);
     }
 
     @Override

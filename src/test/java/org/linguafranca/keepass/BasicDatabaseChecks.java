@@ -1,7 +1,9 @@
 package org.linguafranca.keepass;
 
 import org.junit.Test;
+import org.linguafranca.keepass.dom.DomDatabaseWrapper;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,11 +66,11 @@ public class BasicDatabaseChecks {
     public void testAddRemoveEntry() {
         Entry e1 = database.getRootGroup().addEntry(database.newEntry());
         e1.setTitle("entry1");
-        List<Entry> l1 = database.getRootGroup().findEntries("entry1");
+        List<Entry> l1 = database.findEntries("entry1");
         assertTrue(l1.size() == 1);
 
         Entry e12 = database.getRootGroup().addEntry(database.newEntry("entry12"));
-        List<Entry> l2 = database.getRootGroup().findEntries("entry1");
+        List<Entry> l2 = database.findEntries("entry1");
         assertTrue(l2.size() == 2);
 
         // show that the entries are different
@@ -76,14 +78,14 @@ public class BasicDatabaseChecks {
 
         // show that the list is a copy
         l2.clear();
-        assertTrue(database.getRootGroup().findEntries("entry1").size() == 2);
+        assertTrue(database.findEntries("entry1").size() == 2);
 
         // show that we get an equivalent entry when we remove to when we inserted
         Entry e12b = database.getRootGroup().removeEntry(e12);
         assertTrue(e12b.equals(e12));
         // has been unhooked from parent
         assertTrue(e12.getParent() == null);
-        assertTrue(database.getRootGroup().findEntries("entry1").size() == 1);
+        assertTrue(database.findEntries("entry1").size() == 1);
     }
 
     @Test
@@ -153,5 +155,38 @@ public class BasicDatabaseChecks {
         List<String> l = e2.getPropertyNames();
         l.removeAll(Entry.STANDARD_PROPERTY_NAMES);
         assertEquals(0, l.size());
+    }
+
+    @Test
+    public void testCopy() throws IOException {
+        Entry entry1 = database.newEntry();
+        entry1.setTitle("Entry");
+        entry1.setUsername("Username");
+        entry1.setPassword("Password");
+        entry1.setUrl("http://dont.follow.me");
+        entry1.setNotes("Notes");
+        entry1.setIcon(database.newIcon(2));
+
+        // create a new Database
+        Database database2 = new DomDatabaseWrapper();
+        // create a new Entry in new Database
+        Entry entry2 = database2.newEntry(entry1);
+
+        assertEquals(entry1.getTitle(), entry2.getTitle());
+        assertEquals(entry1.getUsername(), entry2.getUsername());
+        assertEquals(entry1.getPassword(), entry2.getPassword());
+        assertEquals(entry1.getUrl(), entry2.getUrl());
+        assertEquals(entry1.getNotes(), entry2.getNotes());
+        assertEquals(entry1.getIcon(), entry2.getIcon());
+        assertNotEquals(entry1.getUuid(), entry2.getUuid());
+
+        Group group1 = database.newGroup();
+        group1.setName("Group");
+        group1.setIcon(database.newIcon(3));
+
+        Group group2 = database2.newGroup(group1);
+        assertEquals(group1.getName(), group2.getName());
+        assertEquals(group1.getIcon(), group2.getIcon());
+        assertNotEquals(group1.getUuid(), group2.getUuid());
     }
 }
