@@ -29,10 +29,9 @@ public class KdbxFormatter implements Formatter {
         String pass = new String(credentials.getPassword(), "UTF-8");
         // fresh kdbx header
         KdbxHeader kdbxHeader = new KdbxHeader();
-        // to avoid re-encrypting all memory protected fields we need to keep the same key
-        kdbxHeader.setProtectedStreamKey(databaseProvider.getEncryption().getKey());
         OutputStream unencrytedOutputStream = KdbxSerializer.createEncryptedOutputStream(pass, kdbxHeader, encryptedOutputStream);
         databaseProvider.setHeaderHash(kdbxHeader.getMessageDigest());
+        databaseProvider.setEncryption(new Salsa20Encryption(kdbxHeader.getProtectedStreamKey()));
         databaseProvider.save(unencrytedOutputStream);
         unencrytedOutputStream.flush();
         unencrytedOutputStream.close();

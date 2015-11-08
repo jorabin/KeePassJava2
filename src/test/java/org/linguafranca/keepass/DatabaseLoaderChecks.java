@@ -53,5 +53,14 @@ public class DatabaseLoaderChecks {
             assertEquals(passwordEntry.getTitle(), passwordEntry.getPassword());
             System.out.println(passwordEntry.getTitle());
         }
+
+        List<Entry> entries = database.findEntries(new Entry.Matcher() {
+            @Override
+            public boolean matches(Entry entry) {
+                return entry.getTitle().equals("hello world");
+            }});
+
+        assertEquals(1, entries.size());
+        assertEquals("pass", entries.get(0).getPassword());
     }
 }

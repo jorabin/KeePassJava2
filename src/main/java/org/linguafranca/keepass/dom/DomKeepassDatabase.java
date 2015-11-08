@@ -86,17 +86,17 @@ public class DomKeepassDatabase implements DatabaseProvider {
 
     @Override
     public void save(OutputStream outputStream) {
-
+        Document copyDoc = (Document) doc.cloneNode(true);
         try {
             // check whether protection is required and if so mark the element with @Protected='True'
-            prepareProtection("Title");
-            prepareProtection("UserName");
-            prepareProtection("Password");
-            prepareProtection("Notes");
-            prepareProtection("URL");
+            prepareProtection(copyDoc, "Title");
+            prepareProtection(copyDoc, "UserName");
+            prepareProtection(copyDoc, "Password");
+            prepareProtection(copyDoc, "Notes");
+            prepareProtection(copyDoc, "URL");
 
             // encrypt and base64 every element marked as protected
-            NodeList protectedContent = (NodeList) xpath.evaluate("//*[@Protected='True']", doc, XPathConstants.NODESET);
+            NodeList protectedContent = (NodeList) xpath.evaluate("//*[@Protected='True']", copyDoc, XPathConstants.NODESET);
             for (int i = 0; i < protectedContent.getLength(); i++){
                 Element element = ((Element) protectedContent.item(i));
                 String decrypted = getElementContent(".", element);
@@ -112,7 +112,7 @@ public class DomKeepassDatabase implements DatabaseProvider {
             throw new IllegalStateException(e);
         }
 
-        Source xmlSource = new DOMSource(doc);
+        Source xmlSource = new DOMSource(copyDoc);
         Result outputTarget = new StreamResult(outputStream);
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
@@ -128,7 +128,7 @@ public class DomKeepassDatabase implements DatabaseProvider {
 
     private static final String protectQuery = "//Meta/MemoryProtection/Protect%s";
     private static final String pattern = "//String/Key[text()='%s']/following-sibling::Value";
-    private void prepareProtection(String protect) throws XPathExpressionException {
+    private void prepareProtection(Document doc, String protect) throws XPathExpressionException {
         // does this require encryption
         String query = String.format(protectQuery, protect);
         if (!((String) xpath.evaluate(query, doc, XPathConstants.STRING)).toLowerCase().equals("true")) {
