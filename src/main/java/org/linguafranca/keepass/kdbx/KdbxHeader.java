@@ -79,62 +79,62 @@ public class KdbxHeader {
 
     /**
      * Get a final key digest according to the settings of this KDBX file
-     * @param password the password supplied
+     * @param digest the key digest
      * @return a digest
      */
-    public byte[] getFinalKeyDigest(String password) {
-        return Encryption.getFinalKeyDigest(password, getMasterSeed(), getTransformSeed(), getTransformRounds());
+    public byte[] getFinalKeyDigest(byte[] digest) {
+        return Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
     }
 
     /**
-     * Create a decrypted stream using the supplied password and encrypted input stream using the data contained
+     * Create a decrypted stream supplied digest and encrypted input stream using the data contained
      * in this instance.
-     * @param password the password
+     * @param digest the key digest
      * @param inputStream the encrypted input stream
      * @return a decrypted stream
      * @throws IOException
      */
-    public InputStream createDecryptedStream(String password, InputStream inputStream) throws IOException {
-        return createDecryptedStream(password, this, inputStream);
+    public InputStream createDecryptedStream(byte[] digest, InputStream inputStream) throws IOException {
+        return createDecryptedStream(digest, this, inputStream);
     }
 
     /**
      * Create a decrypted stream using the supplied password and encrypted input stream using the data contained
      * in the passed KdbxHeader instance
-     * @param password the password
+     * @param digest the key digest
      * @param header a kdbx header
      * @param inputStream the encrypted input stream
      * @return a decrypted stream
      * @throws IOException
      */
-    public static InputStream createDecryptedStream(String password, KdbxHeader header, InputStream inputStream) throws IOException {
-        Cipher cipher = Encryption.initCipher(Cipher.DECRYPT_MODE, header.getFinalKeyDigest(password), header.getEncryptionIv());
+    public static InputStream createDecryptedStream(byte[] digest, KdbxHeader header, InputStream inputStream) throws IOException {
+        Cipher cipher = Encryption.initCipher(Cipher.DECRYPT_MODE, header.getFinalKeyDigest(digest), header.getEncryptionIv());
         return new CipherInputStream(inputStream, cipher);
     }
 
     /**
      * Create an encrypted stream using the supplied password and unencrypted output stream using the data contained
      * in this instance
-     * @param password the password
+     * @param digest the key digest
      * @param outputStream the plain text output stream
      * @return a decrypted stream
      * @throws IOException
      */
-    public OutputStream createEncryptedStream(String password, OutputStream outputStream) throws IOException {
-        return createEncryptedStream(password, this, outputStream);
+    public OutputStream createEncryptedStream(byte[] digest, OutputStream outputStream) throws IOException {
+        return createEncryptedStream(digest, this, outputStream);
     }
 
     /**
      * Create an encrypted stream using the supplied password and unencrypted output stream using the data contained
      * in the passed KdbxHeader instance
-     * @param password the password
+     * @param digest the key digest
      * @param header a kdbx header
      * @param outputStream the plain text output stream
      * @return a decrypted stream
      * @throws IOException
      */
-    public static OutputStream createEncryptedStream(String password, KdbxHeader header, OutputStream outputStream) throws IOException {
-        Cipher cipher = Encryption.initCipher(Cipher.ENCRYPT_MODE, header.getFinalKeyDigest(password), header.getEncryptionIv());
+    public static OutputStream createEncryptedStream(byte[] digest, KdbxHeader header, OutputStream outputStream) throws IOException {
+        Cipher cipher = Encryption.initCipher(Cipher.ENCRYPT_MODE, header.getFinalKeyDigest(digest), header.getEncryptionIv());
         return new CipherOutputStream(outputStream, cipher);
     }
 

@@ -28,7 +28,7 @@ public class KdbDatabase extends AbstractDatabase {
     }
 
     public static KdbDatabase load(Credentials credentials, InputStream inputStream) throws IOException {
-        return KdbSerializer.createKdbDatabase(new String(credentials.getPassword(), "UTF-8"), new KdbHeader(), inputStream);
+        return KdbSerializer.createKdbDatabase(credentials, new KdbHeader(), inputStream);
     }
 
     /**

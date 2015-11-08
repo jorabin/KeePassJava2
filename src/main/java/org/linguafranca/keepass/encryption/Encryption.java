@@ -93,27 +93,26 @@ public class Encryption {
      * @param transformRounds the number of transform rounds
      * @return a digest
      */
+/*
     public static byte[] getFinalKeyDigest(String password, byte[] masterSeed, byte[] transformSeed, long transformRounds) {
         return getFinalKeyDigest(getDigest(password), masterSeed, transformSeed, transformRounds);
     }
+*/
 
     /**
      * Gets a digest for a digest transformed according to the parameters.
      *
      * <p>For kdb files the key is used directly, for KDBX files the key is a digest.
      *
-     * @param passwordDigest a key or key digest
+     * @param key a key
      * @param masterSeed the master seed
      * @param transformSeed the transform seed
      * @param transformRounds the number of transform rounds
      * @return a digest
      */
-    public static byte[] getFinalKeyDigest(byte[] passwordDigest, byte[] masterSeed, byte[] transformSeed, long transformRounds) {
+    public static byte[] getFinalKeyDigest(byte[] key, byte[] masterSeed, byte[] transformSeed, long transformRounds) {
 
         MessageDigest md = getMessageDigestInstance();
-        md.update(passwordDigest);
-        byte[] hashedPassword = md.digest();
-
         Cipher cipher = getCipherInstance("AES/ECB/NoPadding");
 
         try {
@@ -123,8 +122,8 @@ public class Encryption {
         }
 
         // Encrypt the key transformRounds times
-        byte[] inputKey = new byte[hashedPassword.length];
-        System.arraycopy(hashedPassword, 0, inputKey, 0, inputKey.length);
+        byte[] inputKey = new byte[key.length];
+        System.arraycopy(key, 0, inputKey, 0, inputKey.length);
         byte[] outputKey = new byte[inputKey.length];
         for (long rounds = 0; rounds < transformRounds; rounds++) {
             try {
@@ -135,15 +134,10 @@ public class Encryption {
             }
         }
 
-        // md.digest() resets the digest, but just in case get a new one
-        md = getMessageDigestInstance();
-        md.update(outputKey);
-        byte[] transformedPassword = md.digest();
+        byte[] transformedPassword = md.digest(outputKey);
 
-        md = getMessageDigestInstance();
         md.update(masterSeed);
-        md.update(transformedPassword);
-        return md.digest();
+        return md.digest(transformedPassword);
     }
 
     /**

@@ -16,7 +16,7 @@ public class KdbDatabaseLoaderTest extends DatabaseLoaderChecks {
         // get an input stream from kdbx file
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdb");
         // file has password credentials
-        Credentials credentials = new Credentials.Password("123");
+        Credentials credentials = new KdbCredentials.Password("123");
         // open database. DomDatabaseWrapper is so-called, since it wraps
         // a W3C DOM, populated from the KeePass XML, and presents it
         // through a org.linguafranca.keepass.Database interface.

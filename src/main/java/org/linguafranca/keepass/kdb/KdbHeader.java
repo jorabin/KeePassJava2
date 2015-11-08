@@ -35,12 +35,12 @@ public class KdbHeader {
     /**
      * Create a decrypted stream from an encrypted one
      *
-     * @param password credentials
+     * @param key key
      * @param inputStream an encrypted stream
      * @return a decrypted stream
      * @throws IOException
      */
-    public InputStream createDecryptedInputStream(String password, InputStream inputStream) throws IOException {
+    public InputStream createDecryptedInputStream(byte[] key, InputStream inputStream) throws IOException {
         Cipher cipher;
         if ((flags & FLAG_RIJNDAEL) != 0) {
             cipher = Encryption.getCipherInstance("AES/CBC/PKCS5Padding");
@@ -50,7 +50,7 @@ public class KdbHeader {
             throw new IllegalStateException("Encryption algorithm is not supported");
         }
 
-        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(password.getBytes(), masterSeed, transformSeed, transformRounds);
+        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(key, masterSeed, transformSeed, transformRounds);
         cipher = Encryption.initCipher(cipher, Cipher.DECRYPT_MODE, finalKeyDigest, encryptionIv);
         return new CipherInputStream(inputStream, cipher);
     }

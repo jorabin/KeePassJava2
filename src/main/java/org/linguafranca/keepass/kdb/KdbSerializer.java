@@ -1,6 +1,7 @@
 package org.linguafranca.keepass.kdb;
 
 import com.google.common.io.LittleEndianDataInputStream;
+import org.linguafranca.keepass.Credentials;
 import org.linguafranca.keepass.Group;
 import org.linguafranca.keepass.encryption.Encryption;
 
@@ -42,14 +43,14 @@ public class KdbSerializer {
     /**
      * Construct a KDB database from the supplied inputstream.
      *
-     * @param password the encryption key
+     * @param credentials the credentials
      * @param kdbHeader a header to be populated with values read from the stream
      * @param inputStream an inputStream to read from
      * @return a constructed KdbDatabase
      * @throws IOException if reading of the inputStream fails
      * @throws IllegalStateException if decoding of KDB format fails
      */
-    public static KdbDatabase createKdbDatabase(String password, KdbHeader kdbHeader, InputStream inputStream) throws IOException {
+    public static KdbDatabase createKdbDatabase(Credentials credentials, KdbHeader kdbHeader, InputStream inputStream) throws IOException {
         // everything is little endian
         DataInput dataInput = new LittleEndianDataInputStream(inputStream);
         // check the magic values to verify file type
@@ -58,7 +59,7 @@ public class KdbSerializer {
         deserializeHeader(kdbHeader, dataInput);
 
         // Create a decrypted stream from where we have read to
-        InputStream decryptedInputStream = kdbHeader.createDecryptedInputStream(password, inputStream);
+        InputStream decryptedInputStream = kdbHeader.createDecryptedInputStream(credentials.getKey(), inputStream);
 
         // Wrap the decrypted stream in a digest stream
         MessageDigest digest = Encryption.getMessageDigestInstance();

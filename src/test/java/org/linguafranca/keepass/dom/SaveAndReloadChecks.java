@@ -3,8 +3,9 @@ package org.linguafranca.keepass.dom;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.keepass.*;
+import org.linguafranca.keepass.kdb.KdbCredentials;
+import org.linguafranca.keepass.kdbx.KdbxCredentials;
 import org.linguafranca.keepass.kdbx.KdbxFormatter;
-import sun.jvm.hotspot.utilities.Assert;
 
 import java.io.*;
 import java.util.UUID;
@@ -24,10 +25,10 @@ public class SaveAndReloadChecks {
 
         File temp = File.createTempFile("temp", "temp");
         FileOutputStream fos = new FileOutputStream(temp);
-        output.save(new Credentials.Password("123"), fos);
+        output.save(new KdbxCredentials.Password("123".getBytes()), fos);
 
         FileInputStream fis = new FileInputStream(temp);
-        DomDatabaseWrapper input = DomDatabaseWrapper.load(new Credentials.Password("123"), fis);
+        DomDatabaseWrapper input = DomDatabaseWrapper.load(new KdbxCredentials.Password("123".getBytes()), fis);
 
         input.save(new KdbxFormatter.NoOp(), new Credentials.NoOp(), System.out);
 
@@ -80,7 +81,7 @@ public class SaveAndReloadChecks {
         DomDatabaseWrapper database = createNewDatabase();
 
         FileOutputStream outputStream = new FileOutputStream("compatibility.kdbx");
-        database.save(new Credentials.Password("123"), outputStream);
+        database.save(new KdbxCredentials.Password("123".getBytes()), outputStream);
     }
 
     /**

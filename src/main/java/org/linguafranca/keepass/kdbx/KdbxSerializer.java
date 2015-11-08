@@ -2,6 +2,7 @@ package org.linguafranca.keepass.kdbx;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
+import org.linguafranca.keepass.Credentials;
 import org.linguafranca.keepass.encryption.Encryption;
 import org.linguafranca.keepass.hashblock.*;
 
@@ -45,17 +46,17 @@ public class KdbxSerializer {
 
     /**
      * Provides the payload of a KDBX file as an unencrypted {@link InputStream}.
-     * @param password the password for the stream
+     * @param credentials credentials for decryption of the stream
      * @param kdbxHeader a header instance to be populated with values from the stream
      * @param inputStream a KDBX formatted input stream
      * @return an unencrypted input stream, to be read and closed by the caller
      * @throws IOException
      */
-    public static InputStream createUnencryptedInputStream(String password, KdbxHeader kdbxHeader, InputStream inputStream) throws IOException {
+    public static InputStream createUnencryptedInputStream(Credentials credentials, KdbxHeader kdbxHeader, InputStream inputStream) throws IOException {
 
         readKdbxHeader(kdbxHeader, inputStream);
 
-        InputStream decryptedInputStream = kdbxHeader.createDecryptedStream(password, inputStream);
+        InputStream decryptedInputStream = kdbxHeader.createDecryptedStream(credentials.getKey(), inputStream);
 
         checkStartBytes(kdbxHeader, decryptedInputStream);
 
@@ -69,17 +70,17 @@ public class KdbxSerializer {
 
     /**
      * Provides an {@link OutputStream} to be encoded and encrypted in KDBX format
-     * @param password the password to apply
+     * @param credentials credentials for encryption of the stream
      * @param kdbxHeader a KDBX header to control the formatting and encryption operation
      * @param outputStream output stream to contain the encrypted output
      * @return an unencrypted output stream, to be written to, flushed and closed by the caller
      * @throws IOException
      */
-    public static OutputStream createEncryptedOutputStream(String password, KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
+    public static OutputStream createEncryptedOutputStream(Credentials credentials, KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
 
         writeKdbxHeader(kdbxHeader, outputStream);
 
-        OutputStream encryptedOutputStream = kdbxHeader.createEncryptedStream(password, outputStream);
+        OutputStream encryptedOutputStream = kdbxHeader.createEncryptedStream(credentials.getKey(), outputStream);
 
         writeStartBytes(kdbxHeader, encryptedOutputStream);
 

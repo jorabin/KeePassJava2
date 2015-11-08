@@ -2,6 +2,7 @@ package org.linguafranca.keepass;
 
 import org.junit.Test;
 import org.linguafranca.keepass.dom.DomDatabaseWrapper;
+import org.linguafranca.keepass.kdbx.KdbxCredentials;
 import org.linguafranca.keepass.kdbx.KdbxFormatter;
 
 import java.io.FileInputStream;
@@ -45,7 +46,7 @@ public class VisitorTest {
     public void testLoadDB() {
         try {
             InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
-            DomDatabaseWrapper db = new DomDatabaseWrapper(new KdbxFormatter(), new Credentials.Password("123"), inputStream);
+            DomDatabaseWrapper db = new DomDatabaseWrapper(new KdbxFormatter(), new KdbxCredentials.Password("123".getBytes()), inputStream);
             db.visit(visitor);
 
             List<Entry> matched = db.findEntries(new Entry.Matcher() {

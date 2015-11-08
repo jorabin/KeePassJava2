@@ -17,8 +17,7 @@ public class KdbxFormatter implements Formatter {
     @Override
     public void load(DatabaseProvider databaseProvider, Credentials credentials, InputStream encryptedInputStream) throws IOException {
         KdbxHeader kdbxHeader = new KdbxHeader();
-        String pass = new String(credentials.getPassword(), "UTF-8");
-        InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(pass, kdbxHeader, encryptedInputStream);
+        InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, encryptedInputStream);
         databaseProvider.setEncryption(new Salsa20Encryption(kdbxHeader.getProtectedStreamKey()));
         databaseProvider.load(decryptedInputStream);
         decryptedInputStream.close();
@@ -26,10 +25,9 @@ public class KdbxFormatter implements Formatter {
 
     @Override
     public void save(DatabaseProvider databaseProvider, Credentials credentials, OutputStream encryptedOutputStream) throws IOException {
-        String pass = new String(credentials.getPassword(), "UTF-8");
         // fresh kdbx header
         KdbxHeader kdbxHeader = new KdbxHeader();
-        OutputStream unencrytedOutputStream = KdbxSerializer.createEncryptedOutputStream(pass, kdbxHeader, encryptedOutputStream);
+        OutputStream unencrytedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, encryptedOutputStream);
         databaseProvider.setHeaderHash(kdbxHeader.getMessageDigest());
         databaseProvider.setEncryption(new Salsa20Encryption(kdbxHeader.getProtectedStreamKey()));
         databaseProvider.save(unencrytedOutputStream);

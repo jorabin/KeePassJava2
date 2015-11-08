@@ -1,6 +1,7 @@
 package org.linguafranca.keepass.kdbx;
 
 import org.junit.Test;
+import org.linguafranca.keepass.Credentials;
 import org.linguafranca.keepass.kdbx.KdbxHeader;
 import org.linguafranca.keepass.kdbx.KdbxSerializer;
 
@@ -17,7 +18,8 @@ public class KdbxSerializerTest {
     @Test
     public void testGetPlainTextInputStream() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
-        InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream("123", new KdbxHeader(), inputStream);
+        Credentials credentials = new KdbxCredentials.Password("123".getBytes());
+        InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         byte[] buffer = new byte[1024];
         while ( decryptedInputStream.available() > 0) {
             int read = decryptedInputStream.read(buffer);
@@ -30,13 +32,14 @@ public class KdbxSerializerTest {
     public void testCypherTextOutputStream() throws Exception {
         File tempFile = File.createTempFile("test", "test");
         OutputStream testStream = new FileOutputStream(tempFile);
-        OutputStream outputStream = KdbxSerializer.createEncryptedOutputStream("123", new KdbxHeader(), testStream);
+        Credentials credentials = new KdbxCredentials.Password("123".getBytes());
+        OutputStream outputStream = KdbxSerializer.createEncryptedOutputStream(credentials, new KdbxHeader(), testStream);
 
         outputStream.write("Hello World\n".getBytes());
         outputStream.flush();
         outputStream.close();
 
-        InputStream inputStream = KdbxSerializer.createUnencryptedInputStream("123", new KdbxHeader(), new FileInputStream(tempFile));
+        InputStream inputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), new FileInputStream(tempFile));
         Scanner scanner = new Scanner(inputStream);
         assertEquals("Hello World", scanner.nextLine());
     }
