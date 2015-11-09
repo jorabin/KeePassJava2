@@ -18,6 +18,8 @@ import java.io.OutputStream;
 
 import static org.linguafranca.db.kdbx.dom.DomHelper.*;
 /**
+ * The class wraps a {@link DomSerializableDatabase} as a {@link org.linguafranca.db.Database}.
+ *
  * @author jo
  */
 public class DomDatabaseWrapper extends AbstractDatabase {

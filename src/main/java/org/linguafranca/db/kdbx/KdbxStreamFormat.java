@@ -7,6 +7,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
+ * This class implements KDBX formatted saving and loading of databases
+ *
  * @author jo
  */
 public class KdbxStreamFormat implements StreamFormat {

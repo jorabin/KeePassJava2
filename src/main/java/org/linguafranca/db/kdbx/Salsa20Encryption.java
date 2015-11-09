@@ -13,8 +13,8 @@ import java.security.MessageDigest;
  *
  * <p>Salsa20 doesn't quite fit the memory model
  * supposed by SerializableDatabase.Encryption - all encrypted
- * items have to be decrypted in order of encryption,
- * essentially in document order and at the same time.
+ * items have to be en/decrypted in order of encryption,
+ * i.e. in document order and at the same time.
  *
  * <p>The encrypt and decrypt methods
  * actually do the same thing. They are here

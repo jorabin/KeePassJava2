@@ -15,27 +15,30 @@ import java.util.UUID;
 /**
  * This class represents the header portion of a Keepass KDBX file or stream. The header is received in
  * plain text and describes the encryption and compression of the remainder of the file.
- * <p/>
- * When transferred, the values of the header are represented in little-endian order. The values
- * stored in this class are big-endian i.e. they need to be converted before or after use (e.g.
- * by using a {@link com.google.common.io.LittleEndianDataInputStream} or
- * {@link com.google.common.io.LittleEndianDataOutputStream}).
- * <p/>
+ *
+ * <p>It is a factory for encryption and decryption streams and contains a hash of its own serialization.
+ *
+ * <p>While KDBX streams are Little-Endian, data is passed to and from this class in standard Java byte order.
+ *
  * @author jo
  */
 public class KdbxHeader {
 
     /**
-     * The numeric 0 represents uncompressed and 1 GZip compressed
+     * The ordinal 0 represents uncompressed and 1 GZip compressed
      */
     public enum CompressionFlags {
         NONE, GZIP
     }
 
     /**
-     * The ordinals represent various types of encryption that may be applied to fields
+     * The ordinals represent various types of encryption that may
+     * be applied to fields within the unencrypted data
+     *
+     * @see StreamFormat
+     * @see KdbxStreamFormat
      */
-    public enum CrsAlgorithm {
+    public enum ProtectedStreamAlgorithm {
         NONE, ARC_FOUR, SALSA_20
     }
 
@@ -45,7 +48,7 @@ public class KdbxHeader {
     public static final UUID AES_CIPHER = UUID.fromString("31C1F2E6-BF71-4350-BE58-05216AFC5AFF");
 
     /* the cipher in use */
-    private UUID cipher;
+    private UUID cipherUuid;
     /* whether the data is compressed */
     private CompressionFlags compressionFlags;
     private byte [] masterSeed;
@@ -53,9 +56,9 @@ public class KdbxHeader {
     private long transformRounds;
     private byte[] encryptionIv;
     private byte[] protectedStreamKey;
+    private ProtectedStreamAlgorithm protectedStreamAlgorithm;
     /* these bytes appear in cipher text immediately following the header */
     private byte[] streamStartBytes;
-    private CrsAlgorithm crsAlgorithm;
     /* not transmitted as part of the header, used in the XML payload, so calculated
      * on transmission or receipt */
     private byte[] headerHash;
@@ -65,7 +68,7 @@ public class KdbxHeader {
      */
     public KdbxHeader() {
         SecureRandom random = new SecureRandom();
-        cipher = AES_CIPHER;
+        cipherUuid = AES_CIPHER;
         compressionFlags = CompressionFlags.GZIP;
         masterSeed = random.generateSeed(32);
         transformSeed = random.generateSeed(32);
@@ -73,72 +76,40 @@ public class KdbxHeader {
         encryptionIv = random.generateSeed(16);
         protectedStreamKey = random.generateSeed(32);
         streamStartBytes = new byte[32];
-        crsAlgorithm = CrsAlgorithm.SALSA_20;
+        protectedStreamAlgorithm = ProtectedStreamAlgorithm.SALSA_20;
     }
 
     /**
-     * Get a final key digest according to the settings of this KDBX file
-     * @param digest the key digest
-     * @return a digest
-     */
-    public byte[] getFinalKeyDigest(byte[] digest) {
-        return Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
-    }
-
-    /**
-     * Create a decrypted stream supplied digest and encrypted input stream using the data contained
-     * in this instance.
+     * Create a decrypted input stream using supplied digest and this header
+     * apply decryption to the passed encrypted input stream
+     *
      * @param digest the key digest
      * @param inputStream the encrypted input stream
      * @return a decrypted stream
      * @throws IOException
      */
     public InputStream createDecryptedStream(byte[] digest, InputStream inputStream) throws IOException {
-        return createDecryptedStream(digest, this, inputStream);
-    }
-
-    /**
-     * Create a decrypted stream using the supplied password and encrypted input stream using the data contained
-     * in the passed KdbxHeader instance
-     * @param digest the key digest
-     * @param header a kdbx header
-     * @param inputStream the encrypted input stream
-     * @return a decrypted stream
-     * @throws IOException
-     */
-    public static InputStream createDecryptedStream(byte[] digest, KdbxHeader header, InputStream inputStream) throws IOException {
-        Cipher cipher = Encryption.initCipher(Cipher.DECRYPT_MODE, header.getFinalKeyDigest(digest), header.getEncryptionIv());
+        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
+        Cipher cipher = Encryption.initCipher(Cipher.DECRYPT_MODE, finalKeyDigest, getEncryptionIv());
         return new CipherInputStream(inputStream, cipher);
     }
 
     /**
-     * Create an encrypted stream using the supplied password and unencrypted output stream using the data contained
-     * in this instance
+     * Create an unencrypted outputstream using the supplied digest and this header
+     * and use the supplied output stream to write encypted data.
      * @param digest the key digest
-     * @param outputStream the plain text output stream
-     * @return a decrypted stream
+     * @param outputStream the output stream which is the destination for encrypted data
+     * @return an output stream to write unencrypted data to
      * @throws IOException
      */
     public OutputStream createEncryptedStream(byte[] digest, OutputStream outputStream) throws IOException {
-        return createEncryptedStream(digest, this, outputStream);
-    }
-
-    /**
-     * Create an encrypted stream using the supplied password and unencrypted output stream using the data contained
-     * in the passed KdbxHeader instance
-     * @param digest the key digest
-     * @param header a kdbx header
-     * @param outputStream the plain text output stream
-     * @return a decrypted stream
-     * @throws IOException
-     */
-    public static OutputStream createEncryptedStream(byte[] digest, KdbxHeader header, OutputStream outputStream) throws IOException {
-        Cipher cipher = Encryption.initCipher(Cipher.ENCRYPT_MODE, header.getFinalKeyDigest(digest), header.getEncryptionIv());
+        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
+        Cipher cipher = Encryption.initCipher(Cipher.ENCRYPT_MODE, finalKeyDigest, getEncryptionIv());
         return new CipherOutputStream(outputStream, cipher);
     }
 
-    public UUID getCipher() {
-        return cipher;
+    public UUID getCipherUuid() {
+        return cipherUuid;
     }
 
     public CompressionFlags getCompressionFlags() {
@@ -169,21 +140,21 @@ public class KdbxHeader {
         return streamStartBytes;
     }
 
-    public CrsAlgorithm getCrsAlgorithm() {
-        return crsAlgorithm;
+    public ProtectedStreamAlgorithm getProtectedStreamAlgorithm() {
+        return protectedStreamAlgorithm;
     }
 
     public byte[] getHeaderHash() {
         return headerHash;
     }
 
-    public void setCipher(byte[] uuid) {
+    public void setCipherUuid(byte[] uuid) {
         ByteBuffer b = ByteBuffer.wrap(uuid);
         UUID incoming = new UUID(b.getLong(), b.getLong(8));
         if (!incoming.equals(AES_CIPHER)) {
             throw new IllegalStateException("Unknown Cipher UUID " + incoming.toString());
         }
-        this.cipher = incoming;
+        this.cipherUuid = incoming;
     }
 
     public void setCompressionFlags(int flags) {
@@ -215,7 +186,7 @@ public class KdbxHeader {
     }
 
     public void setInnerRandomStreamId(int innerRandomStreamId) {
-        this.crsAlgorithm = CrsAlgorithm.values()[innerRandomStreamId];
+        this.protectedStreamAlgorithm = ProtectedStreamAlgorithm.values()[innerRandomStreamId];
     }
 
     public void setHeaderHash(byte[] headerHash) {

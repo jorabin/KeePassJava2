@@ -21,7 +21,7 @@ public class KdbxKeyFile {
 
     /**
      * Load a key from an InputStream with a KDBX XML key file.
-     * @param inputStream the inputstream holding the key
+     * @param inputStream the input stream holding the key
      * @return they key or null if there was a problem
      */
     public static byte[] load(InputStream inputStream) {

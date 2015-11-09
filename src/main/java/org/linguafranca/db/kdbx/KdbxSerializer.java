@@ -76,7 +76,7 @@ public class KdbxSerializer {
      * Provides an {@link OutputStream} to be encoded and encrypted in KDBX format
      * @param credentials credentials for encryption of the stream
      * @param kdbxHeader a KDBX header to control the formatting and encryption operation
-     * @param outputStream output stream to contain the encrypted output
+     * @param outputStream output stream to contain the KDBX formatted output
      * @return an unencrypted output stream, to be written to, flushed and closed by the caller
      * @throws IOException
      */
@@ -186,7 +186,7 @@ public class KdbxSerializer {
                     break;
 
                 case HeaderType.CIPHER_ID:
-                    kdbxHeader.setCipher(getByteArray(ledis));
+                    kdbxHeader.setCipherUuid(getByteArray(ledis));
                     break;
 
                 case HeaderType.COMPRESSION_FLAGS:
@@ -254,8 +254,8 @@ public class KdbxSerializer {
         ledos.writeShort(16);
         byte[] b = new byte[16];
         ByteBuffer bb = ByteBuffer.wrap(b);
-        bb.putLong(kdbxHeader.getCipher().getMostSignificantBits());
-        bb.putLong(8, kdbxHeader.getCipher().getLeastSignificantBits());
+        bb.putLong(kdbxHeader.getCipherUuid().getMostSignificantBits());
+        bb.putLong(8, kdbxHeader.getCipherUuid().getLeastSignificantBits());
         ledos.write(b);
 
         ledos.writeByte(HeaderType.COMPRESSION_FLAGS);
@@ -288,7 +288,7 @@ public class KdbxSerializer {
 
         ledos.writeByte(HeaderType.INNER_RANDOM_STREAM_ID);
         ledos.writeShort(4);
-        ledos.writeInt(kdbxHeader.getCrsAlgorithm().ordinal());
+        ledos.writeInt(kdbxHeader.getProtectedStreamAlgorithm().ordinal());
 
         ledos.writeByte(HeaderType.END);
         ledos.writeShort(0);

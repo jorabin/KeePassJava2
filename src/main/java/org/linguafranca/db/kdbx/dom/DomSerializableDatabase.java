@@ -1,7 +1,7 @@
 package org.linguafranca.db.kdbx.dom;
 
-import org.linguafranca.db.kdbx.SerializableDatabase;
 import org.linguafranca.db.kdbx.Salsa20Encryption;
+import org.linguafranca.db.kdbx.SerializableDatabase;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -17,14 +17,22 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
-import java.io.*;
-import java.security.MessageDigest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.SecureRandom;
 import java.util.Date;
 
 import static org.linguafranca.db.kdbx.dom.DomHelper.*;
 
 /**
+ * This class is an XML DOM implementation of a KDBX database. The data is maintained as a DOM,
+ * despite the obvious inefficiency of doing do, in order to maintain transparency on loading and
+ * saving of elements and attributes this implementation knows nothing about.
+ *
+ * <p>Obviously, perhaps, if the database is added to, or under certain types of modification,
+ * those elements will be missing from a re-serialization.
+ *
  * @author jo
  */
 public class DomSerializableDatabase implements SerializableDatabase {
@@ -36,7 +44,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
 
     public static DomSerializableDatabase createEmptyDatabase() throws IOException {
         DomSerializableDatabase result = new DomSerializableDatabase();
-        // read in the template keepass xml database
+        // read in the template KeePass XML database
         result.load(result.getClass().getClassLoader().getResourceAsStream("base.kdbx.xml"));
         try {
             // replace all placeholder dates with now

@@ -199,11 +199,4 @@ public class DomEntryWrapper extends AbstractEntry {
         return element.equals(that.element) && database.equals(that.database);
 
     }
-
-    @Override
-    public int hashCode() {
-        int result = element.hashCode();
-        result = 31 * result + database.hashCode();
-        return result;
-    }
 }

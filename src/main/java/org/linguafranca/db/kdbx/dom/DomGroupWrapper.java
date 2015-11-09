@@ -78,8 +78,8 @@ public class DomGroupWrapper extends AbstractGroup {
     public List<Group> getGroups() {
         List<Element> elements = getElements(GROUP_ELEMENT_NAME, this.element);
         List<Group> result = new ArrayList<>(elements.size());
-        for (Element element: elements){
-            result.add(new DomGroupWrapper(element, database));
+        for (Element e: elements){
+            result.add(new DomGroupWrapper(e, database));
         }
         return result;
     }
@@ -126,8 +126,8 @@ public class DomGroupWrapper extends AbstractGroup {
     public List<Entry> getEntries() {
         List<Element> elements = getElements(ENTRY_ELEMENT_NAME, this.element);
         List<Entry> entries = new ArrayList<>(elements.size());
-        for(Element element: elements) {
-            entries.add(new DomEntryWrapper(element, database));
+        for(Element e: elements) {
+            entries.add(new DomEntryWrapper(e, database));
         }
         return entries;
     }
@@ -156,12 +156,5 @@ public class DomGroupWrapper extends AbstractGroup {
 
         return element.equals(that.element) && database.equals(that.database);
 
-    }
-
-    @Override
-    public int hashCode() {
-        int result = element.hashCode();
-        result = 31 * result + database.hashCode();
-        return result;
     }
 }

@@ -16,11 +16,16 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
+ * The class contains static helper methods for access to the underlying XML DOM
+ *
  * @author jo
  */
 public class DomHelper {
+
     static XPath xpath = XPathFactory.newInstance().newXPath();
+
     static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
     static final String GROUP_ELEMENT_NAME = "Group";
     static final String ENTRY_ELEMENT_NAME = "Entry";
     static final String ICON_ELEMENT_NAME = "IconID";
@@ -57,12 +62,14 @@ public class DomHelper {
             return value;
         }
     }
+
     static class DateValueCreator implements ValueCreator {
         @Override
         public String getValue() {
             return dateFormatter.format(new Date());
         }
     }
+
     static class UuidValueCreator implements ValueCreator {
         @Override
         public String getValue() {
@@ -70,8 +77,6 @@ public class DomHelper {
         }
 
     }
-
-
 
     static void ensureElements (Element element, Map<String, ValueCreator> childElements) {
         for (Map.Entry<String, ValueCreator> entry: childElements.entrySet()) {
