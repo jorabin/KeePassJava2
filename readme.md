@@ -1,6 +1,6 @@
 # KeePassJava2
 
-A Java 7 API for databases compatible with the renowned KeePass password
+A Java 7 API for databases compatible with the renowned [KeePass](http://keepass.info) password
 safe for Windows. It can read and write KeePass 2.x and can read KeePass 1.x formats.
 
 It is licensed under the Apache 2 License and is currently in a pre-release
