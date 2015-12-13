@@ -36,7 +36,7 @@ how to use the methods of those classes to create and modifty entries.
         // get an input stream
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
         // password credentials
-        Credentials credentials = new Credentials.Password("123");
+        Credentials credentials = new KdbxCredentials.Password("123".getBytes());
         // open database
         Database database = new DomDatabaseWrapper(credentials, inputStream);
 
@@ -65,7 +65,7 @@ how to use the methods of those classes to create and modifty entries.
 
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test.kdb");
         // password credentials
-        Credentials credentials = new Credentials.Password("123");
+        Credentials credentials = new KdbCredentials.Password("123".getBytes());
         // load KdbDatabase
         Database database = KdbDatabase.load(credentials, inputStream);
 
