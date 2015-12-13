@@ -1,3 +1,19 @@
+/*
+ * Copyright 2015 Jo Rabin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.linguafranca.db;
 
 import java.util.List;
@@ -8,14 +24,22 @@ import java.util.List;
  * allowed as children of any group.
  *
  * <p>A database is a factory for new Groups and Entries. Groups and entries belonging
- * to one databsae cannot in general be added to another database, they need to be
+ * to one database cannot in general be added to another database, they need to be
  * copied using {@link #newGroup(Group)} and {@link #newEntry(Entry)}.
  *
- * <p>Databases may be navigated directly from the root, or using a {@link Visitor} and
- * {@link #visit(Visitor)}.
+ * <p>Databases may be navigated directly from the root {@link #getRootGroup()},
+ * or using a {@link Visitor} and {@link #visit(Visitor)} or {@link #visit(Group, Visitor)}
+ * to start the visit at a particular group.
  *
- * <p>All Lists provided by all interfaces my be modified by the caller without
- * affecting the underlying database structure.
+ * <p>A list of entries that match a string or some custom criteria may be obtained using
+ * the {@link #findEntries(Entry.Matcher)} and {@link #findEntries(String)} methods.
+ *
+ * <p>To match (optionally recursively) entries in a {@link Group} use
+ * {@link Group#findEntries(String, boolean)} or {@link Group#findEntries(Entry.Matcher, boolean)}.
+ *
+ * <p>All Lists provided returned by methods of all interfaces may be modified by
+ * the caller without affecting the underlying database structure, however changes
+ * to the Groups and Entries contained in the lists do modify the database.
  */
 public interface Database {
 

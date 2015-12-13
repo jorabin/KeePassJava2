@@ -1,3 +1,19 @@
+/*
+ * Copyright 2015 Jo Rabin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.linguafranca.db;
 
 import java.util.*;
@@ -75,7 +91,7 @@ public interface Entry {
 
     /**
      * Returns an XPath-like representation of this
-     * entry's ancestor groups and the tile of this entry.
+     * entry's ancestor groups and the title of this entry.
      */
     String getPath();
 
@@ -96,8 +112,8 @@ public interface Entry {
      *
      * @param name the name of the property to set
      * @param value the value to set it to
-     * @throws UnsupportedOperationException if the name is not one of the standard properties and properties
-     * are not supported
+     * @throws UnsupportedOperationException if the name is not one of the standard properties and
+     * non-standard properties are not supported.
      */
     void setProperty(String name, String value);
 
@@ -117,7 +133,8 @@ public interface Entry {
     Group getParent();
 
     /**
-     * Get the UUID of this entry
+     * Get the UUID of this entry. Databases (like KDB) that do not natively support
+     * UUIDs must provide a surrogate here.
      *
      * @return a UUID
      */
@@ -160,22 +177,79 @@ public interface Entry {
      */
     void setPassword(String pass);
 
+    /**
+     * Gets the URL for this entry.
+     *
+     * <p>Implementations should Touch LastAccessedTime when this method is called.
+     *
+     * @return a string representation of a URL
+     */
     String getUrl();
 
+    /**
+     * Sets the url for this Entry.
+     *
+     * <p>Implementations should Touch LastModifiedTime when this method is called.
+     *
+     * @param url the value to set
+     */
     void setUrl(String url);
 
+    /**
+     * Returns true if this url to lowercase contains the passed url to lowercase.
+     * @param url a string to match
+     * @return true if matches
+     */
     boolean matchUrl(String url);
 
+    /**
+     * Gets the title of this entry.
+     *
+     * <p>Implementations should Touch LastAccessedTime when this method is called.
+     *
+     * @return a title
+     */
     String getTitle();
 
+    /**
+     * Sets the title for this Entry.
+     *
+     * <p>Implementations should Touch LastModifiedTime when this method is called.
+     *
+     * @param title the value to set
+     */
     void setTitle(String title);
 
+    /**
+     * Returns true if this title to lowercase contains the passed title to lowercase.
+     * @param text a string to match
+     * @return true if matches
+     */
     boolean matchTitle(String text);
 
+    /**
+     * Gets the notes field for this entry.
+     *
+     * <p>Implementations should Touch LastAccessedTime when this method is called.
+     *
+     * @return the notes field
+     */
     String getNotes();
 
+    /**
+     * Sets the notes for this Entry.
+     *
+     * <p>Implementations should Touch LastModifiedTime when this method is called.
+     *
+     * @param notes the value to set
+     */
     void setNotes(String notes);
 
+    /**
+     * Returns true if the notes to lowercase contains the passed string to lowercase.
+     * @param text a string to match
+     * @return true if matches
+     */
     boolean matchNotes(String text);
 
     Icon getIcon();
