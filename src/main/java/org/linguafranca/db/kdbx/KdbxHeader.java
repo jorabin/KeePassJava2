@@ -102,7 +102,7 @@ public class KdbxHeader {
      * @throws IOException
      */
     public InputStream createDecryptedStream(byte[] digest, InputStream inputStream) throws IOException {
-        byte[] finalKeyDigest = Encryption.getBcFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
+        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
         return Encryption.getDecryptedInputStream(inputStream, finalKeyDigest, getEncryptionIv());
     }
 
@@ -115,7 +115,7 @@ public class KdbxHeader {
      * @throws IOException
      */
     public OutputStream createEncryptedStream(byte[] digest, OutputStream outputStream) throws IOException {
-        byte[] finalKeyDigest = Encryption.getBcFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
+        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
         return Encryption.getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
     }
 

@@ -42,7 +42,7 @@ import java.util.UUID;
  * <li>In an Encrypted form:</li>
  * <ol>
  * <li>Repeated serialised form of all Groups</li>
- * <li>Repeated serialised form of all entries</li>
+ * <li>Repeated serialised form of all Entries</li>
  * </ol>
  * </ol>
  *

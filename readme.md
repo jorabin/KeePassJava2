@@ -7,11 +7,11 @@ Features to date:
 
 - Read and write KeePass 2.x format
 - Keepass 2.x Password and Keyfile Credentials
-- Read KeePass 1.x format
+- Read KeePass 1.x format (Rijndael only)
+- *No* requirement for JCE Policy Files
 - Interfaces for Database, Group and Entry allow compatible addition of other formats
 
-It is licensed under the Apache 2 License and is currently in a pre-release
-stage of development, **you are especially warned to take care when using it**.
+It is licensed under the Apache 2 License and is currently usable.
 
     The work is provided on an "AS IS" BASIS, WITHOUT
     WARRANTIES OR CONDITIONS OF ANY KIND, either express or
@@ -79,17 +79,6 @@ how to use the methods of those classes to create and modifty entries.
         // visit all groups and entries and list them to console
         database.visit(new Database.PrintVisitor());
 
-
-## Java Cryptography Extensions
-
-Java Cryptography Extensions are required, as 256 bit encryption is used.
-
-Download the approriate version:
-- [Java 7](http://www.oracle.com/technetwork/java/javase/downloads/jce-7-download-432124.html)
-- [Java 8](http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html)
-
-and open the Zip file which contains a README describing where the jar files
-need to go.
 
 ## Dependencies
 

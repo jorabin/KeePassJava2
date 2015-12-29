@@ -32,13 +32,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * A number of utilities whose partial purpose is to wrap
- * Checked Exceptions into unchecked {@link
- * IllegalStateException}s to allow for more readable code.
- *
- * <p>There is no point in cluttering up calling classes with
- * checked exception handling for repeated calls that
- * have previously succeeded.
+ * Encryption and decryption utilities..
  *
  * @author jo
  */
@@ -96,7 +90,7 @@ public class Encryption {
     /**
      * Create a final key from the parameters passed
      */
-    public static byte[] getBcFinalKeyDigest(byte[] key, byte[] masterSeed, byte[] transformSeed, long transformRounds) {
+    public static byte[] getFinalKeyDigest(byte[] key, byte[] masterSeed, byte[] transformSeed, long transformRounds) {
 
         AESEngine engine = new AESEngine();
         engine.init(true, new KeyParameter(transformSeed));

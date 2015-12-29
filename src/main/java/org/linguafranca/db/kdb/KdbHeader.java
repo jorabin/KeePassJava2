@@ -19,7 +19,6 @@ package org.linguafranca.db.kdb;
 import org.linguafranca.security.Encryption;
 
 import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -62,7 +61,7 @@ public class KdbHeader {
             throw new IllegalStateException("Encryption algorithm is not supported");
         }
 
-        byte[] finalKeyDigest = Encryption.getBcFinalKeyDigest(key, masterSeed, transformSeed, transformRounds);
+        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(key, masterSeed, transformSeed, transformRounds);
         return Encryption.getDecryptedInputStream(inputStream, finalKeyDigest, encryptionIv);
     }
 
