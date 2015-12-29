@@ -45,7 +45,7 @@ how to use the methods of those classes to create and modifty entries.
         // password credentials
         Credentials credentials = new KdbxCredentials.Password("123".getBytes());
         // open database
-        Database database = new DomDatabaseWrapper(credentials, inputStream);
+        Database database = DomDatabaseWrapper.load(credentials, inputStream);
 
         // visit all groups and entries and list them to console
         database.visit(new Database.PrintVisitor());
