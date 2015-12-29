@@ -58,17 +58,12 @@ public class KdbHeader {
      */
     public InputStream createDecryptedInputStream(byte[] key, InputStream inputStream) throws IOException {
         Cipher cipher;
-        if ((flags & FLAG_RIJNDAEL) != 0) {
-            cipher = Encryption.getCipherInstance("AES/CBC/PKCS5Padding");
-        } else if ((flags & FLAG_TWOFISH) != 0) {
-            cipher = Encryption.getCipherInstance("TWOFISH/CBC/PKCS7PADDING");
-        } else {
+        if ((flags & FLAG_RIJNDAEL) == 0) {
             throw new IllegalStateException("Encryption algorithm is not supported");
         }
 
-        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(key, masterSeed, transformSeed, transformRounds);
-        cipher = Encryption.initCipher(cipher, Cipher.DECRYPT_MODE, finalKeyDigest, encryptionIv);
-        return new CipherInputStream(inputStream, cipher);
+        byte[] finalKeyDigest = Encryption.getBcFinalKeyDigest(key, masterSeed, transformSeed, transformRounds);
+        return Encryption.getDecryptedInputStream(inputStream, finalKeyDigest, encryptionIv);
     }
 
     public int getFlags() {

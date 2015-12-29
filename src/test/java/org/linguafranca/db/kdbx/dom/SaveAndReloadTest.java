@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author jo
  */
-public class SaveAndReloadChecks {
+public class SaveAndReloadTest {
 
 
     @Test

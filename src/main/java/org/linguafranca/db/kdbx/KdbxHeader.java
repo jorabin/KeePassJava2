@@ -18,9 +18,6 @@ package org.linguafranca.db.kdbx;
 
 import org.linguafranca.security.Encryption;
 
-import javax.crypto.Cipher;
-import javax.crypto.CipherInputStream;
-import javax.crypto.CipherOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,7 +26,7 @@ import java.security.SecureRandom;
 import java.util.UUID;
 
 /**
- * This class represents the header portion of a Keepass KDBX file or stream. The header is received in
+ * This class represents the header portion of a KeePass KDBX file or stream. The header is received in
  * plain text and describes the encryption and compression of the remainder of the file.
  *
  * <p>It is a factory for encryption and decryption streams and contains a hash of its own serialization.
@@ -105,23 +102,21 @@ public class KdbxHeader {
      * @throws IOException
      */
     public InputStream createDecryptedStream(byte[] digest, InputStream inputStream) throws IOException {
-        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
-        Cipher cipher = Encryption.initCipher(Cipher.DECRYPT_MODE, finalKeyDigest, getEncryptionIv());
-        return new CipherInputStream(inputStream, cipher);
+        byte[] finalKeyDigest = Encryption.getBcFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
+        return Encryption.getDecryptedInputStream(inputStream, finalKeyDigest, getEncryptionIv());
     }
 
     /**
      * Create an unencrypted outputstream using the supplied digest and this header
-     * and use the supplied output stream to write encypted data.
+     * and use the supplied output stream to write encrypted data.
      * @param digest the key digest
      * @param outputStream the output stream which is the destination for encrypted data
      * @return an output stream to write unencrypted data to
      * @throws IOException
      */
     public OutputStream createEncryptedStream(byte[] digest, OutputStream outputStream) throws IOException {
-        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
-        Cipher cipher = Encryption.initCipher(Cipher.ENCRYPT_MODE, finalKeyDigest, getEncryptionIv());
-        return new CipherOutputStream(outputStream, cipher);
+        byte[] finalKeyDigest = Encryption.getBcFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
+        return Encryption.getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
     }
 
     public UUID getCipherUuid() {

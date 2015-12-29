@@ -16,15 +16,20 @@
 
 package org.linguafranca.security;
 
-import org.jetbrains.annotations.NotNull;
+import org.bouncycastle.crypto.engines.AESEngine;
+import org.bouncycastle.crypto.engines.AESFastEngine;
+import org.bouncycastle.crypto.io.CipherInputStream;
+import org.bouncycastle.crypto.io.CipherOutputStream;
+import org.bouncycastle.crypto.modes.CBCBlockCipher;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 
-import javax.crypto.Cipher;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.ShortBufferException;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.security.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * A number of utilities whose partial purpose is to wrap
@@ -40,28 +45,12 @@ import java.security.*;
 public class Encryption {
 
     /**
-     * Gets a Cipher instance
-     *
-     * @param type a string representing the type
-     * @return an instance
-     */
-    @NotNull
-    public static Cipher getCipherInstance(String type) {
-        try {
-            return Cipher.getInstance(type);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("NoSuchAlgorithm: " + e.getMessage());
-        } catch (NoSuchPaddingException e) {
-            throw new IllegalStateException("NoSuchPadding: " + e.getMessage());
-        }
-    }
-
-    /**
      * Gets a digest for a UTF-8 encoded string
      *
      * @param string the string
      * @return a digest as a byte array
      */
+    @SuppressWarnings("unused")
     public static byte[] getDigest(String string) {
         return getDigest(string, "UTF-8");
     }
@@ -75,7 +64,7 @@ public class Encryption {
      */
     public static byte[] getDigest(String string, String encoding) {
         if (string == null || string.length() == 0)
-            throw new IllegalArgumentException("Password cannot be null or empty");
+            throw new IllegalArgumentException("String cannot be null or empty");
 
         if (encoding == null || encoding.length() == 0)
             throw new IllegalArgumentException("Encoding cannot be null or empty");
@@ -105,75 +94,47 @@ public class Encryption {
     }
 
     /**
-     * Gets a digest for a key transformed according to the parameters.
-     *
-     * @param key a key
-     * @param masterSeed the master seed
-     * @param transformSeed the transform seed
-     * @param transformRounds the number of transform rounds
-     * @return a digest
+     * Create a final key from the parameters passed
      */
-    public static byte[] getFinalKeyDigest(byte[] key, byte[] masterSeed, byte[] transformSeed, long transformRounds) {
+    public static byte[] getBcFinalKeyDigest(byte[] key, byte[] masterSeed, byte[] transformSeed, long transformRounds) {
+
+        AESEngine engine = new AESEngine();
+        engine.init(true, new KeyParameter(transformSeed));
+
+        // copy input key
+        byte[] transformedKey = new byte[key.length];
+        System.arraycopy(key, 0, transformedKey, 0, transformedKey.length);
+
+        // transform rounds times
+        for (long rounds = 0; rounds < transformRounds; rounds++) {
+            engine.processBlock(transformedKey, 0, transformedKey, 0);
+            engine.processBlock(transformedKey, 16, transformedKey, 16);
+        }
 
         MessageDigest md = getMessageDigestInstance();
-        Cipher cipher = getCipherInstance("AES/ECB/NoPadding");
-
-        try {
-            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(transformSeed, "AES"));
-        } catch (InvalidKeyException e) {
-            throw new IllegalArgumentException("Invalid password", e);
-        }
-
-        // Encrypt the key transformRounds times
-        byte[] inputKey = new byte[key.length];
-        System.arraycopy(key, 0, inputKey, 0, inputKey.length);
-        byte[] outputKey = new byte[inputKey.length];
-        for (long rounds = 0; rounds < transformRounds; rounds++) {
-            try {
-                cipher.update(inputKey, 0, inputKey.length, outputKey, 0);
-                System.arraycopy(outputKey, 0, inputKey, 0, outputKey.length);
-            } catch (ShortBufferException e) {
-                throw new IllegalStateException(e.getMessage());
-            }
-        }
-
-        byte[] transformedPassword = md.digest(outputKey);
+        byte[] transformedKeyDigest = md.digest(transformedKey);
 
         md.update(masterSeed);
-        return md.digest(transformedPassword);
+        return md.digest(transformedKeyDigest);
     }
 
     /**
-     * Gets and initializes a Cipher instance using AES/CBC/PKCS5Padding
-     *
-     * @param mode {@link javax.crypto.Cipher.ENCRYPT_MODE} {@link javax.crypto.Cipher.DECRYPT_MODE} etc
-     * @param finalKey a finalKey
-     * @param encryptionIv an encryptionIv
-     * @return initialized Cipher
+     * Create a decrypted input stream from an encrypted one
      */
-    @SuppressWarnings("JavadocReference")
-    public static Cipher initCipher(int mode, byte[] finalKey, byte[] encryptionIv) {
-        return initCipher(Encryption.getCipherInstance("AES/CBC/PKCS5Padding"), mode, finalKey, encryptionIv);
+    public static InputStream getDecryptedInputStream (InputStream encryptedInputStream, byte[] keyData, byte[] ivData) {
+        final ParametersWithIV keyAndIV = new ParametersWithIV(new KeyParameter(keyData), ivData);
+        PaddedBufferedBlockCipher pbbc = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESFastEngine()));
+        pbbc.init(false, keyAndIV);
+        return new CipherInputStream(encryptedInputStream, pbbc);
     }
 
     /**
-     * Gets and initializes a Cipher instance using specified Cipher
-     *
-     * @param cipher a Cipher instance
-     * @param mode {@link javax.crypto.Cipher.ENCRYPT_MODE} {@link javax.crypto.Cipher.DECRYPT_MODE} etc
-     * @param finalKey a finalKey
-     * @param encryptionIv an encryptionIv
-     * @return initialized Cipher
+     * Create an encrypted output stream from an unencrypted output stream
      */
-    @SuppressWarnings("JavadocReference")
-    public static Cipher initCipher(Cipher cipher, int mode, byte[] finalKey, byte[] encryptionIv) {
-        Key aesKey = new SecretKeySpec(finalKey, "AES");
-        IvParameterSpec iv = new IvParameterSpec(encryptionIv);
-        try {
-            cipher.init(mode, aesKey, iv);
-        } catch (InvalidKeyException | InvalidAlgorithmParameterException e) {
-            throw new IllegalStateException(e.getMessage());
-        }
-        return cipher;
+    public static OutputStream getEncryptedOutputStream (OutputStream decryptedOutputStream, byte[] keyData, byte[] ivData) {
+        final ParametersWithIV keyAndIV = new ParametersWithIV(new KeyParameter(keyData), ivData);
+        PaddedBufferedBlockCipher pbbc = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESFastEngine()));
+        pbbc.init(true, keyAndIV);
+        return new CipherOutputStream(decryptedOutputStream, pbbc);
     }
 }
