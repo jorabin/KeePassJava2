@@ -54,10 +54,12 @@ public class DomGroupWrapper extends AbstractGroup {
     private final Element element;
     private final DomDatabaseWrapper database;
 
-    public DomGroupWrapper(Element element, DomDatabaseWrapper database) {
+    public DomGroupWrapper(Element element, DomDatabaseWrapper database, boolean newGroup) {
         this.database = database;
         this.element = element;
-        ensureElements(this.element, mandatoryGroupElements);
+        if (newGroup) {
+            ensureElements(this.element, mandatoryGroupElements);
+        }
     }
 
     @Override
@@ -97,7 +99,7 @@ public class DomGroupWrapper extends AbstractGroup {
         List<Element> elements = getElements(GROUP_ELEMENT_NAME, this.element);
         List<Group> result = new ArrayList<>(elements.size());
         for (Element e: elements){
-            result.add(new DomGroupWrapper(e, database));
+            result.add(new DomGroupWrapper(e, database, false));
         }
         return result;
     }
@@ -112,7 +114,7 @@ public class DomGroupWrapper extends AbstractGroup {
         if (element == element.getOwnerDocument().getDocumentElement().getElementsByTagName(GROUP_ELEMENT_NAME).item(0)){
             return null;
         }
-        return new DomGroupWrapper(parent, database);
+        return new DomGroupWrapper(parent, database, false);
     }
 
     @Override
@@ -145,7 +147,7 @@ public class DomGroupWrapper extends AbstractGroup {
         List<Element> elements = getElements(ENTRY_ELEMENT_NAME, this.element);
         List<Entry> entries = new ArrayList<>(elements.size());
         for(Element e: elements) {
-            entries.add(new DomEntryWrapper(e, database));
+            entries.add(new DomEntryWrapper(e, database, false));
         }
         return entries;
     }

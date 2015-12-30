@@ -47,15 +47,17 @@ public class DomEntryWrapper extends AbstractEntry {
     final Element element;
     final DomDatabaseWrapper database;
 
-    public DomEntryWrapper(Element element, DomDatabaseWrapper database) {
+    public DomEntryWrapper(Element element, DomDatabaseWrapper database, boolean newElement) {
         this.element = element;
         this.database = database;
-        DomHelper.ensureElements(element, mandatoryEntryElements);
-        ensureProperty("Notes");
-        ensureProperty("Title");
-        ensureProperty("URL");
-        ensureProperty("UserName");
-        ensureProperty("Password");
+        if (newElement) {
+            DomHelper.ensureElements(element, mandatoryEntryElements);
+            ensureProperty("Notes");
+            ensureProperty("Title");
+            ensureProperty("URL");
+            ensureProperty("UserName");
+            ensureProperty("Password");
+        }
     }
 
     @Override
@@ -102,7 +104,7 @@ public class DomEntryWrapper extends AbstractEntry {
         if (element.getParentNode() == null) {
             return null;
         }
-        return new DomGroupWrapper((Element) element.getParentNode(), database);
+        return new DomGroupWrapper((Element) element.getParentNode(), database, false);
     }
 
     @Override

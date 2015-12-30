@@ -88,17 +88,17 @@ public class DomDatabaseWrapper extends AbstractDatabase {
 
     @Override
     public Group getRootGroup() {
-        return new DomGroupWrapper(dbRootGroup, this);
+        return new DomGroupWrapper(dbRootGroup, this, false);
     }
 
     @Override
     public Group newGroup() {
-        return new DomGroupWrapper(document.createElement(GROUP_ELEMENT_NAME), this);
+        return new DomGroupWrapper(document.createElement(GROUP_ELEMENT_NAME), this, true);
     }
 
     @Override
     public Entry newEntry() {
-        return new DomEntryWrapper(document.createElement(ENTRY_ELEMENT_NAME), this);
+        return new DomEntryWrapper(document.createElement(ENTRY_ELEMENT_NAME), this, true);
     }
 
     @Override
