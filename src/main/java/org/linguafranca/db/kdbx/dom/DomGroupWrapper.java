@@ -76,6 +76,7 @@ public class DomGroupWrapper extends AbstractGroup {
     @Override
     public void setName(String name) {
         setElementContent(NAME_ELEMENT_NAME, element, name);
+        database.setDirty(true);
     }
 
     @Override
@@ -92,6 +93,7 @@ public class DomGroupWrapper extends AbstractGroup {
     @Override
     public void setIcon(Icon icon) {
         setElementContent(ICON_ELEMENT_NAME, element, String.valueOf(icon.getIndex()));
+        database.setDirty(true);
     }
 
     @Override
@@ -133,12 +135,14 @@ public class DomGroupWrapper extends AbstractGroup {
         }
         element.appendChild(((DomGroupWrapper) group).element);
         touchElement("Times/LocationChanged", ((DomGroupWrapper) group).element);
+        database.setDirty(true);
         return group;
     }
 
     @Override
     public Group removeGroup(Group g1) {
         element.removeChild(((DomGroupWrapper) g1).element);
+        database.setDirty(true);
         return g1;
     }
 
@@ -158,12 +162,14 @@ public class DomGroupWrapper extends AbstractGroup {
             ((DomEntryWrapper) entry).element.getParentNode().removeChild(element);
         }
         element.appendChild(((DomEntryWrapper) entry).element);
+        database.setDirty(true);
         return entry;
     }
 
     @Override
     public Entry removeEntry(Entry e12) {
         element.removeChild(((DomEntryWrapper) e12).element);
+        database.setDirty(true);
         return e12;
     }
 

@@ -30,6 +30,17 @@ import java.util.List;
  */
 public abstract class AbstractDatabase implements Database {
 
+    private boolean isDirty;
+
+    @Override
+    public boolean isDirty() {
+        return isDirty;
+    }
+
+    public void setDirty(boolean dirty) {
+        isDirty = dirty;
+    }
+
     @Override
     public void visit(Visitor visitor) {
         visitor.startVisit(getRootGroup());

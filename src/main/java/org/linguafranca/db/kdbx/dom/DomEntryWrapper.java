@@ -78,6 +78,7 @@ public class DomEntryWrapper extends AbstractEntry {
         }
         DomHelper.setElementContent(DomHelper.VALUE_ELEMENT_NAME, property, value);
         DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element);
+        database.setDirty(true);
     }
 
     @Override
@@ -171,6 +172,7 @@ public class DomEntryWrapper extends AbstractEntry {
     public void setIcon(Icon icon) {
         DomHelper.getElement(DomHelper.ICON_ELEMENT_NAME, element, true).setTextContent(String.valueOf(icon.getIndex()));
         DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element);
+        database.setDirty(true);
     }
 
     @Override

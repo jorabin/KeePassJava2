@@ -72,10 +72,12 @@ public class DomDatabaseWrapper extends AbstractDatabase {
 
     public void save(Credentials credentials, OutputStream outputStream) throws IOException {
         new KdbxStreamFormat().save(domDatabase, credentials, outputStream);
+        setDirty(false);
     }
 
     public void save(StreamFormat streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
         streamFormat.save(domDatabase, credentials, outputStream);
+        setDirty(false);
     }
 
     public boolean shouldProtect(String name) {
@@ -120,6 +122,7 @@ public class DomDatabaseWrapper extends AbstractDatabase {
     public void setName(String name) {
         setElementContent("DatabaseName", dbMeta, name);
         touchElement("DatabaseNameChanged", dbMeta);
+        setDirty(true);
     }
 
     @Override
@@ -131,5 +134,6 @@ public class DomDatabaseWrapper extends AbstractDatabase {
     public void setDescription(String description) {
         setElementContent("DatabaseDescription", dbMeta, description);
         touchElement("DatabaseDescriptionChanged", dbMeta);
+        setDirty(true);
     }
 }

@@ -146,4 +146,9 @@ public interface Database {
      * @param description a description of the database
      */
     void setDescription(String description);
+
+    /**
+     * True if database been modified
+     */
+    boolean isDirty();
 }
