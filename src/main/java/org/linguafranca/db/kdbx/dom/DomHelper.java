@@ -127,6 +127,15 @@ public class DomHelper {
         }
     }
 
+    static int getElementsCount (String elementPath, Element parentElement) {
+        try {
+            NodeList nodes = (NodeList) xpath.evaluate(elementPath, parentElement, XPathConstants.NODESET);
+            return nodes.getLength();
+        } catch (XPathExpressionException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     static Element newElement(String elementName, Element parentElement) {
         Element newElement = parentElement.getOwnerDocument().createElement(elementName);
         parentElement.appendChild(newElement);

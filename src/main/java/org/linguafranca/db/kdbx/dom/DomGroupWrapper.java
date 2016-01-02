@@ -107,6 +107,12 @@ public class DomGroupWrapper extends AbstractGroup {
     }
 
     @Override
+    public int getGroupsCount() {
+        List<Element> elements = getElements(GROUP_ELEMENT_NAME, this.element);
+        return elements.size();
+    }
+
+    @Override
     public @Nullable Group getParent() {
         Element parent = ((Element) element.getParentNode());
         if (parent == null) {
@@ -154,6 +160,11 @@ public class DomGroupWrapper extends AbstractGroup {
             entries.add(new DomEntryWrapper(e, database, false));
         }
         return entries;
+    }
+
+    @Override
+    public int getEntriesCount() {
+        return getElementsCount(ENTRY_ELEMENT_NAME, this.element);
     }
 
     @Override

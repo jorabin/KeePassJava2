@@ -74,6 +74,11 @@ public class KdbGroup extends AbstractGroup {
     }
 
     @Override
+    public int getEntriesCount() {
+        return entries.size();
+    }
+
+    @Override
     public Entry addEntry(Entry entry) {
         KdbGroup entryParent = (((KdbEntry) entry).parent);
         if (entryParent != null) {
@@ -162,6 +167,11 @@ public class KdbGroup extends AbstractGroup {
     @Override
     public List<Group> getGroups() {
         return new ArrayList<>(groups);
+    }
+
+    @Override
+    public int getGroupsCount() {
+        return groups.size();
     }
 
     int getFlags() {

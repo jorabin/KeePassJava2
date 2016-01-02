@@ -61,6 +61,11 @@ public interface Group {
     List<Group> getGroups();
 
     /**
+     * Returns the number of groups that are direct children of this group
+     */
+    int getGroupsCount();
+
+    /**
      * Remove the group from its current parent, if any and add it to this gorup.
      *
      * <p>The root group cannot be added to another group.
@@ -96,6 +101,11 @@ public interface Group {
      * Returns a modifiable by the caller list of entries contained in this group.
      */
     List<Entry> getEntries();
+
+    /**
+     * Returns the number of entries in this group
+     */
+    int getEntriesCount();
 
     /**
      * Finds all entries in this group that match the string supplied.
