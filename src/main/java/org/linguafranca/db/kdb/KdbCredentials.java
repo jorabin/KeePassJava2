@@ -26,12 +26,12 @@ import java.security.MessageDigest;
  *
  * @author jo
  */
-public class KdbCredentials {
+public interface KdbCredentials extends Credentials {
 
     /**
      * Password only credentials
      */
-    public static class Password implements Credentials {
+    public static class Password implements KdbCredentials {
         private byte [] key;
 
         public Password(byte[] password) {
