@@ -17,7 +17,7 @@
 package org.linguafranca.security;
 
 import org.junit.Test;
-import org.linguafranca.db.kdbx.Salsa20Encryption;
+import org.linguafranca.pwdb.kdbx.Salsa20Encryption;
 
 import java.security.SecureRandom;
 
