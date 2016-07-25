@@ -48,7 +48,7 @@ how to use the methods of those classes to create and modifty entries.
         Database database = DomDatabaseWrapper.load(credentials, inputStream);
 
         // visit all groups and entries and list them to console
-        database.visit(new new Vistor.Print());
+        database.visit(new Vistor.Print());
 
 ### Save KDBX Database
         // create an empty database

@@ -22,7 +22,10 @@ import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import javax.xml.bind.DatatypeConverter;
+//import javax.xml.bind.DatatypeConverter;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
+
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -195,7 +198,8 @@ public class DomHelper {
         ByteBuffer b = ByteBuffer.wrap(buffer);
         b.putLong(uuid.getMostSignificantBits());
         b.putLong(8, uuid.getLeastSignificantBits());
-        return DatatypeConverter.printBase64Binary(buffer);
+        // round the houses for Android
+        return new String(Base64.encodeBase64(buffer));
     }
 
     static String hexStringFromUuid(UUID uuid) {
@@ -203,16 +207,19 @@ public class DomHelper {
         ByteBuffer b = ByteBuffer.wrap(buffer);
         b.putLong(uuid.getMostSignificantBits());
         b.putLong(8, uuid.getLeastSignificantBits());
-        return DatatypeConverter.printHexBinary(buffer);
+        // round the houses for Android
+        return new String(Hex.encodeHex(buffer));
     }
 
     static String hexStringFromBase64(String base64) {
-        byte[] buffer = DatatypeConverter.parseBase64Binary(base64);
-        return DatatypeConverter.printHexBinary(buffer);
+        // round the houses for Android
+        byte[] buffer = Base64.decodeBase64(base64.getBytes());
+        return new String(Hex.encodeHex(buffer));
     }
 
     static UUID uuidFromBase64(String base64) {
-        byte[] buffer = DatatypeConverter.parseBase64Binary(base64);
+        // round the houses for Android
+        byte[] buffer = Base64.decodeBase64(base64.getBytes());
         ByteBuffer b = ByteBuffer.wrap(buffer);
         return new UUID(b.getLong(), b.getLong(8));
     }
