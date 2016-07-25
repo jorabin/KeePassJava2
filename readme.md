@@ -77,7 +77,7 @@ how to use the methods of those classes to create and modifty entries.
         Database database = KdbDatabase.load(credentials, inputStream);
 
         // visit all groups and entries and list them to console
-        database.visit(new Database.PrintVisitor());
+        database.visit(new Vistor.Print());
 
 
 ## Dependencies
