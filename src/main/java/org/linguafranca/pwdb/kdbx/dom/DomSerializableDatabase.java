@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
+import org.apache.commons.codec.binary.Base64;
 import org.linguafranca.pwdb.kdbx.Salsa20Encryption;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
 import org.w3c.dom.Document;
@@ -24,7 +25,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -92,7 +92,8 @@ public class DomSerializableDatabase implements SerializableDatabase {
             for (int i = 0; i < protectedContent.getLength(); i++){
                 Element element = ((Element) protectedContent.item(i));
                 String base64 = getElementContent(".", element);
-                byte[] encrypted = DatatypeConverter.parseBase64Binary(base64);
+                // Android compatibility
+                byte[] encrypted = Base64.decodeBase64(base64.getBytes());
                 String decrypted = new String(encryption.decrypt(encrypted), "UTF-8");
                 setElementContent(".", element, decrypted);
                 element.removeAttribute("Protected");
@@ -128,7 +129,8 @@ public class DomSerializableDatabase implements SerializableDatabase {
                     decrypted = "";
                 }
                 byte[] encrypted = encryption.encrypt(decrypted.getBytes());
-                String base64 = DatatypeConverter.printBase64Binary(encrypted);
+                // Android compatibility
+                String base64 = new String(Base64.encodeBase64(encrypted));
                 setElementContent(".", element, base64);
             }
 
@@ -171,7 +173,8 @@ public class DomSerializableDatabase implements SerializableDatabase {
     public byte[] getHeaderHash() {
         try {
             String base64 = (String) xpath.evaluate("//HeaderHash", doc, XPathConstants.STRING);
-            return DatatypeConverter.parseBase64Binary(base64);
+            // Android compatibility
+            return Base64.decodeBase64(base64.getBytes());
         } catch (XPathExpressionException e) {
             throw new IllegalStateException("Can't get header hash", e);
         }
@@ -179,7 +182,8 @@ public class DomSerializableDatabase implements SerializableDatabase {
 
     @Override
     public void setHeaderHash(byte[] hash) {
-        String base64String = DatatypeConverter.printBase64Binary(hash);
+        // Android compatibility
+        String base64String = new String(Base64.encodeBase64(hash));
         try {
             ((Element) xpath.evaluate("//HeaderHash", doc, XPathConstants.NODE)).setTextContent(base64String);
         } catch (XPathExpressionException e) {

@@ -16,9 +16,9 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import org.apache.commons.codec.binary.Base64;
 import org.w3c.dom.Document;
 
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -52,6 +52,7 @@ public class KdbxKeyFile {
         } catch (Exception e) {
             return null;
         }
-        return DatatypeConverter.parseBase64Binary(base64);
+        // android compatibility
+        return Base64.decodeBase64(base64.getBytes());
     }
 }

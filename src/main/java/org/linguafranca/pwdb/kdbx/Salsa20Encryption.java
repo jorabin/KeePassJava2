@@ -19,9 +19,9 @@ package org.linguafranca.pwdb.kdbx;
 import org.bouncycastle.crypto.engines.Salsa20Engine;
 import org.bouncycastle.crypto.params.KeyParameter;
 import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.util.encoders.Hex;
 import org.linguafranca.security.Encryption;
 
-import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 
 /**
@@ -43,7 +43,8 @@ public class Salsa20Encryption implements SerializableDatabase.Encryption {
     private final Salsa20Engine salsa20;
     private final byte[] key;
 
-    private static final byte[] SALSA20_IV = DatatypeConverter.parseHexBinary("E830094B97205D2A");
+    // Android compatibility
+    private static final byte[] SALSA20_IV = Hex.decode("E830094B97205D2A".getBytes());
 
     /**
      * Creates a Salsa20 engine
