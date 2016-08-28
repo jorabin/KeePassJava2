@@ -26,7 +26,10 @@ It is licensed under the Apache 2 License and is currently usable.
  (see [license](#license))
 
 ## Maven Coordinates
-_not yet_
+        <groupId>org.linguafranca.pwdb</groupId>
+        <artifactId>keepassjava2</artifactId>
+        <version>2.0.0</version>
+
 ## Status
 Alpha. Somewhat tested but awaiting contributions ...
 ## Java Version
