@@ -26,7 +26,6 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <bcprov-jdk15on.version>1.53</bcprov-jdk15on.version>
         <guava.version>18.0</guava.version>
         <annotations.version>13.0</annotations.version>
         <annotations.intellij.version>12.0</annotations.intellij.version>
@@ -35,13 +34,15 @@
         <maven-surefire-plugin.version>2.19</maven-surefire-plugin.version>
         <java.version>1.7</java.version>
         <commons-codec.version>1.10</commons-codec.version>
+        <spongycastle.core.version>1.54.0.0</spongycastle.core.version>
     </properties>
 
     <dependencies>
+        <!-- using spongy castle in deference to Android -->
         <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15on</artifactId>
-             <version>${bcprov-jdk15on.version}</version>
+            <groupId>com.madgag.spongycastle</groupId>
+            <artifactId>core</artifactId>
+            <version>${spongycastle.core.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>

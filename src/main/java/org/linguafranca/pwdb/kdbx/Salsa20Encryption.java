@@ -16,10 +16,10 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.bouncycastle.crypto.engines.Salsa20Engine;
-import org.bouncycastle.crypto.params.KeyParameter;
-import org.bouncycastle.crypto.params.ParametersWithIV;
-import org.bouncycastle.util.encoders.Hex;
+import org.spongycastle.crypto.engines.Salsa20Engine;
+import org.spongycastle.crypto.params.KeyParameter;
+import org.spongycastle.crypto.params.ParametersWithIV;
+import org.spongycastle.util.encoders.Hex;
 import org.linguafranca.security.Encryption;
 
 import java.security.MessageDigest;

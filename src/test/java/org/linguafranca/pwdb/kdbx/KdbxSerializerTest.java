@@ -31,7 +31,7 @@ public class KdbxSerializerTest {
 
     @Test
     public void testGetPlainTextInputStream() throws Exception {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
         Credentials credentials = new KdbxCredentials.Password("123".getBytes());
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         byte[] buffer = new byte[1024];
