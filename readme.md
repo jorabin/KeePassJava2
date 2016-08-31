@@ -107,7 +107,11 @@ need to add the following to your `build.gradle`:
 
 to mimic the behaviour of Maven's surefire plugin.
 
-## Acknowlegements
+## Change Log
+
+In [this file](./CHANGELOG.md).
+
+## Acknowledgements
 
 Many thanks to Pavel Ivanov [@ivanovpv](https://github.com/ivanovpv) for 
 his help with Android and Gradle compatibility issues.
