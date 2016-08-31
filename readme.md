@@ -96,7 +96,14 @@ It also depends on SLF4J and Junit for tests.
 
 Maven 3.
 
+## Gradle
 
+Gradle dependencies to build sources enlisted as following:
+
+    compile 'com.madgag.spongycastle:core:1.54.0.0'
+    compile 'com.google.guava:guava:18.0'
+    compile 'commons-codec:commons-codec:1.3'
+    compile 'org.jetbrains:annotations:13.0'
 
 ##  <a name="license">License</a>
 
