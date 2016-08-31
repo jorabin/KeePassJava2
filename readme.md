@@ -26,9 +26,12 @@ It is licensed under the Apache 2 License and is currently usable.
  (see [license](#license))
 
 ## Maven Coordinates
+
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>keepassjava2</artifactId>
         <version>2.0.0</version>
+        
+ at Maven Central, snapshot builds at [Sonatype OSS](https://oss.sonatype.org/content/groups/public/).
 
 ## Java Version
 
@@ -90,11 +93,24 @@ Aside from the JRE the API depends on
 
 It also depends on SLF4J and Junit for tests.
 
-## Build
+## Build from Source
 
-Maven 3.
+Included POM is for Maven 3.
 
+If you prefer Gradle the automatic conversion `gradle init` converts the POM successfully, however you will 
+need to add the following to your `build.gradle`:
 
+    test {
+        include '**/Test*'
+        include '**/*Test.*'
+    }
+
+to mimic the behaviour of Maven's surefire plugin.
+
+## Acknowlegements
+
+Many thanks to Pavel Ivanov [@ivanovpv](https://github.com/ivanovpv) for 
+his help with Android and Gradle compatibility issues.
 
 ##  <a name="license">License</a>
 

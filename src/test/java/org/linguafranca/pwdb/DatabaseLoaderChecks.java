@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 //import java.awt.*;
@@ -28,7 +29,8 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author jo
  */
-public class DatabaseLoaderChecks {
+@Ignore
+public abstract class DatabaseLoaderChecks {
     protected Database database;
 
     /**
