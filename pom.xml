@@ -39,7 +39,7 @@
 
     <scm>
         <connection>scm:git:git://github.com/jorabin/KeePassJava2.git</connection>
-        <developerConnection>scm:git:ssh://github.com/jorabin/KeePassJava2.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:jorabin/KeePassJava2.git</developerConnection>
         <url>https://github.com/jorabin/KeePassJava2</url>
     </scm>
 
