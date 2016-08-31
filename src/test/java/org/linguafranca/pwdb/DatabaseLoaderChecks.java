@@ -18,8 +18,8 @@ package org.linguafranca.pwdb;
 
 import org.junit.Test;
 
-import java.awt.*;
-import java.awt.datatransfer.StringSelection;
+//import java.awt.*;
+//import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -54,9 +54,11 @@ public class DatabaseLoaderChecks {
         if (tests.size() > 0) {
             // copy the password of the first entry to the clipboard
             String pass = tests.get(0).getPassword();
+/*
             StringSelection selection = new StringSelection(pass);
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
             System.out.println(pass + " copied to clip board");
+*/
             // all the relevant entries should have the password 123
             String pass2 = tests.get(0).getPassword();
             assertEquals(pass, pass2);

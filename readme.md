@@ -30,8 +30,6 @@ It is licensed under the Apache 2 License and is currently usable.
         <artifactId>keepassjava2</artifactId>
         <version>2.0.0</version>
 
-## Status
-Alpha. Somewhat tested but awaiting contributions ...
 ## Java Version
 
 It is written for Java 1.7.
