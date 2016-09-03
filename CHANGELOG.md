@@ -3,7 +3,7 @@
 Now that there has been a release (2.0.0) time to start a change log to help
 understand what is going on.
 
-Trying to follow the suggestions at [Keep a Change Log](keepachangelog.com)
+Trying to follow the suggestions at [Keep a Change Log](keepachangelog.com) and [Semantic Versioning] (http://semver.org/spec/v2.0.0.html)
 
 ##[Unreleased]
 ### Added
