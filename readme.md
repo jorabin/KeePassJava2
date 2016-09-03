@@ -9,6 +9,7 @@ Features to date:
 - Keepass 2.x Password and Keyfile Credentials
 - Read KeePass 1.x format (Rijndael only)
 - *No* requirement for JCE Policy Files
+- Android compatible
 - Interfaces for Database, Group and Entry allow compatible addition of other formats
 
 It is licensed under the Apache 2 License and is currently usable.
@@ -40,7 +41,7 @@ It is written for Java 1.7.
 ## Quick Start
 
 The class Javadoc on Interface classes Database, Group and Entry describe
-how to use the methods of those classes to create and modifty entries.
+how to use the methods of those classes to create and modify entries.
 
 ### Load KDBX Database
 
