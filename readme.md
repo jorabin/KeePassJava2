@@ -90,6 +90,7 @@ how to use the methods of those classes to create and modify entries.
 Aside from the JRE the API depends on
 
 - Google Guava [license](https://github.com/google/guava/blob/master/COPYING).
+- Apache Commons Codec [license](http://www.apache.org/licenses/LICENSE-2.0).
 - Spongy Castle which is a repackaging for Android of Bouncy Castle [license](https://www.bouncycastle.org/licence.html)
 
 It also depends on SLF4J and Junit for tests.
