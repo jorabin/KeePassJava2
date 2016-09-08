@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import org.jetbrains.annotations.NotNull;
 import org.linguafranca.security.Encryption;
 import org.linguafranca.security.Credentials;
 
@@ -36,7 +37,12 @@ public interface KdbxCredentials extends Credentials {
 
         private final byte[] key;
 
-        public KeyFile(byte[] password, InputStream inputStream) {
+        /**
+         * Constructor for KDBX Keyfile
+         * @param password Master Password (<code>new byte[0]</code> if none)
+         * @param inputStream inputstream of the keyfile
+         */
+        public KeyFile(@NotNull byte[] password, @NotNull InputStream inputStream) {
             MessageDigest md = Encryption.getMessageDigestInstance();
             byte[] pwKey = md.digest(password);
 
@@ -61,7 +67,7 @@ public interface KdbxCredentials extends Credentials {
 
         private final byte[] key;
 
-        public Password(byte[] password) {
+        public Password(@NotNull byte[] password) {
             MessageDigest md = Encryption.getMessageDigestInstance();
             byte[] digest = md.digest(password);
             key = md.digest(digest);
