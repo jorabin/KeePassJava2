@@ -119,7 +119,7 @@ public class KdbxSerializer {
         byte [] startBytes = new byte[32];
         ledis.readFully(startBytes);
         if (!Arrays.equals(startBytes, kdbxHeader.getStreamStartBytes())) {
-            throw new IllegalStateException("Inconsistent stream bytes");
+            throw new IllegalStateException("Inconsistent stream start bytes. This usually means the credentials were wromng.");
         }
     }
 

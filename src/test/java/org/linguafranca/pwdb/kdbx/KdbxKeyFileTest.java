@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
@@ -42,6 +43,14 @@ public class KdbxKeyFileTest {
     public void testNoPasswordLoad() throws Exception {
         InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("EmptyKey.kdbx");
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("EmptyKey.key");
+        Credentials credentials = new KdbxCredentials.KeyFile(new byte[0], inputStreamKeyFile);
+        Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
+    }
+
+    @Test @Ignore
+    public void testWindowsNoPasswordLoad() throws Exception {
+        InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("NewDatabase2.kdbx");
+        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("NewDatabase2.key");
         Credentials credentials = new KdbxCredentials.KeyFile(new byte[0], inputStreamKeyFile);
         Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
     }
