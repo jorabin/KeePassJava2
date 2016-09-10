@@ -14,20 +14,6 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<!--
-~ Licensed under the Apache License, Version 2.0 (the "License");
-~ you may not use this file except in compliance with the License.
-~ You may obtain a copy of the License at
-~
-~ http://www.apache.org/licenses/LICENSE-2.0
-~
-~ Unless required by applicable law or agreed to in writing, software
-~ distributed under the License is distributed on an "AS IS" BASIS,
-~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-~ See the License for the specific language governing permissions and
-~ limitations under the License.
--->
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:annotation>
@@ -46,10 +32,7 @@
         more documentation could most usefully be added.
 
         Many elements are probably optional but are not marked as such. In real life they are serialised
-        as empty elements and some are serialised with content "null". You have been warned.
-
-        Note in particular that when we say keepassBoolean we don't really mean that since True is the canonical
-        representation of true etc.</xs:documentation>
+        as empty elements and some are serialised with content "null". You have been warned.</xs:documentation>
     </xs:annotation>
 
     <!--==++ ELEMENTS ++==-->
