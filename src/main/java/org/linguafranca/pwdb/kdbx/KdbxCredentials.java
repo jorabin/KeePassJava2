@@ -38,19 +38,34 @@ public interface KdbxCredentials extends Credentials {
         private final byte[] key;
 
         /**
-         * Constructor for KDBX Keyfile
-         * @param password Master Password (<code>new byte[0]</code> if none)
+         * Constructor for password with  KDBX Keyfile
+         * @param password Master Password (<code>new byte[0]</code> if empty, not none)
          * @param inputStream inputstream of the keyfile
          */
         public KeyFile(@NotNull byte[] password, @NotNull InputStream inputStream) {
             MessageDigest md = Encryption.getMessageDigestInstance();
             byte[] pwKey = md.digest(password);
+            md.update(pwKey);
 
             byte[] keyFileData = KdbxKeyFile.load(inputStream);
             if (keyFileData == null) {
                 throw new IllegalStateException("Could not read key file");
             }
-            md.update(pwKey);
+            this.key = md.digest(keyFileData);
+        }
+
+        /**
+         * Constructor for KDBX Keyfile with no password
+         * @param inputStream inputstream of the keyfile
+         */
+        public KeyFile(@NotNull InputStream inputStream) {
+            MessageDigest md = Encryption.getMessageDigestInstance();
+            md.update(new byte[0]);
+
+            byte[] keyFileData = KdbxKeyFile.load(inputStream);
+            if (keyFileData == null) {
+                throw new IllegalStateException("Could not read key file");
+            }
             this.key = md.digest(keyFileData);
         }
 

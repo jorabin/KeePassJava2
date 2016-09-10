@@ -39,19 +39,36 @@ public class KdbxKeyFileTest {
         assertEquals(32, key.length);
     }
 
+    /*
+    Test for empty password
+     */
     @Test
-    public void testNoPasswordLoad() throws Exception {
-        InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("EmptyKey.kdbx");
-        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("EmptyKey.key");
+    public void testEmptyPassword() throws Exception {
+        InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("EmptyPassword.kdbx");
+        Credentials credentials = new KdbxCredentials.Password(new byte[0]);
+        Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
+    }
+
+
+    /**
+    Test for empty password with key
+     */
+    @Test
+    public void testEmptyPasswordLoad() throws Exception {
+        InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("EmptyPasswordWithKey.kdbx");
+        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("EmptyPasswordWithKey.key");
         Credentials credentials = new KdbxCredentials.KeyFile(new byte[0], inputStreamKeyFile);
         Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
     }
 
-    @Test @Ignore
+    /**
+    Test for no master password
+     */
+    @Test
     public void testWindowsNoPasswordLoad() throws Exception {
-        InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("NewDatabase2.kdbx");
-        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("NewDatabase2.key");
-        Credentials credentials = new KdbxCredentials.KeyFile(new byte[0], inputStreamKeyFile);
+        InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("NoPasswordWithKey.kdbx");
+        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("NoPasswordWithKey.key");
+        Credentials credentials = new KdbxCredentials.KeyFile(inputStreamKeyFile);
         Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
     }
 }
