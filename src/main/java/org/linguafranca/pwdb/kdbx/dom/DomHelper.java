@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
+import com.google.common.io.ByteStreams;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,9 +31,14 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 /**
  * The class contains static helper methods for access to the underlying XML DOM
@@ -65,6 +71,7 @@ public class DomHelper {
     static final String LOCATION_CHANGED = "Times/LocationChanged";
 
     static final String PROPERTY_ELEMENT_FORMAT = "String[Key/text()='%s']";
+    static final String BINARY_PROPERTY_ELEMENT_FORMAT = "Binary[Key/text()='%s']";
     static final String VALUE_ELEMENT_NAME = "Value";
 
     interface ValueCreator {
@@ -167,6 +174,68 @@ public class DomHelper {
         result.setTextContent(value);
         return result;
     }
+
+    @Nullable
+    static byte[] getBinaryElementContent(String elementPath, Element parentElement) {
+        Element result = getElement(elementPath, parentElement, false);
+        if (result == null) {
+            return null;
+        }
+        String id = result.getAttribute("Ref");
+        Element content = getElement("//Binaries/Binary[@ID=" + id + "]", parentElement.getOwnerDocument().getDocumentElement(),false);
+        if (content == null) {
+            throw new IllegalStateException("Could not find binary content with ID " + id);
+        }
+        byte[] value = Base64.decodeBase64(content.getTextContent().getBytes());
+        if (content.hasAttribute("Compressed")) {
+            ByteArrayInputStream bais = new ByteArrayInputStream(value);
+            try {
+                GZIPInputStream g = new GZIPInputStream(bais);
+                value = ByteStreams.toByteArray(g);
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+        return value;
+    }
+
+    @NotNull
+    static Element setBinaryElementContent(String elementPath, Element parentElement, byte[] value) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            // zip up the content
+            GZIPOutputStream g = new GZIPOutputStream(baos);
+            g.write(value,0,value.length);
+            g.flush();
+            g.close();
+            byte[] output = baos.toByteArray();
+            // render as base64
+            String b64 = Base64.encodeBase64String(output);
+
+            //Find the highest numbered existing content
+            String max = xpath.evaluate("//Binaries/Binary/@ID[not(. < ../../Binary/@ID)][1]", parentElement.getOwnerDocument().getDocumentElement());
+            Integer newIndex = Integer.valueOf(max) + 1;
+
+            Element binaries = getElement("//Binaries", parentElement.getOwnerDocument().getDocumentElement(),false);
+            if (binaries == null) {
+                throw new IllegalStateException("Binaries not found");
+            }
+            Element binary = (Element) binaries.appendChild(binaries.getOwnerDocument().createElement("Binary"));
+            binary.setTextContent(b64);
+            binary.setAttribute("Compressed", "True");
+            binary.setAttribute("ID", newIndex.toString());
+
+            Element result = getElement(elementPath, parentElement, true);
+            result.setAttribute("Ref", newIndex.toString());
+
+
+            return result;
+
+        } catch (IOException | XPathExpressionException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
 
     @NotNull
     static Element touchElement(String elementPath, Element parentElement) {

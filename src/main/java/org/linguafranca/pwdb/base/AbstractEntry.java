@@ -28,22 +28,22 @@ public abstract class AbstractEntry implements Entry {
 
     @Override
     public  boolean matchTitle(String text){
-        return (getTitle().toLowerCase().contains(text.toLowerCase()));
+        return (getTitle() != null && getTitle().toLowerCase().contains(text.toLowerCase()));
     }
 
     @Override
     public  boolean matchNotes(String text){
-        return (getNotes().toLowerCase().contains(text.toLowerCase()));
+        return (getNotes()!=null && getNotes().toLowerCase().contains(text.toLowerCase()));
     }
 
     @Override
     public  boolean matchUsername(String text){
-        return (getUsername().toLowerCase().contains(text.toLowerCase()));
+        return (getUsername()!=null && getUsername().toLowerCase().contains(text.toLowerCase()));
     }
 
     @Override
     public  boolean matchUrl(String text){
-        return (getUrl().toLowerCase().contains(text.toLowerCase()));
+        return (getUrl()!=null && getUrl().toLowerCase().contains(text.toLowerCase()));
     }
 
     @Override

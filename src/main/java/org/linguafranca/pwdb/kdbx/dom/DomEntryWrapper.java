@@ -91,6 +91,38 @@ public class DomEntryWrapper extends AbstractEntry {
         return result;
     }
 
+    @Override
+    public byte[] getBinaryProperty(String name) {
+        Element property = DomHelper.getElement(String.format(DomHelper.BINARY_PROPERTY_ELEMENT_FORMAT, name), element, false);
+        if (property == null) {
+            return null;
+        }
+        return DomHelper.getBinaryElementContent(DomHelper.VALUE_ELEMENT_NAME, property);
+    }
+
+    @Override
+    public void setBinaryProperty(String name, byte[] value) {
+        Element property = DomHelper.getElement(String.format(DomHelper.BINARY_PROPERTY_ELEMENT_FORMAT, name), element, false);
+        if (property == null) {
+            property = DomHelper.newElement("Binary", element);
+            DomHelper.setElementContent("Key", property, name);
+        }
+        DomHelper.setBinaryElementContent(DomHelper.VALUE_ELEMENT_NAME, property, value);
+        DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element);
+        database.setDirty(true);
+
+    }
+
+    @Override
+    public List<String> getBinaryPropertyNames() {
+        ArrayList<String> result = new ArrayList<>();
+        List<Element> list = DomHelper.getElements("Binary", element);
+        for (Element listElement: list) {
+            result.add(DomHelper.getElementContent("Key", listElement));
+        }
+        return result;
+    }
+
     private void ensureProperty(String name){
         Element property = DomHelper.getElement(String.format(DomHelper.PROPERTY_ELEMENT_FORMAT, name), element, false);
         if (property == null) {
@@ -191,6 +223,12 @@ public class DomEntryWrapper extends AbstractEntry {
         } catch (ParseException e) {
             return new Date(0);
         }
+    }
+
+    @Override
+    public boolean getExpires() {
+        String content = DomHelper.getElementContent(DomHelper.EXPIRES_ELEMENT_NAME, element);
+        return content != null && content.equalsIgnoreCase("true");
     }
 
     @Override

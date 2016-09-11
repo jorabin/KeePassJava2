@@ -207,4 +207,24 @@ public class KdbEntry extends AbstractEntry {
     public boolean match(String text) {
         return super.match(text) || this.getBinaryDescription().toLowerCase().contains(text.toLowerCase());
     }
+
+    @Override
+    public byte[] getBinaryProperty(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setBinaryProperty(String name, byte[] value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<String> getBinaryPropertyNames() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean getExpires() {
+        return false;
+    }
 }

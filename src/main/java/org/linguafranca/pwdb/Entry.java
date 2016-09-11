@@ -127,6 +127,37 @@ public interface Entry {
     List<String> getPropertyNames();
 
     /**
+     * Gets the value of a binary property.
+     *
+     * <p>Support for this method is optional.
+     *
+     * @param name the name of the property to get
+     * @return a value or null if the property is not known, or if setting of arbitrary properties is not supported
+     */
+    byte[] getBinaryProperty(String name);
+
+    /**
+     * Sets the value of a binary property.
+     *
+     * <p>Support for this method is optional.
+     *
+     * @param name the name of the property to set
+     * @param value the value to set it to
+     * @throws UnsupportedOperationException if binary properties are not supported.
+     */
+    void setBinaryProperty(String name, byte[] value);
+
+    /**
+     * Returns a list of binary property names known to the entry.
+     *
+     * <p>All implementations of Entry are required to support reading and writing of
+     * {@link #STANDARD_PROPERTY_NAMES}.
+     * @return a list that is modifiable by the caller without affecting the Entry.
+     * @throws UnsupportedOperationException if binary properties are not supported.
+     */
+    List<String> getBinaryPropertyNames();
+
+    /**
      * Get the parent of this entry
      * @return a parent
      */
@@ -252,13 +283,23 @@ public interface Entry {
      */
     boolean matchNotes(String text);
 
+    /**
+     * Returns the {@link Icon} associated with this entry.
+     * @return an Icon
+     */
     Icon getIcon();
 
+    /**
+     * Sets the {@link Icon} associated with this entry.
+     * @param icon an Icon
+     */
     void setIcon(Icon icon);
 
     Date getLastAccessTime();
 
     Date getCreationTime();
+
+    boolean getExpires();
 
     Date getExpiryTime();
 
