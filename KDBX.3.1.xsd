@@ -219,27 +219,28 @@
     <xs:simpleType name="keepassBoolean">
         <xs:restriction>
             <xs:simpleType>
-                <xs:simpleType name="keepassFalse">
-                    <xs:restriction base="xs:string">
-                        <xs:enumeration value="0"/>
-                        <xs:enumeration value="No"/>
-                        <xs:enumeration value="false"/>
-                        <xs:enumeration value="False"/>
-                        <xs:enumeration value="null"/>
-                    </xs:restriction>
-                </xs:simpleType>
-                <xs:simpleType name="keepassTrue">
-                    <xs:restriction base="xs:string">
-                        <xs:enumeration value="1"/>
-                        <xs:enumeration value="Yes"/>
-                        <xs:enumeration value="true"/>
-                        <xs:enumeration value="True"/>
-                    </xs:restriction>
-                </xs:simpleType>
+                <xs:union memberTypes="keepassFalse keepassTrue"/>
             </xs:simpleType>
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:simpleType name="keepassFalse">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="0"/>
+            <xs:enumeration value="No"/>
+            <xs:enumeration value="false"/>
+            <xs:enumeration value="False"/>
+            <xs:enumeration value="null"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="keepassTrue">
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="1"/>
+            <xs:enumeration value="Yes"/>
+            <xs:enumeration value="true"/>
+            <xs:enumeration value="True"/>
+        </xs:restriction>
+    </xs:simpleType>
 
     <xs:simpleType name="commaSeparatedList">
         <xs:annotation>
@@ -260,7 +261,10 @@
             fields. Not really clear whether the keys are case sensitive.</xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="Key">
+            <xs:element name="Key" type="xs:string">
+
+
+<!--
                 <xs:alternative test="text()='UserName'|'Title'|'Password'|'Notes'|'URL'">
                     <xs:simpleType name="DefaultStringField">
                         <xs:restriction base="xs:string"/>
@@ -271,6 +275,7 @@
                         <xs:restriction base="xs:string"/>
                     </xs:simpleType>
                 </xs:alternative>
+-->
             </xs:element>
             <xs:element name="Value">
                 <xs:complexType>
@@ -461,7 +466,9 @@
                 I don't know if there is a convention as to how to avoid element name
                 conflicts.</xs:documentation>
         </xs:annotation>
-        <xs:any/>
+        <xs:sequence>
+            <xs:any minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
     </xs:complexType>
 
 </xs:schema>
