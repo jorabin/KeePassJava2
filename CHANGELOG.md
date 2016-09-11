@@ -12,6 +12,7 @@ Trying to follow the suggestions at [Keep a Change Log](keepachangelog.com) and 
 - documentation about file formats
     - a diagram explaining format 3.1 vs 4
     - an xsd for 3.1
+- [Issue #4] support binary properties
 
 ### Fixed
 
