@@ -43,19 +43,26 @@ It is written for Java 1.7.
 The class Javadoc on Interface classes Database, Group and Entry describe
 how to use the methods of those classes to create and modify entries.
 
-### Load KDBX Database
+### Load KDBX    
+        public void loadKdbx() throws IOException {
+            // get an input stream
+            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
+            // password credentials
+            Credentials credentials = new KdbxCreds("123".getBytes());
+            // open database
+            Database database = DomDatabaseWrapper.load(credentials, inputStream);
+    
+            // visit all groups and entries and list them to console
+            database.visit(new Visitor.Print());
+        }
 
-        // get an input stream
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
-        // password credentials
-        Credentials credentials = new KdbxCredentials.Password("123".getBytes());
-        // open database
-        Database database = DomDatabaseWrapper.load(credentials, inputStream);
+### Save KDBX    
 
-        // visit all groups and entries and list them to console
-        database.visit(new Vistor.Print());
-
-### Save KDBX Database
+    private static Entry entryFactory(DomDatabaseWrapper database, String s, int e) {
+        return database.newEntry(String.format("Group %s Entry %d", s, e));
+    }
+    
+    public void saveKdbx() throws IOException {
         // create an empty database
         DomDatabaseWrapper database = new DomDatabaseWrapper();
 
@@ -70,20 +77,22 @@ how to use the methods of those classes to create and modify entries.
 
         // save to a file with password "123"
         FileOutputStream outputStream = new FileOutputStream("test.kdbx");
-        database.save(new KdbxCredentials.Password("123".getBytes()), outputStream);
+        database.save(new KdbxCreds("123".getBytes()), outputStream);
+    }
 
 
-### Load KDB Database
+### Load KDB    
 
+    public void loadKdb() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test.kdb");
         // password credentials
         Credentials credentials = new KdbCredentials.Password("123".getBytes());
         // load KdbDatabase
         Database database = KdbDatabase.load(credentials, inputStream);
-
         // visit all groups and entries and list them to console
-        database.visit(new Vistor.Print());
-
+        database.visit(new Visitor.Print());
+    }
+}
 
 ## Dependencies
 

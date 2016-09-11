@@ -9,6 +9,20 @@ Trying to follow the suggestions at [Keep a Change Log](keepachangelog.com) and 
 ### Added
 
 - this changelog file
+- documentation about file formats
+    - a diagram explaining format 3.1 vs 4
+    - an xsd for 3.1
+
+### Fixed
+
+- [Issue #6] did not understand difference between no password and empty password
+
+### Changed
+
+- Kdbx credentials simplified, old version deprecated
+    - KdbxCredentials Deprecated
+    - KdbxCreds Introduced
+
 
 ##[2.0.0] 2016-08-31
 

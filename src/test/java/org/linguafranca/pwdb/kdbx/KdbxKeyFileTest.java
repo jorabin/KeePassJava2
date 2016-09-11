@@ -43,6 +43,39 @@ public class KdbxKeyFileTest {
     Test for empty password
      */
     @Test
+    public void testEmptyPasswordCreds() throws Exception {
+        InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("EmptyPassword.kdbx");
+        Credentials credentials = new KdbxCreds(new byte[0]);
+        Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
+    }
+
+
+    /**
+     Test for empty password with key
+     */
+    @Test
+    public void testEmptyPasswordKeyCreds() throws Exception {
+        InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("EmptyPasswordWithKey.kdbx");
+        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("EmptyPasswordWithKey.key");
+        Credentials credentials = new KdbxCreds(new byte[0], inputStreamKeyFile);
+        Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
+    }
+
+    /**
+     Test for no master password
+     */
+    @Test
+    public void testNoPasswordKeyCreds() throws Exception {
+        InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("NoPasswordWithKey.kdbx");
+        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("NoPasswordWithKey.key");
+        Credentials credentials = new KdbxCreds(inputStreamKeyFile);
+        Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
+    }
+
+    /*
+    Test for empty password
+     */
+    @Test
     public void testEmptyPassword() throws Exception {
         InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("EmptyPassword.kdbx");
         Credentials credentials = new KdbxCredentials.Password(new byte[0]);
@@ -51,7 +84,7 @@ public class KdbxKeyFileTest {
 
 
     /**
-    Test for empty password with key
+     Test for empty password with key
      */
     @Test
     public void testEmptyPasswordLoad() throws Exception {
@@ -62,7 +95,7 @@ public class KdbxKeyFileTest {
     }
 
     /**
-    Test for no master password
+     Test for no master password
      */
     @Test
     public void testWindowsNoPasswordLoad() throws Exception {

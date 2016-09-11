@@ -27,7 +27,9 @@ import java.security.MessageDigest;
  * The class holds subclasses of {@link Credentials} appropriate to KDBX files.
  *
  * @author jo
+ * @deprecated use KdbxCreds instead
  */
+@Deprecated
 public interface KdbxCredentials extends Credentials {
 
     /**
@@ -60,7 +62,6 @@ public interface KdbxCredentials extends Credentials {
          */
         public KeyFile(@NotNull InputStream inputStream) {
             MessageDigest md = Encryption.getMessageDigestInstance();
-            md.update(new byte[0]);
 
             byte[] keyFileData = KdbxKeyFile.load(inputStream);
             if (keyFileData == null) {
