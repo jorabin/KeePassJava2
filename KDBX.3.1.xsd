@@ -15,24 +15,25 @@
   ~ limitations under the License.
   -->
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-           xmlns:xs="http://www.w3.org/2001/XMLSchema">
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="1.0">
     <xs:annotation>
         <xs:documentation>This is an attempt to document the KDBX 3.1 XML format as used by
-        Keepass 2.x compatible programs.
+            KeePass 2.x compatible programs.
 
-        Conventions in this schema:
+            Conventions in this schema:
 
-        KeepassFile, Group, Entry, Times and History are top level elements as they may be useful for
-        creating fragments or something.
+            KeePassFile, Group, Entry, Times and History are top level elements as they may be useful for
+            creating fragments or something.
 
-        There are types for almost everything that contains documentation as to its purpose
-        and how it's used and if there are restrictions on the values.
+            There are types for almost everything that contains documentation as to its purpose
+            and how it's used and if there are restrictions on the values.
 
-        Everything else is simply included inline for the sake of brevity. Undoubtedly
-        more documentation could most usefully be added.
+            Everything else is simply included inline for the sake of brevity. Undoubtedly
+            more documentation could most usefully be added.
 
-        Many elements are probably optional but are not marked as such. In real life they are serialised
-        as empty elements and some are serialised with content "null". You have been warned.</xs:documentation>
+            Many elements are probably optional but are not marked as such. In real life they are serialised
+            as empty elements and some are serialised with content "null". You have been warned.
+        </xs:documentation>
     </xs:annotation>
 
     <!--==++ ELEMENTS ++==-->
@@ -49,31 +50,33 @@
                             <xs:documentation>This contains database settings and also contains information
                                 about the last state of the program that used the database. Presumably assuming
                                 that the same program will be used to open it again, or that a different program
-                                would want/need the same settings.</xs:documentation>
+                                would want/need the same settings.
+                            </xs:documentation>
                         </xs:annotation>
                         <xs:sequence>
                             <xs:element name="Generator" type="xs:string"/>
                             <xs:element name="HeaderHash" type="xs:base64Binary" minOccurs="0"/>
                             <xs:element name="DatabaseName" type="xs:string"/>
-                            <xs:element name="DatabaseNameChanged" type="xs:dateTime"/>
+                            <xs:element name="DatabaseNameChanged" type="keepassDateTime"/>
                             <xs:element name="DatabaseDescription" type="xs:string"/>
-                            <xs:element name="DatabaseDescriptionChanged" type="xs:dateTime"/>
+                            <xs:element name="DatabaseDescriptionChanged" type="keepassDateTime"/>
                             <xs:element name="DefaultUserName" type="xs:string"/>
-                            <xs:element name="DefaultUserNameChanged" type="xs:dateTime"/>
+                            <xs:element name="DefaultUserNameChanged" type="keepassDateTime"/>
                             <xs:element name="MaintenanceHistoryDays" type="xs:int"/>
                             <xs:element name="Color" type="color"/>
-                            <xs:element name="MasterKeyChanged" type="xs:dateTime"/>
+                            <xs:element name="MasterKeyChanged" type="keepassDateTime"/>
                             <xs:element name="MasterKeyChangeRec" type="changeDays"/>
                             <xs:element name="MasterKeyChangeForce" type="changeDays"/>
                             <xs:element name="MemoryProtection">
                                 <xs:annotation>
                                     <xs:documentation>When the XML database is loaded into memory, sensitive
-                                    fields will be encrypted in that stream. This element specifies which of the
-                                    standardFields are encrypted in that stream, which is decrypted using Salsa20
-                                    and the InnerRandomStream encryption header.
+                                        fields will be encrypted in that stream. This element specifies which of the
+                                        standardFields are encrypted in that stream, which is decrypted using Salsa20
+                                        and the InnerRandomStream encryption header.
 
-                                    /./Entry/String/Value/@Protected signifies that the value of a stringField is
-                                    so encrypted and applies also to customFields.</xs:documentation>
+                                        /./Entry/String/Value/@Protected signifies that the value of a stringField is
+                                        so encrypted and applies also to customFields.
+                                    </xs:documentation>
                                 </xs:annotation>
                                 <xs:complexType>
                                     <xs:sequence>
@@ -88,9 +91,9 @@
                             <xs:element name="CustomIcons" type="customIcons"/>
                             <xs:element name="RecycleBinEnabled" type="keepassBoolean"/>
                             <xs:element name="RecycleBinUUID" type="uuidRef"/>
-                            <xs:element name="RecycleBinChanged" type="xs:dateTime"/>
+                            <xs:element name="RecycleBinChanged" type="keepassDateTime"/>
                             <xs:element name="EntryTemplatesGroup" type="uuidRef"/>
-                            <xs:element name="EntryTemplatesGroupChanged" type="xs:dateTime"/>
+                            <xs:element name="EntryTemplatesGroupChanged" type="keepassDateTime"/>
                             <xs:element name="LastSelectedGroup" type="uuidRef"/>
                             <xs:element name="LastTopVisibleGroup" type="uuidRef"/>
                             <xs:element name="HistoryMaxItems" type="xs:int"/>
@@ -106,12 +109,17 @@
                         <xs:sequence>
                             <xs:element ref="Group">
                                 <xs:annotation>
-                                    <xs:documentation>This is the root group which contains everything.</xs:documentation>
+                                    <xs:documentation>This is the root group which contains everything.
+                                    </xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                             <xs:element name="DeletedObjects">
                                 <xs:annotation>
-                                    <xs:documentation>I don't know what this is for. Ihave not seen it populated.</xs:documentation>
+                                    <xs:documentation>When the user permanently deletes an entry or a group,
+                                        an item is created in this node. This allows the synchronization function
+                                        to decide whether an object has been deleted or is just missing in one of
+                                        the databases that are being synchronized.
+                                    </xs:documentation>
                                 </xs:annotation>
                             </xs:element>
                         </xs:sequence>
@@ -151,7 +159,7 @@
                 <xs:element name="CustomIconUUID" type="customIconUuidRef" minOccurs="0"/>
                 <xs:element name="ForegroundColor" type="color"/>
                 <xs:element name="BackgroundColor" type="color"/>
-                <xs:element name="OverrideURL" type ="overrideUrl"/>
+                <xs:element name="OverrideURL" type="overrideUrl"/>
                 <xs:element name="Tags" type="commaSeparatedList"/>
                 <xs:element ref="Times"/>
                 <xs:element name="String" type="stringField" maxOccurs="unbounded" minOccurs="0"/>
@@ -165,23 +173,24 @@
     <xs:element name="Times">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="LastModificationTime" type="xs:dateTime">
+                <xs:element name="LastModificationTime" type="keepassDateTime">
                     <xs:annotation>
                         <xs:documentation>When it was last updated, resulting in an update to History if that is
-                        active.</xs:documentation>
+                            active.
+                        </xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="CreationTime" type="xs:dateTime">
+                <xs:element name="CreationTime" type="keepassDateTime">
                     <xs:annotation>
                         <xs:documentation>When it was originally created.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="LastAccessTime" type="xs:dateTime">
+                <xs:element name="LastAccessTime" type="keepassDateTime">
                     <xs:annotation>
                         <xs:documentation>When was last used (read).</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="ExpiryTime" type="xs:dateTime">
+                <xs:element name="ExpiryTime" type="keepassDateTime">
                     <xs:annotation>
                         <xs:documentation>When it expires if it expires.</xs:documentation>
                     </xs:annotation>
@@ -191,14 +200,22 @@
                         <xs:documentation>True if it expires.</xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="UsageCount" type="xs:dateTime">
+                <xs:element name="UsageCount" type="keepassDateTime">
                     <xs:annotation>
-                        <xs:documentation>I don't know what this means.</xs:documentation>
+                        <xs:documentation>How often the object has been used (e.g. by copying data of it to the
+                            clipboard, performing auto-type with it, etc.). However, a change to the usage count is
+                            not considered to be a database change (i.e. the database is not marked as changed by the
+                            UI), thus this value is typically incorrect (and the same applies to the last access
+                            time).
+                        </xs:documentation>
                     </xs:annotation>
                 </xs:element>
-                <xs:element name="LocationChanged" type="xs:dateTime">
+                <xs:element name="LocationChanged" type="keepassDateTime">
                     <xs:annotation>
-                        <xs:documentation>I don't know what this means.</xs:documentation>
+                        <xs:documentation>The date/time when the object was last moved. This allows the
+                            synchronization function to correctly determine the most recent location of the
+                            object.
+                        </xs:documentation>
                     </xs:annotation>
                 </xs:element>
             </xs:sequence>
@@ -217,6 +234,14 @@
     <!--==++ TYPES ++==-->
 
     <xs:simpleType name="keepassBoolean">
+        <xs:annotation>
+            <xs:appinfo>
+                <jxb:javaType
+                        name="Boolean"
+                        parseMethod="org.linguafranca.pwdb.kdbx.Helpers.toBoolean"
+                        printMethod="org.linguafranca.pwdb.kdbx.Helpers.fromBoolean"/>
+            </xs:appinfo>
+        </xs:annotation>
         <xs:restriction>
             <xs:simpleType>
                 <xs:union memberTypes="keepassFalse keepassTrue"/>
@@ -242,12 +267,29 @@
         </xs:restriction>
     </xs:simpleType>
 
+    <xs:simpleType name="keepassDateTime">
+        <xs:annotation>
+            <xs:documentation>This is ISO Date time stored as UTC (Z time zone). Left
+                to its own devices JAXB will make a XMLGregorianCalendar for these fields
+                which we don't want.
+            </xs:documentation>
+            <xs:appinfo>
+                <jxb:javaType
+                        name="java.util.Date"
+                        parseMethod="org.linguafranca.pwdb.kdbx.Helpers.toDate"
+                        printMethod="org.linguafranca.pwdb.kdbx.Helpers.fromDate"/>
+            </xs:appinfo>
+        </xs:annotation>
+        <xs:restriction base="xs:dateTime"/>
+    </xs:simpleType>
+
     <xs:simpleType name="commaSeparatedList">
         <xs:annotation>
             <xs:documentation>XSD doesn't do comma separated lists so we can't model this handily.
 
-            Assume that the format is something like [{token}{, token}*]+ where white space is ignored except
-            as part of the name of the token.</xs:documentation>
+                Assume that the format is something like [{token}{, token}*]+ where white space is ignored except
+                as part of the name of the token.
+            </xs:documentation>
         </xs:annotation>
 
         <xs:restriction base="xs:string"/>
@@ -256,27 +298,13 @@
     <xs:complexType name="stringField">
         <xs:annotation>
             <xs:documentation>This is where the values of the database are actually stored. You can have String valued
-            fields and you can have Binary valued fields. There are "Default" String fields (username and so on) and
-            there are custom string fields (custom only in that their names are not the names of default string
-            fields. Not really clear whether the keys are case sensitive.</xs:documentation>
+                fields and you can have Binary valued fields. There are "Default" String fields (username and so on) and
+                there are custom string fields (custom only in that their names are not the names of default string
+                fields. Not really clear whether the keys are case sensitive.
+            </xs:documentation>
         </xs:annotation>
         <xs:sequence>
-            <xs:element name="Key" type="xs:string">
-
-
-<!--
-                <xs:alternative test="text()='UserName'|'Title'|'Password'|'Notes'|'URL'">
-                    <xs:simpleType name="DefaultStringField">
-                        <xs:restriction base="xs:string"/>
-                    </xs:simpleType>
-                </xs:alternative>
-                <xs:alternative>
-                    <xs:simpleType name="CustomStringField">
-                        <xs:restriction base="xs:string"/>
-                    </xs:simpleType>
-                </xs:alternative>
--->
-            </xs:element>
+            <xs:element name="Key" type="xs:string"/>
             <xs:element name="Value">
                 <xs:complexType>
                     <xs:simpleContent>
@@ -293,10 +321,11 @@
     <xs:complexType name="binaryField">
         <xs:annotation>
             <xs:documentation>If derived from a file then the Key element conventionally contains the file name.
-            I think it would be useful to add a mime type on this ...
+                I think it would be useful to add a mime type on this ...
 
-            The Value element is the value of /./meta/binaries/binary/@ID that is referenced from this
-            binary.</xs:documentation>
+                The Value element is the value of /./meta/binaries/binary/@ID that is referenced from this
+                binary.
+            </xs:documentation>
         </xs:annotation>
         <xs:sequence>
             <xs:element name="Key" type="xs:string"/>
@@ -360,8 +389,9 @@
 
     <xs:simpleType name="overrideUrl">
         <xs:annotation>
-            <xs:documentation>This is some kind of way of invoking different URLs for different browsers
-            but it's not really clear to me. There is a squiggly bracket syntax at work ... {}</xs:documentation>
+            <xs:documentation>Specifies the override URL, as documented at
+                http://keepass.info/help/base/autourl.html#override
+            </xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
@@ -370,23 +400,38 @@
 
     <xs:complexType name="autoType">
         <xs:annotation>
-            <xs:documentation>This is all something to do with what get typed and if it gets typed. I don't understand
-            what it is for or how it works. Other than if you make the entry happen in keypass the it will log you
-            in through the browser that is launched.</xs:documentation>
+            <xs:documentation>Stores everything related to auto-type for this entry.
+                http://keepass.info/help/base/autotype.html
+            </xs:documentation>
         </xs:annotation>
-            <xs:sequence>
-                <xs:element name="Enabled" type="keepassBoolean"/>
-                <xs:element name="DataTransferObfuscation" type="xs:int"/>
-                <xs:element name="DefaultSequence" type="xs:string"/>
-                <xs:element name="Association">
-                    <xs:complexType>
-                        <xs:sequence>
-                            <xs:element name="Window" type="xs:string"/>
-                            <xs:element name="KeystrokeSequence" type="xs:string"/>
-                        </xs:sequence>
-                    </xs:complexType>
-                </xs:element>
-            </xs:sequence>
+        <xs:sequence>
+            <xs:element name="Enabled" type="keepassBoolean"/>
+            <xs:element name="DataTransferObfuscation">
+                <xs:annotation>
+                    <xs:documentation>1 if Two-Channel Auto-Type Obfuscation is enabled, otherwise 0.
+                        http://keepass.info/help/v2/autotype_obfuscation.html
+                    </xs:documentation>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:int">
+                        <xs:enumeration value="0"/>
+                        <xs:enumeration value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="DefaultSequence" type="xs:string"/>
+            <xs:element name="Association">
+                <xs:annotation>
+                    <xs:documentation>Custom window/sequence association</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                        <xs:element name="Window" type="xs:string"/>
+                        <xs:element name="KeystrokeSequence" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
     </xs:complexType>
 
     <!-- Change Days -->
@@ -394,7 +439,8 @@
     <xs:simpleType name="changeDays">
         <xs:annotation>
             <xs:documentation>Number of days before triggering an event e.g. suggesting a password change.
-                -1 means never. 0 means???</xs:documentation>
+                -1 means never. 0 means every time.
+            </xs:documentation>
         </xs:annotation>
         <xs:restriction base="xs:int">
             <xs:minInclusive value="-1"/>
@@ -406,17 +452,24 @@
     <xs:simpleType name="uuid">
         <xs:annotation>
             <xs:documentation>A base64 encoded UUID. Each Group and Entry has a UUID. When added to History the same
-                UUID is
-                maintained.</xs:documentation>
+                UUID is maintained.
+            </xs:documentation>
+            <xs:appinfo>
+                <jxb:javaType
+                        name="java.util.UUID"
+                        parseMethod="org.linguafranca.pwdb.kdbx.Helpers.uuidFromBase64"
+                        printMethod="org.linguafranca.pwdb.kdbx.Helpers.base64FromUuid"/>
+            </xs:appinfo>
         </xs:annotation>
         <xs:restriction base="xs:base64Binary"/>
     </xs:simpleType>
 
     <xs:simpleType name="uuidRef">
         <xs:annotation>
-            <xs:documentation>A reference to the UUID oe.g. a Group like the Recycle bin. If, for
+            <xs:documentation>A reference to the UUID e.g. a Group like the Recycle bin. If, for
                 example, the recycle bin is enabled but has not been used, then it won't have been
-                created and the value stored here is a 0 UUID.</xs:documentation>
+                created and the value stored here is a 0 UUID.
+            </xs:documentation>
         </xs:annotation>
         <xs:restriction base="uuid"/>
     </xs:simpleType>
@@ -448,7 +501,7 @@
                 <xs:complexType>
                     <xs:simpleContent>
                         <xs:extension base="xs:base64Binary">
-                            <xs:attribute name="ID" type="xs:integer"/>
+                            <xs:attribute name="ID" type="xs:int"/>
                             <xs:attribute name="Compressed" type="keepassBoolean" use="optional" default="False"/>
                         </xs:extension>
                     </xs:simpleContent>
@@ -463,8 +516,8 @@
     <xs:complexType name="customData">
         <xs:annotation>
             <xs:documentation>Third party programs and plugins can put custom data here.
-                I don't know if there is a convention as to how to avoid element name
-                conflicts.</xs:documentation>
+                Unique element names should be used, e.g. "PluginName_ItemName".
+            </xs:documentation>
         </xs:annotation>
         <xs:sequence>
             <xs:any minOccurs="0" maxOccurs="unbounded"/>
