@@ -30,12 +30,13 @@ import java.security.MessageDigest;
  * @deprecated use KdbxCreds instead
  */
 @Deprecated
+@SuppressWarnings("deprecation")
 public interface KdbxCredentials extends Credentials {
 
     /**
      * Class for KDBX key file with password credentials
      */
-    public static class KeyFile implements KdbxCredentials {
+    class KeyFile implements KdbxCredentials {
 
         private final byte[] key;
 
@@ -79,7 +80,7 @@ public interface KdbxCredentials extends Credentials {
     /**
      * Class for KDBX password only credentials
      */
-    public static class Password implements KdbxCredentials {
+    class Password implements KdbxCredentials {
 
         private final byte[] key;
 

@@ -21,6 +21,7 @@ import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractGroup;
+import org.linguafranca.pwdb.kdbx.Helpers;
 import org.w3c.dom.Element;
 
 import java.util.*;
@@ -82,7 +83,7 @@ public class DomGroupWrapper extends AbstractGroup {
     @Override
     public UUID getUuid() {
         String encodedUuid = getElementContent(UUID_ELEMENT_NAME, element);
-        return uuidFromBase64(encodedUuid);
+        return Helpers.uuidFromBase64(encodedUuid);
     }
 
     @Override

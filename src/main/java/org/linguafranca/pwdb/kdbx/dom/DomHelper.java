@@ -16,36 +16,29 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
-import com.google.common.io.ByteStreams;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.linguafranca.pwdb.kdbx.Helpers;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 //import javax.xml.bind.DatatypeConverter;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 /**
  * The class contains static helper methods for access to the underlying XML DOM
  *
  * @author jo
  */
-public class DomHelper {
+class DomHelper {
 
     static XPath xpath = XPathFactory.newInstance().newXPath();
 
@@ -186,31 +179,13 @@ public class DomHelper {
         if (content == null) {
             throw new IllegalStateException("Could not find binary content with ID " + id);
         }
-        byte[] value = Base64.decodeBase64(content.getTextContent().getBytes());
-        if (content.hasAttribute("Compressed")) {
-            ByteArrayInputStream bais = new ByteArrayInputStream(value);
-            try {
-                GZIPInputStream g = new GZIPInputStream(bais);
-                value = ByteStreams.toByteArray(g);
-            } catch (IOException e) {
-                throw new IllegalStateException(e);
-            }
-        }
-        return value;
+        return Helpers.getBinaryContent(content.getTextContent().getBytes(), content.hasAttribute("Compressed"));
     }
 
     @NotNull
     static Element setBinaryElementContent(String elementPath, Element parentElement, byte[] value) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
-            // zip up the content
-            GZIPOutputStream g = new GZIPOutputStream(baos);
-            g.write(value,0,value.length);
-            g.flush();
-            g.close();
-            byte[] output = baos.toByteArray();
-            // render as base64
-            String b64 = Base64.encodeBase64String(output);
+            String b64 = Helpers.SetBinaryContent(value);
 
             //Find the highest numbered existing content
             String max = xpath.evaluate("//Binaries/Binary/@ID[not(. < ../../Binary/@ID)][1]", parentElement.getOwnerDocument().getDocumentElement());
@@ -259,37 +234,7 @@ public class DomHelper {
     }
 
     static String base64RandomUuid () {
-        return base64FromUuid(UUID.randomUUID());
+        return Helpers.base64FromUuid(UUID.randomUUID());
     }
 
-    static String base64FromUuid(UUID uuid) {
-        byte[] buffer = new byte[16];
-        ByteBuffer b = ByteBuffer.wrap(buffer);
-        b.putLong(uuid.getMostSignificantBits());
-        b.putLong(8, uuid.getLeastSignificantBits());
-        // round the houses for Android
-        return new String(Base64.encodeBase64(buffer));
-    }
-
-    static String hexStringFromUuid(UUID uuid) {
-        byte[] buffer = new byte[16];
-        ByteBuffer b = ByteBuffer.wrap(buffer);
-        b.putLong(uuid.getMostSignificantBits());
-        b.putLong(8, uuid.getLeastSignificantBits());
-        // round the houses for Android
-        return new String(Hex.encodeHex(buffer));
-    }
-
-    static String hexStringFromBase64(String base64) {
-        // round the houses for Android
-        byte[] buffer = Base64.decodeBase64(base64.getBytes());
-        return new String(Hex.encodeHex(buffer));
-    }
-
-    static UUID uuidFromBase64(String base64) {
-        // round the houses for Android
-        byte[] buffer = Base64.decodeBase64(base64.getBytes());
-        ByteBuffer b = ByteBuffer.wrap(buffer);
-        return new UUID(b.getLong(), b.getLong(8));
-    }
 }

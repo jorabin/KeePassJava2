@@ -19,6 +19,7 @@ package org.linguafranca.pwdb.kdbx.dom;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractEntry;
+import org.linguafranca.pwdb.kdbx.Helpers;
 import org.w3c.dom.Element;
 
 import java.text.ParseException;
@@ -142,7 +143,7 @@ public class DomEntryWrapper extends AbstractEntry {
 
     @Override
     public UUID getUuid() {
-        return DomHelper.uuidFromBase64(DomHelper.getElementContent(DomHelper.UUID_ELEMENT_NAME, element));
+        return Helpers.uuidFromBase64(DomHelper.getElementContent(DomHelper.UUID_ELEMENT_NAME, element));
     }
 
     @Override
