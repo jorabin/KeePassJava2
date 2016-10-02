@@ -34,9 +34,6 @@ import java.util.*;
  * <p>Support for additional textual properties may be provided
  * by a database implementation.
  *
- * <p>At some point support for binary properties may be added
- * to this interface
- *
  * <p>Entries provide support for tracking when they are used.
  * At some point support for accessing a history of modifications
  * may be added to this interface
