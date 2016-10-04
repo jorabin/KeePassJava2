@@ -15,7 +15,7 @@
   ~ limitations under the License.
   -->
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
-           xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:jxb="http://java.sun.com/xml/ns/jaxb" jxb:version="1.0">
+           xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:annotation>
         <xs:documentation>This is an attempt to document the KDBX 3.1 XML format as used by
             KeePass 2.x compatible programs.
@@ -234,14 +234,6 @@
     <!--==++ TYPES ++==-->
 
     <xs:simpleType name="keepassBoolean">
-        <xs:annotation>
-            <xs:appinfo>
-                <jxb:javaType
-                        name="Boolean"
-                        parseMethod="org.linguafranca.pwdb.kdbx.Helpers.toBoolean"
-                        printMethod="org.linguafranca.pwdb.kdbx.Helpers.fromBoolean"/>
-            </xs:appinfo>
-        </xs:annotation>
         <xs:restriction>
             <xs:simpleType>
                 <xs:union memberTypes="keepassFalse keepassTrue"/>
@@ -273,12 +265,6 @@
                 to its own devices JAXB will make a XMLGregorianCalendar for these fields
                 which we don't want.
             </xs:documentation>
-            <xs:appinfo>
-                <jxb:javaType
-                        name="java.util.Date"
-                        parseMethod="org.linguafranca.pwdb.kdbx.Helpers.toDate"
-                        printMethod="org.linguafranca.pwdb.kdbx.Helpers.fromDate"/>
-            </xs:appinfo>
         </xs:annotation>
         <xs:restriction base="xs:dateTime"/>
     </xs:simpleType>
@@ -454,12 +440,6 @@
             <xs:documentation>A base64 encoded UUID. Each Group and Entry has a UUID. When added to History the same
                 UUID is maintained.
             </xs:documentation>
-            <xs:appinfo>
-                <jxb:javaType
-                        name="java.util.UUID"
-                        parseMethod="org.linguafranca.pwdb.kdbx.Helpers.uuidFromBase64"
-                        printMethod="org.linguafranca.pwdb.kdbx.Helpers.base64FromUuid"/>
-            </xs:appinfo>
         </xs:annotation>
         <xs:restriction base="xs:base64Binary"/>
     </xs:simpleType>

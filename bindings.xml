@@ -1,0 +1,40 @@
+<!--
+  ~ Copyright 2015 Jo Rabin
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!--
+     Used by XJC to generate custom adapters for the relevant types from the Schema
+  -->
+<bindings xmlns="http://java.sun.com/xml/ns/jaxb" version="2.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <bindings schemaLocation="KDBX.3.1.xsd">
+        <bindings node="//xs:simpleType[@name='keepassBoolean']">
+            <javaType name="Boolean"
+                      parseMethod="org.linguafranca.pwdb.kdbx.Helpers.toBoolean"
+                      printMethod="org.linguafranca.pwdb.kdbx.Helpers.fromBoolean"
+            />
+        </bindings>
+        <bindings node="//xs:simpleType[@name='keepassDateTime']">
+            <javaType name="java.util.Date"
+                      parseMethod="org.linguafranca.pwdb.kdbx.Helpers.toDate"
+                      printMethod="org.linguafranca.pwdb.kdbx.Helpers.fromDate"
+            />
+        </bindings>
+        <bindings node="//xs:simpleType[@name='uuid']">
+            <javaType name="java.util.UUID"
+                      parseMethod="org.linguafranca.pwdb.kdbx.Helpers.uuidFromBase64"
+                      printMethod="org.linguafranca.pwdb.kdbx.Helpers.base64FromUuid"
+            />
+        </bindings>
+    </bindings>
+</bindings>
