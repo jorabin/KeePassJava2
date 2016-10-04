@@ -17,7 +17,7 @@
 package org.linguafranca.pwdb.jaxb;
 
 import org.junit.Test;
-import org.linguafranca.pwdb.kdbx.mem.KeePassFile;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

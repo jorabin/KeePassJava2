@@ -20,7 +20,7 @@ import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
-import org.linguafranca.pwdb.kdbx.mem.*;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
 
 
 import java.util.*;
@@ -32,12 +32,12 @@ public class JaxbEntryWrapper extends AbstractEntry {
 
 
     private final JaxbDatabaseWrapper jaxbDatabaseWrapper;
-    private org.linguafranca.pwdb.kdbx.mem.Entry entry;
+    private org.linguafranca.pwdb.kdbx.jaxb.binding.Entry entry;
     private Group parent;
     private HashMap<String, String> strings = new HashMap<>();
     private HashMap<String, byte[]> binaries = new HashMap<>();
 
-    public JaxbEntryWrapper(JaxbDatabaseWrapper jaxbDatabaseWrapper, Group parent, org.linguafranca.pwdb.kdbx.mem.Entry entry) {
+    public JaxbEntryWrapper(JaxbDatabaseWrapper jaxbDatabaseWrapper, Group parent, org.linguafranca.pwdb.kdbx.jaxb.binding.Entry entry) {
         this.entry = entry;
         this.jaxbDatabaseWrapper = jaxbDatabaseWrapper;
         this.parent = parent;
@@ -200,7 +200,7 @@ public class JaxbEntryWrapper extends AbstractEntry {
         entry.getTimes().setLastModificationTime(new Date());
     }
 
-    public org.linguafranca.pwdb.kdbx.mem.Entry getBackingEntry(){
+    public org.linguafranca.pwdb.kdbx.jaxb.binding.Entry getBackingEntry(){
         return entry;
     }
 }

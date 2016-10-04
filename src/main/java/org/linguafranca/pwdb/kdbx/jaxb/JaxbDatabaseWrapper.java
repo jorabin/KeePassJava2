@@ -26,9 +26,9 @@ import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
-import org.linguafranca.pwdb.kdbx.mem.KeePassFile;
-import org.linguafranca.pwdb.kdbx.mem.ObjectFactory;
-import org.linguafranca.pwdb.kdbx.mem.StringField;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.ObjectFactory;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.StringField;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

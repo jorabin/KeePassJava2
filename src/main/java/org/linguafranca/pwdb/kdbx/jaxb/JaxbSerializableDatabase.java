@@ -18,9 +18,7 @@ package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.apache.commons.codec.binary.Base64;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
-import org.linguafranca.pwdb.kdbx.mem.*;
-import org.linguafranca.pwdb.kdbx.mem.Entry;
-import org.linguafranca.pwdb.kdbx.mem.Group;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;

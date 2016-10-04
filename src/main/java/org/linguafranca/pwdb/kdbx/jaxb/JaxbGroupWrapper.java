@@ -31,18 +31,18 @@ import java.util.UUID;
 public class JaxbGroupWrapper extends AbstractGroup {
     private final JaxbDatabaseWrapper databaseWrapper;
     private Group parent;
-    private final org.linguafranca.pwdb.kdbx.mem.Group group;
+    private final org.linguafranca.pwdb.kdbx.jaxb.binding.Group group;
     private List<Group> children;
     private List<Entry> entries;
 
-    public JaxbGroupWrapper(JaxbDatabaseWrapper databaseWrapper, Group parent, org.linguafranca.pwdb.kdbx.mem.Group group) {
+    public JaxbGroupWrapper(JaxbDatabaseWrapper databaseWrapper, Group parent, org.linguafranca.pwdb.kdbx.jaxb.binding.Group group) {
         this.databaseWrapper = databaseWrapper;
         this.parent = parent;
         this.group = group;
-        for (org.linguafranca.pwdb.kdbx.mem.Group childGroup : group.getGroup()) {
+        for (org.linguafranca.pwdb.kdbx.jaxb.binding.Group childGroup : group.getGroup()) {
             children.add(new JaxbGroupWrapper(databaseWrapper, this, childGroup));
         }
-        for (org.linguafranca.pwdb.kdbx.mem.Entry childEntry : group.getEntry()) {
+        for (org.linguafranca.pwdb.kdbx.jaxb.binding.Entry childEntry : group.getEntry()) {
             entries.add(new JaxbEntryWrapper(databaseWrapper, this, childEntry));
         }
     }
@@ -131,7 +131,7 @@ public class JaxbGroupWrapper extends AbstractGroup {
         group.setIconID(icon.getIndex());
     }
 
-    public org.linguafranca.pwdb.kdbx.mem.Group getBackingGroup() {
+    public org.linguafranca.pwdb.kdbx.jaxb.binding.Group getBackingGroup() {
         return group;
     }
 }

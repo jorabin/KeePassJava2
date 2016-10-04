@@ -162,6 +162,34 @@
 
     <profiles>
         <profile>
+            <id>generateSources</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>jaxb2-maven-plugin</artifactId>
+                        <version>2.2</version>
+                        <executions>
+                            <execution>
+                                <id>xjc</id>
+                                <goals>
+                                    <goal>xjc</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <!-- xjc -d src/generated/java -p org.linguafranca.pwdb.kdbx.jaxb.binding KDBX.3.1.xsd -->
+                            <sources>
+                                <source>KDBX.3.1.xsd</source>
+                            </sources>
+                            <packageName>org.linguafranca.pwdb.kdbx.jaxb.binding</packageName>
+                            <outputDirectory>src/generated/java</outputDirectory>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>signJar</id>
             <build>
                 <plugins>
