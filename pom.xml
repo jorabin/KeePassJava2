@@ -19,9 +19,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.linguafranca.pwdb</groupId>
-    <artifactId>keepassjava2</artifactId>
+    <artifactId>keepassjava2-parent</artifactId>
     <version>2.1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <modules>
+        <module>core</module>
+        <module>jaxb</module>
+    </modules>
+    <packaging>pom</packaging>
 
     <name>KeepassJava2</name>
     <description>A Java 7 API for databases compatible with the renowned KeePass password safe for Windows</description>
@@ -75,60 +79,6 @@
         <maven-release-plugin.version>2.5</maven-release-plugin.version>
     </properties>
 
-    <dependencies>
-        <!-- using spongy castle rather than bouncy castle in deference to Android -->
-        <dependency>
-            <groupId>com.madgag.spongycastle</groupId>
-            <artifactId>core</artifactId>
-            <version>${spongycastle.core.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>${commons-codec.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>${annotations.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.intellij</groupId>
-            <artifactId>annotations</artifactId>
-            <version>${annotations.intellij.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j-api.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -138,7 +88,6 @@
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
-                    <generatedSourcesDirectory>src/generated/java</generatedSourcesDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -161,37 +110,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>generateSources</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>jaxb2-maven-plugin</artifactId>
-                        <version>2.2</version>
-                        <executions>
-                            <execution>
-                                <id>xjc</id>
-                                <goals>
-                                    <goal>xjc</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <!-- xjc -d src/generated/java -p org.linguafranca.pwdb.kdbx.jaxb.binding KDBX.3.1.xsd -->
-                            <sources>
-                                <source>KDBX.3.1.xsd</source>
-                            </sources>
-                            <xjbSources>
-                                <source>bindings.xml</source>
-                            </xjbSources>
-                            <packageName>org.linguafranca.pwdb.kdbx.jaxb.binding</packageName>
-                            <outputDirectory>src/generated/java</outputDirectory>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>signJar</id>
             <build>
