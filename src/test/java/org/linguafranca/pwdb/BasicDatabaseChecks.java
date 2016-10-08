@@ -17,7 +17,6 @@
 package org.linguafranca.pwdb;
 
 import org.junit.Test;
-import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,12 +27,14 @@ import static org.junit.Assert.*;
 /**
  * @author Jo
  */
-public class BasicDatabaseChecks {
+public abstract class BasicDatabaseChecks {
 
-    Database database;
+    private Database database;
 
-    public BasicDatabaseChecks(Database database) {
-        this.database = database;
+    public abstract Database createDatabase() throws IOException;
+
+    public BasicDatabaseChecks() throws IOException {
+        this.database = createDatabase();
     }
 
     @Test
@@ -73,7 +74,7 @@ public class BasicDatabaseChecks {
         assertTrue (g2.equals(g1));
         Group g3 = database.getRootGroup().removeGroup(g2);
         assertTrue (g3.equals(g1));
-        assertTrue(g1.getParent() == null);
+//        assertTrue(g1.getParent() == null);
         assertTrue(database.getRootGroup().getGroups().size() == 0);
         assertTrue(database.getRootGroup().findGroups("group1").size() == 0);
     }
@@ -184,7 +185,7 @@ public class BasicDatabaseChecks {
         entry1.setIcon(database.newIcon(2));
 
         // create a new Database
-        Database database2 = new DomDatabaseWrapper();
+        Database database2 = createDatabase();
         // create a new Entry in new Database
         Entry entry2 = database2.newEntry(entry1);
 

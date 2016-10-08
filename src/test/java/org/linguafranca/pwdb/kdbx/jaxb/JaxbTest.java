@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.jaxb;
+package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.StringField;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.*;
 
 /**
  * @author jo
@@ -32,6 +31,23 @@ public class JaxbTest {
     public void unmarshal() throws JAXBException {
         JAXBContext jc = JAXBContext.newInstance(KeePassFile.class);
         Unmarshaller u = jc.createUnmarshaller();
+        u.setEventHandler(new ValidationEventHandler() {
+            @Override
+            public boolean handleEvent(ValidationEvent event) {
+                System.out.println(event.getLocator().getLineNumber() +": "+ event.getMessage());
+                return true;
+            }
+        });
+        u.setListener(new Unmarshaller.Listener() {
+            @Override
+            public void afterUnmarshal(Object target, Object parent) {
+                if (target instanceof StringField.Value) {
+                    StringField.Value value = (StringField.Value) target;
+                    System.out.println(value.getValue());
+                }
+                super.afterUnmarshal(target, parent);
+            }
+        });
         KeePassFile kpf = (KeePassFile) u.unmarshal(getClass().getClassLoader().getResourceAsStream("ExampleDatabase.xml"));
         System.out.println(kpf.getMeta().getDatabaseDescription());
 

@@ -14,48 +14,56 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx.dom;
+package org.linguafranca.pwdb;
 
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.linguafranca.pwdb.Visitor;
+import org.linguafranca.pwdb.kdbx.KdbxCredentials;
+import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.security.Credentials;
-import org.linguafranca.pwdb.kdbx.KdbxCredentials;
-import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Group;
 
 import java.io.*;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author jo
  */
-public class SaveAndReloadTest {
+public abstract class SaveAndReloadChecks {
 
+    public abstract Database getDatabase();
+    public abstract Database getDatabase(String name, Credentials credentials) throws IOException;
+
+    public abstract void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException;
+    @SuppressWarnings("unused")
+    public abstract void saveDatabase(Database database, StreamFormat streamFormat, Credentials credentials, OutputStream outputStream) throws IOException;
+    public abstract Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException;
 
     @Test
     public void saveAndReloadTest() throws IOException {
-        DomDatabaseWrapper output = createNewDatabase();
+
+        long now = System.currentTimeMillis();
+
+        Database output = createNewDatabase();
+        assertTrue(output.isDirty());
+        assertEquals(5, output.getRootGroup().getGroupsCount());
 
         File temp = File.createTempFile("temp", "temp");
         FileOutputStream fos = new FileOutputStream(temp);
-        output.save(new KdbxCredentials.Password("123".getBytes()), fos);
+        saveDatabase(output, new KdbxCreds("123".getBytes()), fos);
+        assertFalse(output.isDirty());
 
         FileInputStream fis = new FileInputStream(temp);
-        DomDatabaseWrapper input = DomDatabaseWrapper.load(new KdbxCredentials.Password("123".getBytes()), fis);
-
-        input.save(new StreamFormat.None(), new Credentials.None(), System.out);
+        Database input = loadDatabase(new KdbxCreds("123".getBytes()), fis);
 
         for (Integer g = 0; g< 5; g++){
             Group group = input.getRootGroup().getGroups().get(g);
             assertEquals(g.toString(), group.getName());
             assertEquals(g + 1, group.getEntries().size());
+            assertEquals(g+1, group.getEntriesCount());
             for (int e = 0; e <= g; e++) {
                 Entry entry = group.getEntries().get(e);
                 assertEquals(g + "-" + e, entry.getTitle());
@@ -65,11 +73,42 @@ public class SaveAndReloadTest {
                 assertEquals(g + "- n - " + e, entry.getNotes());
             }
         }
+        //saveDatabase(input, new StreamFormat.None(), new Credentials.None(), System.out);
+        System.out.format("Test took %d millis", System.currentTimeMillis() - now);
 
     }
 
-    private DomDatabaseWrapper createNewDatabase() throws IOException {
-        DomDatabaseWrapper database = new DomDatabaseWrapper();
+    @Test
+    public void saveAndReloadTest2() throws IOException {
+        Database attachment = getDatabase("Attachment.kdbx", new KdbxCreds("123".getBytes()));
+
+        Entry entry = attachment.findEntries("Test attachment").get(0);
+        assertArrayEquals(new String[] {"letter J.jpeg"}, entry.getBinaryPropertyNames().toArray());
+
+        Entry entry2 = attachment.findEntries("Test 2 attachment").get(0);
+        assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry2.getBinaryPropertyNames().toArray());
+
+        byte[] content = entry2.getBinaryProperty("letter L.jpeg");
+        entry.setBinaryProperty("letter L.jpeg", content);
+        assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
+
+        File temp = File.createTempFile("temp", "temp");
+        FileOutputStream fos = new FileOutputStream(temp);
+        saveDatabase(attachment, new KdbxCreds("123".getBytes()), fos);
+
+        FileInputStream fis = new FileInputStream(temp);
+        Database input = loadDatabase(new KdbxCreds("123".getBytes()), fis);
+
+        entry = input.findEntries("Test attachment").get(0);
+        assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
+
+
+        //saveDatabase(input, new StreamFormat.None(), new Credentials.None(), System.out);
+
+    }
+
+    private Database createNewDatabase() throws IOException {
+        Database database = getDatabase();
 
         for (Integer g = 0; g < 5; g++){
             Group group = database.getRootGroup().addGroup(database.newGroup(g.toString()));
@@ -94,23 +133,23 @@ public class SaveAndReloadTest {
     /**
      * Outputs the database to a file - we can try to read it in other versions of the program. Run "manually".
      *
-     * @throws IOException
+     * @throws IOException when naughty
      */
     @Test @Ignore
     public void saveNewDatabase () throws IOException {
-        DomDatabaseWrapper database = createNewDatabase();
+        Database database = createNewDatabase();
 
         FileOutputStream outputStream = new FileOutputStream("compatibility.kdbx");
-        database.save(new KdbxCredentials.Password("123".getBytes()), outputStream);
+        saveDatabase(database, new KdbxCreds("123".getBytes()), outputStream);
     }
 
     /**
      * Doesn't do anything other than output the database using default PrintVisitor
-     * @throws IOException
+     * @throws IOException when naughty
      */
     @Test
     public void inspectNewDatabase () throws IOException {
-        DomDatabaseWrapper database = createNewDatabase();
+        Database database = createNewDatabase();
 
         database.visit(new Visitor.Print());
     }
@@ -119,7 +158,7 @@ public class SaveAndReloadTest {
     // the assertions here somewhat duplicate those in BasicDatabaseChecks
     @Test
     public void testNewDatabase() throws IOException {
-        DomDatabaseWrapper database = new DomDatabaseWrapper();
+        Database database = getDatabase();
         Group root = database.getRootGroup();
         assertTrue(root.isRootGroup());
         assertEquals(0, root.getGroups().size());
@@ -133,7 +172,7 @@ public class SaveAndReloadTest {
         database.setName("Modified Database");
         assertEquals("Modified Database", database.getName());
 
-        assertEquals("Empty Database", database.getDescription());
+        assertEquals("New Database created by KeePassJava2", database.getDescription());
         database.setDescription("Test Database");
         assertEquals("Test Database", database.getDescription());
 

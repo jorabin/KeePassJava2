@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx.dom;
+package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.EntryChecks;
@@ -29,15 +29,15 @@ import java.io.OutputStream;
 /**
  * @author jo
  */
-public class DomEntryWrapperTest extends EntryChecks {
+public class JaxbEntryTest extends EntryChecks {
 
-    public DomEntryWrapperTest () throws IOException {
+    public JaxbEntryTest() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
-        database = DomDatabaseWrapper.load(new KdbxCreds("123".getBytes()), inputStream);
+        database =JaxbDatabaseWrapper.load(new KdbxCreds("123".getBytes()),inputStream);
     }
 
     @Override
     public void saveDatabase(Database database, StreamFormat streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
-        ((DomDatabaseWrapper) database).save(streamFormat, credentials, outputStream);
+
     }
 }

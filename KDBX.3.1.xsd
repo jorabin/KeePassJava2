@@ -115,7 +115,7 @@
                             </xs:element>
                             <xs:element name="DeletedObjects">
                                 <xs:annotation>
-                                    <xs:documentation>When the user permanently deletes an entry or a group,
+                                    <xs:documentation>When the user permanently deletes an wrappedEntry or a group,
                                         an item is created in this node. This allows the synchronization function
                                         to decide whether an object has been deleted or is just missing in one of
                                         the databases that are being synchronized.
@@ -229,7 +229,6 @@
             </xs:sequence>
         </xs:complexType>
     </xs:element>
-
 
     <!--==++ TYPES ++==-->
 
@@ -386,7 +385,7 @@
 
     <xs:complexType name="autoType">
         <xs:annotation>
-            <xs:documentation>Stores everything related to auto-type for this entry.
+            <xs:documentation>Stores everything related to auto-type for this wrappedEntry.
                 http://keepass.info/help/base/autotype.html
             </xs:documentation>
         </xs:annotation>

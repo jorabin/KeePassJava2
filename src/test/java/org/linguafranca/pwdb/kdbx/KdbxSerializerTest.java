@@ -32,7 +32,7 @@ public class KdbxSerializerTest {
     @Test
     public void testGetPlainTextInputStream() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
-        Credentials credentials = new KdbxCredentials.Password("123".getBytes());
+        Credentials credentials = new KdbxCreds("123".getBytes());
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         byte[] buffer = new byte[1024];
         while ( decryptedInputStream.available() > 0) {
@@ -46,7 +46,7 @@ public class KdbxSerializerTest {
     public void testCypherTextOutputStream() throws Exception {
         File tempFile = File.createTempFile("test", "test");
         OutputStream testStream = new FileOutputStream(tempFile);
-        Credentials credentials = new KdbxCredentials.Password("123".getBytes());
+        Credentials credentials = new KdbxCreds("123".getBytes());
         OutputStream outputStream = KdbxSerializer.createEncryptedOutputStream(credentials, new KdbxHeader(), testStream);
 
         outputStream.write("Hello World\n".getBytes());

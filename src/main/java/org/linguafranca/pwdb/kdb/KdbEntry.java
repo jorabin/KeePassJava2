@@ -227,4 +227,9 @@ public class KdbEntry extends AbstractEntry {
     public boolean getExpires() {
         return false;
     }
+
+    @Override
+    protected void touch() {
+        lastModificationTime = new Date();
+    }
 }

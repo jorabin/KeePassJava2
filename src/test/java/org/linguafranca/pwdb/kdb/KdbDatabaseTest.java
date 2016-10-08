@@ -17,12 +17,20 @@
 package org.linguafranca.pwdb.kdb;
 
 import org.linguafranca.pwdb.BasicDatabaseChecks;
+import org.linguafranca.pwdb.Database;
+
+import java.io.IOException;
 
 /**
  * @author Jo
  */
 public class KdbDatabaseTest  extends BasicDatabaseChecks {
-    public KdbDatabaseTest() {
-        super(new KdbDatabase());
+    @Override
+    public Database createDatabase() throws IOException {
+        return new KdbDatabase();
+    }
+
+    public KdbDatabaseTest() throws IOException {
+        super();
     }
 }

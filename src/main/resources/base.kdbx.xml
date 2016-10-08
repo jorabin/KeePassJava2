@@ -20,7 +20,7 @@
         <HeaderHash></HeaderHash>
         <DatabaseName>New Database</DatabaseName>
         <DatabaseNameChanged>${creationDate}</DatabaseNameChanged>
-        <DatabaseDescription>Empty Database</DatabaseDescription>
+        <DatabaseDescription>New Database created by KeePassJava2</DatabaseDescription>
         <DatabaseDescriptionChanged>${creationDate}</DatabaseDescriptionChanged>
         <DefaultUserName/>
         <DefaultUserNameChanged>${creationDate}</DefaultUserNameChanged>

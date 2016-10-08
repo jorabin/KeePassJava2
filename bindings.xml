@@ -16,7 +16,9 @@
 <!--
      Used by XJC to generate custom adapters for the relevant types from the Schema
   -->
-<bindings xmlns="http://java.sun.com/xml/ns/jaxb" version="2.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<bindings xmlns="http://java.sun.com/xml/ns/jaxb"
+          xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+          version="2.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <bindings schemaLocation="KDBX.3.1.xsd">
         <bindings node="//xs:simpleType[@name='keepassBoolean']">
             <javaType name="Boolean"

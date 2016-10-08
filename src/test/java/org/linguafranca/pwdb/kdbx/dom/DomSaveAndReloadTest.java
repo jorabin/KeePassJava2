@@ -17,8 +17,7 @@
 package org.linguafranca.pwdb.kdbx.dom;
 
 import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.EntryChecks;
-import org.linguafranca.pwdb.kdbx.KdbxCreds;
+import org.linguafranca.pwdb.SaveAndReloadChecks;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.security.Credentials;
 
@@ -29,15 +28,34 @@ import java.io.OutputStream;
 /**
  * @author jo
  */
-public class DomEntryWrapperTest extends EntryChecks {
+public class DomSaveAndReloadTest extends SaveAndReloadChecks{
 
-    public DomEntryWrapperTest () throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
-        database = DomDatabaseWrapper.load(new KdbxCreds("123".getBytes()), inputStream);
+    @Override
+    public Database getDatabase() {
+        try {
+            return new DomDatabaseWrapper();
+        } catch (IOException e) {
+            throw new IllegalStateException();
+        }
+    }
+    @Override
+    public Database getDatabase(String name, Credentials credentials) throws IOException {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(name);
+        return DomDatabaseWrapper.load(credentials, inputStream);
+    }
+
+    @Override
+    public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
+        database.save(credentials, outputStream);
     }
 
     @Override
     public void saveDatabase(Database database, StreamFormat streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
         ((DomDatabaseWrapper) database).save(streamFormat, credentials, outputStream);
+    }
+
+    @Override
+    public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
+        return DomDatabaseWrapper.load(credentials, inputStream);
     }
 }

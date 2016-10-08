@@ -62,6 +62,9 @@ public interface Group {
 
     /**
      * Returns the number of groups that are direct children of this group
+     *
+     * <p>It's possible that returning a list as in {@link #getGroups()} may incur significantly
+     * more overhead so use this method if only the count is reuqired
      */
     int getGroupsCount();
 
@@ -104,6 +107,9 @@ public interface Group {
 
     /**
      * Returns the number of entries in this group
+     *
+     * <p>It's possible that returning a list as in {@link #getEntries()} may incur significantly
+     * more overhead so use this method if only the count is reuqired
      */
     int getEntriesCount();
 

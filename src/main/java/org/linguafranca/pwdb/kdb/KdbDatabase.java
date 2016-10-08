@@ -25,6 +25,7 @@ import org.linguafranca.pwdb.Icon;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
@@ -99,6 +100,26 @@ public class KdbDatabase extends AbstractDatabase {
     @Override
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public void save(Credentials credentials, OutputStream outputStream) throws IOException {
+        throw new UnsupportedOperationException("Cannot save KDB files in this implementation");
+    }
+
+    @Override
+    public boolean shouldProtect(String propertyName) {
+        return false;
+    }
+
+    @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
+    public void setName(String s) {
+
     }
 
     static class GroupFinder extends Visitor.Default {

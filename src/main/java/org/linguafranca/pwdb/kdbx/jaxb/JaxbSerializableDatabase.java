@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.apache.commons.codec.binary.Base64;
+import org.linguafranca.pwdb.kdbx.StreamEncryption;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
 
@@ -28,18 +29,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author jo
  */
+@SuppressWarnings("WeakerAccess")
 public class JaxbSerializableDatabase implements SerializableDatabase {
 
     private KeePassFile keePassFile;
-    private Encryption encryption;
+    private StreamEncryption encryption;
 
 
     @Override
@@ -47,37 +46,37 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
         try {
             JAXBContext jc = JAXBContext.newInstance(KeePassFile.class);
             Unmarshaller u = jc.createUnmarshaller();
+            u.setListener(new Unmarshaller.Listener() {
+                @Override
+                public void afterUnmarshal(Object target, Object parent) {
+                    try {
+                        if (target instanceof StringField.Value) {
+                            StringField.Value value = (StringField.Value) target;
+                            if (value.getProtected() !=null && value.getProtected()) {
+                                byte[] encrypted = Base64.decodeBase64(value.getValue().getBytes());
+                                String decrypted = new String(encryption.decrypt(encrypted), "UTF-8");
+                                value.setValue(decrypted);
+                                value.setProtected(false);
+                            }
+                        }
+                        /*if (target instanceof Group && !(parent instanceof Group)) {
+                            ((Group) target).isRootGroup = true;
+                        }*/
+                    } catch (UnsupportedEncodingException e) {
+                        throw new IllegalStateException();
+                    }
+                }
+            });
             keePassFile = (KeePassFile) u.unmarshal(inputStream);
-            decryptGroup(keePassFile.getRoot().getGroup());
             return this;
         } catch (JAXBException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private void decryptGroup(Group group) {
-        try {
-            for (Entry entry : group.getEntry()) {
-                for (StringField field : entry.getString()) {
-                    if (field.getValue().getProtected()) {
-                        byte[] encrypted = Base64.decodeBase64(field.getValue().getValue().getBytes());
-                        String decrypted = new String(encryption.decrypt(encrypted), "UTF-8");
-                        field.getValue().setValue(decrypted);
-                        field.getValue().setProtected(false);
-                    }
-                }
-            }
-            for (Group group1 : group.getGroup()) {
-                decryptGroup(group1);
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     @Override
     public void save(OutputStream outputStream) throws IOException {
-        List<String> toEncrypt = new ArrayList<>();
+        final List<String> toEncrypt = new ArrayList<>();
         if (keePassFile.getMeta().getMemoryProtection().getProtectTitle()) {
             toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_TITLE);
         }
@@ -93,43 +92,41 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
         if (keePassFile.getMeta().getMemoryProtection().getProtectNotes()) {
             toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_NOTES);
         }
-        encryptGroup(keePassFile.getRoot().getGroup(), toEncrypt);
         try {
             JAXBContext jc = JAXBContext.newInstance(KeePassFile.class);
             Marshaller u = jc.createMarshaller();
+            u.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            u.setListener(new Marshaller.Listener() {
+                @Override
+                public void beforeMarshal(Object source) {
+                    try {
+                        if (source instanceof StringField) {
+                            StringField field = (StringField) source;
+                            if (toEncrypt.contains(field.getKey())) {
+                                byte[] encrypted = encryption.encrypt(field.getValue().getValue().getBytes());
+                                String b64 = new String(Base64.encodeBase64(encrypted), "UTF-8");
+                                field.getValue().setValue(b64);
+                                field.getValue().setProtected(true);
+                            }
+                        }
+                    } catch (UnsupportedEncodingException e) {
+                        throw new IllegalStateException();
+                    }
+                }
+            });
             u.marshal(keePassFile, outputStream);
         } catch (JAXBException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private void encryptGroup(Group group, List<String> encrypt) {
-        try {
-            for (Entry entry : group.getEntry()) {
-                for (StringField field : entry.getString()) {
-                    if (encrypt.contains(field.getKey())) {
-                        byte[] encrypted = encryption.encrypt(field.getValue().getValue().getBytes());
-                        String b64 = new String(Base64.encodeBase64(encrypted), "UTF-8");
-                        field.getValue().setValue(b64);
-                        field.getValue().setProtected(true);
-                    }
-                }
-            }
-            for (Group group1 : group.getGroup()) {
-                encryptGroup(group1, encrypt);
-            }
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     @Override
-    public Encryption getEncryption() {
+    public StreamEncryption getEncryption() {
         return encryption;
     }
 
     @Override
-    public void setEncryption(Encryption encryption) {
+    public void setEncryption(StreamEncryption encryption) {
         this.encryption = encryption;
     }
 
@@ -141,10 +138,6 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
     @Override
     public void setHeaderHash(byte[] hash) {
         keePassFile.getMeta().setHeaderHash(hash);
-    }
-
-    public KeePassFile getKeePassFile() {
-        return keePassFile;
     }
 
     public static JaxbSerializableDatabase createEmptyDatabase () {
@@ -211,5 +204,13 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
         root.setGroup(rootGroup);
 
         return result;
+    }
+
+    public KeePassFile getKeePassFile() {
+        return keePassFile;
+    }
+
+    public void setKeePassFile(KeePassFile keypassFile) {
+        this.keePassFile = keypassFile;
     }
 }

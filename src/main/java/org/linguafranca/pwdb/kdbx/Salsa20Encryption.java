@@ -28,7 +28,7 @@ import java.security.MessageDigest;
  * A helper class for Salsa20 encryption.
  *
  * <p>Salsa20 doesn't quite fit the memory model
- * supposed by SerializableDatabase.Encryption - all encrypted
+ * supposed by SerializableDatabase.StreamEncryption - all encrypted
  * items have to be en/decrypted in order of encryption,
  * i.e. in document order and at the same time.
  *
@@ -38,7 +38,7 @@ import java.security.MessageDigest;
  *
  * @author jo
  */
-public class Salsa20Encryption implements SerializableDatabase.Encryption {
+public class Salsa20Encryption implements StreamEncryption {
 
     private final Salsa20Engine salsa20;
     private final byte[] key;
@@ -52,6 +52,7 @@ public class Salsa20Encryption implements SerializableDatabase.Encryption {
      * @param key the key to use
      * @return an initialized Salsa20 engine
      */
+    @SuppressWarnings("WeakerAccess")
     public static Salsa20Engine createSalsa20(byte[] key) {
         MessageDigest md = Encryption.getMessageDigestInstance();
         KeyParameter keyParameter = new KeyParameter(md.digest(key));

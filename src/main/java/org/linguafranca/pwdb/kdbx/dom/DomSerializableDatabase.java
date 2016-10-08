@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx.dom;
 
 import org.apache.commons.codec.binary.Base64;
+import org.linguafranca.pwdb.kdbx.StreamEncryption;
 import org.linguafranca.pwdb.kdbx.Salsa20Encryption;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
 import org.w3c.dom.Document;
@@ -54,7 +55,7 @@ import static org.linguafranca.pwdb.kdbx.dom.DomHelper.*;
 public class DomSerializableDatabase implements SerializableDatabase {
 
     private Document doc;
-    private Encryption encryption;
+    private StreamEncryption encryption;
 
     private DomSerializableDatabase() {}
 
@@ -193,12 +194,12 @@ public class DomSerializableDatabase implements SerializableDatabase {
 
 
     @Override
-    public Encryption getEncryption() {
+    public StreamEncryption getEncryption() {
         return encryption;
     }
 
     @Override
-    public void setEncryption(Encryption encryption) {
+    public void setEncryption(StreamEncryption encryption) {
         this.encryption = encryption;
     }
 

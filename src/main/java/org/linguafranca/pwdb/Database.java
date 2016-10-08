@@ -16,6 +16,10 @@
 
 package org.linguafranca.pwdb;
 
+import org.linguafranca.security.Credentials;
+
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 
 /**
@@ -136,6 +140,18 @@ public interface Database {
     List<Entry> findEntries(String find);
 
     /**
+     * Gets the name of the database or null if not supported
+     * @return a database name
+     */
+    String getName();
+
+    /**
+     * Set the name of the database if this is supported
+     * @param name the name
+     */
+    void setName(String name);
+
+    /**
      * Gets the database description, if there is one
      * @return the description or null if not supported
      */
@@ -151,4 +167,17 @@ public interface Database {
      * True if database been modified
      */
     boolean isDirty();
+
+    /**
+     * Save the database to a stream
+     */
+    void save(Credentials credentials, OutputStream outputStream) throws IOException;
+
+    /**
+     * Properties to encrypt
+     * @param propertyName the property of interest
+     * @return true if it should be encrypted
+     */
+    boolean shouldProtect(String propertyName);
+
 }

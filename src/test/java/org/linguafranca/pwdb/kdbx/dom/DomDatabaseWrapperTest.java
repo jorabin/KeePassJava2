@@ -18,10 +18,11 @@ package org.linguafranca.pwdb.kdbx.dom;
 
 import org.junit.Test;
 import org.linguafranca.pwdb.BasicDatabaseChecks;
-import org.linguafranca.security.Credentials;
-import org.linguafranca.pwdb.kdbx.StreamFormat;
-import org.linguafranca.pwdb.kdbx.KdbxCredentials;
+import org.linguafranca.pwdb.Database;
+import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
+import org.linguafranca.pwdb.kdbx.StreamFormat;
+import org.linguafranca.security.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,13 +33,12 @@ import java.io.InputStream;
 public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
 
     public DomDatabaseWrapperTest() throws IOException {
-        super(new DomDatabaseWrapper());
     }
 
     @Test
     public void inspectPasswordDatabase() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
-        DomDatabaseWrapper database = new DomDatabaseWrapper(new KdbxStreamFormat(), new KdbxCredentials.Password("123".getBytes()), inputStream);
+        DomDatabaseWrapper database = new DomDatabaseWrapper(new KdbxStreamFormat(), new KdbxCreds("123".getBytes()), inputStream);
 
         database.save(new StreamFormat.None(), new Credentials.None(), System.out);
     }
@@ -46,10 +46,15 @@ public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
     @Test
     public void inspectKeyfileDatabase() throws IOException {
         InputStream keyFileInputStream = getClass().getClassLoader().getResourceAsStream("KeyFileDatabase.key");
-        Credentials credentials = new KdbxCredentials.KeyFile("123".getBytes(), keyFileInputStream);
+        Credentials credentials = new KdbxCreds("123".getBytes(), keyFileInputStream);
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("KeyFileDatabase.kdbx");
         DomDatabaseWrapper database = new DomDatabaseWrapper(new KdbxStreamFormat(), credentials, inputStream);
 
         database.save(new StreamFormat.None(), new Credentials.None(), System.out);
+    }
+
+    @Override
+    public Database createDatabase() throws IOException {
+        return new DomDatabaseWrapper();
     }
 }

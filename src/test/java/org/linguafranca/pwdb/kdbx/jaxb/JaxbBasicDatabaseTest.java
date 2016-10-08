@@ -14,27 +14,23 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx;
+package org.linguafranca.pwdb.kdbx.jaxb;
 
-import org.junit.Test;
-import org.linguafranca.pwdb.example.QuickStart;
-import org.linguafranca.security.Credentials;
-import org.xml.sax.*;
+import org.linguafranca.pwdb.BasicDatabaseChecks;
+import org.linguafranca.pwdb.Database;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
- * Simple illustration of hooking a SAX parser up to process a KDBX file
- * 
  * @author jo
  */
-public class SaxParsingTest {
-    @Test
-    public void exampleSaxparsing () throws IOException, SAXException, ParserConfigurationException {
-        new QuickStart().exampleSaxparsing();
+public class JaxbBasicDatabaseTest extends BasicDatabaseChecks {
+
+    public JaxbBasicDatabaseTest() throws IOException {
+    }
+
+    @Override
+    public Database createDatabase() {
+        return new JaxbDatabaseWrapper(JaxbSerializableDatabase.createEmptyDatabase().getKeePassFile());
     }
 }

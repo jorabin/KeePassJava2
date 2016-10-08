@@ -21,8 +21,9 @@ import org.linguafranca.pwdb.Icon;
 /**
  * @author jo
  */
+@SuppressWarnings("WeakerAccess")
 public class JaxbIconWrapper implements Icon{
-    int index;
+    private int index;
 
     public JaxbIconWrapper(int iconID) {
        index = iconID;
@@ -40,5 +41,21 @@ public class JaxbIconWrapper implements Icon{
     @Override
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JaxbIconWrapper that = (JaxbIconWrapper) o;
+
+        return index == that.index;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return index;
     }
 }

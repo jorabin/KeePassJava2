@@ -16,7 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.linguafranca.security.Credentials;
+import org.linguafranca.security.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,12 +35,17 @@ public interface StreamFormat {
 
         @Override
         public void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream inputStream) throws IOException {
+            serializableDatabase.setEncryption(new StreamEncryption.None());
             serializableDatabase.load(inputStream);
+            inputStream.close();
         }
 
         @Override
         public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream outputStream) throws IOException {
+            serializableDatabase.setEncryption(new StreamEncryption.None());
             serializableDatabase.save(outputStream);
+            outputStream.flush();
+            outputStream.close();
         }
     }
 

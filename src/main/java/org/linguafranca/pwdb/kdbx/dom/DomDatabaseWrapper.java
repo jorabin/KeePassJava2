@@ -70,6 +70,7 @@ public class DomDatabaseWrapper extends AbstractDatabase {
         }
     }
 
+    @Override
     public void save(Credentials credentials, OutputStream outputStream) throws IOException {
         new KdbxStreamFormat().save(domDatabase, credentials, outputStream);
         setDirty(false);

@@ -59,6 +59,7 @@ import java.util.zip.GZIPOutputStream;
  * <p/>
  * @author jo
  */
+@SuppressWarnings("WeakerAccess")
 public class KdbxSerializer {
 
     // make entirely static
@@ -70,7 +71,7 @@ public class KdbxSerializer {
      * @param kdbxHeader a header instance to be populated with values from the stream
      * @param inputStream a KDBX formatted input stream
      * @return an unencrypted input stream, to be read and closed by the caller
-     * @throws IOException
+     * @throws IOException on error
      */
     public static InputStream createUnencryptedInputStream(Credentials credentials, KdbxHeader kdbxHeader, InputStream inputStream) throws IOException {
 
@@ -94,7 +95,7 @@ public class KdbxSerializer {
      * @param kdbxHeader a KDBX header to control the formatting and encryption operation
      * @param outputStream output stream to contain the KDBX formatted output
      * @return an unencrypted output stream, to be written to, flushed and closed by the caller
-     * @throws IOException
+     * @throws IOException on error
      */
     public static OutputStream createEncryptedOutputStream(Credentials credentials, KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
 
@@ -152,7 +153,7 @@ public class KdbxSerializer {
      * kdbx file;
      * @param ledis an input stream
      * @return true if it looks like this is a kdbx file
-     * @throws IOException
+     * @throws IOException on error
      */
     private static boolean verifyMagicNumber(LittleEndianDataInputStream ledis) throws IOException {
         int sig1 = ledis.readInt();
@@ -164,7 +165,7 @@ public class KdbxSerializer {
      * Read 4 bytes and make sure they conform to expectations of file version
      * @param ledis an input stream
      * @return true if it looks like we understand this file version
-     * @throws IOException
+     * @throws IOException on error
      */
     private static boolean verifyFileVersion(LittleEndianDataInputStream ledis) throws IOException {
         return ((ledis.readInt() & FILE_VERSION_CRITICAL_MASK) <= (FILE_VERSION_32 & FILE_VERSION_CRITICAL_MASK));
@@ -175,7 +176,7 @@ public class KdbxSerializer {
      * @param kdbxHeader a header to be populated
      * @param inputStream an input stream
      * @return the populated KdbxHeader
-     * @throws IOException
+     * @throws IOException on error
      */
     public static KdbxHeader readKdbxHeader(KdbxHeader kdbxHeader, InputStream inputStream) throws IOException {
 
@@ -253,7 +254,7 @@ public class KdbxSerializer {
      * message digest of the written stream.
      * @param kdbxHeader the header to write and update
      * @param outputStream the output stream
-     * @throws IOException
+     * @throws IOException on error
      */
     public static void writeKdbxHeader(KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
         MessageDigest messageDigest = Encryption.getMessageDigestInstance();

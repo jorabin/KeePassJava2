@@ -35,21 +35,13 @@ import java.io.OutputStream;
  */
 public interface SerializableDatabase {
 
-    interface Encryption {
-        byte[] getKey();
-
-        byte[] decrypt(byte[] encryptedText);
-
-        byte[] encrypt(byte[] decryptedText);
-    }
-
     SerializableDatabase load(InputStream inputStream) throws IOException;
 
     void save(OutputStream outputStream) throws IOException;
 
-    Encryption getEncryption();
+    StreamEncryption getEncryption();
 
-    void setEncryption(Encryption encryption);
+    void setEncryption(StreamEncryption encryption);
 
     byte[] getHeaderHash();
 

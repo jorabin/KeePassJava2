@@ -69,4 +69,61 @@ public abstract class AbstractEntry implements Entry {
     public String toString() {
         return this.getPath();
     }
+
+    @Override
+    public String getUsername() {
+        return getProperty(STANDARD_PROPERTY_NAME_USER_NAME);
+    }
+
+    @Override
+    public void setUsername(String username) {
+        setProperty(STANDARD_PROPERTY_NAME_USER_NAME, username);
+        touch();
+    }
+
+    @Override
+    public String getPassword() {
+        return getProperty(STANDARD_PROPERTY_NAME_PASSWORD);
+    }
+
+    @Override
+    public void setPassword(String pass) {
+        setProperty(STANDARD_PROPERTY_NAME_PASSWORD, pass);
+        touch();
+    }
+
+    @Override
+    public String getUrl() {
+        return getProperty(STANDARD_PROPERTY_NAME_URL);
+    }
+
+    @Override
+    public void setUrl(String url) {
+        setProperty(STANDARD_PROPERTY_NAME_URL, url);
+        touch();
+    }
+
+    @Override
+    public String getTitle() {
+        return getProperty(STANDARD_PROPERTY_NAME_TITLE);
+    }
+
+    @Override
+    public void setTitle(String title) {
+        setProperty(STANDARD_PROPERTY_NAME_TITLE, title);
+        touch();
+    }
+
+    @Override
+    public String getNotes() {
+        return getProperty(STANDARD_PROPERTY_NAME_NOTES);
+    }
+
+    @Override
+    public void setNotes(String notes) {
+        setProperty(STANDARD_PROPERTY_NAME_NOTES, notes);
+        touch();
+    }
+
+    protected abstract void touch();
 }

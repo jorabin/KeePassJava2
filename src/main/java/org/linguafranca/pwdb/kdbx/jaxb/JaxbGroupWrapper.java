@@ -22,34 +22,39 @@ import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractGroup;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 /**
  * @author jo
  */
+@SuppressWarnings("WeakerAccess")
 public class JaxbGroupWrapper extends AbstractGroup {
     private final JaxbDatabaseWrapper databaseWrapper;
     private Group parent;
     private final org.linguafranca.pwdb.kdbx.jaxb.binding.Group group;
-    private List<Group> children;
-    private List<Entry> entries;
+    boolean isRootGroup;
 
     public JaxbGroupWrapper(JaxbDatabaseWrapper databaseWrapper, Group parent, org.linguafranca.pwdb.kdbx.jaxb.binding.Group group) {
         this.databaseWrapper = databaseWrapper;
         this.parent = parent;
         this.group = group;
-        for (org.linguafranca.pwdb.kdbx.jaxb.binding.Group childGroup : group.getGroup()) {
-            children.add(new JaxbGroupWrapper(databaseWrapper, this, childGroup));
+
+        if (group.getUUID() == null) {
+            group.setUUID(UUID.randomUUID());
         }
-        for (org.linguafranca.pwdb.kdbx.jaxb.binding.Entry childEntry : group.getEntry()) {
-            entries.add(new JaxbEntryWrapper(databaseWrapper, this, childEntry));
+        if (group.getTimes() == null) {
+            group.setTimes(databaseWrapper.getObjectFactory().createTimes());
+        }
+        if (group.getName() == null) {
+            group.setName("");
         }
     }
 
     @Override
     public boolean isRootGroup() {
-        return parent == null;
+        return isRootGroup;
     }
 
     @Override
@@ -59,50 +64,74 @@ public class JaxbGroupWrapper extends AbstractGroup {
 
     @Override
     public void setParent(Group parent) {
+        if (isRootGroup()) {
+            throw new IllegalStateException("Cannot add root group to another group");
+        }
         this.parent = parent;
     }
 
     @Override
     public List<Group> getGroups() {
-        return children;
+        List<Group> result = new ArrayList<>();
+        for (org.linguafranca.pwdb.kdbx.jaxb.binding.Group child : group.getGroup()) {
+            result.add(new JaxbGroupWrapper(databaseWrapper, this, child));
+        }
+        return result;
     }
 
     @Override
     public int getGroupsCount() {
-        return children.size();
+        return group.getGroup().size();
     }
 
     @Override
     public Group addGroup(Group group) {
-        children.add(group);
+        if (group.isRootGroup()) {
+            throw new IllegalStateException("Cannot add root group to another group");
+        }
+        JaxbGroupWrapper g = JaxbGroupWrapper.create(databaseWrapper, this, group);
+        this.group.getGroup().add(g.getBackingGroup());
+        if (group.getParent() != null) {
+            group.getParent().removeGroup(group);
+        }
+        group.setParent(this);
         return group;
     }
 
     @Override
     public Group removeGroup(Group group) {
-        children.remove(group);
+        if (!(group instanceof JaxbGroupWrapper)){
+            return null;
+        }
+        this.group.getGroup().remove(((JaxbGroupWrapper) group).getBackingGroup());
+        group.setParent(null);
         return group;
     }
 
     @Override
     public List<Entry> getEntries() {
-        return entries;
+        List<Entry> result = new ArrayList<>();
+        for (org.linguafranca.pwdb.kdbx.jaxb.binding.Entry entry : group.getEntry()) {
+            result.add(new JaxbEntryWrapper(databaseWrapper, this, entry));
+        }
+        return result;
     }
 
     @Override
     public int getEntriesCount() {
-        return entries.size();
+        return group.getEntry().size();
     }
 
     @Override
     public Entry addEntry(Entry entry) {
-        entries.add(entry);
+        JaxbEntryWrapper e = JaxbEntryWrapper.create(databaseWrapper, this, entry);
+        group.getEntry().add(e.getBackingEntry());
         return entry;
     }
 
     @Override
     public Entry removeEntry(Entry entry) {
-        entries.remove(entry);
+        this.group.getEntry().remove(((JaxbEntryWrapper) entry).getBackingEntry());
         return entry;
     }
 
@@ -133,5 +162,45 @@ public class JaxbGroupWrapper extends AbstractGroup {
 
     public org.linguafranca.pwdb.kdbx.jaxb.binding.Group getBackingGroup() {
         return group;
+    }
+
+    public static JaxbGroupWrapper create(JaxbDatabaseWrapper wrapper, JaxbGroupWrapper parent, Group group){
+        if (group instanceof JaxbGroupWrapper && ((JaxbGroupWrapper) group).databaseWrapper.equals(parent.databaseWrapper)) {
+            return (JaxbGroupWrapper) group;
+        }
+        org.linguafranca.pwdb.kdbx.jaxb.binding.Group backingGroup = wrapper.getObjectFactory().createGroup();
+        backingGroup.setName(group.getName());
+        backingGroup.setIconID(group.getIcon().getIndex());
+        backingGroup.setUUID(group.getUuid());
+        JaxbGroupWrapper result = new JaxbGroupWrapper(wrapper, parent, backingGroup);
+
+        // copy entries
+        for (Entry entry: group.getEntries()) {
+            backingGroup.getEntry().add(JaxbEntryWrapper.create(wrapper, result, entry).getBackingEntry());
+        }
+
+        // copy sub groups
+        for (Group child: group.getGroups()) {
+            backingGroup.getGroup().add(JaxbGroupWrapper.create(wrapper, result, child).getBackingGroup());
+        }
+        return result;
+     }
+
+    @Override
+    public int hashCode() {
+        int result = databaseWrapper.hashCode();
+        result = 31 * result + group.hashCode();
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        JaxbGroupWrapper that = (JaxbGroupWrapper) o;
+
+        return databaseWrapper.equals(that.databaseWrapper) && group.equals(that.group);
+
     }
 }

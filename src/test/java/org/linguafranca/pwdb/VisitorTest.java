@@ -17,9 +17,9 @@
 package org.linguafranca.pwdb;
 
 import org.junit.Test;
-import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
-import org.linguafranca.pwdb.kdbx.KdbxCredentials;
+import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
+import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -31,8 +31,8 @@ import static org.junit.Assert.assertTrue;
  * @author Jo
  */
 public class VisitorTest {
-    List<Entry> visitorList = new ArrayList<>();
-    Visitor visitor = new Visitor() {
+    private List<Entry> visitorList = new ArrayList<>();
+    private Visitor visitor = new Visitor() {
         StringBuffer indentation = new StringBuffer();
         @Override
         public void startVisit(Group group) {
@@ -61,7 +61,7 @@ public class VisitorTest {
     public void testLoadDB() {
         try {
             InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
-            DomDatabaseWrapper db = new DomDatabaseWrapper(new KdbxStreamFormat(), new KdbxCredentials.Password("123".getBytes()), inputStream);
+            DomDatabaseWrapper db = new DomDatabaseWrapper(new KdbxStreamFormat(), new KdbxCreds("123".getBytes()), inputStream);
             db.visit(visitor);
 
             List<Entry> matched = db.findEntries(new Entry.Matcher() {

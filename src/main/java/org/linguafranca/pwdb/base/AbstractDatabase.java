@@ -20,7 +20,10 @@ import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Visitor;
+import org.linguafranca.security.Credentials;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 /**

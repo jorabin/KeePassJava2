@@ -16,7 +16,6 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
@@ -24,7 +23,8 @@ import org.linguafranca.security.Credentials;
 
 import java.io.InputStream;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author jo
@@ -47,6 +47,7 @@ public class KdbxKeyFileTest {
         InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("EmptyPassword.kdbx");
         Credentials credentials = new KdbxCreds(new byte[0]);
         Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
+        System.out.println(database.getDescription());
     }
 
 
@@ -59,6 +60,7 @@ public class KdbxKeyFileTest {
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("EmptyPasswordWithKey.key");
         Credentials credentials = new KdbxCreds(new byte[0], inputStreamKeyFile);
         Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
+        System.out.println(database.getDescription());
     }
 
     /**
@@ -70,6 +72,7 @@ public class KdbxKeyFileTest {
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("NoPasswordWithKey.key");
         Credentials credentials = new KdbxCreds(inputStreamKeyFile);
         Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
+        System.out.println(database.getDescription());
     }
 
     /*
@@ -78,30 +81,8 @@ public class KdbxKeyFileTest {
     @Test
     public void testEmptyPassword() throws Exception {
         InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("EmptyPassword.kdbx");
-        Credentials credentials = new KdbxCredentials.Password(new byte[0]);
+        Credentials credentials = new KdbxCreds(new byte[0]);
         Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
-    }
-
-
-    /**
-     Test for empty password with key
-     */
-    @Test
-    public void testEmptyPasswordLoad() throws Exception {
-        InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("EmptyPasswordWithKey.kdbx");
-        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("EmptyPasswordWithKey.key");
-        Credentials credentials = new KdbxCredentials.KeyFile(new byte[0], inputStreamKeyFile);
-        Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
-    }
-
-    /**
-     Test for no master password
-     */
-    @Test
-    public void testWindowsNoPasswordLoad() throws Exception {
-        InputStream inputStreamDB = getClass().getClassLoader().getResourceAsStream("NoPasswordWithKey.kdbx");
-        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("NoPasswordWithKey.key");
-        Credentials credentials = new KdbxCredentials.KeyFile(inputStreamKeyFile);
-        Database database = DomDatabaseWrapper.load(credentials, inputStreamDB);
+        System.out.println(database.getDescription());
     }
 }

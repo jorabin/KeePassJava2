@@ -22,46 +22,47 @@ import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.base.AbstractDatabase;
-import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
-import org.linguafranca.pwdb.kdbx.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.ObjectFactory;
-import org.linguafranca.pwdb.kdbx.jaxb.binding.StringField;
+import org.linguafranca.security.Credentials;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 
 /**
  * @author jo
  */
+@SuppressWarnings("WeakerAccess")
 public class JaxbDatabaseWrapper extends AbstractDatabase {
 
     private KeePassFile keePassFile;
     private ObjectFactory objectFactory = new ObjectFactory();
-    private Group root;
+    private JaxbGroupWrapper root;
+
+    public JaxbDatabaseWrapper() {
+        this(JaxbSerializableDatabase.createEmptyDatabase().getKeePassFile());
+    }
 
     public JaxbDatabaseWrapper(KeePassFile keePassFile) {
         this.keePassFile = keePassFile;
         this.root = new JaxbGroupWrapper(this, null, keePassFile.getRoot().getGroup());
+        this.root.isRootGroup = true;
         // initialise all wrappers
-        visit(new Visitor.Default() {});
+        visit(new Visitor.Default() {
+        });
     }
 
-    public static JaxbDatabaseWrapper load(KdbxCreds creds, InputStream inputStream) {
+    public static JaxbDatabaseWrapper load(Credentials creds, InputStream inputStream) {
         StreamFormat format = new KdbxStreamFormat();
-        JaxbSerializableDatabase db = new JaxbSerializableDatabase();
-
-        return getJaxbDatabaseWrapper(format, creds, inputStream);
+        return load(format, creds, inputStream);
     }
 
     @NotNull
-    private static JaxbDatabaseWrapper getJaxbDatabaseWrapper(StreamFormat format, KdbxCreds creds, InputStream inputStream) {
+    public static JaxbDatabaseWrapper load(StreamFormat format, Credentials creds, InputStream inputStream) {
         JaxbSerializableDatabase db = new JaxbSerializableDatabase();
         try {
             format.load(db, creds, inputStream);
@@ -71,6 +72,16 @@ public class JaxbDatabaseWrapper extends AbstractDatabase {
         return new JaxbDatabaseWrapper(db.getKeePassFile());
     }
 
+    @Override
+    public void save(Credentials creds, OutputStream outputStream) throws IOException {
+        save(new KdbxStreamFormat(), creds, outputStream);
+    }
+    public void save(StreamFormat format, Credentials creds, OutputStream outputStream) throws IOException {
+        JaxbSerializableDatabase jsd = new JaxbSerializableDatabase();
+        jsd.setKeePassFile(this.keePassFile);
+        format.save(jsd, creds, outputStream);
+        setDirty(false);
+    }
     @Override
     public Group getRootGroup() {
         return root;
@@ -83,7 +94,7 @@ public class JaxbDatabaseWrapper extends AbstractDatabase {
 
     @Override
     public Entry newEntry() {
-        return new JaxbEntryWrapper(this, null, objectFactory.createEntry());
+        return new JaxbEntryWrapper(this, null);
     }
 
     @Override
@@ -106,7 +117,34 @@ public class JaxbDatabaseWrapper extends AbstractDatabase {
         keePassFile.getMeta().setDatabaseDescription(description);
     }
 
+    @Override
+    public boolean shouldProtect(String propertyName) {
+        switch (propertyName.toLowerCase()) {
+            case "title":  return keePassFile.getMeta().getMemoryProtection().getProtectTitle();
+            case "username":  return keePassFile.getMeta().getMemoryProtection().getProtectUserName();
+            case "password":  return keePassFile.getMeta().getMemoryProtection().getProtectPassword();
+            case "url":  return keePassFile.getMeta().getMemoryProtection().getProtectURL();
+            case "notes":  return keePassFile.getMeta().getMemoryProtection().getProtectNotes();
+            default: return false;
+        }
+    }
+
+    @Override
+    public String getName() {
+        return keePassFile.getMeta().getDatabaseName();
+    }
+
+    @Override
+    public void setName(String s) {
+        keePassFile.getMeta().setDatabaseName(s);
+        keePassFile.getMeta().setDatabaseNameChanged(new Date());
+    }
+
     public KeePassFile getKeePassFile() {
         return keePassFile;
+    }
+
+    ObjectFactory getObjectFactory() {
+        return objectFactory;
     }
 }

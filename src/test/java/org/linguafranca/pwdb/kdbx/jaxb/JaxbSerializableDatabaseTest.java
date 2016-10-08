@@ -18,8 +18,6 @@ package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 /**
  * @author jo
  */
@@ -28,7 +26,5 @@ public class JaxbSerializableDatabaseTest {
     public void createEmptyDatabase() throws Exception {
         JaxbSerializableDatabase db = JaxbSerializableDatabase.createEmptyDatabase();
         db.save(System.out);
-
     }
-
 }

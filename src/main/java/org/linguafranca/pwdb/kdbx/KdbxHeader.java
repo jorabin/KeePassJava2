@@ -35,11 +35,13 @@ import java.util.UUID;
  *
  * @author jo
  */
+@SuppressWarnings("WeakerAccess")
 public class KdbxHeader {
 
     /**
      * The ordinal 0 represents uncompressed and 1 GZip compressed
      */
+    @SuppressWarnings("WeakerAccess")
     public enum CompressionFlags {
         NONE, GZIP
     }
@@ -51,6 +53,7 @@ public class KdbxHeader {
      * @see StreamFormat
      * @see KdbxStreamFormat
      */
+    @SuppressWarnings("WeakerAccess, unused")
     public enum ProtectedStreamAlgorithm {
         NONE, ARC_FOUR, SALSA_20
     }
@@ -99,7 +102,7 @@ public class KdbxHeader {
      * @param digest the key digest
      * @param inputStream the encrypted input stream
      * @return a decrypted stream
-     * @throws IOException
+     * @throws IOException if something bad happens
      */
     public InputStream createDecryptedStream(byte[] digest, InputStream inputStream) throws IOException {
         byte[] finalKeyDigest = Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
@@ -112,7 +115,7 @@ public class KdbxHeader {
      * @param digest the key digest
      * @param outputStream the output stream which is the destination for encrypted data
      * @return an output stream to write unencrypted data to
-     * @throws IOException
+     * @throws IOException  if something bad happens
      */
     public OutputStream createEncryptedStream(byte[] digest, OutputStream outputStream) throws IOException {
         byte[] finalKeyDigest = Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());

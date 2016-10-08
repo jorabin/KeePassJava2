@@ -147,56 +147,6 @@ public class DomEntryWrapper extends AbstractEntry {
     }
 
     @Override
-    public String getUsername() {
-        return getProperty("UserName");
-    }
-
-    @Override
-    public void setUsername(String username) {
-        setProperty("UserName", username);
-    }
-
-    @Override
-    public String getPassword() {
-        return getProperty("Password");
-    }
-
-    @Override
-    public void setPassword(String pass) {
-        setProperty("Password", pass);
-    }
-
-    @Override
-    public String getUrl() {
-        return getProperty("URL");
-    }
-
-    @Override
-    public void setUrl(String url) {
-        setProperty("URL", url);
-    }
-
-    @Override
-    public String getTitle() {
-        return getProperty("Title");
-    }
-
-    @Override
-    public void setTitle(String title) {
-        setProperty("Title", title);
-    }
-
-    @Override
-    public String getNotes() {
-        return getProperty("Notes");
-    }
-
-    @Override
-    public void setNotes(String notes) {
-        setProperty("Notes", notes);
-    }
-
-    @Override
     public Icon getIcon() {
         return new DomIconWrapper(DomHelper.getElement(DomHelper.ICON_ELEMENT_NAME, element, false));
     }
@@ -248,6 +198,11 @@ public class DomEntryWrapper extends AbstractEntry {
         } catch (ParseException e) {
             return new Date(0);
         }
+    }
+
+    @Override
+    protected void touch() {
+        DomHelper.setElementContent(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element, DomHelper.dateFormatter.format(new Date()));
     }
 
     @Override

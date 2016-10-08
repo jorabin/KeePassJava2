@@ -31,9 +31,10 @@ import java.io.InputStream;
  *
  * @author jo
  */
+@SuppressWarnings("WeakerAccess")
 public class KdbxKeyFile {
 
-    static XPath xpath = XPathFactory.newInstance().newXPath();
+    private static XPath xpath = XPathFactory.newInstance().newXPath();
 
     /**
      * Load a key from an InputStream with a KDBX XML key file.

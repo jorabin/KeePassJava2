@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx.dom;
+package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.linguafranca.pwdb.DatabaseLoaderChecks;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.security.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,16 +25,16 @@ import java.io.InputStream;
 /**
  * @author jo
  */
-public class DomDatabaseWrapperLoaderTest extends DatabaseLoaderChecks {
+public class JaxbLoaderTest extends DatabaseLoaderChecks {
 
-    public DomDatabaseWrapperLoaderTest() throws IOException {
+    public JaxbLoaderTest() throws IOException {
         // get an input stream from kdbx file
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
         // file has password credentials
-        Credentials credentials = new KdbxCreds("123".getBytes());
+        KdbxCreds credentials = new KdbxCreds("123".getBytes());
         // open database. DomDatabaseWrapper is so-called, since it wraps
         // a W3C DOM, populated from the KeePass XML, and presents it
         // through a org.linguafranca.keepass.Database interface.
-        super.database = DomDatabaseWrapper.load(credentials, inputStream);
+        super.database = JaxbDatabaseWrapper.load(credentials, inputStream);
     }
 }

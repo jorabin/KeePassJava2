@@ -16,25 +16,34 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.junit.Test;
-import org.linguafranca.pwdb.example.QuickStart;
-import org.linguafranca.security.Credentials;
-import org.xml.sax.*;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
- * Simple illustration of hooking a SAX parser up to process a KDBX file
- * 
+ * KDBX "protected" fields are stream encrypted. They must be decrypted in
+ * the same order as they were encrypted.
+ *
  * @author jo
  */
-public class SaxParsingTest {
-    @Test
-    public void exampleSaxparsing () throws IOException, SAXException, ParserConfigurationException {
-        new QuickStart().exampleSaxparsing();
+public interface StreamEncryption {
+    byte[] getKey();
+
+    byte[] decrypt(byte[] encryptedText);
+
+    byte[] encrypt(byte[] decryptedText);
+
+    class None implements StreamEncryption {
+
+        @Override
+        public byte[] getKey() {
+            return new byte[0];
+        }
+
+        @Override
+        public byte[] decrypt(byte[] encryptedText) {
+            return encryptedText;
+        }
+
+        @Override
+        public byte[] encrypt(byte[] decryptedText) {
+            return decryptedText;
+        }
     }
 }

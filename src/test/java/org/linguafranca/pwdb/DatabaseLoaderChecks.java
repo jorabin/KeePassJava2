@@ -16,20 +16,19 @@
 
 package org.linguafranca.pwdb;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
-//import java.awt.*;
-//import java.awt.datatransfer.StringSelection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+//import java.awt.*;
+//import java.awt.datatransfer.StringSelection;
+
 /**
  * @author jo
  */
-@Ignore
 public abstract class DatabaseLoaderChecks {
     protected Database database;
 
