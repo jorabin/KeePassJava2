@@ -19,23 +19,23 @@
 <bindings xmlns="http://java.sun.com/xml/ns/jaxb"
           xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
           version="2.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <bindings schemaLocation="KDBX.3.1.xsd">
+    <bindings schemaLocation="../KDBX.3.1.xsd">
         <bindings node="//xs:simpleType[@name='keepassBoolean']">
             <javaType name="Boolean"
-                      parseMethod="linguafranca.pwdb.kdbx.Helpers.toBoolean"
-                      printMethod="linguafranca.pwdb.kdbx.Helpers.fromBoolean"
+                      parseMethod="org.linguafranca.pwdb.kdbx.Helpers.toBoolean"
+                      printMethod="org.linguafranca.pwdb.kdbx.Helpers.fromBoolean"
             />
         </bindings>
         <bindings node="//xs:simpleType[@name='keepassDateTime']">
             <javaType name="java.util.Date"
-                      parseMethod="linguafranca.pwdb.kdbx.Helpers.toDate"
-                      printMethod="linguafranca.pwdb.kdbx.Helpers.fromDate"
+                      parseMethod="org.linguafranca.pwdb.kdbx.Helpers.toDate"
+                      printMethod="org.linguafranca.pwdb.kdbx.Helpers.fromDate"
             />
         </bindings>
         <bindings node="//xs:simpleType[@name='uuid']">
             <javaType name="java.util.UUID"
-                      parseMethod="linguafranca.pwdb.kdbx.Helpers.uuidFromBase64"
-                      printMethod="linguafranca.pwdb.kdbx.Helpers.base64FromUuid"
+                      parseMethod="org.linguafranca.pwdb.kdbx.Helpers.uuidFromBase64"
+                      printMethod="org.linguafranca.pwdb.kdbx.Helpers.base64FromUuid"
             />
         </bindings>
     </bindings>

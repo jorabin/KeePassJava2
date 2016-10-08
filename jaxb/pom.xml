@@ -83,13 +83,13 @@
                         <configuration>
                             <!-- xjc -d src/generated/java -p org.linguafranca.pwdb.kdbx.jaxb.binding KDBX.3.1.xsd -->
                             <sources>
-                                <source>KDBX.3.1.xsd</source>
+                                <source>../KDBX.3.1.xsd</source>
                             </sources>
                             <xjbSources>
                                 <source>bindings.xml</source>
                             </xjbSources>
                             <packageName>org.linguafranca.pwdb.kdbx.jaxb.binding</packageName>
-                            <outputDirectory>jaxb/src/generated/java</outputDirectory>
+                            <outputDirectory>src/generated/java</outputDirectory>
                         </configuration>
                     </plugin>
                 </plugins>
