@@ -107,7 +107,7 @@ public class QuickStart {
         KdbxHeader kdbxHeader = new KdbxHeader();
         try (InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, encryptedInputStream)) {
             // use this to decrypt the encrypted fields
-            final Salsa20Encryption memoryProtection = new Salsa20Encryption(kdbxHeader.getProtectedStreamKey());
+            final Salsa20StreamEncryptor memoryProtection = new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey());
             SAXParserFactory spfactory = SAXParserFactory.newInstance();
             SAXParser saxParser = spfactory.newSAXParser();
             XMLReader xmlReader = saxParser.getXMLReader();
@@ -155,7 +155,7 @@ public class QuickStart {
                 public void characters(char[] ch, int start, int length) throws SAXException {
                     String content = new String(ch, start, length);
                     if (protectedContent) {
-                        content = new String(memoryProtection.decrypt(Helpers.getBinaryBase64Content(content.getBytes(), false)));
+                        content = new String(memoryProtection.decrypt(Helpers.decodeBase64Content(content.getBytes(), false)));
                     }
                     System.out.print(content);
                     protectedContent = false;

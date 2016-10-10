@@ -1,6 +1,11 @@
 #Change Log
 
 Trying to follow the suggestions at [Keep a Change Log](keepachangelog.com) and [Semantic Versioning] (http://semver.org/spec/v2.0.0.html)
+##[next]
+
+- Added a module structure to allow selective building, for android etc.
+- [Issue #5] Added a Jaxb implementation which is faster than the dom implementation
+- [Issue #5] Added a Simple implementation since Jaxb not great for Android
 
 ##[2.0.1] 2016-10-02
 ### Added

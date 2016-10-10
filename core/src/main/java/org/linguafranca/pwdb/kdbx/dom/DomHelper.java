@@ -178,13 +178,13 @@ class DomHelper {
         if (content == null) {
             throw new IllegalStateException("Could not find binary content with ID " + id);
         }
-        return Helpers.getBinaryBase64Content(content.getTextContent().getBytes(), content.hasAttribute("Compressed"));
+        return Helpers.decodeBase64Content(content.getTextContent().getBytes(), content.hasAttribute("Compressed"));
     }
 
     @NotNull
     static Element setBinaryElementContent(String elementPath, Element parentElement, byte[] value) {
         try {
-            String b64 = Helpers.SetBinaryBase64Content(value);
+            String b64 = Helpers.encodeBase64Content(value, true);
 
             //Find the highest numbered existing content
             String max = xpath.evaluate("//Binaries/Binary/@ID[not(. < ../../Binary/@ID)][1]", parentElement.getOwnerDocument().getDocumentElement());

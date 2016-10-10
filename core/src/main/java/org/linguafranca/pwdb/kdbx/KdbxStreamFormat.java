@@ -33,7 +33,7 @@ public class KdbxStreamFormat implements StreamFormat {
     public void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream encryptedInputStream) throws IOException {
         KdbxHeader kdbxHeader = new KdbxHeader();
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, encryptedInputStream);
-        serializableDatabase.setEncryption(new Salsa20Encryption(kdbxHeader.getProtectedStreamKey()));
+        serializableDatabase.setEncryption(new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey()));
         serializableDatabase.load(decryptedInputStream);
         decryptedInputStream.close();
     }
@@ -44,7 +44,7 @@ public class KdbxStreamFormat implements StreamFormat {
         KdbxHeader kdbxHeader = new KdbxHeader();
         OutputStream unencrytedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, encryptedOutputStream);
         serializableDatabase.setHeaderHash(kdbxHeader.getHeaderHash());
-        serializableDatabase.setEncryption(new Salsa20Encryption(kdbxHeader.getProtectedStreamKey()));
+        serializableDatabase.setEncryption(new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey()));
         serializableDatabase.save(unencrytedOutputStream);
         unencrytedOutputStream.flush();
         unencrytedOutputStream.close();

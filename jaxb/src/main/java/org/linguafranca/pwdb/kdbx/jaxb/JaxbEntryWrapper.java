@@ -122,7 +122,10 @@ public class JaxbEntryWrapper extends AbstractEntry {
                 Integer ref = binaryField.getValue().getRef();
                 for (Binaries.Binary binary: jaxbDatabaseWrapper.getKeePassFile().getMeta().getBinaries().getBinary()){
                     if (binary.getID().equals(ref)) {
-                        return Helpers.getBinaryContent(binary.getValue(), binary.getCompressed());
+                        if (binary.getCompressed()) {
+                            return Helpers.unzipBinaryContent(binary.getValue());
+                        }
+                        return binary.getValue();
                     }
                 }
             }
@@ -157,7 +160,7 @@ public class JaxbEntryWrapper extends AbstractEntry {
         // create a new binary to put in the store
         Binaries.Binary newBin = jaxbDatabaseWrapper.getObjectFactory().createBinariesBinary();
         newBin.setID(max);
-        newBin.setValue(Helpers.setBinaryContent(value));
+        newBin.setValue(Helpers.zipBinaryContent(value));
         newBin.setCompressed(true);
         binaryList.add(newBin);
 

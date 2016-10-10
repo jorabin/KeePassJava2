@@ -16,6 +16,8 @@
 
 package org.linguafranca.security;
 
+import java.security.MessageDigest;
+
 /**
  * Supports a contract that yields a key for decryption of databases
  *
@@ -29,7 +31,8 @@ public interface Credentials {
     class None implements Credentials {
         @Override
         public byte[] getKey() {
-            return new byte[0];
+            MessageDigest md = Encryption.getMessageDigestInstance();
+            return md.digest(new byte[0]);
         }
     }
 

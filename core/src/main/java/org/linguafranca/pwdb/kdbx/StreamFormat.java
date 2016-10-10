@@ -35,14 +35,14 @@ public interface StreamFormat {
 
         @Override
         public void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream inputStream) throws IOException {
-            serializableDatabase.setEncryption(new StreamEncryption.None());
+            serializableDatabase.setEncryption(new StreamEncryptor.None());
             serializableDatabase.load(inputStream);
             inputStream.close();
         }
 
         @Override
         public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream outputStream) throws IOException {
-            serializableDatabase.setEncryption(new StreamEncryption.None());
+            serializableDatabase.setEncryption(new StreamEncryptor.None());
             serializableDatabase.save(outputStream);
             outputStream.flush();
             outputStream.close();

@@ -16,9 +16,9 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
-import org.linguafranca.pwdb.kdbx.Salsa20Encryption;
+import org.linguafranca.pwdb.kdbx.Salsa20StreamEncryptor;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
-import org.linguafranca.pwdb.kdbx.StreamEncryption;
+import org.linguafranca.pwdb.kdbx.StreamEncryptor;
 import org.apache.commons.codec.binary.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -53,7 +53,7 @@ import java.util.Date;
 public class DomSerializableDatabase implements SerializableDatabase {
 
     private Document doc;
-    private StreamEncryption encryption;
+    private StreamEncryptor encryption;
 
     private DomSerializableDatabase() {}
 
@@ -74,7 +74,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
         } catch (XPathExpressionException e) {
             throw new IllegalStateException(e);
         }
-        result.setEncryption(new Salsa20Encryption(SecureRandom.getSeed(32)));
+        result.setEncryption(new Salsa20StreamEncryptor(SecureRandom.getSeed(32)));
         return result;
     }
 
@@ -192,12 +192,12 @@ public class DomSerializableDatabase implements SerializableDatabase {
 
 
     @Override
-    public StreamEncryption getEncryption() {
+    public StreamEncryptor getEncryption() {
         return encryption;
     }
 
     @Override
-    public void setEncryption(StreamEncryption encryption) {
+    public void setEncryption(StreamEncryptor encryption) {
         this.encryption = encryption;
     }
 

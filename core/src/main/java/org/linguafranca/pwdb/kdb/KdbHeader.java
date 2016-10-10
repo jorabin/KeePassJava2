@@ -58,7 +58,7 @@ public class KdbHeader {
     public InputStream createDecryptedInputStream(byte[] key, InputStream inputStream) throws IOException {
         Cipher cipher;
         if ((flags & FLAG_RIJNDAEL) == 0) {
-            throw new IllegalStateException("StreamEncryption algorithm is not supported");
+            throw new IllegalStateException("StreamEncryptor algorithm is not supported");
         }
 
         byte[] finalKeyDigest = Encryption.getFinalKeyDigest(key, masterSeed, transformSeed, transformRounds);

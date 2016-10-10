@@ -14,36 +14,21 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx;
+package org.linguafranca.xml;
+
+import javax.xml.stream.events.XMLEvent;
 
 /**
- * KDBX "protected" fields are stream encrypted. They must be decrypted in
- * the same order as they were encrypted.
- *
  * @author jo
  */
-public interface StreamEncryption {
-    byte[] getKey();
+public interface XmlEventTransformer {
+    XMLEvent transform(XMLEvent event);
 
-    byte[] decrypt(byte[] encryptedText);
-
-    byte[] encrypt(byte[] decryptedText);
-
-    class None implements StreamEncryption {
-
+    @SuppressWarnings("unused")
+    class None implements XmlEventTransformer {
         @Override
-        public byte[] getKey() {
-            return new byte[0];
-        }
-
-        @Override
-        public byte[] decrypt(byte[] encryptedText) {
-            return encryptedText;
-        }
-
-        @Override
-        public byte[] encrypt(byte[] decryptedText) {
-            return decryptedText;
+        public XMLEvent transform(XMLEvent event) {
+            return event;
         }
     }
 }

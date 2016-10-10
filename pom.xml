@@ -24,6 +24,7 @@
     <modules>
         <module>core</module>
         <module>jaxb</module>
+        <module>simple</module>
     </modules>
     <packaging>pom</packaging>
 

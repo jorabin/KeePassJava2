@@ -18,7 +18,7 @@ package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.apache.commons.codec.binary.Base64;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
-import org.linguafranca.pwdb.kdbx.StreamEncryption;
+import org.linguafranca.pwdb.kdbx.StreamEncryptor;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
 
 import javax.xml.bind.JAXBContext;
@@ -41,7 +41,7 @@ import java.util.UUID;
 public class JaxbSerializableDatabase implements SerializableDatabase {
 
     private KeePassFile keePassFile;
-    private StreamEncryption encryption;
+    private StreamEncryptor encryption;
 
 
     @Override
@@ -124,12 +124,12 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
     }
 
     @Override
-    public StreamEncryption getEncryption() {
+    public StreamEncryptor getEncryption() {
         return encryption;
     }
 
     @Override
-    public void setEncryption(StreamEncryption encryption) {
+    public void setEncryption(StreamEncryptor encryption) {
         this.encryption = encryption;
     }
 

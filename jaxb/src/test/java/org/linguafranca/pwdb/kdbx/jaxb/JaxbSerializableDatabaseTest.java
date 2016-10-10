@@ -17,6 +17,10 @@
 package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.junit.Test;
+import org.linguafranca.pwdb.Visitor;
+import org.linguafranca.pwdb.kdbx.KdbxCreds;
+
+import java.io.InputStream;
 
 /**
  * @author jo
@@ -27,4 +31,11 @@ public class JaxbSerializableDatabaseTest {
         JaxbSerializableDatabase db = JaxbSerializableDatabase.createEmptyDatabase();
         db.save(System.out);
     }
+    @Test
+    public void loadXml() throws Exception {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
+        JaxbDatabaseWrapper database = JaxbDatabaseWrapper.load(new KdbxCreds("123".getBytes()), inputStream);
+        database.visit(new Visitor.Print());
+    }
+
 }

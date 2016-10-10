@@ -39,9 +39,9 @@ public interface SerializableDatabase {
 
     void save(OutputStream outputStream) throws IOException;
 
-    StreamEncryption getEncryption();
+    StreamEncryptor getEncryption();
 
-    void setEncryption(StreamEncryption encryption);
+    void setEncryption(StreamEncryptor encryption);
 
     byte[] getHeaderHash();
 
