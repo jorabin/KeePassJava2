@@ -31,12 +31,12 @@ import java.io.OutputStream;
 public class JaxbSaveAndReloadTest extends SaveAndReloadChecks {
     @Override
     public Database getDatabase() {
-        return new JaxbDatabaseWrapper();
+        return new JaxbDatabase();
     }
     @Override
     public Database getDatabase(String name, Credentials credentials) {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(name);
-        return JaxbDatabaseWrapper.load(credentials, inputStream);
+        return JaxbDatabase.load(credentials, inputStream);
     }
 
     @Override
@@ -46,11 +46,11 @@ public class JaxbSaveAndReloadTest extends SaveAndReloadChecks {
 
     @Override
     public void saveDatabase(Database database, StreamFormat streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
-        ((JaxbDatabaseWrapper) database).save(streamFormat, credentials, outputStream);
+        ((JaxbDatabase) database).save(streamFormat, credentials, outputStream);
     }
 
     @Override
     public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
-        return JaxbDatabaseWrapper.load(credentials, inputStream);
+        return JaxbDatabase.load(credentials, inputStream);
     }
 }

@@ -35,6 +35,6 @@ public class JaxbLoaderTest extends DatabaseLoaderChecks {
         // open database. DomDatabaseWrapper is so-called, since it wraps
         // a W3C DOM, populated from the KeePass XML, and presents it
         // through a org.linguafranca.keepass.Database interface.
-        super.database = JaxbDatabaseWrapper.load(credentials, inputStream);
+        super.database = JaxbDatabase.load(credentials, inputStream);
     }
 }

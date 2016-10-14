@@ -29,7 +29,10 @@ import java.util.List;
  *
  * <p>A database is a factory for new Groups and Entries. Groups and entries belonging
  * to one database cannot in general be added to another database, they need to be
- * copied using {@link #newGroup(Group)} and {@link #newEntry(Entry)}.
+ * imported using {@link #newGroup(Group)} and {@link #newEntry(Entry)}, or implicitly
+ * imported using {@link Group#addGroup(Group)}  which automatically create Groups and
+ * Entries (as well as importing sub groups and their entries). {@link Group#addEntry(Entry)}
+ * allows arbitrary importing from other databases.
  *
  * <p>Databases may be navigated directly from the root {@link #getRootGroup()},
  * or using a {@link Visitor} and {@link #visit(Visitor)} or {@link #visit(Group, Visitor)}

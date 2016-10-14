@@ -61,6 +61,7 @@ public abstract class BasicDatabaseChecks {
         Group g2 = database.newGroup();
         assertEquals("", g2.getName());
         assertNotNull(g2.getUuid());
+        assertEquals(0, g2.getIcon().getIndex());
         assertEquals(0, g2.getGroups().size());
         assertEquals(0, g2.getEntries().size());
 
@@ -79,7 +80,7 @@ public abstract class BasicDatabaseChecks {
         assertTrue (g2.equals(g1));
         Group g3 = database.getRootGroup().removeGroup(g2);
         assertTrue (g3.equals(g1));
-//        assertTrue(g1.getParent() == null);
+        assertTrue(g1.getParent() == null);
         assertTrue(database.getRootGroup().getGroups().size() == 0);
         assertTrue(database.getRootGroup().findGroups("group1").size() == 0);
     }

@@ -23,7 +23,7 @@ import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.kdb.KdbCredentials;
 import org.linguafranca.pwdb.kdb.KdbDatabase;
 import org.linguafranca.pwdb.kdbx.*;
-import org.linguafranca.pwdb.kdbx.jaxb.JaxbDatabaseWrapper;
+import org.linguafranca.pwdb.kdbx.jaxb.JaxbDatabase;
 import org.linguafranca.security.Credentials;
 import org.xml.sax.*;
 
@@ -50,7 +50,7 @@ public class QuickStart {
         // password credentials
         Credentials credentials = new KdbxCreds("123".getBytes());
         // Jaxb implementation seems a lot faster than the DOM implementation
-        Database database = JaxbDatabaseWrapper.load(credentials, inputStream);
+        Database database = JaxbDatabase.load(credentials, inputStream);
         // alternatively open database using Dom implementation (slow)
         // Database database = DomDatabaseWrapper.load(credentials, inputStream);
 
@@ -69,7 +69,7 @@ public class QuickStart {
 
     public void saveKdbx() throws IOException {
         // create an empty database
-        Database database = new JaxbDatabaseWrapper();
+        Database database = new JaxbDatabase();
 
         // add some groups and entries
         for (Integer g = 0; g < 5; g++){

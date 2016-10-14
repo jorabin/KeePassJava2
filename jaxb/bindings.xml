@@ -20,6 +20,11 @@
           xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
           version="2.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <bindings schemaLocation="../KDBX.3.1.xsd">
+<!--
+        <globalBindings>
+            <xjc:superClass name="org.linguafranca.pwdb.kdbx.jaxb.base.BaseGroup" />
+        </globalBindings>
+-->
         <bindings node="//xs:simpleType[@name='keepassBoolean']">
             <javaType name="Boolean"
                       parseMethod="org.linguafranca.pwdb.kdbx.Helpers.toBoolean"
@@ -28,8 +33,8 @@
         </bindings>
         <bindings node="//xs:simpleType[@name='keepassDateTime']">
             <javaType name="java.util.Date"
-                      parseMethod="org.linguafranca.pwdb.kdbx.Helpers.toDate"
-                      printMethod="org.linguafranca.pwdb.kdbx.Helpers.fromDate"
+                      parseMethod="org.linguafranca.pwdb.kdbx.jaxb.util.DateAdapter.fromString"
+                      printMethod="org.linguafranca.pwdb.kdbx.jaxb.util.DateAdapter.toString"
             />
         </bindings>
         <bindings node="//xs:simpleType[@name='uuid']">
@@ -37,6 +42,18 @@
                       parseMethod="org.linguafranca.pwdb.kdbx.Helpers.uuidFromBase64"
                       printMethod="org.linguafranca.pwdb.kdbx.Helpers.base64FromUuid"
             />
+        </bindings>
+        <bindings node = "//xs:complexType[@name='EntryBase']">
+            <class implClass="org.linguafranca.pwdb.kdbx.jaxb.base.AbstractJaxbEntry"/>
+        </bindings>
+        <bindings node = "//xs:complexType[@name='GroupBase']">
+            <class implClass="org.linguafranca.pwdb.kdbx.jaxb.base.AbstractJaxbGroup"/>
+        </bindings>
+        <bindings node = "//xs:element[@name='Group']">
+            <class name="JaxbGroupBinding" />
+        </bindings>
+        <bindings node = "//xs:element[@name='Entry']">
+            <class name="JaxbEntryBinding" />
         </bindings>
     </bindings>
 </bindings>

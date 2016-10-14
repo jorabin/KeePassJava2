@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package org.linguafranca.xml;
+package org.linguafranca.pwdb.kdbx.jaxb.util;
 
-import javax.xml.stream.events.XMLEvent;
+import org.linguafranca.pwdb.kdbx.Helpers;
+
+import java.util.Date;
 
 /**
- * An interface for allowing XML events to be transformed by {@link XmlOutputStreamFilter}
- * and {@link XmlInputStreamFilter}.
- *
  * @author jo
  */
-public interface XmlEventTransformer {
-    XMLEvent transform(XMLEvent event);
+public class DateAdapter {
+    public static String toString(Date date) {
+        return Helpers.fromDate(date);
+    }
 
-    @SuppressWarnings("unused")
-    class None implements XmlEventTransformer {
-        @Override
-        public XMLEvent transform(XMLEvent event) {
-            return event;
+    public static Date fromString(String string) {
+        if (string.equals("${creationDate}")) {
+            return new Date();
         }
+        return Helpers.toDate(string);
     }
 }

@@ -45,7 +45,8 @@ public interface Group {
     Group getParent();
 
     /**
-     * Set parent is equivalent to <code>parent.addGroup(this)</code>
+     * Add this group to a parent. The group must be of a type compatible with the database
+     * and if it already belongs to another group it is removed from that group.
      *
      * @param parent a prospective parent
      */
@@ -69,13 +70,16 @@ public interface Group {
     int getGroupsCount();
 
     /**
-     * Remove the group from its current parent, if any and add it to this gorup.
+     * If the group belongs to this databse then move it from its present parent, if any, to
+     * the group on which this method is called.
+     *
+     * <p> If it does not belong to this database then import the group and all its sub groups and entries.
+     * The group is unaffected in its original database.
      *
      * <p>The root group cannot be added to another group.
      *
      * @param group the group to add
      * @return the group added
-     * @throws IllegalArgumentException if the group is not part of this database
      */
     Group addGroup(Group group);
 
@@ -93,9 +97,12 @@ public interface Group {
      * Removes the group supplied from this group. The group removed
      * no longer has a parent and so in not part of the database any more unless
      * it is re-added to another group.
-     *
+     * <p>
+     * If the group is incompatible with the databse an exception is thrown.
+     * <p>
+     * If the group is not present no error is thrown.
      * @param group the group to remove
-     * @return the group removed
+     * @return the group passed for removal
      * @throws IllegalArgumentException if the group is not a child of this group
      */
     Group removeGroup(Group group);

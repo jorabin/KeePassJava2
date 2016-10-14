@@ -23,13 +23,17 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
 
+import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
+import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
+import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
+
 /**
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
 public class KdbxInputTransformer implements XmlEventTransformer {
-    private final StreamEncryptor streamEncryptor;
     private XMLEventFactory xmlEventFactory = new com.fasterxml.aalto.stax.EventFactoryImpl();
+    private final StreamEncryptor streamEncryptor;
     private boolean decryptContent;
 
     public KdbxInputTransformer (StreamEncryptor streamEncryptor) {
@@ -38,18 +42,18 @@ public class KdbxInputTransformer implements XmlEventTransformer {
 
     public XMLEvent transform (XMLEvent event) {
         switch (event.getEventType()) {
-            case XMLEvent.START_ELEMENT: {
+            case START_ELEMENT: {
                 Attribute attribute = event.asStartElement().getAttributeByName(new QName("Protected"));
                 if (attribute != null) {
                     decryptContent = Helpers.toBoolean(attribute.getValue());
                 }
                 break;
             }
-            case XMLEvent.END_ELEMENT: {
+            case END_ELEMENT: {
                 decryptContent = false;
                 break;
             }
-            case XMLEvent.CHARACTERS: {
+            case CHARACTERS: {
                 if (decryptContent) {
                     String text = event.asCharacters().getData();
                     text = new String(streamEncryptor.decrypt(Helpers.decodeBase64Content(text.getBytes(), false)));

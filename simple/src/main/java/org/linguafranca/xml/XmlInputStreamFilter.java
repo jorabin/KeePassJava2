@@ -27,6 +27,13 @@ import java.io.InputStream;
 
 
 /**
+ * A filter to accept a stream, interpret as XML, allow transformation
+ * as XML then forward as a stream.
+ *
+ * <p>Although this means that the interpretation of the XML will happen
+ * twice, here and in the target application, some such applications
+ * do not accept XML streams. e.g. the Simple XML framework.
+ *
  * @author jo
  */
 public class XmlInputStreamFilter extends InputStream {
@@ -46,8 +53,10 @@ public class XmlInputStreamFilter extends InputStream {
     public XmlInputStreamFilter(InputStream is, XmlEventTransformer transformer) throws XMLStreamException {
         this.inputStream = is;
         this.eventTransformer = transformer;
+
         XMLInputFactory inputFactory = new com.fasterxml.aalto.stax.InputFactoryImpl();
         this.xmlEventReader = inputFactory.createXMLEventReader(is);
+
         XMLOutputFactory outputFactory = new com.fasterxml.aalto.stax.OutputFactoryImpl();
         this.xmlEventWriter = outputFactory.createXMLEventWriter(xmlWriteStream);
     }
@@ -70,7 +79,6 @@ public class XmlInputStreamFilter extends InputStream {
         while ((bytesRead = xmlInStream.read(b, offset, length)) < length && !done) {
             if (bytesRead == -1) {
                 try {
-                    //load();
                     loadEvents();
                 } catch (XMLStreamException e) {
                     throw new IOException(e);

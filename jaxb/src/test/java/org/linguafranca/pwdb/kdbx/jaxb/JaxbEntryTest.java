@@ -33,7 +33,7 @@ public class JaxbEntryTest extends EntryChecks {
 
     public JaxbEntryTest() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
-        database =JaxbDatabaseWrapper.load(new KdbxCreds("123".getBytes()),inputStream);
+        database = JaxbDatabase.load(new KdbxCreds("123".getBytes()),inputStream);
     }
 
     @Override

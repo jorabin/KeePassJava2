@@ -30,6 +30,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
+ * A filter to accept a stream, interpret as XML, allow transformation
+ * as XML then forward as a stream.
+ *
+ * <p>Although this means that the interpretation of the XML will happen
+ * twice, here and in the target application, some such applications
+ * do not accept XML streams. e.g. the Simple XML framework.
+ *
  * @author jo
  */
 @SuppressWarnings({"WeakerAccess", "unused"})

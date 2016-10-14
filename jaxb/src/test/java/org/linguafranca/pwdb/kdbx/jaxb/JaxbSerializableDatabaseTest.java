@@ -19,6 +19,7 @@ package org.linguafranca.pwdb.kdbx.jaxb;
 import org.junit.Test;
 import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
+import org.linguafranca.pwdb.kdbx.StreamFormat;
 
 import java.io.InputStream;
 
@@ -28,13 +29,13 @@ import java.io.InputStream;
 public class JaxbSerializableDatabaseTest {
     @Test
     public void createEmptyDatabase() throws Exception {
-        JaxbSerializableDatabase db = JaxbSerializableDatabase.createEmptyDatabase();
-        db.save(System.out);
+        JaxbDatabase db = JaxbDatabase.createEmptyDatabase();
+        db.save(new KdbxCreds.None(), System.out);
     }
     @Test
     public void loadXml() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
-        JaxbDatabaseWrapper database = JaxbDatabaseWrapper.load(new KdbxCreds("123".getBytes()), inputStream);
+        JaxbDatabase database = JaxbDatabase.load(new KdbxCreds("123".getBytes()), inputStream);
         database.visit(new Visitor.Print());
     }
 

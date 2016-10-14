@@ -31,6 +31,6 @@ public class JaxbBasicDatabaseTest extends BasicDatabaseChecks {
 
     @Override
     public Database createDatabase() {
-        return new JaxbDatabaseWrapper(JaxbSerializableDatabase.createEmptyDatabase().getKeePassFile());
+        return new JaxbDatabase();
     }
 }

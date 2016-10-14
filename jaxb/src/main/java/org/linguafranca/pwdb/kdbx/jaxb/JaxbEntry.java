@@ -16,12 +16,12 @@
 
 package org.linguafranca.pwdb.kdbx.jaxb;
 
-import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
+
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,33 +29,33 @@ import java.util.List;
 import java.util.UUID;
 
 /**
+ * Implementation of {@link Entry} for JAXB.
+ *
+ * <p>The class wraps an underlying JAXB generated delegate.
+ *
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
-public class JaxbEntryWrapper extends AbstractEntry {
+public class JaxbEntry extends AbstractEntry {
 
+    private JaxbDatabase database;
+    protected JaxbEntryBinding delegate;
 
-    private final JaxbDatabaseWrapper jaxbDatabaseWrapper;
-    private org.linguafranca.pwdb.kdbx.jaxb.binding.Entry wrappedEntry;
-    private Group parent;
-
-    public JaxbEntryWrapper(JaxbDatabaseWrapper jaxbDatabaseWrapper, Group parent) {
-        this.jaxbDatabaseWrapper = jaxbDatabaseWrapper;
-        this.parent = parent;
-        this.wrappedEntry = jaxbDatabaseWrapper.getObjectFactory().createEntry();
+    public JaxbEntry(JaxbDatabase jaxbDatabase) {
+        this.database = jaxbDatabase;
+        this.delegate = new JaxbEntryBinding();
 
         for (String s: STANDARD_PROPERTY_NAMES) {
-            StringField field = jaxbDatabaseWrapper.getObjectFactory().createStringField();
+            StringField field = jaxbDatabase.getObjectFactory().createStringField();
             field.setKey(s);
-            StringField.Value value = jaxbDatabaseWrapper.getObjectFactory().createStringFieldValue();
+            StringField.Value value = jaxbDatabase.getObjectFactory().createStringFieldValue();
             value.setValue("");
             field.setValue(value);
-            this.wrappedEntry.getString().add(field);
+            delegate.getString().add(field);
         }
 
-        Times times = jaxbDatabaseWrapper.getObjectFactory().createTimes();
-        this.wrappedEntry.setTimes(times);
         Date now = new Date();
+        Times times = new Times();
         times.setLastModificationTime(now);
         times.setCreationTime(now);
         times.setLastAccessTime(now);
@@ -63,19 +63,46 @@ public class JaxbEntryWrapper extends AbstractEntry {
         times.setExpires(false);
         times.setUsageCount(0);
         times.setLocationChanged(now);
+        this.delegate.setTimes(times);
 
-        wrappedEntry.setUUID(UUID.randomUUID());
+        delegate.setUUID(UUID.randomUUID());
     }
 
-    public JaxbEntryWrapper(JaxbDatabaseWrapper jaxbDatabaseWrapper, Group parent, org.linguafranca.pwdb.kdbx.jaxb.binding.Entry wrappedEntry) {
-        this.wrappedEntry = wrappedEntry;
-        this.jaxbDatabaseWrapper = jaxbDatabaseWrapper;
-        this.parent = parent;
+    public JaxbEntry(JaxbDatabase database, JaxbEntryBinding entry) {
+        this.database = database;
+        this.delegate = entry;
+    }
+
+    public static JaxbEntry importEntry(JaxbGroup parent, Entry entry) {
+        if (entry instanceof JaxbEntry &&
+                ((JaxbEntry) entry).database.equals(parent.database)){
+                ((JaxbEntry) entry).delegate.parent = parent.delegate;
+            return (JaxbEntry) entry;
+        }
+        JaxbEntry result = new JaxbEntry(parent.database);
+        result.delegate.setUUID(entry.getUuid());
+        result.delegate.setIconID(entry.getIcon().getIndex());
+        result.delegate.getTimes().setExpires(entry.getExpires());
+        result.delegate.getTimes().setExpiryTime(entry.getExpiryTime());
+        result.delegate.getTimes().setCreationTime(entry.getCreationTime());
+        result.delegate.getTimes().setLastAccessTime(entry.getLastAccessTime());
+        result.delegate.getTimes().setLastModificationTime(entry.getLastModificationTime());
+        result.delegate.getTimes().setCreationTime(entry.getCreationTime());
+        result.delegate.parent = parent.delegate;
+
+        for (String propertyName : entry.getPropertyNames()) {
+            result.setProperty(propertyName, entry.getProperty(propertyName));
+        }
+
+        for (String propertyName : entry.getBinaryPropertyNames()) {
+            result.setBinaryProperty(propertyName, entry.getBinaryProperty(propertyName));
+        }
+        return result;
     }
 
     @Override
     public String getProperty(String name) {
-        for (StringField field: wrappedEntry.getString()){
+        for (StringField field: delegate.getString()){
             if (field.getKey().equals(name)){
                 return field.getValue().getValue();
             }
@@ -86,30 +113,30 @@ public class JaxbEntryWrapper extends AbstractEntry {
     @Override
     public void setProperty(String name, String value) {
         StringField toRemove = null;
-        for (StringField field: wrappedEntry.getString()){
+        for (StringField field: delegate.getString()){
             if (field.getKey().equals(name)) {
                 toRemove = field;
                 break;
             }
         }
         if (toRemove != null) {
-            wrappedEntry.getString().remove(toRemove);
+            delegate.getString().remove(toRemove);
         }
 
-        StringField.Value fieldValue = jaxbDatabaseWrapper.getObjectFactory().createStringFieldValue();
+        StringField.Value fieldValue = database.getObjectFactory().createStringFieldValue();
         fieldValue.setValue(value);
         fieldValue.setProtected(false);
-        StringField field = jaxbDatabaseWrapper.getObjectFactory().createStringField();
+        StringField field = database.getObjectFactory().createStringField();
         field.setKey(name);
         field.setValue(fieldValue);
-        wrappedEntry.getString().add(field);
+        delegate.getString().add(field);
         touch();
     }
 
     @Override
     public List<String> getPropertyNames() {
         List<String> result = new ArrayList<>();
-        for (StringField stringField : wrappedEntry.getString()) {
+        for (StringField stringField : delegate.getString()) {
             result.add(stringField.getKey());
         }
         return result;
@@ -117,10 +144,10 @@ public class JaxbEntryWrapper extends AbstractEntry {
 
     @Override
     public byte[] getBinaryProperty(String name) {
-        for (BinaryField binaryField : wrappedEntry.getBinary()){
+        for (BinaryField binaryField : delegate.getBinary()){
             if (binaryField.getKey().equals(name)){
                 Integer ref = binaryField.getValue().getRef();
-                for (Binaries.Binary binary: jaxbDatabaseWrapper.getKeePassFile().getMeta().getBinaries().getBinary()){
+                for (Binaries.Binary binary: database.getKeePassFile().getMeta().getBinaries().getBinary()){
                     if (binary.getID().equals(ref)) {
                         if (binary.getCompressed()) {
                             return Helpers.unzipBinaryContent(binary.getValue());
@@ -137,19 +164,19 @@ public class JaxbEntryWrapper extends AbstractEntry {
     public void setBinaryProperty(String name, byte[] value) {
         // remove old binary property with same name
         BinaryField toRemove = null;
-        for (BinaryField binaryField : wrappedEntry.getBinary()) {
+        for (BinaryField binaryField : delegate.getBinary()) {
             if (binaryField.getKey().equals(name)) {
                 toRemove = binaryField;
                 break;
             }
         }
         if (toRemove != null) {
-            wrappedEntry.getBinary().remove(toRemove);
+            delegate.getBinary().remove(toRemove);
         }
 
         // what is the next free index in the binary store?
         Integer max = -1;
-        List<Binaries.Binary> binaryList = jaxbDatabaseWrapper.getKeePassFile().getMeta().getBinaries().getBinary();
+        List<Binaries.Binary> binaryList = database.getKeePassFile().getMeta().getBinaries().getBinary();
         for (Binaries.Binary binary: binaryList){
             if (binary.getID() > max) {
                 max = binary.getID();
@@ -158,109 +185,83 @@ public class JaxbEntryWrapper extends AbstractEntry {
         max++;
 
         // create a new binary to put in the store
-        Binaries.Binary newBin = jaxbDatabaseWrapper.getObjectFactory().createBinariesBinary();
+        Binaries.Binary newBin = database.getObjectFactory().createBinariesBinary();
         newBin.setID(max);
         newBin.setValue(Helpers.zipBinaryContent(value));
         newBin.setCompressed(true);
         binaryList.add(newBin);
 
         // make a reference to it from the entry
-        BinaryField binaryField = jaxbDatabaseWrapper.getObjectFactory().createBinaryField();
+        BinaryField binaryField = database.getObjectFactory().createBinaryField();
         binaryField.setKey(name);
-        BinaryField.Value fieldValue = jaxbDatabaseWrapper.getObjectFactory().createBinaryFieldValue();
+        BinaryField.Value fieldValue = database.getObjectFactory().createBinaryFieldValue();
         fieldValue.setRef(max);
         binaryField.setValue(fieldValue);
-        wrappedEntry.getBinary().add(binaryField);
+        delegate.getBinary().add(binaryField);
         touch();
     }
 
     @Override
     public List<String> getBinaryPropertyNames() {
         List<String> result = new ArrayList<>();
-        for (BinaryField binaryField : wrappedEntry.getBinary()) {
+        for (BinaryField binaryField : delegate.getBinary()) {
             result.add(binaryField.getKey());
         }
         return result;
     }
 
     @Override
-    public Group getParent() {
-        return parent;
+    public JaxbGroup getParent() {
+        if (delegate.parent == null) {
+            return null;
+        }
+        return new JaxbGroup(database, ((JaxbGroupBinding) delegate.parent));
     }
 
     @Override
     public UUID getUuid() {
-        return wrappedEntry.getUUID();
+        return delegate.getUUID();
     }
 
     @Override
     public Icon getIcon() {
-        return new JaxbIconWrapper(wrappedEntry.getIconID());
+        return new JaxbIconWrapper(delegate.getIconID());
     }
 
     @Override
     public void setIcon(Icon icon) {
-        wrappedEntry.setIconID(icon.getIndex());
+        delegate.setIconID(icon.getIndex());
         touch();
     }
 
     @Override
     public Date getLastAccessTime() {
-        return wrappedEntry.getTimes().getLastAccessTime();
+        return delegate.getTimes().getLastAccessTime();
     }
 
     @Override
     public Date getCreationTime() {
-        return wrappedEntry.getTimes().getCreationTime();
+        return delegate.getTimes().getCreationTime();
     }
 
     @Override
     public boolean getExpires() {
-        return wrappedEntry.getTimes().getExpires();
+        return delegate.getTimes().getExpires();
     }
 
     @Override
     public Date getExpiryTime() {
-        return wrappedEntry.getTimes().getExpiryTime();
+        return delegate.getTimes().getExpiryTime();
     }
 
     @Override
     public Date getLastModificationTime() {
-        return wrappedEntry.getTimes().getLastModificationTime();
+        return delegate.getTimes().getLastModificationTime();
     }
 
     @Override
     protected void touch() {
-        jaxbDatabaseWrapper.setDirty(true);
-        wrappedEntry.getTimes().setLastModificationTime(new Date());
-    }
-
-    public org.linguafranca.pwdb.kdbx.jaxb.binding.Entry getBackingEntry(){
-        return wrappedEntry;
-    }
-
-    public static JaxbEntryWrapper create(JaxbDatabaseWrapper wrapper, JaxbGroupWrapper parent, Entry entry) {
-        if (entry instanceof JaxbEntryWrapper) {
-            return (JaxbEntryWrapper) entry;
-        }
-        JaxbEntryWrapper result = new JaxbEntryWrapper(wrapper, parent);
-        org.linguafranca.pwdb.kdbx.jaxb.binding.Entry backingEntry = result.getBackingEntry();
-        backingEntry.setUUID(entry.getUuid());
-        backingEntry.setIconID(entry.getIcon().getIndex());
-        backingEntry.getTimes().setExpires(entry.getExpires());
-        backingEntry.getTimes().setExpiryTime(entry.getExpiryTime());
-        backingEntry.getTimes().setCreationTime(entry.getCreationTime());
-        backingEntry.getTimes().setLastAccessTime(entry.getLastAccessTime());
-        backingEntry.getTimes().setLastModificationTime(entry.getLastModificationTime());
-        backingEntry.getTimes().setCreationTime(entry.getCreationTime());
-
-        for (String propertyName : entry.getPropertyNames()) {
-            result.setProperty(propertyName, entry.getProperty(propertyName));
-        }
-
-        for (String propertyName : entry.getBinaryPropertyNames()) {
-            result.setBinaryProperty(propertyName, entry.getBinaryProperty(propertyName));
-        }
-        return result;
+        database.setDirty(true);
+        delegate.getTimes().setLastModificationTime(new Date());
     }
 }

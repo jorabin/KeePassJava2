@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-package org.linguafranca.xml;
+package org.linguafranca.pwdb.kdbx.jaxb.base;
 
-import javax.xml.stream.events.XMLEvent;
+import org.linguafranca.pwdb.base.AbstractEntry;
+
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
- * An interface for allowing XML events to be transformed by {@link XmlOutputStreamFilter}
- * and {@link XmlInputStreamFilter}.
- *
  * @author jo
  */
-public interface XmlEventTransformer {
-    XMLEvent transform(XMLEvent event);
-
-    @SuppressWarnings("unused")
-    class None implements XmlEventTransformer {
-        @Override
-        public XMLEvent transform(XMLEvent event) {
-            return event;
-        }
-    }
+public abstract class AbstractJaxbEntry {
+    @XmlTransient
+    public AbstractJaxbGroup parent;
 }

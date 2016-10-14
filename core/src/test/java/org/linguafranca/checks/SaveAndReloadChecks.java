@@ -67,6 +67,7 @@ public abstract class SaveAndReloadChecks {
             assertEquals(g.toString(), group.getName());
             assertEquals(g + 1, group.getEntries().size());
             assertEquals(g+1, group.getEntriesCount());
+            assertEquals(input.getRootGroup(), group.getParent());
             for (int e = 0; e <= g; e++) {
                 Entry entry = group.getEntries().get(e);
                 assertEquals(g + "-" + e, entry.getTitle());
@@ -74,6 +75,7 @@ public abstract class SaveAndReloadChecks {
                 assertEquals(g + "- p -" + e, entry.getPassword());
                 assertEquals(g + "- url - " + e, entry.getUrl());
                 assertEquals(g + "- n - " + e, entry.getNotes());
+                assertEquals(group, entry.getParent());
             }
         }
         //saveDatabase(input, new StreamFormat.None(), new Credentials.None(), System.out);

@@ -63,11 +63,10 @@ public abstract class EntryChecks {
         byte [] original = ByteStreams.toByteArray(testfile);
         Entry entry = database.findEntries("Test attachment").get(0);
         entry.setBinaryProperty("letter L.jpeg", original);
-        //saveDatabase(database, new StreamFormat.None(), new Credentials.None(), System.out);
-
         byte [] letterL = entry.getBinaryProperty("letter L.jpeg");
         assertArrayEquals(original, letterL);
-
+        assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
+        assertTrue(database.isDirty());
     }
 
     @Test

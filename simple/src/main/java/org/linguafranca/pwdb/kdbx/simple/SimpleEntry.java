@@ -35,6 +35,8 @@ import java.util.UUID;
 import static org.linguafranca.pwdb.kdbx.simple.model.EntryClasses.*;
 
 /**
+ * Implementation of {@link Entry} for Simple XML framework
+ *
  * @author jo
  */
 @SuppressWarnings({"WeakerAccess"})
@@ -72,7 +74,7 @@ public class SimpleEntry extends AbstractEntry {
     @Transient
     SimpleGroup parent;
 
-    public SimpleEntry() {
+    protected SimpleEntry() {
         string = new ArrayList<>();
         binary = new ArrayList<>();
         times = new Times(new Date());
@@ -80,10 +82,44 @@ public class SimpleEntry extends AbstractEntry {
         iconID = 0;
     }
 
-    @Override
-    protected void touch() {
-        this.times.setLastModificationTime(new Date());
-        this.database.setDirty(true);
+    /**
+     * Factory to create a new {@link SimpleEntry} with no parent
+     * @param database in which this entry
+     * @return a detached Entry
+     */
+    public static SimpleEntry createEntry(SimpleDatabase database) {
+        SimpleEntry result = new SimpleEntry();
+        result.database = database;
+        result.parent = null;
+        for (String p: Entry.STANDARD_PROPERTY_NAMES) {
+            result.setProperty(p, "");
+        }
+        return result;
+    }
+
+    /**
+     * Copy an existing entry from another database or return the same entry if it is the same database
+     * in either case making parent the owner of the entry
+     * @param parent the group to be the parent
+     * @param entry the entry to copy
+     * @return a new entry or the same entry if already in the specified database
+     */
+    public static SimpleEntry importEntry(SimpleGroup parent, Entry entry) {
+        if (entry instanceof SimpleEntry && ((SimpleEntry) entry).database == parent.database) {
+            ((SimpleEntry) entry).parent = parent;
+            return ((SimpleEntry) entry);
+        }
+        SimpleEntry result = createEntry(parent.database);
+        result.parent = parent;
+        result.iconID = entry.getIcon().getIndex();
+        result.uuid = entry.getUuid();
+        for (String propertyName: entry.getPropertyNames()) {
+            result.setProperty(propertyName, entry.getProperty(propertyName));
+        }
+        for (String propertyName: entry.getBinaryPropertyNames()) {
+            result.setBinaryProperty(propertyName, entry.getBinaryProperty(propertyName));
+        }
+        return result;
     }
 
     @Override
@@ -149,7 +185,7 @@ public class SimpleEntry extends AbstractEntry {
         // create a new binary to put in the store
         KeePassFile.Binaries.Binary newBin = new KeePassFile.Binaries.Binary();
         newBin.setId(max);
-        newBin.setValue(new String(Helpers.encodeBase64Content(bytes, true)));
+        newBin.setValue(Helpers.encodeBase64Content(bytes, true));
         newBin.setCompressed(true);
         database.getBinaries().add(newBin);
 
@@ -173,7 +209,7 @@ public class SimpleEntry extends AbstractEntry {
     }
 
     @Override
-    public org.linguafranca.pwdb.Group getParent() {
+    public SimpleGroup getParent() {
         return parent;
     }
 
@@ -217,29 +253,9 @@ public class SimpleEntry extends AbstractEntry {
         return times.getLastModificationTime();
     }
 
-    public static SimpleEntry createEntry(SimpleDatabase database, SimpleGroup parent) {
-        SimpleEntry result = new SimpleEntry();
-        result.database = database;
-        result.parent = parent;
-        for (String p: Entry.STANDARD_PROPERTY_NAMES) {
-            result.setProperty(p, "");
-        }
-        return result;
-    }
-
-    public static SimpleEntry createEntry(SimpleGroup parent, org.linguafranca.pwdb.Entry entry) {
-        if (entry instanceof SimpleEntry && ((SimpleEntry) entry).database == parent.database) {
-            return ((SimpleEntry) entry);
-        }
-        SimpleEntry result = createEntry(parent.database, parent);
-        result.iconID = entry.getIcon().getIndex();
-        result.uuid = entry.getUuid();
-        for (String propertyName: entry.getPropertyNames()) {
-            result.setProperty(propertyName, entry.getProperty(propertyName));
-        }
-        for (String propertyName: entry.getBinaryPropertyNames()) {
-            result.setBinaryProperty(propertyName, entry.getBinaryProperty(propertyName));
-        }
-        return result;
+    @Override
+    protected void touch() {
+        this.times.setLastModificationTime(new Date());
+        this.database.setDirty(true);
     }
 }

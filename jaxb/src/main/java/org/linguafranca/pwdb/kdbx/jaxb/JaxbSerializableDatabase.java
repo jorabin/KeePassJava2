@@ -40,12 +40,12 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public class JaxbSerializableDatabase implements SerializableDatabase {
 
-    private KeePassFile keePassFile;
+    protected KeePassFile keePassFile;
     private StreamEncryptor encryption;
 
 
     @Override
-    public SerializableDatabase load(InputStream inputStream) {
+    public JaxbSerializableDatabase load(InputStream inputStream) {
         try {
             JAXBContext jc = JAXBContext.newInstance(KeePassFile.class);
             Unmarshaller u = jc.createUnmarshaller();
@@ -62,9 +62,12 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
                                 value.setProtected(false);
                             }
                         }
-                        /*if (target instanceof Group && !(parent instanceof Group)) {
-                            ((Group) target).isRootGroup = true;
-                        }*/
+                        if (target instanceof JaxbGroupBinding && (parent instanceof JaxbGroupBinding)) {
+                            ((JaxbGroupBinding) target).parent = ((JaxbGroupBinding) parent);
+                        }
+                        if (target instanceof JaxbEntryBinding && (parent instanceof JaxbGroupBinding)) {
+                            ((JaxbEntryBinding) target).parent = ((JaxbGroupBinding) parent);
+                        }
                     } catch (UnsupportedEncodingException e) {
                         throw new IllegalStateException();
                     }
@@ -143,71 +146,6 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
         keePassFile.getMeta().setHeaderHash(hash);
     }
 
-    public static JaxbSerializableDatabase createEmptyDatabase () {
-        JaxbSerializableDatabase result = new JaxbSerializableDatabase();
-
-        ObjectFactory objectFactory = new ObjectFactory();
-        result.keePassFile = objectFactory.createKeePassFile();
-        KeePassFile.Meta meta = objectFactory.createKeePassFileMeta();
-        result.keePassFile.setMeta(meta);
-        Date now = new Date();
-        meta.setGenerator("KeepassJava2");
-        meta.setDatabaseName("New Database");
-        meta.setDatabaseNameChanged(now);
-        meta.setDatabaseDescription("New Database created by KeePassJava2");
-        meta.setDatabaseDescriptionChanged(now);
-        meta.setDefaultUserNameChanged(now);
-        meta.setMaintenanceHistoryDays(365);
-        meta.setMasterKeyChanged(now);
-        meta.setMasterKeyChangeRec(-1);
-        meta.setMasterKeyChangeForce(-1);
-
-        KeePassFile.Meta.MemoryProtection p = objectFactory.createKeePassFileMetaMemoryProtection();
-        p.setProtectTitle(false);
-        p.setProtectUserName(false);
-        p.setProtectPassword(true);
-        p.setProtectURL(false);
-        p.setProtectNotes(false);
-
-        meta.setMemoryProtection(p);
-
-        meta.setRecycleBinEnabled(true);
-        meta.setRecycleBinUUID(new UUID(0,0));
-        meta.setRecycleBinChanged(now);
-
-        meta.setEntryTemplatesGroup(new UUID(0,0));
-        meta.setEntryTemplatesGroupChanged(now);
-        meta.setLastSelectedGroup(new UUID(0,0));
-        meta.setLastTopVisibleGroup(new UUID(0,0));
-
-        meta.setHistoryMaxItems(10);
-        meta.setHistoryMaxSize(6291456);
-
-        Group rootGroup = objectFactory.createGroup();
-        rootGroup.setUUID(UUID.randomUUID());
-        rootGroup.setName("Root");
-        rootGroup.setIconID(48);
-
-        Times times = objectFactory.createTimes();
-        times.setLastModificationTime(now);
-        times.setCreationTime(now);
-        times.setLastAccessTime(now);
-        times.setExpiryTime(now);
-        times.setExpires(false);
-        times.setUsageCount(0);
-        times.setLocationChanged(now);
-        rootGroup.setTimes(times);
-        rootGroup.setIsExpanded(true);
-        rootGroup.setEnableAutoType(true);
-        rootGroup.setEnableSearching(true);
-        rootGroup.setLastTopVisibleEntry(new UUID(0,0));
-
-        KeePassFile.Root root = objectFactory.createKeePassFileRoot();
-        result.keePassFile.setRoot(root);
-        root.setGroup(rootGroup);
-
-        return result;
-    }
 
     public KeePassFile getKeePassFile() {
         return keePassFile;

@@ -130,8 +130,12 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:complexType name="GroupBase" abstract="true"/>
+
     <xs:element name="Group">
         <xs:complexType>
+            <xs:complexContent>
+            <xs:extension base="GroupBase">
             <xs:sequence>
                 <xs:element name="UUID" type="uuid"/>
                 <xs:element name="Name" type="xs:string"/>
@@ -148,11 +152,17 @@
                 <xs:element ref="Entry" minOccurs="0" maxOccurs="unbounded"/>
                 <xs:element ref="Group" minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
+            </xs:extension>
+            </xs:complexContent>
         </xs:complexType>
     </xs:element>
 
+    <xs:complexType name="EntryBase" abstract="true"/>
+
     <xs:element name="Entry">
         <xs:complexType>
+            <xs:complexContent>
+                <xs:extension base="EntryBase">
             <xs:sequence>
                 <xs:element name="UUID" type="uuid"/>
                 <xs:element name="IconID" type="iconId"/>
@@ -167,6 +177,8 @@
                 <xs:element name="AutoType" type="autoType"/>
                 <xs:element ref="History" minOccurs="0"/>
             </xs:sequence>
+                </xs:extension>
+            </xs:complexContent>
         </xs:complexType>
     </xs:element>
 
