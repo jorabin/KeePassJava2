@@ -21,6 +21,7 @@ import org.linguafranca.pwdb.kdbx.Helpers;
 import java.util.Date;
 
 /**
+ * Used for loading the database template which contains placeholders.
  * @author jo
  */
 public class DateAdapter {

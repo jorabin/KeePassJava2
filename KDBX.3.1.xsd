@@ -130,53 +130,58 @@
         </xs:complexType>
     </xs:element>
 
-    <xs:complexType name="GroupBase" abstract="true"/>
+    <xs:complexType name="Parented" abstract="true">
+        <xs:annotation>
+            <xs:documentation>A parent type for Entry and Group that allows us to
+                insert a superclass holding a link to a parent group during automatic
+                class generation.
+            </xs:documentation>
+        </xs:annotation>
+    </xs:complexType>
 
     <xs:element name="Group">
         <xs:complexType>
             <xs:complexContent>
-            <xs:extension base="GroupBase">
-            <xs:sequence>
-                <xs:element name="UUID" type="uuid"/>
-                <xs:element name="Name" type="xs:string"/>
-                <xs:element name="Notes" type="xs:string"/>
-                <xs:element name="IconID" type="iconId"/>
-                <xs:element ref="Times"/>
-                <!-- not sure what the flwg are for -->
-                <xs:element name="IsExpanded" type="keepassBoolean"/>
-                <xs:element name="DefaultAutoTypeSequence" type="xs:string"/>
-                <xs:element name="EnableAutoType" type="keepassBoolean"/>
-                <xs:element name="EnableSearching" type="keepassBoolean"/>
-                <xs:element name="LastTopVisibleEntry" type="uuidRef"/>
-                <!-- a load of entries then a load of groups -->
-                <xs:element ref="Entry" minOccurs="0" maxOccurs="unbounded"/>
-                <xs:element ref="Group" minOccurs="0" maxOccurs="unbounded"/>
-            </xs:sequence>
-            </xs:extension>
+                <xs:extension base="Parented">
+                    <xs:sequence>
+                        <xs:element name="UUID" type="uuid"/>
+                        <xs:element name="Name" type="xs:string"/>
+                        <xs:element name="Notes" type="xs:string"/>
+                        <xs:element name="IconID" type="iconId"/>
+                        <xs:element ref="Times"/>
+                        <!-- not sure what the flwg are for -->
+                        <xs:element name="IsExpanded" type="keepassBoolean"/>
+                        <xs:element name="DefaultAutoTypeSequence" type="xs:string"/>
+                        <xs:element name="EnableAutoType" type="keepassBoolean"/>
+                        <xs:element name="EnableSearching" type="keepassBoolean"/>
+                        <xs:element name="LastTopVisibleEntry" type="uuidRef"/>
+                        <!-- a load of entries then a load of groups -->
+                        <xs:element ref="Entry" minOccurs="0" maxOccurs="unbounded"/>
+                        <xs:element ref="Group" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                </xs:extension>
             </xs:complexContent>
         </xs:complexType>
     </xs:element>
 
-    <xs:complexType name="EntryBase" abstract="true"/>
-
     <xs:element name="Entry">
         <xs:complexType>
             <xs:complexContent>
-                <xs:extension base="EntryBase">
-            <xs:sequence>
-                <xs:element name="UUID" type="uuid"/>
-                <xs:element name="IconID" type="iconId"/>
-                <xs:element name="CustomIconUUID" type="customIconUuidRef" minOccurs="0"/>
-                <xs:element name="ForegroundColor" type="color"/>
-                <xs:element name="BackgroundColor" type="color"/>
-                <xs:element name="OverrideURL" type="overrideUrl"/>
-                <xs:element name="Tags" type="commaSeparatedList"/>
-                <xs:element ref="Times"/>
-                <xs:element name="String" type="stringField" maxOccurs="unbounded" minOccurs="0"/>
-                <xs:element name="Binary" type="binaryField" maxOccurs="unbounded" minOccurs="0"/>
-                <xs:element name="AutoType" type="autoType"/>
-                <xs:element ref="History" minOccurs="0"/>
-            </xs:sequence>
+                <xs:extension base="Parented">
+                    <xs:sequence>
+                        <xs:element name="UUID" type="uuid"/>
+                        <xs:element name="IconID" type="iconId"/>
+                        <xs:element name="CustomIconUUID" type="customIconUuidRef" minOccurs="0"/>
+                        <xs:element name="ForegroundColor" type="color"/>
+                        <xs:element name="BackgroundColor" type="color"/>
+                        <xs:element name="OverrideURL" type="overrideUrl"/>
+                        <xs:element name="Tags" type="commaSeparatedList"/>
+                        <xs:element ref="Times"/>
+                        <xs:element name="String" type="stringField" maxOccurs="unbounded" minOccurs="0"/>
+                        <xs:element name="Binary" type="binaryField" maxOccurs="unbounded" minOccurs="0"/>
+                        <xs:element name="AutoType" type="autoType"/>
+                        <xs:element ref="History" minOccurs="0"/>
+                    </xs:sequence>
                 </xs:extension>
             </xs:complexContent>
         </xs:complexType>

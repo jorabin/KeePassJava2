@@ -20,11 +20,6 @@
           xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
           version="2.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <bindings schemaLocation="../KDBX.3.1.xsd">
-<!--
-        <globalBindings>
-            <xjc:superClass name="org.linguafranca.pwdb.kdbx.jaxb.base.BaseGroup" />
-        </globalBindings>
--->
         <bindings node="//xs:simpleType[@name='keepassBoolean']">
             <javaType name="Boolean"
                       parseMethod="org.linguafranca.pwdb.kdbx.Helpers.toBoolean"
@@ -43,12 +38,12 @@
                       printMethod="org.linguafranca.pwdb.kdbx.Helpers.base64FromUuid"
             />
         </bindings>
-        <bindings node = "//xs:complexType[@name='EntryBase']">
-            <class implClass="org.linguafranca.pwdb.kdbx.jaxb.base.AbstractJaxbEntry"/>
+        <bindings node = "//xs:complexType[@name='Parented']">
+            <class implClass="org.linguafranca.pwdb.kdbx.jaxb.base.AbstractJaxbParentedBinding">
+                <javadoc>This class, while generated, is not used see {@link org.linguafranca.pwdb.kdbx.jaxb.base.AbstractJaxbParentedBinding} which is the actual implementation class.</javadoc>
+            </class>
         </bindings>
-        <bindings node = "//xs:complexType[@name='GroupBase']">
-            <class implClass="org.linguafranca.pwdb.kdbx.jaxb.base.AbstractJaxbGroup"/>
-        </bindings>
+
         <bindings node = "//xs:element[@name='Group']">
             <class name="JaxbGroupBinding" />
         </bindings>

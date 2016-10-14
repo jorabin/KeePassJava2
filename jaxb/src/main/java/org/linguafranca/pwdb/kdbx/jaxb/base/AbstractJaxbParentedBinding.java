@@ -16,14 +16,15 @@
 
 package org.linguafranca.pwdb.kdbx.jaxb.base;
 
-import org.linguafranca.pwdb.base.AbstractGroup;
-
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
+ * Ancestor class for Entry and Group Jaxb Bindings, allowing insertion of
+ * a reference to the parent group.
+ *
  * @author jo
  */
-public abstract class AbstractJaxbGroup {
+public abstract class AbstractJaxbParentedBinding {
     @XmlTransient
-    public AbstractJaxbGroup parent;
+    public AbstractJaxbParentedBinding parent;
 }
