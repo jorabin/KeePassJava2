@@ -70,11 +70,8 @@ public interface Group {
     int getGroupsCount();
 
     /**
-     * If the group belongs to this databse then move it from its present parent, if any, to
+     * If the group belongs to this database then move it from its present parent, if any, to
      * the group on which this method is called.
-     *
-     * <p> If it does not belong to this database then import the group and all its sub groups and entries.
-     * The group is unaffected in its original database.
      *
      * <p>The root group cannot be added to another group.
      *
@@ -163,6 +160,12 @@ public interface Group {
     Entry removeEntry(Entry entry);
 
     /**
+     * Make a deep copy of a group
+     * @param group the group to deep copy
+     */
+    void copy(Group group);
+
+    /**
      * Returns an XPath-like string of the names of Groups from the Root
      * to this Group.
      */
@@ -177,4 +180,6 @@ public interface Group {
     Icon getIcon();
 
     void setIcon(Icon icon);
+
+    Database getDatabase();
 }

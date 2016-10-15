@@ -41,9 +41,9 @@ import java.io.InputStream;
  */
 public class QuickStart {
 
-/*
-### Load KDBX
-*/
+    /**
+     * Load KDBX
+     */
     public void loadKdbx() throws IOException {
         // get an input stream
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("src/test/resources/test123.kdbx");
@@ -59,9 +59,9 @@ public class QuickStart {
         database.visit(new Visitor.Print());
     }
 
-/*
-### Save KDBX
-*/
+    /**
+     * Save KDBX
+     */
 
     private static Entry entryFactory(Database database, String s, int e) {
         return database.newEntry(String.format("Group %s Entry %d", s, e));
@@ -72,7 +72,7 @@ public class QuickStart {
         Database database = new JaxbDatabase();
 
         // add some groups and entries
-        for (Integer g = 0; g < 5; g++){
+        for (Integer g = 0; g < 5; g++) {
             Group group = database.getRootGroup().addGroup(database.newGroup(g.toString()));
             for (int e = 0; e <= g; e++) {
                 // entry factory is a local helper to populate an entry
@@ -85,9 +85,17 @@ public class QuickStart {
         database.save(new KdbxCreds("123".getBytes()), outputStream);
     }
 
-/*
-### Load KDB
-*/
+    /**
+     * Splice - add a group from one database to a parent from another (or copy from the same db)
+     */
+    public static void splice(Group newParent, Group groupToSplice) {
+        Group addedGroup = newParent.addGroup(newParent.getDatabase().newGroup(groupToSplice));
+        addedGroup.copy(groupToSplice);
+    }
+
+    /**
+     * Load KDB and save as KDBX
+     */
     public void loadKdb() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test.kdb");
         // password credentials
@@ -96,12 +104,20 @@ public class QuickStart {
         Database database = KdbDatabase.load(credentials, inputStream);
         // visit all groups and entries and list them to console
         database.visit(new Visitor.Print());
+        // create a KDBX database
+        JaxbDatabase kdbxDatabse = new JaxbDatabase();
+        kdbxDatabse.setName(database.getName());
+        kdbxDatabse.setDescription("Migration of KDB Database to KDBX Database");
+        // deep copy from group (not including source group)
+        kdbxDatabse.getRootGroup().copy(database.getRootGroup());
+        // save it
+        kdbxDatabse.save(new KdbxCreds("123".getBytes()), new FileOutputStream("migration.kdbx"));
     }
 
-/*
-### SAX Parsing
- */
-    public void exampleSaxparsing () throws IOException, SAXException, ParserConfigurationException {
+    /**
+     * SAX Parsing
+     */
+    public void exampleSaxparsing() throws IOException, SAXException, ParserConfigurationException {
         InputStream encryptedInputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
         Credentials credentials = new KdbxCreds("123".getBytes());
         KdbxHeader kdbxHeader = new KdbxHeader();

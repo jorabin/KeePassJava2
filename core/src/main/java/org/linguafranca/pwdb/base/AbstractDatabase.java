@@ -113,6 +113,18 @@ public abstract class AbstractDatabase implements Database {
                 // oh well, we tried
             }
         }
+        try {
+            for (String propertyName: entry.getBinaryPropertyNames()) {
+                try {
+                    // all implementations must support setting of STANDARD_PROPERTY_NAMES
+                    result.setBinaryProperty(propertyName, entry.getBinaryProperty(propertyName));
+                } catch (UnsupportedOperationException e) {
+                    // oh well, we tried
+                }
+            }
+        } catch (UnsupportedOperationException e) {
+            // never mind
+        }
         result.setIcon(this.newIcon(entry.getIcon().getIndex()));
         // everything else should have been copied via properties
         return result;

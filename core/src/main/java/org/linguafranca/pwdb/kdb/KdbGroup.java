@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdb;
 
+import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractGroup;
@@ -33,6 +34,7 @@ import java.util.UUID;
 public class KdbGroup extends AbstractGroup {
     private boolean root;
     private KdbGroup parent;
+    protected KdbDatabase database;
     private UUID uuid = UUID.randomUUID();
     private String name = "";
     private Icon icon = new KdbIcon(0);
@@ -205,5 +207,9 @@ public class KdbGroup extends AbstractGroup {
     public String toString() {
         String time = KdbDatabase.isoDateFormat.format(creationTime);
         return getPath() + String.format(" (%s) %s [%d]", uuid.toString(), time, flags);
+    }
+
+    public Database getDatabase() {
+        return database;
     }
 }

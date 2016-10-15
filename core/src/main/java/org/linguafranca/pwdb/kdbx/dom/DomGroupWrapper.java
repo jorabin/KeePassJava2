@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx.dom;
 
 import org.jetbrains.annotations.Nullable;
+import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
@@ -197,6 +198,11 @@ public class DomGroupWrapper extends AbstractGroup {
     public void setIcon(Icon icon) {
         setElementContent(ICON_ELEMENT_NAME, element, String.valueOf(icon.getIndex()));
         database.setDirty(true);
+    }
+
+    @Override
+    public Database getDatabase() {
+        return database;
     }
 
     @Override

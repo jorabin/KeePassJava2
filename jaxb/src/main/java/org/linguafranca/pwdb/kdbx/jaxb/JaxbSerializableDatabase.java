@@ -19,7 +19,10 @@ package org.linguafranca.pwdb.kdbx.jaxb;
 import org.apache.commons.codec.binary.Base64;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.StreamEncryptor;
-import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.JaxbEntryBinding;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.JaxbGroupBinding;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.StringField;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -30,9 +33,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * @author jo

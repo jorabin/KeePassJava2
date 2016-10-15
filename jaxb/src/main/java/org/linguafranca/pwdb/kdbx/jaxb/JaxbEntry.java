@@ -38,7 +38,7 @@ import java.util.UUID;
 @SuppressWarnings("WeakerAccess")
 public class JaxbEntry extends AbstractEntry {
 
-    private JaxbDatabase database;
+    protected JaxbDatabase database;
     protected JaxbEntryBinding delegate;
 
     public JaxbEntry(JaxbDatabase jaxbDatabase) {
@@ -71,33 +71,6 @@ public class JaxbEntry extends AbstractEntry {
     public JaxbEntry(JaxbDatabase database, JaxbEntryBinding entry) {
         this.database = database;
         this.delegate = entry;
-    }
-
-    public static JaxbEntry importEntry(JaxbGroup parent, Entry entry) {
-        if (entry instanceof JaxbEntry &&
-                ((JaxbEntry) entry).database.equals(parent.database)){
-                ((JaxbEntry) entry).delegate.parent = parent.delegate;
-            return (JaxbEntry) entry;
-        }
-        JaxbEntry result = new JaxbEntry(parent.database);
-        result.delegate.setUUID(entry.getUuid());
-        result.delegate.setIconID(entry.getIcon().getIndex());
-        result.delegate.getTimes().setExpires(entry.getExpires());
-        result.delegate.getTimes().setExpiryTime(entry.getExpiryTime());
-        result.delegate.getTimes().setCreationTime(entry.getCreationTime());
-        result.delegate.getTimes().setLastAccessTime(entry.getLastAccessTime());
-        result.delegate.getTimes().setLastModificationTime(entry.getLastModificationTime());
-        result.delegate.getTimes().setCreationTime(entry.getCreationTime());
-        result.delegate.parent = parent.delegate;
-
-        for (String propertyName : entry.getPropertyNames()) {
-            result.setProperty(propertyName, entry.getProperty(propertyName));
-        }
-
-        for (String propertyName : entry.getBinaryPropertyNames()) {
-            result.setBinaryProperty(propertyName, entry.getBinaryProperty(propertyName));
-        }
-        return result;
     }
 
     @Override

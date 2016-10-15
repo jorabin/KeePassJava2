@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.base;
 
+import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
 
@@ -71,6 +72,17 @@ public abstract class AbstractGroup implements Group {
             }
         }
         return result;
+    }
+
+    @Override
+    public void copy(Group parent) {
+        for (Group child : parent.getGroups()) {
+            Group addedGroup = addGroup(this.getDatabase().newGroup(child));
+            addedGroup.copy(child);
+        }
+        for (Entry entry : parent.getEntries()) {
+            addEntry(this.getDatabase().newEntry(entry));
+        }
     }
 
     @Override

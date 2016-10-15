@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx.jaxb;
 
 
+import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
@@ -62,37 +63,13 @@ public class JaxbGroup extends AbstractGroup {
         delegate.setUUID(UUID.randomUUID());
     }
 
-    public static JaxbGroup importGroup(JaxbGroup parent, Group group){
-        if (group instanceof JaxbGroup &&
-                parent.database.equals(((JaxbGroup) group).database)){
-            ((JaxbGroup) group).delegate.parent= parent.delegate;
-            return (JaxbGroup) group;
-        }
-        JaxbGroup result = new JaxbGroup(parent.database);
-        result.setName(group.getName());
-        result.setIcon(parent.database.newIcon(group.getIcon().getIndex()));
-        result.delegate.setUUID(group.getUuid());
-        result.delegate.parent = parent.delegate;
-
-        // copy entries
-        for (Entry entry: group.getEntries()) {
-            result.addEntry(JaxbEntry.importEntry(result, entry));
-        }
-
-        // copy sub groups
-        for (Group child: group.getGroups()) {
-            result.addGroup(importGroup(result, child));
-        }
-        return result;
-    }
-
     @Override
     public boolean isRootGroup() {
         return database.getRootGroup().equals(this);
     }
 
     @Override
-    public Group getParent() {
+    public JaxbGroup getParent() {
         if (delegate.parent == null) {
             return null;
         }
@@ -105,8 +82,8 @@ public class JaxbGroup extends AbstractGroup {
             throw new IllegalStateException("Cannot add root group to another group");
         }
 
-        if (!(group instanceof JaxbGroup)) {
-            throw new IllegalStateException("Parent is not a compatible JaxbGroupBinding type");
+        if (!isCompatibleGroup(database, group)) {
+            throw new IllegalStateException("Parent is incompatible");
         }
 
         JaxbGroup JaxbGroupBinding = (JaxbGroup) group;
@@ -141,18 +118,22 @@ public class JaxbGroup extends AbstractGroup {
         if (group.isRootGroup()) {
             throw new IllegalStateException("Cannot add root group to another group");
         }
-        if (group.getParent() != null && group instanceof JaxbGroup) {
-            ((JaxbGroup) group.getParent()).delegate.getGroup().remove(((JaxbGroup) group).delegate);
+        if (!isCompatibleGroup(this.database, group)) {
+            throw new IllegalStateException("Group to add is incompatible");
         }
-        JaxbGroup JaxbGroupBinding = JaxbGroup.importGroup(this, group);
-        delegate.getGroup().add(JaxbGroupBinding.delegate);
+        JaxbGroup jaxbGroup = (JaxbGroup) group;
+        if (group.getParent() != null) {
+            ((JaxbGroup) group.getParent()).delegate.getGroup().remove(jaxbGroup.delegate);
+        }
+        jaxbGroup.delegate.parent = this.delegate;
+        this.delegate.getGroup().add(jaxbGroup.delegate);
         touch();
-        return JaxbGroupBinding;
+        return jaxbGroup;
     }
 
     @Override
     public Group removeGroup(Group group) {
-        if (!(group instanceof JaxbGroup)) {
+        if (!isCompatibleGroup(database, group)) {
             throw new IllegalStateException("group is not a compatible type");
         }
         delegate.getGroup().remove(((JaxbGroup) group).delegate);
@@ -177,10 +158,13 @@ public class JaxbGroup extends AbstractGroup {
 
     @Override
     public Entry addEntry(Entry entry) {
+        if (!isCompatibleEntry(database, entry)) {
+            throw new IllegalStateException("Incompatible Entry");
+        }
         if (entry.getParent() != null) {
             entry.getParent().removeEntry(entry);
         }
-        JaxbEntry jaxbEntry = JaxbEntry.importEntry(this, entry);
+        JaxbEntry jaxbEntry = ((JaxbEntry) entry);
         delegate.getEntry().add(jaxbEntry.delegate);
         jaxbEntry.delegate.parent = this.delegate;
         touch();
@@ -223,6 +207,11 @@ public class JaxbGroup extends AbstractGroup {
     }
 
     @Override
+    public Database getDatabase() {
+        return database;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -230,12 +219,18 @@ public class JaxbGroup extends AbstractGroup {
         JaxbGroup that = (JaxbGroup) o;
 
         return database.equals(that.database) && delegate.equals(that.delegate);
-
     }
 
     private void touch() {
         this.delegate.getTimes().setLastModificationTime(new Date());
         this.database.setDirty(true);
+    }
+
+    private static boolean isCompatibleGroup(JaxbDatabase database, Group group) {
+        return (group != null && group instanceof JaxbGroup && ((JaxbGroup) group).database.equals(database));
+    }
+    private static boolean isCompatibleEntry(JaxbDatabase database, Entry entry) {
+        return (entry != null && entry instanceof JaxbEntry && ((JaxbEntry) entry).database.equals(database));
     }
 
 }

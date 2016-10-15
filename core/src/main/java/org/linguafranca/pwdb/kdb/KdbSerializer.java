@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdb;
 
 import com.google.common.io.LittleEndianDataInputStream;
+import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.security.Credentials;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.security.Encryption;
@@ -105,6 +106,13 @@ public class KdbSerializer {
         digestInputStream.close();
 
         return kdbDatabase;
+    }
+
+    private static void setDatabase(KdbDatabase kdbDatabase, Group group) {
+        for (Group child: group.getGroups()){
+            ((KdbGroup) child).database = kdbDatabase;
+            setDatabase(kdbDatabase, child);
+        }
     }
 
     // these are the signatures of a KDB "V3" file

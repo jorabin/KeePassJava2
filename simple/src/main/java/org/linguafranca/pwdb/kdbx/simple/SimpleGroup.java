@@ -16,9 +16,11 @@
 
 package org.linguafranca.pwdb.kdbx.simple;
 
+import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
+import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.simple.converter.KeePassBooleanConverter;
 import org.linguafranca.pwdb.kdbx.simple.converter.UuidConverter;
 import org.linguafranca.pwdb.kdbx.simple.model.Times;
@@ -90,30 +92,6 @@ public class SimpleGroup extends org.linguafranca.pwdb.base.AbstractGroup {
         return group;
     }
 
-    public static SimpleGroup importGroup(SimpleGroup parent, Group group){
-        if (group instanceof SimpleGroup && parent.database == ((SimpleGroup) group).database) {
-            ((SimpleGroup) group).parent = parent;
-            return (SimpleGroup) group;
-        }
-
-        SimpleGroup result = createGroup(parent.database);
-        result.parent = parent;
-        result.uuid = group.getUuid();
-        result.name = group.getName();
-        result.iconID = group.getIcon().getIndex();
-
-        // copy entries
-        for (Entry entry: group.getEntries()) {
-            result.addEntry(SimpleEntry.importEntry(result, entry));
-        }
-
-        // copy sub groups
-        for (Group child: group.getGroups()) {
-            result.addGroup(importGroup(result, child));
-        }
-        return result;
-    }
-
     @Override
     public boolean isRootGroup() {
         return database.getRootGroup().equals(this);
@@ -160,10 +138,14 @@ public class SimpleGroup extends org.linguafranca.pwdb.base.AbstractGroup {
         if (group.isRootGroup()) {
             throw new IllegalStateException("Cannot add root group to another group");
         }
+        if (!isCompatible(database, group)) {
+            throw new IllegalStateException("Group is not a compatible group");
+        }
         if (group.getParent() != null) {
             group.getParent().removeGroup(group);
         }
-        SimpleGroup g = importGroup(this, group);
+        SimpleGroup g = (SimpleGroup) group;
+        g.parent = this;
         this.group.add(g);
         touch();
         return g;
@@ -241,8 +223,17 @@ public class SimpleGroup extends org.linguafranca.pwdb.base.AbstractGroup {
         touch();
     }
 
+    @Override
+    public Database getDatabase() {
+        return database;
+    }
+
     private void touch() {
         this.times.setLastModificationTime(new Date());
         this.database.setDirty(true);
+    }
+
+    private boolean isCompatible(Database database, Group group){
+        return group != null && group instanceof SimpleGroup && parent.database == ((SimpleGroup) group).database;
     }
 }
