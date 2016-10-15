@@ -16,11 +16,6 @@
 
 package org.linguafranca.pwdb.kdbx.jaxb;
 
-
-import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Group;
-import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.JaxbEntryBinding;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.JaxbGroupBinding;
@@ -32,14 +27,14 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Implementation of {@link Group} for JAXB.
+ * Implementation of {@link org.linguafranca.pwdb.Group} for JAXB.
  *
  * <p>The class wraps an underlying JAXB generated delegate.
  *
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
-public class JaxbGroup extends AbstractGroup {
+public class JaxbGroup extends AbstractGroup<JaxbDatabase, JaxbGroup, JaxbEntry, JaxbIcon> {
 
     protected JaxbDatabase database;
     protected JaxbGroupBinding delegate;
@@ -77,31 +72,30 @@ public class JaxbGroup extends AbstractGroup {
     }
 
     @Override
-    public void setParent(Group group) {
+    public void setParent(JaxbGroup group) {
         if (isRootGroup()) {
             throw new IllegalStateException("Cannot add root group to another group");
         }
 
-        if (!isCompatibleGroup(database, group)) {
-            throw new IllegalStateException("Parent is incompatible");
+        if (this.database != group.database) {
+            throw new IllegalStateException("Must be from same database");
         }
 
-        JaxbGroup JaxbGroupBinding = (JaxbGroup) group;
-        JaxbGroupBinding parent = (JaxbGroupBinding) JaxbGroupBinding.delegate.parent;
+        JaxbGroupBinding parent = (JaxbGroupBinding) group.delegate.parent;
 
         if (parent != null) {
-            parent.getGroup().remove(JaxbGroupBinding.delegate);
+            parent.getGroup().remove(group.delegate);
             parent.getTimes().setLastModificationTime(new Date());
         }
 
-        this.delegate.parent = JaxbGroupBinding.delegate;
+        this.delegate.parent = group.delegate;
         ((JaxbGroupBinding) this.delegate.parent).getTimes().setLastModificationTime(new Date());
         touch();
     }
 
     @Override
-    public List<Group> getGroups() {
-        List<Group> result = new ArrayList<>();
+    public List<JaxbGroup> getGroups() {
+        List<JaxbGroup> result = new ArrayList<>();
         for (JaxbGroupBinding child : delegate.getGroup()) {
             result.add(new JaxbGroup(database, child));
         }
@@ -114,37 +108,37 @@ public class JaxbGroup extends AbstractGroup {
     }
 
     @Override
-    public Group addGroup(Group group) {
+    public JaxbGroup addGroup(JaxbGroup group) {
         if (group.isRootGroup()) {
             throw new IllegalStateException("Cannot add root group to another group");
         }
-        if (!isCompatibleGroup(this.database, group)) {
-            throw new IllegalStateException("Group to add is incompatible");
+        if (this.database != group.database) {
+            throw new IllegalStateException("Must be from same database");
         }
-        JaxbGroup jaxbGroup = (JaxbGroup) group;
-        if (group.getParent() != null) {
-            ((JaxbGroup) group.getParent()).delegate.getGroup().remove(jaxbGroup.delegate);
-        }
-        jaxbGroup.delegate.parent = this.delegate;
-        this.delegate.getGroup().add(jaxbGroup.delegate);
-        touch();
-        return jaxbGroup;
-    }
 
-    @Override
-    public Group removeGroup(Group group) {
-        if (!isCompatibleGroup(database, group)) {
-            throw new IllegalStateException("group is not a compatible type");
+        if (group.getParent() != null) {
+            group.getParent().delegate.getGroup().remove(group.delegate);
         }
-        delegate.getGroup().remove(((JaxbGroup) group).delegate);
-        ((JaxbGroup) group).delegate.parent = null;
+        group.delegate.parent = this.delegate;
+        this.delegate.getGroup().add(group.delegate);
         touch();
         return group;
     }
 
     @Override
-    public List<Entry> getEntries() {
-        List<Entry> result = new ArrayList<>();
+    public JaxbGroup removeGroup(JaxbGroup group) {
+        if (this.database != group.database) {
+            throw new IllegalStateException("Must be from same database");
+        }
+        delegate.getGroup().remove(group.delegate);
+        group.delegate.parent = null;
+        touch();
+        return group;
+    }
+
+    @Override
+    public List<JaxbEntry> getEntries() {
+        List<JaxbEntry> result = new ArrayList<>();
         for (JaxbEntryBinding entry : this.delegate.getEntry()) {
             result.add(new JaxbEntry(database, entry));
         }
@@ -157,27 +151,23 @@ public class JaxbGroup extends AbstractGroup {
     }
 
     @Override
-    public Entry addEntry(Entry entry) {
-        if (!isCompatibleEntry(database, entry)) {
-            throw new IllegalStateException("Incompatible Entry");
+    public JaxbEntry addEntry(JaxbEntry entry) {
+        if (this.database != entry.database) {
+            throw new IllegalStateException("Must be from same database");
         }
         if (entry.getParent() != null) {
             entry.getParent().removeEntry(entry);
         }
-        JaxbEntry jaxbEntry = ((JaxbEntry) entry);
-        delegate.getEntry().add(jaxbEntry.delegate);
-        jaxbEntry.delegate.parent = this.delegate;
+        delegate.getEntry().add(entry.delegate);
+        entry.delegate.parent = this.delegate;
         touch();
-        return jaxbEntry;
+        return entry;
     }
 
     @Override
-    public Entry removeEntry(Entry entry) {
-        if (!(entry instanceof JaxbEntry)) {
-           throw new IllegalStateException("Entry is not a consistent type for removal");
-        }
-        delegate.getEntry().remove(((JaxbEntry) entry).delegate);
-        ((JaxbEntry) entry).delegate.parent = null;
+    public JaxbEntry removeEntry(JaxbEntry entry) {
+        delegate.getEntry().remove(entry.delegate);
+        entry.delegate.parent = null;
         return entry;
     }
 
@@ -197,17 +187,17 @@ public class JaxbGroup extends AbstractGroup {
     }
 
     @Override
-    public Icon getIcon() {
-        return new JaxbIconWrapper(this.delegate.getIconID());
+    public JaxbIcon getIcon() {
+        return new JaxbIcon(this.delegate.getIconID());
     }
 
     @Override
-    public void setIcon(Icon icon) {
+    public void setIcon(JaxbIcon icon) {
         this.delegate.setIconID(icon.getIndex());
     }
 
     @Override
-    public Database getDatabase() {
+    public JaxbDatabase getDatabase() {
         return database;
     }
 
@@ -225,12 +215,4 @@ public class JaxbGroup extends AbstractGroup {
         this.delegate.getTimes().setLastModificationTime(new Date());
         this.database.setDirty(true);
     }
-
-    private static boolean isCompatibleGroup(JaxbDatabase database, Group group) {
-        return (group != null && group instanceof JaxbGroup && ((JaxbGroup) group).database.equals(database));
-    }
-    private static boolean isCompatibleEntry(JaxbDatabase database, Entry entry) {
-        return (entry != null && entry instanceof JaxbEntry && ((JaxbEntry) entry).database.equals(database));
-    }
-
 }

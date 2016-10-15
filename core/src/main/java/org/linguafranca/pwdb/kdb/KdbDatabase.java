@@ -20,7 +20,7 @@ import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.base.AbstractDatabase;
-import org.linguafranca.security.Credentials;
+import org.linguafranca.pwdb.security.Credentials;
 import org.linguafranca.pwdb.Entry;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ import java.util.UUID;
  *
  * @author jo
  */
-public class KdbDatabase extends AbstractDatabase {
+public class KdbDatabase extends AbstractDatabase<KdbDatabase, KdbGroup, KdbEntry, KdbIcon> {
     private String description;
     private KdbGroup rootGroup;
 
@@ -68,27 +68,27 @@ public class KdbDatabase extends AbstractDatabase {
     }
 
     @Override
-    public Group getRootGroup() {
+    public KdbGroup getRootGroup() {
         return rootGroup;
     }
 
     @Override
-    public Group newGroup() {
+    public KdbGroup newGroup() {
         return new KdbGroup();
     }
 
     @Override
-    public Entry newEntry() {
+    public KdbEntry newEntry() {
         return new KdbEntry();
     }
 
     @Override
-    public Icon newIcon() {
+    public KdbIcon newIcon() {
         return new KdbIcon(0);
     }
 
     @Override
-    public Icon newIcon(Integer i) {
+    public KdbIcon newIcon(Integer i) {
         return new KdbIcon(i);
     }
 
@@ -122,11 +122,11 @@ public class KdbDatabase extends AbstractDatabase {
 
     }
 
-    static class GroupFinder extends Visitor.Default {
+    private static class GroupFinder extends Visitor.Default {
         Group foundGroup = null;
         UUID uuid;
 
-        public GroupFinder(UUID uuid) {
+        GroupFinder(UUID uuid) {
             if (uuid==null) {
                 throw new IllegalArgumentException("UUID cannot be null");
             }

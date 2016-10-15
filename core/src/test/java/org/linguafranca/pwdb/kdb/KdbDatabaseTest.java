@@ -16,7 +16,7 @@
 
 package org.linguafranca.pwdb.kdb;
 
-import org.linguafranca.checks.BasicDatabaseChecks;
+import org.linguafranca.pwdb.checks.BasicDatabaseChecks;
 import org.linguafranca.pwdb.Database;
 
 import java.io.IOException;

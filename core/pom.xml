@@ -26,74 +26,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>keepassJava2</artifactId>
-    <name>KeepassJava2-core-module</name>
+    <name>KeepassJava2 :: Classic</name>
+    <description>Contains KDB Database support as well as the DOM implementation of KDBX support.</description>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
     <dependencies>
-        <!-- using spongy castle rather than bouncy castle in deference to Android -->
         <dependency>
-            <groupId>com.madgag.spongycastle</groupId>
-            <artifactId>core</artifactId>
-            <version>${spongycastle.core.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>${guava.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>${commons-codec.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>${annotations.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.intellij</groupId>
-            <artifactId>annotations</artifactId>
-            <version>${annotations.intellij.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j-api.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
-            <scope>compile</scope>
+            <groupId>org.linguafranca.pwdb</groupId>
+            <artifactId>KeePassJava2-base</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

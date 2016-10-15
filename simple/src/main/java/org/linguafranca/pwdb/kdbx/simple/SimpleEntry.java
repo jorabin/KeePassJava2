@@ -16,15 +16,16 @@
 
 package org.linguafranca.pwdb.kdbx.simple;
 
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.simple.converter.UuidConverter;
 import org.linguafranca.pwdb.kdbx.simple.model.EntryClasses;
 import org.linguafranca.pwdb.kdbx.simple.model.KeePassFile;
 import org.linguafranca.pwdb.kdbx.simple.model.Times;
-import org.simpleframework.xml.*;
+import org.simpleframework.xml.Element;
+import org.simpleframework.xml.ElementList;
+import org.simpleframework.xml.Root;
+import org.simpleframework.xml.Transient;
 import org.simpleframework.xml.convert.Convert;
 
 import java.util.ArrayList;
@@ -35,13 +36,13 @@ import java.util.UUID;
 import static org.linguafranca.pwdb.kdbx.simple.model.EntryClasses.*;
 
 /**
- * Implementation of {@link Entry} for Simple XML framework
+ * Implementation of {@link org.linguafranca.pwdb.Entry} for Simple XML framework
  *
  * @author jo
  */
 @SuppressWarnings({"WeakerAccess"})
 @Root(name="Entry")
-public class SimpleEntry extends AbstractEntry {
+public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, SimpleEntry, SimpleIcon> {
     @Element(name = "UUID", type=UUID.class)
     @Convert(UuidConverter.class)
     protected UUID uuid;
@@ -91,33 +92,8 @@ public class SimpleEntry extends AbstractEntry {
         SimpleEntry result = new SimpleEntry();
         result.database = database;
         result.parent = null;
-        for (String p: Entry.STANDARD_PROPERTY_NAMES) {
+        for (String p: STANDARD_PROPERTY_NAMES) {
             result.setProperty(p, "");
-        }
-        return result;
-    }
-
-    /**
-     * Copy an existing entry from another database or return the same entry if it is the same database
-     * in either case making parent the owner of the entry
-     * @param parent the group to be the parent
-     * @param entry the entry to copy
-     * @return a new entry or the same entry if already in the specified database
-     */
-    public static SimpleEntry importEntry(SimpleGroup parent, Entry entry) {
-        if (entry instanceof SimpleEntry && ((SimpleEntry) entry).database == parent.database) {
-            ((SimpleEntry) entry).parent = parent;
-            return ((SimpleEntry) entry);
-        }
-        SimpleEntry result = createEntry(parent.database);
-        result.parent = parent;
-        result.iconID = entry.getIcon().getIndex();
-        result.uuid = entry.getUuid();
-        for (String propertyName: entry.getPropertyNames()) {
-            result.setProperty(propertyName, entry.getProperty(propertyName));
-        }
-        for (String propertyName: entry.getBinaryPropertyNames()) {
-            result.setBinaryProperty(propertyName, entry.getBinaryProperty(propertyName));
         }
         return result;
     }
@@ -219,12 +195,12 @@ public class SimpleEntry extends AbstractEntry {
     }
 
     @Override
-    public Icon getIcon() {
+    public SimpleIcon getIcon() {
         return new SimpleIcon(iconID);
     }
 
     @Override
-    public void setIcon(Icon icon) {
+    public void setIcon(SimpleIcon icon) {
         iconID = icon.getIndex();
     }
 

@@ -17,9 +17,6 @@
 package org.linguafranca.pwdb.kdbx.dom;
 
 import org.jetbrains.annotations.Nullable;
-import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.Helpers;
@@ -31,11 +28,11 @@ import static org.linguafranca.pwdb.kdbx.dom.DomHelper.*;
 
 
 /**
- * Class wraps Groups from a {@link DomSerializableDatabase} as {@link Group}
+ * Class wraps Groups from a {@link DomSerializableDatabase} as {@link org.linguafranca.pwdb.Group}
  *
  * @author jo
  */
-public class DomGroupWrapper extends AbstractGroup {
+public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper> {
 
     static Map<String, ValueCreator> mandatoryGroupElements = new HashMap<String, ValueCreator>() {{
         put(UUID_ELEMENT_NAME, new UuidValueCreator());
@@ -85,14 +82,14 @@ public class DomGroupWrapper extends AbstractGroup {
     }
 
     @Override
-    public void setParent(Group parent) {
+    public void setParent(DomGroupWrapper parent) {
         parent.addGroup(this);
     }
 
     @Override
-    public List<Group> getGroups() {
+    public List<DomGroupWrapper> getGroups() {
         List<Element> elements = getElements(GROUP_ELEMENT_NAME, this.element);
-        List<Group> result = new ArrayList<>(elements.size());
+        List<DomGroupWrapper> result = new ArrayList<>(elements.size());
         for (Element e: elements){
             result.add(new DomGroupWrapper(e, database, false));
         }
@@ -106,41 +103,32 @@ public class DomGroupWrapper extends AbstractGroup {
     }
 
     @Override
-    public Group addGroup(Group group) {
+    public DomGroupWrapper addGroup(DomGroupWrapper group) {
         if (group.isRootGroup()) {
             throw new IllegalStateException("Cannot set root group as child of another group");
         }
-
-        if (!(group instanceof DomGroupWrapper)) {
-            group = database.newGroup(group);
-        }
-
         // skip if this is a new group with no parent
         if (group.getParent() != null) {
-            ((DomGroupWrapper) group.getParent()).touch();
+            group.getParent().touch();
             group.getParent().removeGroup(group);
         }
-        element.appendChild(((DomGroupWrapper) group).element);
-        touchElement("Times/LocationChanged", ((DomGroupWrapper) group).element);
+        element.appendChild(group.element);
+        touchElement("Times/LocationChanged", group.element);
         touch();
         return group;
     }
 
     @Override
-    public Group removeGroup(Group g1) {
-        if (!(g1 instanceof DomGroupWrapper)) {
-            throw new IllegalStateException("Group is not a compatible type");
-        }
-
-        element.removeChild(((DomGroupWrapper) g1).element);
+    public DomGroupWrapper removeGroup(DomGroupWrapper g1) {
+        element.removeChild(g1.element);
         database.setDirty(true);
         return g1;
     }
 
     @Override
-    public List<Entry> getEntries() {
+    public List<DomEntryWrapper> getEntries() {
         List<Element> elements = getElements(ENTRY_ELEMENT_NAME, this.element);
-        List<Entry> entries = new ArrayList<>(elements.size());
+        List<DomEntryWrapper> entries = new ArrayList<>(elements.size());
         for(Element e: elements) {
             entries.add(new DomEntryWrapper(e, database, false));
         }
@@ -153,21 +141,18 @@ public class DomGroupWrapper extends AbstractGroup {
     }
 
     @Override
-    public Entry addEntry(Entry entry) {
+    public DomEntryWrapper addEntry(DomEntryWrapper entry) {
         if (entry.getParent() != null) {
-            ((DomEntryWrapper) entry).element.getParentNode().removeChild(element);
+            entry.element.getParentNode().removeChild(element);
         }
-        element.appendChild(((DomEntryWrapper) entry).element);
+        element.appendChild(entry.element);
         database.setDirty(true);
         return entry;
     }
 
     @Override
-    public Entry removeEntry(Entry e12) {
-        if (!(e12 instanceof DomEntryWrapper)) {
-            throw new IllegalStateException("Entry is not a consistent type for removal");
-        }
-        element.removeChild(((DomEntryWrapper) e12).element);
+    public DomEntryWrapper removeEntry(DomEntryWrapper e12) {
+        element.removeChild(e12.element);
         database.setDirty(true);
         return e12;
     }
@@ -190,18 +175,18 @@ public class DomGroupWrapper extends AbstractGroup {
     }
 
     @Override
-    public Icon getIcon() {
+    public DomIconWrapper getIcon() {
         return new DomIconWrapper(getElement(ICON_ELEMENT_NAME, element, false));
     }
 
     @Override
-    public void setIcon(Icon icon) {
+    public void setIcon(DomIconWrapper icon) {
         setElementContent(ICON_ELEMENT_NAME, element, String.valueOf(icon.getIndex()));
         database.setDirty(true);
     }
 
     @Override
-    public Database getDatabase() {
+    public DomDatabaseWrapper getDatabase() {
         return database;
     }
 

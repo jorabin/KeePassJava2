@@ -16,12 +16,9 @@
 
 package org.linguafranca.pwdb.kdbx.jaxb;
 
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
-
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,14 +26,14 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Implementation of {@link Entry} for JAXB.
+ * Implementation of {@link org.linguafranca.pwdb.Entry} for JAXB.
  *
  * <p>The class wraps an underlying JAXB generated delegate.
  *
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
-public class JaxbEntry extends AbstractEntry {
+public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry, JaxbIcon> {
 
     protected JaxbDatabase database;
     protected JaxbEntryBinding delegate;
@@ -197,12 +194,12 @@ public class JaxbEntry extends AbstractEntry {
     }
 
     @Override
-    public Icon getIcon() {
-        return new JaxbIconWrapper(delegate.getIconID());
+    public JaxbIcon getIcon() {
+        return new JaxbIcon(delegate.getIconID());
     }
 
     @Override
-    public void setIcon(Icon icon) {
+    public void setIcon(JaxbIcon icon) {
         delegate.setIconID(icon.getIndex());
         touch();
     }

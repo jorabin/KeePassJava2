@@ -16,10 +16,10 @@
 
 package org.linguafranca.pwdb.kdbx.simple;
 
-import org.linguafranca.checks.SaveAndReloadChecks;
+import org.linguafranca.pwdb.checks.SaveAndReloadChecks;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
-import org.linguafranca.security.Credentials;
+import org.linguafranca.pwdb.security.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;

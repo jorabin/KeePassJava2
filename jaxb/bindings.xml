@@ -39,8 +39,10 @@
             />
         </bindings>
         <bindings node = "//xs:complexType[@name='Parented']">
-            <class implClass="org.linguafranca.pwdb.kdbx.jaxb.base.AbstractJaxbParentedBinding">
-                <javadoc>This class, while generated, is not used see {@link org.linguafranca.pwdb.kdbx.jaxb.base.AbstractJaxbParentedBinding} which is the actual implementation class.</javadoc>
+            <class implClass="org.linguafranca.pwdb.kdbx.jaxb.org.linguafranca.pwdb.base.AbstractJaxbParentedBinding">
+                <javadoc>This class, while generated, is not used see {@link
+                    org.linguafranca.pwdb.kdbx.jaxb.org.linguafranca.pwdb.base.AbstractJaxbParentedBinding} which is the
+                    actual implementation class.</javadoc>
             </class>
         </bindings>
 

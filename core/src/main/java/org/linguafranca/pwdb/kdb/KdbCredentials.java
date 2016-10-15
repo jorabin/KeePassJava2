@@ -16,8 +16,8 @@
 
 package org.linguafranca.pwdb.kdb;
 
-import org.linguafranca.security.Credentials;
-import org.linguafranca.security.Encryption;
+import org.linguafranca.pwdb.security.Credentials;
+import org.linguafranca.pwdb.security.Encryption;
 
 import java.security.MessageDigest;
 

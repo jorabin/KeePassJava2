@@ -16,9 +16,9 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
-import org.linguafranca.checks.DatabaseLoaderChecks;
+import org.linguafranca.pwdb.checks.DatabaseLoaderChecks;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.security.Credentials;
+import org.linguafranca.pwdb.security.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;

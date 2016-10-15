@@ -18,9 +18,9 @@ package org.linguafranca.pwdb.kdb;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import org.linguafranca.pwdb.base.AbstractGroup;
-import org.linguafranca.security.Credentials;
+import org.linguafranca.pwdb.security.Credentials;
 import org.linguafranca.pwdb.Group;
-import org.linguafranca.security.Encryption;
+import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.DataInput;
 import java.io.IOException;
@@ -108,8 +108,8 @@ public class KdbSerializer {
         return kdbDatabase;
     }
 
-    private static void setDatabase(KdbDatabase kdbDatabase, Group group) {
-        for (Group child: group.getGroups()){
+    private static void setDatabase(KdbDatabase kdbDatabase, KdbGroup group) {
+        for (KdbGroup child: group.getGroups()){
             ((KdbGroup) child).database = kdbDatabase;
             setDatabase(kdbDatabase, child);
         }

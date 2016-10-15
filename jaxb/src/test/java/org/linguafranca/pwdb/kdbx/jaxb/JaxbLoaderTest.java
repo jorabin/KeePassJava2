@@ -16,7 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.jaxb;
 
-import org.linguafranca.checks.DatabaseLoaderChecks;
+import org.linguafranca.pwdb.checks.DatabaseLoaderChecks;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 
 import java.io.IOException;

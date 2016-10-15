@@ -16,14 +16,10 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
-import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.Group;
-import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractDatabase;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
-import org.linguafranca.security.Credentials;
-import org.linguafranca.pwdb.Entry;
+import org.linguafranca.pwdb.security.Credentials;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -34,17 +30,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * The class wraps a {@link DomSerializableDatabase} as a {@link Database}.
+ * The class wraps a {@link DomSerializableDatabase} as a {@link org.linguafranca.pwdb.Database}.
  *
  * @author jo
  */
-public class DomDatabaseWrapper extends AbstractDatabase {
+public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper> {
 
-    Document document;
-    Element dbRootGroup;
-    Element dbMeta;
+    private Document document;
+    private Element dbRootGroup;
+    private Element dbMeta;
 
-    DomSerializableDatabase domDatabase = DomSerializableDatabase.createEmptyDatabase();
+    private DomSerializableDatabase domDatabase = DomSerializableDatabase.createEmptyDatabase();
 
 
     public DomDatabaseWrapper () throws IOException {
@@ -90,28 +86,28 @@ public class DomDatabaseWrapper extends AbstractDatabase {
     }
 
     @Override
-    public Group getRootGroup() {
+    public DomGroupWrapper getRootGroup() {
         return new DomGroupWrapper(dbRootGroup, this, false);
     }
 
     @Override
-    public Group newGroup() {
+    public DomGroupWrapper newGroup() {
         return new DomGroupWrapper(document.createElement(DomHelper.GROUP_ELEMENT_NAME), this, true);
     }
 
     @Override
-    public Entry newEntry() {
+    public DomEntryWrapper newEntry() {
         return new DomEntryWrapper(document.createElement(DomHelper.ENTRY_ELEMENT_NAME), this, true);
     }
 
     @Override
-    public Icon newIcon() {
+    public DomIconWrapper newIcon() {
         return new DomIconWrapper(document.createElement(DomHelper.ICON_ELEMENT_NAME));
     }
 
     @Override
-    public Icon newIcon(Integer i) {
-        Icon icon =  newIcon();
+    public DomIconWrapper newIcon(Integer i) {
+        DomIconWrapper icon =  newIcon();
         icon.setIndex(i);
         return icon;
     }

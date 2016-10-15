@@ -17,9 +17,11 @@
 package org.linguafranca.pwdb.kdbx;
 
 import org.junit.Test;
+import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
-import org.linguafranca.security.Credentials;
+import org.linguafranca.pwdb.kdbx.simple.SimpleEntry;
+import org.linguafranca.pwdb.security.Credentials;
 import org.linguafranca.xml.XmlOutputStreamFilter;
 
 import java.security.SecureRandom;
@@ -32,7 +34,7 @@ public class KdbxInnerOutputStreamTest {
     @Test
     public void test() throws Exception {
         final SimpleDatabase database = new SimpleDatabase();
-        final Entry entry = database.newEntry();
+        final SimpleEntry entry = database.newEntry();
         entry.setTitle("Password Encyption Test");
         entry.setPassword("password");
         database.getRootGroup().addEntry(entry);

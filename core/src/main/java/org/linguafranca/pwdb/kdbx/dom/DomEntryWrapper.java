@@ -16,9 +16,6 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Group;
-import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.w3c.dom.Element;
@@ -27,13 +24,13 @@ import java.text.ParseException;
 import java.util.*;
 
 /**
- * Class wraps Entries from a {@link DomSerializableDatabase} as {@link Entry}
+ * Class wraps Entries from a {@link DomSerializableDatabase} as {@link org.linguafranca.pwdb.Entry}
  *
  * @author jo
  */
-public class DomEntryWrapper extends AbstractEntry {
+public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper>{
 
-    static Map<String, DomHelper.ValueCreator> mandatoryEntryElements = new HashMap<String, DomHelper.ValueCreator>() {{
+    private static Map<String, DomHelper.ValueCreator> mandatoryEntryElements = new HashMap<String, DomHelper.ValueCreator>() {{
         put(DomHelper.UUID_ELEMENT_NAME, new DomHelper.UuidValueCreator());
         put(DomHelper.ICON_ELEMENT_NAME, new DomHelper.ConstantValueCreator("2"));
         put(DomHelper.TIMES_ELEMENT_NAME, new DomHelper.ConstantValueCreator(""));
@@ -47,7 +44,7 @@ public class DomEntryWrapper extends AbstractEntry {
     }};
 
     final Element element;
-    final DomDatabaseWrapper database;
+    private final DomDatabaseWrapper database;
 
     public DomEntryWrapper(Element element, DomDatabaseWrapper database, boolean newElement) {
         this.element = element;
@@ -135,7 +132,7 @@ public class DomEntryWrapper extends AbstractEntry {
     }
 
     @Override
-    public Group getParent() {
+    public DomGroupWrapper getParent() {
         if (element.getParentNode() == null) {
             return null;
         }
@@ -148,12 +145,12 @@ public class DomEntryWrapper extends AbstractEntry {
     }
 
     @Override
-    public Icon getIcon() {
+    public DomIconWrapper getIcon() {
         return new DomIconWrapper(DomHelper.getElement(DomHelper.ICON_ELEMENT_NAME, element, false));
     }
 
     @Override
-    public void setIcon(Icon icon) {
+    public void setIcon(DomIconWrapper icon) {
         DomHelper.getElement(DomHelper.ICON_ELEMENT_NAME, element, true).setTextContent(String.valueOf(icon.getIndex()));
         DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element);
         database.setDirty(true);

@@ -22,7 +22,7 @@ import org.linguafranca.pwdb.kdbx.*;
 import org.linguafranca.pwdb.kdbx.simple.converter.*;
 import org.linguafranca.pwdb.kdbx.simple.model.EntryClasses;
 import org.linguafranca.pwdb.kdbx.simple.model.KeePassFile;
-import org.linguafranca.security.Credentials;
+import org.linguafranca.pwdb.security.Credentials;
 import org.linguafranca.xml.XmlInputStreamFilter;
 import org.linguafranca.xml.XmlOutputStreamFilter;
 import org.simpleframework.xml.*;
@@ -43,7 +43,7 @@ import java.util.*;
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
-public class SimpleDatabase extends AbstractDatabase{
+public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup, SimpleEntry, SimpleIcon>{
 
     private KeePassFile keePassFile;
 
@@ -70,28 +70,28 @@ public class SimpleDatabase extends AbstractDatabase{
     }
 
     @Override
-    public org.linguafranca.pwdb.Group getRootGroup() {
+    public SimpleGroup getRootGroup() {
         return keePassFile.root.getGroup();
     }
 
     @Override
-    public org.linguafranca.pwdb.Group newGroup() {
+    public SimpleGroup newGroup() {
         return SimpleGroup.createGroup(this);
     }
 
     @Override
-    public org.linguafranca.pwdb.Entry newEntry() {
+    public SimpleEntry newEntry() {
         return SimpleEntry.createEntry(this);
     }
 
     @Override
-    public Icon newIcon() {
+    public SimpleIcon newIcon() {
         return new SimpleIcon();
     }
 
     @Override
-    public Icon newIcon(Integer integer) {
-        Icon ic = newIcon();
+    public SimpleIcon newIcon(Integer integer) {
+        SimpleIcon ic = newIcon();
         ic.setIndex(integer);
         return ic;
     }
@@ -128,8 +128,7 @@ public class SimpleDatabase extends AbstractDatabase{
      */
     private static KeePassFile createEmptyDatabase() throws Exception {
         InputStream inputStream = SimpleDatabase.class.getClassLoader().getResourceAsStream("base.kdbx.xml");
-        KeePassFile result = getSerializer().read(KeePassFile.class, inputStream);
-        return result;
+        return getSerializer().read(KeePassFile.class, inputStream);
     }
 
     /**
@@ -230,7 +229,7 @@ public class SimpleDatabase extends AbstractDatabase{
     /**
      * Utility to get a simple framework persister
      * @return a persister
-     * @throws Exception
+     * @throws Exception when things get tough
      */
     private static Serializer getSerializer() throws Exception {
         Registry registry = new Registry();
@@ -243,7 +242,7 @@ public class SimpleDatabase extends AbstractDatabase{
     /**
      * Utility to add in back links to parent group and database
      *
-     * @param parent
+     * @param parent the group to start from
      */
     private static void fixUp(SimpleGroup parent){
         for (SimpleGroup group: parent.group) {
@@ -260,7 +259,7 @@ public class SimpleDatabase extends AbstractDatabase{
     /**
      * Utility to mark fields that need to be encrypted and vice versa
      *
-     * @param parent
+     * @param parent the group to start from
      */
     private static void prepareForSave(SimpleGroup parent){
         for (SimpleGroup group: parent.group) {

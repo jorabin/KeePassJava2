@@ -17,7 +17,7 @@
 package org.linguafranca.pwdb.kdb;
 
 import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Group;
+
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractEntry;
 
@@ -31,7 +31,7 @@ import java.util.UUID;
  *
  * @author jo
  */
-public class KdbEntry extends AbstractEntry {
+public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, KdbIcon> {
     KdbGroup parent;
     private UUID uuid = UUID.randomUUID();
     private String title = "";
@@ -77,7 +77,7 @@ public class KdbEntry extends AbstractEntry {
     }
 
     @Override
-    public Group getParent() {
+    public KdbGroup getParent() {
         return parent;
     }
 
@@ -141,13 +141,13 @@ public class KdbEntry extends AbstractEntry {
     }
 
     @Override
-    public Icon getIcon() {
+    public KdbIcon getIcon() {
         return icon;
     }
 
     @Override
-    public void setIcon(Icon icon) {
-        this.icon = (KdbIcon) icon;
+    public void setIcon(KdbIcon icon) {
+        this.icon = icon;
     }
     
     void setCreationTime(Date creationTime) {

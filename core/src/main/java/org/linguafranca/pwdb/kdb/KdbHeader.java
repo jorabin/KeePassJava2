@@ -16,7 +16,7 @@
 
 package org.linguafranca.pwdb.kdb;
 
-import org.linguafranca.security.Encryption;
+import org.linguafranca.pwdb.security.Encryption;
 
 import javax.crypto.Cipher;
 import java.io.IOException;
