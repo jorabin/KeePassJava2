@@ -20,14 +20,13 @@ import org.junit.BeforeClass;
 import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.kdb.KdbCredentials;
 import org.linguafranca.pwdb.kdb.KdbDatabase;
-import org.linguafranca.pwdb.security.Credentials;
+import org.linguafranca.pwdb.Credentials;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.attribute.FileAttribute;
 import java.util.List;
 
 /**
@@ -43,7 +42,7 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
 
     @BeforeClass
     public static void ensureOutputDir() throws IOException {
-        Files.createDirectory(Paths.get("testOutput"));
+        Files.createDirectories(Paths.get("testOutput"));
     }
 
     /**

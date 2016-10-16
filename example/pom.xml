@@ -19,38 +19,26 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>keepassjava2-parent</artifactId>
+        <artifactId>KeePassJava2-parent</artifactId>
         <groupId>org.linguafranca.pwdb</groupId>
         <version>2.1.0-SNAPSHOT</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>KeePassJava2-example</artifactId>
-    <name>KeePassJava2 :: Examples</name>
+    <name>KeePassJava2 :: Example</name>
     <description>Examples of how to use KeePassJava2</description>
 
     <dependencies>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>keepassJava2</artifactId>
+            <artifactId>KeePassJava2</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>keepassJava2-jaxb</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>keepassJava2-simple</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>keepassJava2-base</artifactId>
+            <artifactId>KeePassJava2-test</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

@@ -16,7 +16,9 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.linguafranca.pwdb.security.Credentials;
+import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxSerializer;
+import org.linguafranca.pwdb.kdbx.stream_3_1.Salsa20StreamEncryptor;
+import org.linguafranca.pwdb.Credentials;
 import org.xml.sax.*;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,10 +37,10 @@ public class SaxParse {
     public void exampleSaxparsing() throws IOException, SAXException, ParserConfigurationException {
         InputStream encryptedInputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
         Credentials credentials = new KdbxCreds("123".getBytes());
-        KdbxHeader kdbxHeader = new KdbxHeader();
+        org.linguafranca.pwdb.kdbx.stream_3_1.KdbxHeader kdbxHeader = new org.linguafranca.pwdb.kdbx.stream_3_1.KdbxHeader();
         try (InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, encryptedInputStream)) {
             // use this to decrypt the encrypted fields
-            final Salsa20StreamEncryptor memoryProtection = new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey());
+            final org.linguafranca.pwdb.kdbx.stream_3_1.Salsa20StreamEncryptor memoryProtection = new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey());
             SAXParserFactory spfactory = SAXParserFactory.newInstance();
             SAXParser saxParser = spfactory.newSAXParser();
             XMLReader xmlReader = saxParser.getXMLReader();

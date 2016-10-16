@@ -22,7 +22,7 @@ import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import org.linguafranca.pwdb.kdbx.simple.SimpleEntry;
 import org.linguafranca.pwdb.kdbx.simple.SimpleGroup;
 import org.linguafranca.pwdb.kdbx.simple.SimpleIcon;
-import org.linguafranca.pwdb.security.Credentials;
+import org.linguafranca.pwdb.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;

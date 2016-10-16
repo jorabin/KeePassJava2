@@ -18,11 +18,11 @@ package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.base.AbstractDatabase;
-import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
+import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.ObjectFactory;
-import org.linguafranca.pwdb.security.Credentials;
+import org.linguafranca.pwdb.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;

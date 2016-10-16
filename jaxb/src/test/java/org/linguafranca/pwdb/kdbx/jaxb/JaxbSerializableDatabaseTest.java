@@ -19,7 +19,6 @@ package org.linguafranca.pwdb.kdbx.jaxb;
 import org.junit.Test;
 import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.StreamFormat;
 
 import java.io.InputStream;
 

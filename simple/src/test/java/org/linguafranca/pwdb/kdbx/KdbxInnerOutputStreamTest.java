@@ -21,7 +21,7 @@ import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import org.linguafranca.pwdb.kdbx.simple.SimpleEntry;
-import org.linguafranca.pwdb.security.Credentials;
+import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.xml.XmlOutputStreamFilter;
 
 import java.security.SecureRandom;

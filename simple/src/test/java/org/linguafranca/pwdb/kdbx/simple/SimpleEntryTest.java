@@ -19,8 +19,7 @@ package org.linguafranca.pwdb.kdbx.simple;
 import org.linguafranca.pwdb.checks.EntryChecks;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.StreamFormat;
-import org.linguafranca.pwdb.security.Credentials;
+import org.linguafranca.pwdb.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +40,7 @@ public class SimpleEntryTest extends EntryChecks {
     }
 
     @Override
-    public void saveDatabase(Database database, StreamFormat streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
+    public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
         database.save(credentials, outputStream);
     }
 }

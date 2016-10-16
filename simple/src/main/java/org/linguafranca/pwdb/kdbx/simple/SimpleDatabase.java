@@ -16,13 +16,16 @@
 
 package org.linguafranca.pwdb.kdbx.simple;
 
-import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.base.AbstractDatabase;
-import org.linguafranca.pwdb.kdbx.*;
+import org.linguafranca.pwdb.kdbx.KdbxInputTransformer;
+import org.linguafranca.pwdb.kdbx.KdbxOutputTransformer;
+import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxHeader;
+import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxSerializer;
+import org.linguafranca.pwdb.kdbx.stream_3_1.Salsa20StreamEncryptor;
 import org.linguafranca.pwdb.kdbx.simple.converter.*;
 import org.linguafranca.pwdb.kdbx.simple.model.EntryClasses;
 import org.linguafranca.pwdb.kdbx.simple.model.KeePassFile;
-import org.linguafranca.pwdb.security.Credentials;
+import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.xml.XmlInputStreamFilter;
 import org.linguafranca.xml.XmlOutputStreamFilter;
 import org.simpleframework.xml.*;
@@ -38,7 +41,7 @@ import java.io.OutputStream;
 import java.util.*;
 
 /**
- * Implementation of {@link Database} using the Simple XML framework.
+ * Implementation of {@link org.linguafranca.pwdb.Database} using the Simple XML framework.
  *
  * @author jo
  */

@@ -22,8 +22,6 @@ import org.linguafranca.pwdb.kdbx.KdbxCreds;
 
 import java.io.InputStream;
 
-import static org.junit.Assert.*;
-
 /**
  * @author jo
  */

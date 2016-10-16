@@ -30,7 +30,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>keepassjava2</artifactId>
-        <version>2.0.1</version>
+        <version>2.1.0</version>
         
  at Maven Central, snapshot builds at [Sonatype OSS](https://oss.sonatype.org/content/groups/public/).
 
@@ -96,11 +96,16 @@ how to use the methods of those classes to create and modify entries.
 
 ## Dependencies
 
-Aside from the JRE the API depends on
+Aside from the JRE the API depends on:
 
-- Google Guava [license](https://github.com/google/guava/blob/master/COPYING).
-- Apache Commons Codec [license](http://www.apache.org/licenses/LICENSE-2.0).
-- Spongy Castle which is a repackaging for Android of Bouncy Castle [license](https://www.bouncycastle.org/licence.html)
+- [Google Guava](https://github.com/google/guava/wiki) [Apache 2 license](https://github.com/google/guava/blob/master/COPYING).
+- [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/) [Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0).
+- [Spongy Castle](https://rtyley.github.io/spongycastle/) which is a repackaging for Android of [Bouncy Castle](https://www.bouncycastle.org/java.html) [Apache 2 license](https://www.bouncycastle.org/licence.html)
+
+The Simple XML implementation additionally depends on:
+
+- [Simple XML Serialization Framework](http://simple.sourceforge.net/)[Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)
+- [Faster XML Aalto](https://github.com/FasterXML/aalto-xml)[Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
 It also depends on SLF4J and Junit for tests.
 
