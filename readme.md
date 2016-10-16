@@ -35,7 +35,7 @@ The composite POM is
         <version>2.1.0</version>
         
  at Maven Central. There are also separate POMs for the various modules. The module structure is illustrated below
- under Build from Source.
+ under [Build from Source](#bfs).
   
  Snapshot builds at [Sonatype OSS](https://oss.sonatype.org/content/groups/public/).
 
@@ -59,7 +59,7 @@ how to use the methods of those classes to create and modify entries. These clas
 provide the basis of all implementations of the various database formats,
 initially KDB and KDBX 3.1 (KeePass 2) file formats, subsequently, potentially, others.
 
-The class [QuickStart.java](example/src/main/java/QuickStart.java) provides some
+The class [QuickStart.java](example/src/main/java/org/linguafranca/pwdb/kdbx/QuickStart.java) provides some
 illustrations of operations using the Database, Group and Entry interfaces.
 
 ### KeePassJava2 and KeePass
@@ -75,7 +75,7 @@ KeePass is in effect defined by the code that Dominik writes to create and maint
 Hence there are no definitive specification of KeePass files other than that code. For the sake of
 clarification and my own satsifaction I have written about my understanding of KeePass formats in the following locations:
 
-1. The Javadoc header to [KdbxSerializer](kdbx/org/linguafranca/pwdb/kdbx/stream_3_1/KdbxSerializer.java) describes KDBX stream formatting.
+1. The Javadoc header to [KdbxSerializer](kdbx/src/main/java/org/linguafranca/pwdb/kdbx/stream_3_1/KdbxSerializer.java) describes KDBX stream formatting.
 2. The XSD Schema [KDBX.3.1.xsd](KDBX.3.1.xsd) documents my understanding of the Keepass XML, and also my lack of understanding, in parts.
 3. [This graphic](Format Diagram.svg) illustrates KDBX 3.1 stream format and also illustrates proposals for the revised KDBX 4.0 format. 
 
@@ -83,14 +83,14 @@ clarification and my own satsifaction I have written about my understanding of K
 
 Aside from the JRE the API depends on:
 
-- [Google Guava](https://github.com/google/guava/wiki) [Apache 2 license](https://github.com/google/guava/blob/master/COPYING).
-- [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/) [Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0).
-- [Spongy Castle](https://rtyley.github.io/spongycastle/) which is a repackaging for Android of [Bouncy Castle](https://www.bouncycastle.org/java.html) [Apache 2 license](https://www.bouncycastle.org/licence.html)
+- [Google Guava](https://github.com/google/guava/wiki) ([Apache 2 license](https://github.com/google/guava/blob/master/COPYING)).
+- [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
+- [Spongy Castle](https://rtyley.github.io/spongycastle/) which is a repackaging for Android of [Bouncy Castle](https://www.bouncycastle.org/java.html) ([Apache 2 license](https://www.bouncycastle.org/licence.html)).
 
 The Simple XML implementation additionally depends on:
 
-- [Simple XML Serialization Framework](http://simple.sourceforge.net/) [Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)
-- [Faster XML Aalto](https://github.com/FasterXML/aalto-xml) [Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0.txt)
+- [Simple XML Serialization Framework](http://simple.sourceforge.net/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
+- [Faster XML Aalto](https://github.com/FasterXML/aalto-xml) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0.txt)).
 
 It also depends on SLF4J and Junit for tests.
 
@@ -98,9 +98,9 @@ It also depends on SLF4J and Junit for tests.
 
 Included POM is for Maven 3.
 
-### Module Structure
+### <a name="bfs">Module Structure</a>
 
-There are rather a lot of modules, this is inorder to allow for extreme modularity. The module dependencies are illustrated below.
+There are rather a lot of modules, this is inorder to allow loaading of minimal necessary functionality. The module dependencies are illustrated below.
 
 ![Module Structure](Module Structure.svg "Illustration of Module Dependencies")
 
