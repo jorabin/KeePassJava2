@@ -1,1 +1,8 @@
-example/testOutput
+testOutput
+build.gradle
+build
+settings.gradle
+gradlew
+gradlew.bat
+.gradle
+gradle

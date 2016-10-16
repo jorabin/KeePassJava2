@@ -24,9 +24,9 @@ import java.io.IOException;
 /**
  * @author jo
  */
-public class SimpleDatabaseTests extends BasicDatabaseChecks {
+public class SimpleDatabaseTest extends BasicDatabaseChecks {
 
-    public SimpleDatabaseTests() throws IOException {
+    public SimpleDatabaseTest() throws IOException {
     }
 
     @Override

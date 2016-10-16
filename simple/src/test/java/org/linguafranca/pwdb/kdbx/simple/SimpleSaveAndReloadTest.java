@@ -29,7 +29,7 @@ import java.io.OutputStream;
 /**
  * @author jo
  */
-public class SimpleSaveAndReloadTests extends SaveAndReloadChecks {
+public class SimpleSaveAndReloadTest extends SaveAndReloadChecks {
     @Override
     public Database getDatabase() {
         return new SimpleDatabase();

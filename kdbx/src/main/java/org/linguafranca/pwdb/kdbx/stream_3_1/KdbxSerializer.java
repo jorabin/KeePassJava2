@@ -37,21 +37,29 @@ import java.util.zip.GZIPOutputStream;
  * <p/>
  * A KDBX file is little-endian and consists of the following:
  * <ol>
- *     <li>An unencrypted portion</li>
- * <ol>
- *     <li>8 bytes Magic number</li>
- *     <li>4 bytes version</li>
- *     <li>A header containing details of the encryption of the remainder of the file</li>
- *     <p>The header fields are encoded using a TLV style. The Type is an enumeratrion encoded in 1 byte.
- *     The length is encoded in 2 bytes and the value according to the length denoted. The sequence is
- *     terminated by a zero type with 0 length.</p>
- * </ol>
- *  <li>An encrypted portion</li>
- *  <ol>
- *      <li>A sequence of bytes contained in the header. If they don't match, decryption has not worked.</li>
- *      <li>A payload serialized in Hashed Block format.</li>
- *      <p>The content of this payload is expected to be a Keepass Database in XML format.</p>
- *  </ol>
+ *      <li>An unencrypted portion</li>
+ *      <ol>
+ *          <li>8 bytes Magic number</li>
+ *          <li>4 bytes version</li>
+ *          <li>A header containing details of the encryption of the remainder of the file</li>
+ *          <p>The header fields are encoded using a TLV style. The Type is an enumeration encoded in 1 byte.
+ *          The length is encoded in 2 bytes and the value according to the length denoted. The sequence is
+ *          terminated by a zero type with 0 length.</p>
+ *          <p>{@link KdbxHeader} details the fields of the header.</p>
+ *      </ol>
+ *      <li>An encrypted portion</li>
+ *      <ol>
+ *          <li>A sequence of bytes contained in the header. If they don't match, decryption has not worked.</li>
+ *          <li>A payload serialized in Hashed Block format, see e.g. {@link HashedBlockInputStream} for details of this.</li>
+ *          <li>The content of this payload may be GZIP compressed.</li>
+ *          <li>The content is now a character stream, which is expected to be
+ *          XML representing a KeePass Database.</li>
+ *          <li>Various fields of the XML (e.g. passwords) are additionally
+ *      and optionally encrypted using a second encryption. They
+ *      are stream encrypted, meaning they have to be decrypted in the
+ *      same order as they were encrypted, namely actual XML document order. Or at least that
+ *      is the way it seems.</li>
+ *      </ol>
  * </ol>
  * <p/>
  * The methods in this class provide support for serializing and deserializing plain text payload content

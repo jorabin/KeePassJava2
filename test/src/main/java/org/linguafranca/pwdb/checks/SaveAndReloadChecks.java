@@ -17,11 +17,14 @@
 package org.linguafranca.pwdb.checks;
 
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.*;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
@@ -38,6 +41,11 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
     public abstract D loadDatabase(Credentials credentials, InputStream inputStream) throws IOException;
     public abstract Credentials getCreds(byte[] creds);
 
+    @BeforeClass
+    public static void ensureOutputDir() throws IOException {
+        Files.createDirectories(Paths.get("testOutput"));
+    }
+
     @Test
     public void saveAndReloadTest() throws IOException {
 
@@ -47,12 +55,13 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         Assert.assertTrue(output.isDirty());
         assertEquals(5, output.getRootGroup().getGroupsCount());
 
-        File temp = File.createTempFile("temp", "temp");
-        FileOutputStream fos = new FileOutputStream(temp);
+        FileOutputStream fos = new FileOutputStream("testOutput/test1.kdbx");
         saveDatabase(output, getCreds("123".getBytes()), fos);
         Assert.assertFalse(output.isDirty());
+        fos.flush();
+        fos.close();
 
-        FileInputStream fis = new FileInputStream(temp);
+        FileInputStream fis = new FileInputStream("testOutput/test1.kdbx");
         D input = loadDatabase(getCreds("123".getBytes()), fis);
 
         for (Integer g = 0; g< 5; g++){
@@ -90,11 +99,12 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         entry.setBinaryProperty("letter L.jpeg", content);
         assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
 
-        File temp = File.createTempFile("temp", "temp");
-        FileOutputStream fos = new FileOutputStream(temp);
+        FileOutputStream fos = new FileOutputStream("testOutput/test2.kdbx");
         saveDatabase(attachment, getCreds("123".getBytes()), fos);
+        fos.flush();
+        fos.close();
 
-        FileInputStream fis = new FileInputStream(temp);
+        FileInputStream fis = new FileInputStream("testOutput/test2.kdbx");
         Database input = loadDatabase(getCreds("123".getBytes()), fis);
 
         entry = (Entry) input.findEntries("Test attachment").get(0);

@@ -212,6 +212,7 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
             // and save the database out
             getSerializer().write(this.keePassFile, plainTextOutputStream);
             plainTextOutputStream.close();
+            plainTextOutputStream.await();
             this.setDirty(false);
 
         } catch (Exception e) {

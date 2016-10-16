@@ -16,15 +16,22 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import org.linguafranca.pwdb.kdbx.simple.SimpleEntry;
 import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.xml.XmlEventTransformer;
+import org.linguafranca.xml.XmlInputStreamFilter;
 import org.linguafranca.xml.XmlOutputStreamFilter;
 
+import javax.xml.stream.XMLStreamException;
+import java.io.*;
 import java.security.SecureRandom;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author jo
@@ -39,6 +46,24 @@ public class KdbxInnerOutputStreamTest {
         entry.setPassword("password");
         database.getRootGroup().addEntry(entry);
         database.save(new KdbxCreds.None(), System.out);
-   }
+    }
+
+    @Test @Ignore
+    public void testOutputStreamFilter () throws IOException, XMLStreamException {
+        File temp = File.createTempFile("temp", "temp");
+        OutputStream outputStream = new FileOutputStream(temp);
+        XmlOutputStreamFilter filter = new XmlOutputStreamFilter(outputStream, new KdbxOutputTransformer.None());
+        outputStream.write("<test>hello world</test>".getBytes());
+        outputStream.flush();
+        outputStream.close();
+
+        InputStream inputStream = new FileInputStream(temp);
+        XmlInputStreamFilter filter1 = new XmlInputStreamFilter(inputStream, new XmlEventTransformer.None());
+        byte[] b = new byte[1024];
+        int l = filter1.read(b);
+        String s = new String(b,0,l);
+        assertEquals("<test>hello world</test>", s);
+    }
+
 
 }

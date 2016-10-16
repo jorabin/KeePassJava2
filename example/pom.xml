@@ -26,8 +26,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>KeePassJava2-example</artifactId>
-    <name>KeePassJava2 :: Example</name>
+    <artifactId>example</artifactId>
+    <name>PWDB :: Example</name>
     <description>Examples of how to use KeePassJava2</description>
 
     <dependencies>

@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>KeePassJava2-test</artifactId>
-    <name>KeePassJava2 :: Test</name>
+    <artifactId>test</artifactId>
+    <name>PWDB :: Test</name>
     <description>Contains the shared test classes for exercising the functionality of a database implementation.</description>
 
     <dependencies>
