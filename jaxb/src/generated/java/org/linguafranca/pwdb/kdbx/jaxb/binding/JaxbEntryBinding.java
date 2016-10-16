@@ -30,7 +30,7 @@ import org.linguafranca.pwdb.kdbx.jaxb.base.AbstractJaxbParentedBinding;
  * &lt;element name="Entry"&gt;
  *   &lt;complexType&gt;
  *     &lt;complexContent&gt;
- *       &lt;extension base="{}Parented"&gt;
+ *       &lt;extension org.linguafranca.pwdb.base="{}Parented"&gt;
  *         &lt;sequence&gt;
  *           &lt;element name="UUID" type="{}uuid"/&gt;
  *           &lt;element name="IconID" type="{}iconId"/&gt;

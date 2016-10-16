@@ -17,15 +17,12 @@
 package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.jetbrains.annotations.NotNull;
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Group;
-import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractDatabase;
-import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
+import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.ObjectFactory;
-import org.linguafranca.security.Credentials;
+import org.linguafranca.pwdb.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,7 +36,7 @@ import java.util.UUID;
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
-public class JaxbDatabase extends AbstractDatabase {
+public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, JaxbEntry, JaxbIcon> {
 
     private KeePassFile keePassFile;
     private ObjectFactory objectFactory = new ObjectFactory();
@@ -91,28 +88,28 @@ public class JaxbDatabase extends AbstractDatabase {
     }
 
     @Override
-    public Group getRootGroup() {
+    public JaxbGroup getRootGroup() {
         return root;
     }
 
     @Override
-    public Group newGroup() {
+    public JaxbGroup newGroup() {
         return new JaxbGroup(this);
     }
 
     @Override
-    public Entry newEntry() {
+    public JaxbEntry newEntry() {
         return new JaxbEntry(this);
     }
 
     @Override
-    public Icon newIcon() {
-        return new JaxbIconWrapper();
+    public JaxbIcon newIcon() {
+        return new JaxbIcon();
     }
 
     @Override
-    public Icon newIcon(Integer i) {
-        return new JaxbIconWrapper(i);
+    public JaxbIcon newIcon(Integer i) {
+        return new JaxbIcon(i);
     }
 
     @Override

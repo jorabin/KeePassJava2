@@ -30,7 +30,7 @@ import java.util.List;
 /**
  * @author jo
  */
-public abstract class EntryClasses extends AbstractEntry {
+public abstract class EntryClasses {
     public static StringProperty getStringProperty(String name, List<StringProperty> string) {
         for (StringProperty property : string) {
             if (property.key.equals(name)) {

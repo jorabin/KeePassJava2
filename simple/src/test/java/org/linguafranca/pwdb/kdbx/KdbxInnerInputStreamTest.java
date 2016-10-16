@@ -19,10 +19,7 @@ package org.linguafranca.pwdb.kdbx;
 import org.junit.Test;
 import org.linguafranca.xml.XmlInputStreamFilter;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.events.Attribute;
-import javax.xml.stream.events.XMLEvent;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -36,7 +33,7 @@ public class KdbxInnerInputStreamTest {
     @Test
     public void test() throws XMLStreamException, IOException {
         InputStream is = getClass().getClassLoader().getResourceAsStream("ExampleDatabase.xml");
-        XmlInputStreamFilter sxd = new XmlInputStreamFilter(is, new KdbxInputTransformer(new Salsa20StreamEncryptor.None()));
+        XmlInputStreamFilter sxd = new XmlInputStreamFilter(is, new KdbxInputTransformer(new org.linguafranca.pwdb.kdbx.stream_3_1.Salsa20StreamEncryptor.None()));
         int len;
         do {
             byte b[] = new byte[8096];

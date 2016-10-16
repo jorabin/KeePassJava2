@@ -17,9 +17,10 @@
 package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.linguafranca.pwdb.Database;
-import org.linguafranca.checks.SaveAndReloadChecks;
+import org.linguafranca.pwdb.checks.SaveAndReloadChecks;
+import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
-import org.linguafranca.security.Credentials;
+import org.linguafranca.pwdb.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,12 +46,12 @@ public class JaxbSaveAndReloadTest extends SaveAndReloadChecks {
     }
 
     @Override
-    public void saveDatabase(Database database, StreamFormat streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
-        ((JaxbDatabase) database).save(streamFormat, credentials, outputStream);
+    public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
+        return JaxbDatabase.load(credentials, inputStream);
     }
 
     @Override
-    public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
-        return JaxbDatabase.load(credentials, inputStream);
+    public Credentials getCreds(byte[] creds) {
+        return new KdbxCreds(creds);
     }
 }
