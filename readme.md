@@ -26,7 +26,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
  (see [license](#license))
 
-## Maven Coordinates
+## <a name="mvn">Maven Coordinates</a>
 
 The composite POM is
 
@@ -104,7 +104,7 @@ There are rather a lot of modules, this is in order to allow loading of minimal 
 
 ![Module Structure](Module Structure.svg "Illustration of Module Dependencies")
 
-The Maven groupId and version are as above. GroupId is `org.linguafranca.pwdb`.
+Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pwdb`. The version id is as noted [above](#mvn).
 
 <table>
 <thead>
@@ -114,7 +114,7 @@ The Maven groupId and version are as above. GroupId is `org.linguafranca.pwdb`.
 <tr><td><a href="database">database</a></td><td>database</td><td>Base definition of the Database APIs.</td></tr>
 <tr><td><a href="">example</a></td><td>example</td><td>Worked examples of loading, saving, splicing etc. using the APIs</td></tr>
 <tr><td><a href="test">test</a></td><td>test</td><td>Shared tests to assess the viability of the implementation.</td></tr>
-<tr><td><a href="all">all</a></td><td><strong>KeePassJava2</strong></td><td>This is the main KeePassJava2 Maven dependency. Provides a route to all implementations via transitive dependency.</td></tr>
+<tr><td><a href="all">all</a></td><td><strong>KeePassJava2</strong></td><td>This is the main KeePassJava2 Maven dependency. Provides a route to all artifacts (other than test and examples) via transitive dependency.</td></tr>
 <tr><td><a href="kdb">kdb</a></td><td>KeePassJava2-kdb</td><td>An implementation of the Database APIs supporting KeePass KDB format.</td></tr>
 <tr><td><a href="kdbx">kdbx</a></td><td>KeePassJava2-kdbx</td><td>Provides support for KDBX streaming and security.</td></tr>
 <tr><td><a href="simple">simple</a></td><td>KeePassJava2-simple</td><td>A Simple XML Platform implementation of KDBX. Could be useful for Android.</td></tr>
