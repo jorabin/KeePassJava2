@@ -45,11 +45,11 @@ It is written for Java 1.7.
 
 ## Quick Start
 
-Password databses are modelled as a three layer abstraction. 
+Password databases are modelled as a three layer abstraction. 
 
-A *Database* is a collection of records whose physical representation needs only to be capable of rendering as a stream. *Entries* hold the information of value in the databse and *Groups* allow the structuring of entries into collections, just like a folder structure. 
+A *Database* is a collection of records whose physical representation needs only to be capable of rendering as a stream. *Entries* hold the information of value in the database and *Groups* allow the structuring of entries into collections, just like a folder structure. 
 
-The Database has a root group and by following sub-groups of the root group the tree structure of the databse can be navigated. Entries belong to groups. Entries can be moved between groups and groups can also be moved between groups. However, entries and groups created in one database cannot be moved to another database without being converted: Database.newEntry(entryToCopy), Databse.newGroup(groupToCopy).
+The Database has a root group and by following sub-groups of the root group the tree structure of the database can be navigated. Entries belong to groups. Entries can be moved between groups and groups can also be moved between groups. However, entries and groups created in one database cannot be moved to another database without being converted: Database.newEntry(entryToCopy), Database.newGroup(groupToCopy).
 
 The class Javadoc on Interface classes
 [Database](database/src/main/java/org/linguafranca/pwdb/Database.java), 
@@ -68,12 +68,12 @@ This project is so named by kind permission of Dominik Reichl the author of KeeP
 is no formal connection with that project.
 
 It has always been the intention to support other specific password database implementations.
-Hence the creation of abstract Databse interfaces raher than following the KeePass model
+Hence the creation of abstract Database interfaces rather than following the KeePass model
 exactly.
 
 KeePass is in effect defined by the code that Dominik writes to create and maintain the project.
 Hence there are no definitive specification of KeePass files other than that code. For the sake of
-clarification and my own satsifaction I have written about my understanding of KeePass formats in the following locations:
+clarification and my own satisfaction I have written about my understanding of KeePass formats in the following locations:
 
 1. The Javadoc header to [KdbxSerializer](kdbx/src/main/java/org/linguafranca/pwdb/kdbx/stream_3_1/KdbxSerializer.java) describes KDBX stream formatting.
 2. The XSD Schema [KDBX.3.1.xsd](KDBX.3.1.xsd) documents my understanding of the Keepass XML, and also my lack of understanding, in parts.
@@ -89,7 +89,7 @@ Aside from the JRE the API depends on:
 
 The Simple XML implementation additionally depends on:
 
-- [Simple XML Serialization Framework](http://simple.sourceforge.net/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
+- [Simple XML Serialisation Framework](http://simple.sourceforge.net/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
 - [Faster XML Aalto](https://github.com/FasterXML/aalto-xml) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0.txt)).
 
 It also depends on SLF4J and Junit for tests.
@@ -100,22 +100,22 @@ Included POM is for Maven 3.
 
 ### <a name="bfs">Module Structure</a>
 
-There are rather a lot of modules, this is inorder to allow loaading of minimal necessary functionality. The module dependencies are illustrated below.
+There are rather a lot of modules, this is in order to allow loading of minimal necessary functionality. The module dependencies are illustrated below.
 
 ![Module Structure](Module Structure.svg "Illustration of Module Dependencies")
 
-The Maven groupId and version are as above. Groupid is `org.linguafranca.pwdb`.
+The Maven groupId and version are as above. GroupId is `org.linguafranca.pwdb`.
 
 <table>
 <thead>
 <tr><th>Module</th><th>ArtifactId</th><th>Description</th></tr>
 </thead>
 <tbody>
-<tr><td><a href="database">database</a></td><td>database</td><td>Base definition of the Databse APIs.</td></tr>
+<tr><td><a href="database">database</a></td><td>database</td><td>Base definition of the Database APIs.</td></tr>
 <tr><td><a href="">example</a></td><td>example</td><td>Worked examples of loading, saving, splicing etc. using the APIs</td></tr>
 <tr><td><a href="test">test</a></td><td>test</td><td>Shared tests to assess the viability of the implementation.</td></tr>
 <tr><td><a href="all">all</a></td><td><strong>KeePassJava2</strong></td><td>This is the main KeePassJava2 Maven dependency. Provides a route to all implementations via transitive dependency.</td></tr>
-<tr><td><a href="kdb">kdb</a></td><td>KeePassJava2-kdb</td><td>An implementation of the Databse APIs supporting KeePass KDB format.</td></tr>
+<tr><td><a href="kdb">kdb</a></td><td>KeePassJava2-kdb</td><td>An implementation of the Database APIs supporting KeePass KDB format.</td></tr>
 <tr><td><a href="kdbx">kdbx</a></td><td>KeePassJava2-kdbx</td><td>Provides support for KDBX streaming and security.</td></tr>
 <tr><td><a href="simple">simple</a></td><td>KeePassJava2-simple</td><td>A Simple XML Platform implementation of KDBX. Could be useful for Android.</td></tr>
 <tr><td><a href="jaxb">jaxb</a></td><td>KeePassJava2-jaxb</td><td>A JAXB implementation of KDBX. Probably not useful for Android. The generated class
@@ -157,7 +157,7 @@ need to add something like the following to the `build.gradle` for the JAXB modu
       }
     }
     
-Youll find it in [gradle-source-sets.txt](jaxb/gradle-source-sets.txt) in the root of the jaxb module.
+You'll find it in [gradle-source-sets.txt](jaxb/gradle-source-sets.txt) in the root of the jaxb module.
 
 ## Change Log
 
