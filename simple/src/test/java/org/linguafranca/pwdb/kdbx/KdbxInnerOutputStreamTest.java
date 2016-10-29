@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import com.google.common.io.ByteStreams;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.Database;
@@ -45,7 +46,7 @@ public class KdbxInnerOutputStreamTest {
         entry.setTitle("Password Encyption Test");
         entry.setPassword("password");
         database.getRootGroup().addEntry(entry);
-        database.save(new KdbxCreds.None(), System.out);
+        database.save(new KdbxCreds.None(), ByteStreams.nullOutputStream());
     }
 
     @Test @Ignore
