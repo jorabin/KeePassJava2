@@ -12,7 +12,7 @@
 
     <artifactId>database</artifactId>
     <name>PWDB :: Database</name>
-    <description>Contains root definitions of Databases etc.</description>
+    <description>Contains root definitions of PWDB Databases etc.</description>
 
     <dependencies>
         <dependency>

@@ -28,7 +28,7 @@
 
     <artifactId>example</artifactId>
     <name>PWDB :: Example</name>
-    <description>Examples of how to use KeePassJava2</description>
+    <description>Examples of how to use PWDB</description>
 
     <dependencies>
         <dependency>

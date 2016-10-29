@@ -53,18 +53,16 @@ import java.util.zip.GZIPOutputStream;
  *          <li>A payload serialized in Hashed Block format, see e.g. {@link HashedBlockInputStream} for details of this.</li>
  *          <li>The content of this payload may be GZIP compressed.</li>
  *          <li>The content is now a character stream, which is expected to be
- *          XML representing a KeePass Database.</li>
- *          <li>Various fields of the XML (e.g. passwords) are additionally
+ *          XML representing a KeePass Database. Assumed UTF-8 encoding.</li>
+ *      </ol>
+ * </ol>
+ * <p>The methods in this class provide support for serializing and deserializing plain text payload content
+ *      to and from the above encrypted format.
+ * <p>Various fields of the plain text XML (e.g. passwords) are additionally
  *      and optionally encrypted using a second encryption. They
  *      are stream encrypted, meaning they have to be decrypted in the
  *      same order as they were encrypted, namely actual XML document order. Or at least that
- *      is the way it seems.</li>
- *      </ol>
- * </ol>
- * <p/>
- * The methods in this class provide support for serializing and deserializing plain text payload content
- * to and from the above format.
- * <p/>
+ *      is the way it seems. The methods of this class do not perform this aspect of encryption/decryption.
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
