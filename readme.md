@@ -31,7 +31,7 @@ It is licensed under the Apache 2 License and is currently usable.
 The composite POM is
 
         <groupId>org.linguafranca.pwdb</groupId>
-        <artifactId>keepassjava2</artifactId>
+        <artifactId>KeePassJava2</artifactId>
         <version>2.1.0</version>
         
  at Maven Central. There are also separate POMs for the various modules. The module structure is illustrated below
