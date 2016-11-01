@@ -19,7 +19,6 @@ package org.linguafranca.pwdb.kdbx;
 import com.google.common.io.ByteStreams;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -89,8 +88,11 @@ public class Helpers {
         return inFormat.format(value);
     }
 
-    @Nullable
-    public static byte[] decodeBase64Content(byte[] content, boolean isCompressed) {
+    public static byte[] decodeBase64Content(byte[] content) {
+        return decodeBase64Content(content, false);
+    }
+
+    public static byte[] decodeBase64Content (byte[] content, boolean isCompressed) {
         byte[] value = Base64.decodeBase64(content);
         if (isCompressed) {
             return unzipBinaryContent(value);
@@ -98,7 +100,6 @@ public class Helpers {
         return value;
     }
 
-    @Nullable
     public static byte[] unzipBinaryContent(byte[] content) {
         ByteArrayInputStream bais = new ByteArrayInputStream(content);
         try {
@@ -107,6 +108,10 @@ public class Helpers {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public static String encodeBase64Content(byte[] value) {
+        return encodeBase64Content(value);
     }
 
     public static String encodeBase64Content(byte[] value, boolean isCompressed) {

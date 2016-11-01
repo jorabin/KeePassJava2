@@ -1,0 +1,228 @@
+18:26:34.769 [main] INFO  proxy - Awaiting connection
+18:26:51.472 [Connection 0 ->] INFO  proxy - upstream starting
+18:26:51.472 [Connection 0 <-] INFO  proxy - downstream starting
+
+
+
+18:26:51.473 [Connection 0 ->] INFO  proxy - POST / HTTP/1.1
+Host: localhost:19455
+Connection: keep-alive
+Content-Length: 54
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36
+Origin: chrome-extension://ompiailgknfdndiefoaoiligalphfdae
+Content-Type: application/json
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.8
+
+{"RequestType":"test-associate","TriggerUnlock":false}
+
+
+
+18:26:51.541 [Connection 0 <-] INFO  proxy - HTTP/1.1 200 OK
+Content-Length: 128
+Content-Type: application/json
+Server: Microsoft-HTTPAPI/2.0
+Date: Mon, 31 Oct 2016 18:26:51 GMT
+
+{"RequestType":"test-associate","Success":false,"Count":0,"Version":"1.8.4.1","Hash":"eefc4faf792a59d034da69c69f3643ef34ba7d8d"}
+
+
+
+18:26:57.523 [Connection 0 ->] INFO  proxy - POST / HTTP/1.1
+Host: localhost:19455
+Connection: keep-alive
+Content-Length: 54
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36
+Origin: chrome-extension://ompiailgknfdndiefoaoiligalphfdae
+Content-Type: application/json
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.8
+
+{"RequestType":"test-associate","TriggerUnlock":false}
+
+
+
+18:26:57.589 [Connection 0 <-] INFO  proxy - HTTP/1.1 200 OK
+Content-Length: 128
+Content-Type: application/json
+Server: Microsoft-HTTPAPI/2.0
+Date: Mon, 31 Oct 2016 18:26:57 GMT
+
+{"RequestType":"test-associate","Success":false,"Count":0,"Version":"1.8.4.1","Hash":"eefc4faf792a59d034da69c69f3643ef34ba7d8d"}
+
+
+
+18:26:57.594 [Connection 0 ->] INFO  proxy - POST / HTTP/1.1
+Host: localhost:19455
+Connection: keep-alive
+Content-Length: 173
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36
+Origin: chrome-extension://ompiailgknfdndiefoaoiligalphfdae
+Content-Type: application/json
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.8
+
+{"RequestType":"associate","Key":"NTxz7Rej/a4H9OFXBmXxMp0BjIfqhy5QEYjLnqhWdkA=","Nonce":"UJUjvviWfVDK7c6KzZNUkw==","Verifier":"f3DwAdI7rcWAH0DzGlCMTjLtH2q2+eBLNgRuojQWLS8="}
+
+
+
+18:27:28.276 [Connection 0 <-] INFO  proxy - HTTP/1.1 200 OK
+Content-Length: 236
+Content-Type: application/json
+Server: Microsoft-HTTPAPI/2.0
+Date: Mon, 31 Oct 2016 18:27:28 GMT
+
+{"RequestType":"associate","Success":true,"Id":"NEW coNECTION","Count":0,"Version":"1.8.4.1","Hash":"eefc4faf792a59d034da69c69f3643ef34ba7d8d","Nonce":"/cdtpNsn3sjiwVtrwYmx3g==","Verifier":"5onGXGq18yT4BM3QJnqUxXMKJ7/4fnRvjZ6R0OO0RSE="}
+
+
+
+18:27:49.553 [Connection 0 ->] INFO  proxy - POST / HTTP/1.1
+Host: localhost:19455
+Connection: keep-alive
+Content-Length: 54
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36
+Origin: chrome-extension://ompiailgknfdndiefoaoiligalphfdae
+Content-Type: application/json
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.8
+
+{"RequestType":"test-associate","TriggerUnlock":false}
+
+
+
+18:27:49.619 [Connection 0 <-] INFO  proxy - HTTP/1.1 200 OK
+Content-Length: 128
+Content-Type: application/json
+Server: Microsoft-HTTPAPI/2.0
+Date: Mon, 31 Oct 2016 18:27:49 GMT
+
+{"RequestType":"test-associate","Success":false,"Count":0,"Version":"1.8.4.1","Hash":"eefc4faf792a59d034da69c69f3643ef34ba7d8d"}
+
+
+
+18:29:38.604 [Connection 0 ->] INFO  proxy - POST / HTTP/1.1
+Host: localhost:19455
+Connection: keep-alive
+Content-Length: 54
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36
+Origin: chrome-extension://ompiailgknfdndiefoaoiligalphfdae
+Content-Type: application/json
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.8
+
+{"RequestType":"test-associate","TriggerUnlock":false}
+
+
+
+18:29:38.663 [Connection 0 <-] INFO  proxy - HTTP/1.1 200 OK
+Content-Length: 128
+Content-Type: application/json
+Server: Microsoft-HTTPAPI/2.0
+Date: Mon, 31 Oct 2016 18:29:38 GMT
+
+{"RequestType":"test-associate","Success":false,"Count":0,"Version":"1.8.4.1","Hash":"eefc4faf792a59d034da69c69f3643ef34ba7d8d"}
+
+
+
+18:29:38.670 [Connection 0 ->] INFO  proxy - POST / HTTP/1.1
+Host: localhost:19455
+Connection: keep-alive
+Content-Length: 345
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36
+Origin: chrome-extension://ompiailgknfdndiefoaoiligalphfdae
+Content-Type: application/json
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.8
+
+{"RequestType":"get-logins","SortSelection":"true","TriggerUnlock":"false","Id":"NEW coNECTION","Nonce":"0zKxhTxwUiGfPYtu0WPrhQ==","Verifier":"7hOpUKLJUyFeIdZiBBUFTwV9JzrdxMSELdeaoXt2ias=","Url":"thIyzORoaXem7BvHrrG+BCEOZ9B2hrWFbyTUEE+Ua6o=","SubmitUrl":"thIyzORoaXem7BvHrrG+BIyLvjut2ACp3PmMgnvDzI3vh+pEe4XyKg9R+Oum1q1b62z+9mrXwpOKtnR/g9ogTQ=="}
+
+
+
+18:29:38.758 [Connection 0 <-] INFO  proxy - HTTP/1.1 200 OK
+Content-Length: 250
+Content-Type: application/json
+Server: Microsoft-HTTPAPI/2.0
+Date: Mon, 31 Oct 2016 18:29:38 GMT
+
+{"RequestType":"get-logins","Success":true,"Id":"NEW coNECTION","Count":0,"Version":"1.8.4.1","Hash":"eefc4faf792a59d034da69c69f3643ef34ba7d8d","Nonce":"NARnSmq7mlnaqNuZLpE3WQ==","Verifier":"Sq4ayYZIz86EO6MSjflPfsP7g7jWg85moHnwqA8V0do=","Entries":[]}
+
+
+
+18:34:31.067 [Connection 0 ->] INFO  proxy - POST / HTTP/1.1
+Host: localhost:19455
+Connection: keep-alive
+Content-Length: 54
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36
+Origin: chrome-extension://ompiailgknfdndiefoaoiligalphfdae
+Content-Type: application/json
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.8
+
+{"RequestType":"test-associate","TriggerUnlock":false}
+
+
+
+18:34:31.131 [Connection 0 <-] INFO  proxy - HTTP/1.1 200 OK
+Content-Length: 128
+Content-Type: application/json
+Server: Microsoft-HTTPAPI/2.0
+Date: Mon, 31 Oct 2016 18:34:31 GMT
+
+{"RequestType":"test-associate","Success":false,"Count":0,"Version":"1.8.4.1","Hash":"eefc4faf792a59d034da69c69f3643ef34ba7d8d"}
+
+
+
+18:34:31.135 [Connection 0 ->] INFO  proxy - POST / HTTP/1.1
+Host: localhost:19455
+Connection: keep-alive
+Content-Length: 168
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36
+Origin: chrome-extension://ompiailgknfdndiefoaoiligalphfdae
+Content-Type: application/json
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.8
+
+{"RequestType":"test-associate","TriggerUnlock":false,"Id":"NEW coNECTION","Nonce":"gWgoWCbp6/9YsuvVH3hSPw==","Verifier":"NQ0d51+hW4Y7NBB0Ns6QKPg0BSWnHwHzleMKpZsdO54="}
+
+
+
+18:34:31.193 [Connection 0 <-] INFO  proxy - HTTP/1.1 200 OK
+Content-Length: 241
+Content-Type: application/json
+Server: Microsoft-HTTPAPI/2.0
+Date: Mon, 31 Oct 2016 18:34:31 GMT
+
+{"RequestType":"test-associate","Success":true,"Id":"NEW coNECTION","Count":0,"Version":"1.8.4.1","Hash":"eefc4faf792a59d034da69c69f3643ef34ba7d8d","Nonce":"HMtkcQjmeRxxm8/GLcPsAQ==","Verifier":"t+wp+yIoG497STtDUf7st9yGSLStHglihAO+GMFHnzg="}
+
+
+
+18:34:31.207 [Connection 0 ->] INFO  proxy - POST / HTTP/1.1
+Host: localhost:19455
+Connection: keep-alive
+Content-Length: 345
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36
+Origin: chrome-extension://ompiailgknfdndiefoaoiligalphfdae
+Content-Type: application/json
+Accept: */*
+Accept-Encoding: gzip, deflate, br
+Accept-Language: en-US,en;q=0.8
+
+{"RequestType":"get-logins","SortSelection":"true","TriggerUnlock":"false","Id":"NEW coNECTION","Nonce":"79y7EyDVndGn3B5iFLp4Kw==","Verifier":"LIY9XDHscI+xgrzIVCFnqsW9yigiNzWbJ1ZpOIBKGVs=","Url":"eZpW5dUli05H5l1+MuwiUNjXZyNemZDmQOFjgkz8uvg=","SubmitUrl":"eZpW5dUli05H5l1+MuwiUO2/H/Faw6yvjvgrCElBRSSbGRJ3a4hXFdq0ws75fK26XT9SQQXqwOvCiTiK5Ybnxg=="}
+
+
+
+18:34:52.694 [Connection 0 <-] INFO  proxy - HTTP/1.1 200 OK
+Content-Length: 432
+Content-Type: application/json
+Server: Microsoft-HTTPAPI/2.0
+Date: Mon, 31 Oct 2016 18:34:52 GMT
+
+{"RequestType":"get-logins","Success":true,"Id":"NEW coNECTION","Count":1,"Version":"1.8.4.1","Hash":"eefc4faf792a59d034da69c69f3643ef34ba7d8d","Nonce":"hQ2JSllJLrVWv1LcxN8+rQ==","Verifier":"TT2014GvCXk+bruePydwqiGFeupP+xv7F7UnC5lc7vo=","Entries":[{"Login":"n1qi36EQkTQhzQiT7TFonA==","Password":"gvgmfbelEa3QxvzRsEG0Hg==","Uuid":"w5MJa4za3DLh+2CmbG9Yl5kr5Gba0wnptN24kZPsWHPA8hPx6Pb1XYxiseh5gARY","Name":"xpCqAwBjmUOqVyI6dfJqGA=="}]}
