@@ -94,7 +94,7 @@ public class KeePassFile {
         protected int masterKeyChangeForce;
         @Element(name = "MemoryProtection")
         public KeePassFile.MemoryProtection memoryProtection;
-        @ElementList(name = "CustomIcons")
+        @ElementList(name = "CustomIcons", required = false)
         protected ArrayList<Icon> customIcons;
         @Element(name = "RecycleBinEnabled", type = Boolean.class)
         @Convert(KeePassBooleanConverter.class)
