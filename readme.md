@@ -34,7 +34,9 @@ The composite POM is
         <artifactId>KeePassJava2</artifactId>
         <version>2.1.0</version>
         
- at Maven Central. There are also separate POMs for the various modules. The module structure is illustrated below
+ at Maven Central. Note that the artifactId has become Camel Case compared with release 2.0.1.
+ 
+ There are also separate POMs for the various modules. The module structure is illustrated below
  under [Build from Source](#bfs).
   
  Snapshot builds at [Sonatype OSS](https://oss.sonatype.org/content/groups/public/).
@@ -45,11 +47,55 @@ It is written for Java 1.7.
 
 ## Quick Start
 
+Create credentials and an input stream for the password file in question:
+
+      KdbxCreds creds = new KdbxCreds("123".getBytes());
+      InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test1.kdbx");
+      
+then choose a database implementation, and load the database.
+
+      Database database = SimpleDatabase.load(credentials, inputStream)
+
+or
+
+      Database database = JaxbDatabase.load(credentials, inputStream)
+
+or
+
+      Database database = DomDatabaseWrapper.load(credentials, inputStream)
+
+Different implementations have varying characteristics, primarily speed. 
+The table below illustrates timings for the file `test1.kdbx` 
+(in the test module resources -
+it is around 2k bytes and contains a few dozen entries)
+as assessed by [this test](https://github.com/jorabin/KeePassJava2/blob/master/example/src/main/java/org/linguafranca/pwdb/kdbx/OpenDbExample.java)
+ in the examples module.
+ 
+    Simple 5 loads 20 iterations 257 millis
+    Jaxb 5 loads 20 iterations 326 millis
+    Dom 5 loads 20 iterations 758 millis
+
+    Simple 10 loads 1 iterations 340 millis
+    Jaxb 10 loads 1 iterations 552 millis
+    Dom 10 loads 1 iterations 175 millis
+
+    Simple 1 loads 50 iterations 28 millis
+    Jaxb 1 loads 50 iterations 47 millis
+    Dom 1 loads 50 iterations 251 millis
+
+Load time is dominant in this example for JAXB and Simple,
+database traversal for the DOM implementation. 
+
+### Discussion
+
 Password databases are modelled as a three layer abstraction. 
 
 A *Database* is a collection of records whose physical representation needs only to be capable of rendering as a stream. *Entries* hold the information of value in the database and *Groups* allow the structuring of entries into collections, just like a folder structure. 
 
-The Database has a root group and by following sub-groups of the root group the tree structure of the database can be navigated. Entries belong to groups. Entries can be moved between groups and groups can also be moved between groups. However, entries and groups created in one database cannot be moved to another database without being converted: Database.newEntry(entryToCopy), Database.newGroup(groupToCopy).
+The Database has a root group and by following sub-groups of the root group the tree structure of the database can be navigated. Entries belong to groups. Entries can be moved between groups and groups can also be moved between groups. However, entries and groups created in one database cannot be moved to another database without being converted: 
+
+    database.newEntry(entryToCopy);
+    database.newGroup(groupToCopy);
 
 The class Javadoc on Interface classes
 [Database](database/src/main/java/org/linguafranca/pwdb/Database.java), 
@@ -102,7 +148,7 @@ Included POM is for Maven 3.
 
 There are rather a lot of modules, this is in order to allow loading of minimal necessary functionality. The module dependencies are illustrated below.
 
-![Module Structure](Module Structure.svg "Illustration of Module Dependencies")
+![Module Structure](Module Structure.svg)
 
 Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pwdb`. The version id is as noted [above](#mvn).
 
