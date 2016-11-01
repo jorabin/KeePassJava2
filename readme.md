@@ -181,29 +181,8 @@ KDBX implementations.
 ### Gradle
 
 If you prefer Gradle the automatic conversion `gradle init` converts the POM successfully, however you will 
-need to add something like the following to the `build.gradle` for the JAXB module, so that the generated sources
- get compiled correctly:
-
-    sourceSets {
-      main {
-        java {
-          srcDirs = ['src/main/java', 'src/generated/java']
-        }
-        resources {
-          srcDirs = ['src/main/resources']
-        }
-      }
-      test{
-        java {
-          srcDirs = ['src/test/java']
-        }
-        resources {
-          srcDirs = ['src/test/resources']
-        }
-      }
-    }
-    
-You'll find it in [gradle-source-sets.txt](jaxb/gradle-source-sets.txt) in the root of the jaxb module.
+need to add something like [gradle-source-sets.txt](jaxb/gradle-source-sets.txt) to the `build.gradle` for the JAXB module, so that the generated sources
+ get compiled correctly.
 
 ## Change Log
 

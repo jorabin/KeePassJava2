@@ -1,7 +1,7 @@
 #Change Log
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
-##[next]
+##[2.1.0] 2016-10-29
 ### Added
 
 - Added a module structure to allow selective building, for android etc.
@@ -9,6 +9,8 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - [Issue #5] Added a Simple implementation since Jaxb not great for Android
 
 ### Changed
+
+- artifactId became Camel Case KeePassJava2
 - Documentation - beefed up the README
 
 ##[2.0.1] 2016-10-02
