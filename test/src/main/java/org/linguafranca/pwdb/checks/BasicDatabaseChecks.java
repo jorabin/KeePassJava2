@@ -32,11 +32,11 @@ import static org.junit.Assert.*;
 /**
  * @author Jo
  */
-public abstract class BasicDatabaseChecks {
+public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon> {
 
-    private Database database;
+    private Database<D,G,E,I> database;
 
-    public abstract Database createDatabase() throws IOException;
+    public abstract Database<D,G,E,I> createDatabase() throws IOException;
 
     public BasicDatabaseChecks() throws IOException {
         this.database = createDatabase();
@@ -73,10 +73,10 @@ public abstract class BasicDatabaseChecks {
 
     @Test
     public void testDeleteGroup () {
-        Group g1 = database.getRootGroup().addGroup(database.newGroup("group1"));
-        List<Group> l1 = database.getRootGroup().findGroups("group1");
+        Group<D,G,E,I> g1 = database.getRootGroup().addGroup(database.newGroup("group1"));
+        List<? extends G> l1 = database.getRootGroup().findGroups("group1");
         Assert.assertTrue(l1.size() == 1);
-        Group g2 = l1.get(0);
+        G g2 = l1.get(0);
         Assert.assertTrue (g2.equals(g1));
         Group g3 = database.getRootGroup().removeGroup(g2);
         Assert.assertTrue (g3.equals(g1));
@@ -87,13 +87,13 @@ public abstract class BasicDatabaseChecks {
 
     @Test
     public void testAddRemoveEntry() {
-        Entry e1 = database.getRootGroup().addEntry(database.newEntry());
+        E e1 = database.getRootGroup().addEntry(database.newEntry());
         e1.setTitle("entry1");
-        List<Entry> l1 = database.findEntries("entry1");
+        List<? extends E> l1 = database.findEntries("entry1");
         Assert.assertTrue(l1.size() == 1);
 
-        Entry e12 = database.getRootGroup().addEntry(database.newEntry("entry12"));
-        List<Entry> l2 = database.findEntries("entry1");
+        E e12 = database.getRootGroup().addEntry(database.newEntry("entry12"));
+        List<? extends E> l2 = database.findEntries("entry1");
         Assert.assertTrue(l2.size() == 2);
 
         // show that the entries are different
@@ -113,7 +113,7 @@ public abstract class BasicDatabaseChecks {
 
     @Test
     public void testSetFields () {
-        Entry e1 = database.newEntry("Entry 1");
+        E e1 = database.newEntry("Entry 1");
         e1.setNotes("this looks a little like Entry 2");
         Assert.assertTrue(e1.getNotes().equals("this looks a little like Entry 2"));
         e1.setUsername("jake@window.com");
@@ -128,7 +128,7 @@ public abstract class BasicDatabaseChecks {
         Assert.assertTrue(e1.matchTitle("1"));
         Assert.assertFalse(e1.matchTitle("doggy"));
 
-        Icon ic1 = database.newIcon(27);
+        I ic1 = database.newIcon(27);
         e1.setIcon(ic1);
         Assert.assertTrue(e1.getIcon().equals(ic1));
 
@@ -166,7 +166,7 @@ public abstract class BasicDatabaseChecks {
 
     @Test
     public void testNewEntry() {
-        Entry e2 = database.newEntry();
+        E e2 = database.newEntry();
         Assert.assertNull(e2.getParent());
         assertEquals("", e2.getPassword());
         Assert.assertNotNull(e2.getUuid());
@@ -182,7 +182,7 @@ public abstract class BasicDatabaseChecks {
 
     @Test
     public void testCopy() throws IOException {
-        Entry entry1 = database.newEntry();
+        E entry1 = database.newEntry();
         entry1.setTitle("Entry");
         entry1.setUsername("Username");
         entry1.setPassword("Password");
@@ -191,9 +191,9 @@ public abstract class BasicDatabaseChecks {
         entry1.setIcon(database.newIcon(2));
 
         // create a new Database
-        Database database2 = createDatabase();
+        Database<D,G,E,I> database2 = createDatabase();
         // create a new Entry in new Database
-        Entry entry2 = database2.newEntry(entry1);
+        E entry2 = database2.newEntry(entry1);
 
         assertEquals(entry1.getTitle(), entry2.getTitle());
         assertEquals(entry1.getUsername(), entry2.getUsername());
@@ -203,11 +203,11 @@ public abstract class BasicDatabaseChecks {
         assertEquals(entry1.getIcon(), entry2.getIcon());
         assertNotEquals(entry1.getUuid(), entry2.getUuid());
 
-        Group group1 = database.newGroup();
+        G group1 = database.newGroup();
         group1.setName("Group");
         group1.setIcon(database.newIcon(3));
 
-        Group group2 = database2.newGroup(group1);
+        G group2 = database2.newGroup(group1);
         assertEquals(group1.getName(), group2.getName());
         assertEquals(group1.getIcon(), group2.getIcon());
         assertNotEquals(group1.getUuid(), group2.getUuid());
