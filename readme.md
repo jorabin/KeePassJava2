@@ -1,5 +1,7 @@
 # KeePassJava2
 
+Master: [![Build Status](https://travis-ci.org/jorabin/KeePassJava2.svg?branch=master)](https://travis-ci.org/jorabin/KeePassJava2) Develop: [![Build Status](https://travis-ci.org/jorabin/KeePassJava2.svg?branch=develop)](https://travis-ci.org/jorabin/KeePassJava2)
+
 A Java 7 API for databases compatible with the renowned [KeePass](http://keepass.info) password
 safe for Windows.
 
@@ -148,7 +150,7 @@ Included POM is for Maven 3.
 
 There are rather a lot of modules, this is in order to allow loading of minimal necessary functionality. The module dependencies are illustrated below.
 
-![Module Structure](./Module Structure.svg "Module Structure")
+[![Module Structure](./Module Structure.svg "Module Structure")](./Module Structure.svg)
 
 Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pwdb`. The version id is as noted [above](#mvn).
 
