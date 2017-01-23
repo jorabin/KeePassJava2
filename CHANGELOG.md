@@ -7,7 +7,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 ### Fixed
 
 - Simple implementation not reading DeletedObjects correctly per Nigel Rook
-- Simple Implementation CustomIcons opional per @Kin-k
+- Simple implementation CustomIcons optional per @Kin-k
 
 ### Added
 
