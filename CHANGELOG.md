@@ -1,6 +1,18 @@
 #Change Log
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
+
+## Next
+
+### Fixed
+
+- Simple implementation not reading DeletedObjects correctly per Nigel Rook
+- Simple Implementation CustomIcons opional per @Kin-k
+
+### Added
+
+- Kdb Key File Support
+
 ##[2.1.0] 2016-10-29
 ### Added
 
