@@ -148,7 +148,7 @@ Included POM is for Maven 3.
 
 There are rather a lot of modules, this is in order to allow loading of minimal necessary functionality. The module dependencies are illustrated below.
 
-![Module Structure](Module Structure.svg?raw=true)
+![Module Structure](Module Structure.svg?raw=true Module Structure)
 
 Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pwdb`. The version id is as noted [above](#mvn).
 
