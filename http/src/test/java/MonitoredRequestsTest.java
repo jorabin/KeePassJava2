@@ -1,6 +1,7 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Test;
+import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.keepasshttp.Message;
 import org.linguafranca.pwdb.keepasshttp.Processor;
 
@@ -34,9 +35,9 @@ public class MonitoredRequestsTest {
         computedResponse.Id = "NEW coNECTION";
 
         System.out.println(gson.toJson(computedResponse));
-        processor.verify(computedResponse);
+        processor.getCrypto().verify(computedResponse);
         System.out.println(gson.toJson(actualResponse));
-        processor.verify(actualResponse);
+        processor.getCrypto().verify(actualResponse);
 
 
 
@@ -48,9 +49,9 @@ public class MonitoredRequestsTest {
         computedResponse.Id = "NEW coNECTION";
 
         System.out.println(gson.toJson(computedResponse));
-        processor.verify(computedResponse);
+        processor.getCrypto().verify(computedResponse);
         System.out.println(gson.toJson(actualResponse));
-        processor.verify(actualResponse);
+        processor.getCrypto().verify(actualResponse);
 
 
         request = gson.fromJson(getLoginsRequest, Message.Request.class);
@@ -61,14 +62,15 @@ public class MonitoredRequestsTest {
         computedResponse.Id = "NEW coNECTION";
 
         System.out.println(gson.toJson(computedResponse));
-        processor.verify(computedResponse);
+        processor.getCrypto().verify(computedResponse);
         System.out.println(gson.toJson(actualResponse));
-        processor.verify(actualResponse);
+        processor.getCrypto().verify(actualResponse);
+        byte[] iv = Helpers.decodeBase64Content(actualResponse.Nonce.getBytes(), false);
         for (Message.ResponseEntry entry: actualResponse.Entries) {
-            System.out.println(processor.decryptFromBase64(entry.Login, actualResponse));
-            System.out.println(processor.decryptFromBase64(entry.Name, actualResponse));
-            System.out.println(processor.decryptFromBase64(entry.Password, actualResponse));
-            System.out.println(processor.decryptFromBase64(entry.Uuid, actualResponse));
+            System.out.println(processor.getCrypto().decryptFromBase64(entry.Login, iv));
+            System.out.println(processor.getCrypto().decryptFromBase64(entry.Name, iv));
+            System.out.println(processor.getCrypto().decryptFromBase64(entry.Password, iv));
+            System.out.println(processor.getCrypto().decryptFromBase64(entry.Uuid, iv));
         }
 
 

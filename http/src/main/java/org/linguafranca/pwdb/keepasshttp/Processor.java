@@ -1,65 +1,30 @@
 package org.linguafranca.pwdb.keepasshttp;
 
-import org.apache.commons.codec.binary.Hex;
 import org.linguafranca.pwdb.kdbx.Helpers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.spongycastle.crypto.InvalidCipherTextException;
-import org.spongycastle.crypto.digests.SHA1Digest;
-import org.spongycastle.crypto.engines.AESFastEngine;
-import org.spongycastle.crypto.modes.CBCBlockCipher;
-import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
-import org.spongycastle.crypto.params.KeyParameter;
-import org.spongycastle.crypto.params.ParametersWithIV;
 
-import java.security.SecureRandom;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 /**
+ *
+ * Contains message handlers for
+ *
  * @author jo
  */
 public class Processor {
 
-    private byte[] binaryKey;
-    private String id;
     private Map<String, RequestHandler> handlers = new HashMap<String, RequestHandler>();
+    private DatabaseAdaptor adaptor = new DatabaseAdaptor.Default();
+    private Crypto crypto = new Crypto();
 
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
-    private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-
-    private String makeId() {
-        return id = "Today's ID is " + dateFormat.format(new Date());
-    }
-
-    private UUID rootGroupUuid = UUID.randomUUID();
-    private UUID recycleBinUuid = UUID.randomUUID();
-
-    public String getHash() {
-        byte[] toHash = (Helpers.hexStringFromUuid(rootGroupUuid) + Helpers.hexStringFromUuid(recycleBinUuid)).getBytes();
-        SHA1Digest digest = new SHA1Digest();
-        byte[] digestBytes = new byte[digest.getDigestSize()];
-        digest.update(toHash, 0, toHash.length);
-        digest.doFinal(digestBytes, 0);
-        String result = new String(Hex.encodeHex(digestBytes));
-        return result.toLowerCase();
-    }
-
-    public interface RequestHandler {
-        void process(Message.Request request, Message.Response response);
-    }
-
-    public RequestHandler getHandler(String requestType) {
-        return handlers.get(requestType);
+    public Processor(String base64Key) {
+        this(Helpers.decodeBase64Content(base64Key.getBytes(), false));
     }
 
     public Processor(byte[] binaryKey) {
         this();
-        this.binaryKey = binaryKey;
-    }
-
-    public Processor(String base64Key) {
-        this(Helpers.decodeBase64Content(base64Key.getBytes()));
+        crypto.setKey(binaryKey);
     }
 
     public Processor() {
@@ -74,126 +39,53 @@ public class Processor {
 */
     }
 
-    public PaddedBufferedBlockCipher getCipher(Http.CMode mode, byte[] iv) {
-        PaddedBufferedBlockCipher result = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESFastEngine()));
-        result.init(mode.getEncrypt(), new ParametersWithIV(new KeyParameter(getKey()), iv));
-        return result;
+    public Crypto getCrypto() {
+        return crypto;
     }
 
-    public boolean verify(Message.Verifiable verifiable) {
-        byte[] verifier = Helpers.decodeBase64Content(verifiable.Verifier.getBytes(), false);
-        byte[] iv = Helpers.decodeBase64Content(verifiable.Nonce.getBytes(), false);
-
-        PaddedBufferedBlockCipher cipher = getCipher(Http.CMode.DECRYPT, iv);
-
-        byte[] output = new byte[cipher.getOutputSize(verifier.length)];
-        int outputlen = cipher.processBytes(verifier, 0, verifier.length, output, 0);
-
-        try {
-            cipher.doFinal(output, outputlen);
-            byte[] comparison = new byte[output.length];
-            System.arraycopy(verifiable.Nonce.getBytes(),0,comparison,0,verifiable.Nonce.length());
-            return Arrays.equals(output, comparison);
-        } catch (InvalidCipherTextException e) {
-            return false;
-        }
+    public String getHash() {
+        return adaptor.getHash();
     }
 
-    public void makeVerifiable(Message.Response response) {
-        byte[] iv = new SecureRandom().generateSeed(16);
-        response.Nonce = Helpers.encodeBase64Content(iv, false);
-        PaddedBufferedBlockCipher cipher = getCipher(Http.CMode.ENCRYPT, iv);
-        response.Verifier = CryptoTransform(response.Nonce, false, true, cipher);
-
-        if (response.RequestType.equals(Message.Type.GET_LOGINS)) {
-            for (Message.ResponseEntry entry: response.Entries) {
-                entry.Login = encryptToBase64(entry.Login, response);
-                entry.Uuid = encryptToBase64(entry.Uuid, response);
-                entry.Name = encryptToBase64(entry.Name, response);
-                entry.Password = encryptToBase64(entry.Password, response);
-            }
-        }
+    public interface RequestHandler {
+        void process(Message.Request request, Message.Response response);
     }
 
-    public String decryptFromBase64(String input, Message.Verifiable verifiable){
-        return CryptoTransform(input, true, false, getCipher(Http.CMode.DECRYPT, Helpers.decodeBase64Content(verifiable.Nonce.getBytes())));
+    public RequestHandler getHandler(String requestType) {
+        return handlers.get(requestType);
     }
 
-    public String encryptToBase64(String input, Message.Verifiable verifiable){
-        return CryptoTransform(input, false, true, getCipher(Http.CMode.ENCRYPT, Helpers.decodeBase64Content(verifiable.Nonce.getBytes())));
-    }
-
-    public String CryptoTransform(String input, boolean base64in, boolean base64out, PaddedBufferedBlockCipher cipher) {
-        byte[] bytes;
-        if (base64in) {
-            bytes = Helpers.decodeBase64Content(input.getBytes(), false);
-        } else {
-            bytes = input.getBytes();
-        }
-
-        byte[] output = new byte[cipher.getOutputSize(bytes.length)];
-        int outputlen = cipher.processBytes(bytes, 0, bytes.length, output, 0);
-        try {
-            int len = cipher.doFinal(output, outputlen);
-            // padded buffer is required on bas64 i.e. encrypted direction
-            if (base64out) {
-                return Helpers.encodeBase64Content(output, false);
-            }
-            // trim to buffer length
-            return new String(output, 0, outputlen + len);
-        } catch (InvalidCipherTextException e) {
-            throw new IllegalStateException(e);
-        }
-    }
 
     private class AssociateHandler implements RequestHandler {
         @Override
         public void process(Message.Request request, Message.Response response) {
-            Processor.this.binaryKey = Helpers.decodeBase64Content(request.Key.getBytes());
-            if (!verify(request)) {
-                logger.warn("Verification failed for " + request.RequestType);
-                return;
-            }
+            Processor.this.crypto.setKey(Helpers.decodeBase64Content(request.Key.getBytes(), false));
 
-            response.Id = makeId();
+            response.Id = adaptor.getId();
             response.Success = true;
-            makeVerifiable(response);
         }
     }
 
     private class TestAssociateHandler implements RequestHandler {
         @Override
         public void process(Message.Request request, Message.Response response) {
-            if (request.Verifier == null || request.Nonce == null) {
-                return;
-            }
-            if (!verify(request)) {
-                logger.warn("Verification failed for " + request.RequestType);
-                return;
-            }
             response.Success = false;
             if (request.Id != null) {
-                response.Success = request.Id.equals(id);
+                response.Success = request.Id.equals(adaptor.getId());
             }
-            makeVerifiable(response);
         }
     }
 
     private class GetLoginsHandler implements Processor.RequestHandler {
         public void process(Message.Request r, Message.Response resp) {
-            if (!verify(r)) {
-                logger.warn("Verification failed for " + r.RequestType);
-                return;
-            }
 
             resp.Entries.add(new Message.ResponseEntry("FB", "FBLOGIN", "FBPASS",
                     Helpers.base64FromUuid(UUID.randomUUID())));
             resp.Entries.add(new Message.ResponseEntry("FB2", "FBLOGIN2", "FBPASS2",
                     Helpers.base64FromUuid(UUID.randomUUID())));
-            resp.Id = id;
+            resp.Id = adaptor.getId();
             resp.Success = true;
             resp.Count = 0;
-            makeVerifiable(resp);
 
 /*
         string submithost = null;
@@ -354,7 +246,4 @@ public class Processor {
         }
     }
 
-    private byte[] getKey() {
-        return binaryKey;
-    }
 }

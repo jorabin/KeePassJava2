@@ -2,7 +2,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.Helpers;
-import org.linguafranca.pwdb.keepasshttp.Http;
+import org.linguafranca.pwdb.keepasshttp.Crypto;
 import org.linguafranca.pwdb.keepasshttp.Processor;
 import org.linguafranca.pwdb.keepasshttp.Message;
 import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
@@ -27,31 +27,31 @@ public class TestRequestResponse {
     public void testVerifyAssociateRequestResponse() {
         Message.Request r = gson.fromJson(requestString, Message.Request.class);
         Processor processor = new Processor(r.Key);
-        assertTrue(processor.verify(r));
+        assertTrue(processor.getCrypto().verify(r));
 
         Message.Response response = new Message.Response(r.RequestType,"");
-        processor.makeVerifiable(response);
+        processor.getCrypto().makeVerifiable(response);
 
-        assertTrue(processor.verify(response));
+        assertTrue(processor.getCrypto().verify(response));
 
     }
     @Test
     public void testGetLogins() {
         Message.Request r = gson.fromJson(getLoginsAssociate, Message.Request.class);
         Processor processor = new Processor(r.Key);
-        processor.verify(r);
+        processor.getCrypto().verify(r);
 
         Message.Request l = gson.fromJson(getLogins, Message.Request.class);
-        assertTrue(processor.verify(l));
+        assertTrue(processor.getCrypto().verify(l));
         String encodedUrl = l.Url;
-        PaddedBufferedBlockCipher cipher = processor.getCipher(Http.CMode.DECRYPT, Helpers.decodeBase64Content(l.Nonce.getBytes(), false));
-        String unencodedUrl = processor.CryptoTransform(encodedUrl, true, false, cipher);
+        PaddedBufferedBlockCipher cipher = processor.getCrypto().getCipher(Crypto.CMode.DECRYPT, Helpers.decodeBase64Content(l.Nonce.getBytes(), false));
+        String unencodedUrl = processor.getCrypto().CryptoTransform(encodedUrl, true, false, cipher);
         System.out.println(unencodedUrl);
         assertEquals("https://www.facebook.com", unencodedUrl);
 
         cipher.reset();
         String encodedSubmitUrl = l.SubmitUrl;
-        String unencodedSubmitUrl = processor.CryptoTransform(encodedSubmitUrl,true,false, cipher);
+        String unencodedSubmitUrl = processor.getCrypto().CryptoTransform(encodedSubmitUrl,true,false, cipher);
         System.out.println(unencodedSubmitUrl);
         assertEquals("https://www.facebook.com/login.php?login_attempt=1&lwv=110", unencodedSubmitUrl);
 
@@ -59,9 +59,9 @@ public class TestRequestResponse {
         response.Success=true;
         response.Count=1;
         response.Entries.add(new Message.ResponseEntry("a", "b", "c","uuid", new ArrayList<Message.ResponseStringField>()));
-        processor.makeVerifiable(response);
+        processor.getCrypto().makeVerifiable(response);
 
-        assertTrue(processor.verify(response));
+        assertTrue(processor.getCrypto().verify(response));
     }
 
 

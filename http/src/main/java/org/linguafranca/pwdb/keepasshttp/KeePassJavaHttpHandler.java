@@ -22,6 +22,7 @@ import java.util.UUID;
  * @author jo
  */
 public class KeePassJavaHttpHandler extends AbstractHandler {
+
     private Logger logger = LoggerFactory.getLogger(KeePassJavaHttpHandler.class);
     private Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     Processor processor = new Processor();
@@ -58,7 +59,18 @@ public class KeePassJavaHttpHandler extends AbstractHandler {
             return;
         }
 
+        if (!processor.getCrypto().verify(request1)) {
+            httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.Success = false;
+            response.Error = "Request did not verify";
+            processor.getCrypto().makeVerifiable(response);
+            request.setHandled(true);
+            return;
+        }
+
         handler.process(request1, response);
+
+        processor.getCrypto().makeVerifiable(response);
 
         OutputStream outputStream = new LogginOutputStream(httpServletResponse.getOutputStream(), logger);
         Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream));
