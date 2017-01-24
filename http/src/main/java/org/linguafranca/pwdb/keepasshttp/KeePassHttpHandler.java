@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.keepasshttp.util.LogginInputStream;
 import org.linguafranca.pwdb.keepasshttp.util.LogginOutputStream;
@@ -20,10 +21,16 @@ import java.io.*;
  */
 public class KeePassHttpHandler extends AbstractHandler {
 
+    private final DatabaseAdaptor adaptor;
+    private Processor processor;
     private Logger logger = LoggerFactory.getLogger(KeePassHttpHandler.class);
     private Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
-    private Processor processor = new Processor();
     private Crypto crypto = new Crypto();
+
+    KeePassHttpHandler(Database database) {
+        this.adaptor = new DatabaseAdaptor.Default(database);
+        this.processor = new Processor(database);
+    }
 
     @Override
     public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
@@ -45,7 +52,7 @@ public class KeePassHttpHandler extends AbstractHandler {
             return;
         }
 
-        Message.Response response = new Message.Response(request1.RequestType, processor.getHash());
+        Message.Response response = new Message.Response(request1.RequestType, adaptor.getHash());
 
         if (request1.RequestType.equals(Message.Type.ASSOCIATE)) {
             crypto.setKey(Helpers.decodeBase64Content(request1.Key.getBytes(), false));

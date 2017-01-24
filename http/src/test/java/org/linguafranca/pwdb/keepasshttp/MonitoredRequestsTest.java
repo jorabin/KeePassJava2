@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.Helpers;
-import org.linguafranca.pwdb.keepasshttp.Message;
-import org.linguafranca.pwdb.keepasshttp.Processor;
-
-import static org.junit.Assert.assertEquals;
+import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 
 /**
  * @author jo
@@ -27,7 +24,7 @@ public class MonitoredRequestsTest {
 
     @Test
     public void sessionTest() {
-        Processor processor = new Processor();
+        Processor processor = new Processor(new SimpleDatabase());
 
         Message.Request request = gson.fromJson(associateRequest, Message.Request.class);
         Crypto crypto = new Crypto(request.Key);

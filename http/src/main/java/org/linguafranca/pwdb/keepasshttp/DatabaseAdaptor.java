@@ -22,7 +22,11 @@ public interface DatabaseAdaptor {
         private String id = "402881E9-58B6-5A30-0158-B65A30B20000";
         private UUID rootGroupUuid = UUID.fromString("402881E9-58B6-5A30-0158-B65AFC580001");
         private UUID recycleBinUuid = UUID.fromString("402881E9-58B6-5A30-0158-B65BC8D30002");
-        private Database database = new SimpleDatabase();
+        private Database database;
+
+        Default(Database database) {
+            this.database = database;
+        }
 
         @Override
         public String getId() {

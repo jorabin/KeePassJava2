@@ -2,6 +2,7 @@ package org.linguafranca.pwdb.keepasshttp;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 
 /**
  * Embedded server
@@ -14,7 +15,7 @@ public class KeePassHttpServer {
         http.setPort(19455);
         http.setIdleTimeout(300000);
         server.addConnector(http);
-        server.setHandler(new KeePassHttpHandler());
+        server.setHandler(new KeePassHttpHandler(new SimpleDatabase()));
         server.start();
         server.join();
     }

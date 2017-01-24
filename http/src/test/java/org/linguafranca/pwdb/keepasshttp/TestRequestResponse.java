@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.Helpers;
+import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import org.linguafranca.pwdb.keepasshttp.Crypto;
 import org.linguafranca.pwdb.keepasshttp.Processor;
 import org.linguafranca.pwdb.keepasshttp.Message;
@@ -32,7 +33,6 @@ public class TestRequestResponse {
     @Test
     public void testVerifyAssociate() {
         Message.Request r = gson.fromJson(associate, Message.Request.class);
-        Processor processor = new Processor();
         Crypto crypto = new Crypto(r.Key);
         assertArrayEquals(r.Key.getBytes(), Helpers.encodeBase64Content(crypto.getKey()).getBytes());
 
@@ -50,7 +50,6 @@ public class TestRequestResponse {
     @Test
     public void testVerifyAssociateRequestResponse() {
         Message.Request r = gson.fromJson(requestString, Message.Request.class);
-        Processor processor = new Processor();
         Crypto crypto = new Crypto(r.Key);
         assertTrue(crypto.verify(r));
 
@@ -63,7 +62,6 @@ public class TestRequestResponse {
     @Test
     public void testGetLogins() {
         Message.Request r = gson.fromJson(getLoginsAssociate, Message.Request.class);
-        Processor processor = new Processor();
         Crypto crypto = new Crypto(r.Key);
         crypto.verify(r);
 
@@ -71,17 +69,17 @@ public class TestRequestResponse {
         assertTrue(crypto.verify(l));
         String encodedUrl = l.Url;
         PaddedBufferedBlockCipher cipher = crypto.getCipher(Crypto.CMode.DECRYPT, Helpers.decodeBase64Content(l.Nonce.getBytes(), false));
-        String unencodedUrl = crypto.CryptoTransform(encodedUrl, true, false, cipher);
+        String unencodedUrl = Crypto.CryptoTransform(encodedUrl, true, false, cipher);
         System.out.println(unencodedUrl);
         assertEquals("https://www.facebook.com", unencodedUrl);
 
         cipher.reset();
         String encodedSubmitUrl = l.SubmitUrl;
-        String unencodedSubmitUrl = crypto.CryptoTransform(encodedSubmitUrl,true,false, cipher);
+        String unencodedSubmitUrl = Crypto.CryptoTransform(encodedSubmitUrl,true,false, cipher);
         System.out.println(unencodedSubmitUrl);
         assertEquals("https://www.facebook.com/login.php?login_attempt=1&lwv=110", unencodedSubmitUrl);
 
-        Message.Response response = new Message.Response(l.RequestType, processor.getHash());
+        Message.Response response = new Message.Response(l.RequestType, new DatabaseAdaptor.Default(new SimpleDatabase()).getHash());
         response.Success=true;
         response.Count=1;
         response.Entries.add(new Message.ResponseEntry("a", "b", "c","uuid", new ArrayList<Message.ResponseStringField>()));

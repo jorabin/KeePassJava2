@@ -1,5 +1,6 @@
 package org.linguafranca.pwdb.keepasshttp;
 
+import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.Helpers;
 
 import java.util.HashMap;
@@ -13,14 +14,12 @@ import java.util.UUID;
  * @author jo
  */
 public class Processor {
-    private interface MessageProcessor {
-        void process(Message.Request request, Message.Response response);
-    }
-
+    private final Database database;
     private Map<String, MessageProcessor> processors = new HashMap<String, MessageProcessor>();
-    private DatabaseAdaptor adaptor = new DatabaseAdaptor.Default();
 
-    public Processor() {
+
+    public Processor(Database database) {
+        this.database = database;
         processors.put(Message.Type.TEST_ASSOCIATE, new TestAssociate());
         processors.put(Message.Type.ASSOCIATE, new Associate());
         processors.put(Message.Type.GET_LOGINS, new GetLogins());
@@ -30,18 +29,21 @@ public class Processor {
         processors.put(Message.Type.GENERATE_PASSWORD, new GeneratePassword());
     }
 
-    public String getHash() {
-        return adaptor.getHash();
+    private interface MessageProcessor {
+        void process(Message.Request request, Message.Response response);
     }
 
     public void process(Message.Request request, Message.Response response) {
         processors.get(request.RequestType).process(request, response);
     }
 
+    private String makeId() {
+        return database.getName() + " (" + database.getRootGroup().getUuid().toString() + ")";
+    }
      private class Associate implements MessageProcessor {
         @Override
         public void process(Message.Request request, Message.Response response) {
-            response.Id = adaptor.getId();
+            response.Id = makeId();
             response.Success = true;
         }
     }
@@ -51,8 +53,8 @@ public class Processor {
         public void process(Message.Request request, Message.Response response) {
             response.Success = false;
             if (request.Id != null) {
-                response.Success = request.Id.equals(adaptor.getId());
-                response.Id = adaptor.getId();
+                response.Success = request.Id.equals(makeId());
+                response.Id = makeId();
             }
         }
     }
@@ -64,7 +66,7 @@ public class Processor {
                     Helpers.base64FromUuid(UUID.randomUUID())));
             resp.Entries.add(new Message.ResponseEntry("FB2", "FBLOGIN2", "FBPASS2",
                     Helpers.base64FromUuid(UUID.randomUUID())));
-            resp.Id = adaptor.getId();
+            resp.Id = makeId();
             resp.Success = true;
             resp.Count = resp.Entries.size();
         }
