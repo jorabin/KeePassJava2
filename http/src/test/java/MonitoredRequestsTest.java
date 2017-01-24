@@ -34,6 +34,8 @@ public class MonitoredRequestsTest {
         processor.getHandler(request.RequestType).process(request, computedResponse);
         computedResponse.Id = "NEW coNECTION";
 
+        processor.getCrypto().makeVerifiable(computedResponse);
+
         System.out.println(gson.toJson(computedResponse));
         processor.getCrypto().verify(computedResponse);
         System.out.println(gson.toJson(actualResponse));
@@ -46,6 +48,7 @@ public class MonitoredRequestsTest {
 
         computedResponse = new Message.Response(request.RequestType, "eefc4faf792a59d034da69c69f3643ef34ba7d8d");
         processor.getHandler(request.RequestType).process(request, computedResponse);
+        processor.getCrypto().makeVerifiable(computedResponse);
         computedResponse.Id = "NEW coNECTION";
 
         System.out.println(gson.toJson(computedResponse));
@@ -59,6 +62,7 @@ public class MonitoredRequestsTest {
 
         computedResponse = new Message.Response(request.RequestType, "eefc4faf792a59d034da69c69f3643ef34ba7d8d");
         processor.getHandler(request.RequestType).process(request, computedResponse);
+        processor.getCrypto().makeVerifiable(computedResponse);
         computedResponse.Id = "NEW coNECTION";
 
         System.out.println(gson.toJson(computedResponse));
