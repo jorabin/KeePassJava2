@@ -2,21 +2,17 @@ package org.linguafranca.pwdb.keepasshttp;
 
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.keepasshttp.Message.ResponseEntry;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
- *
  * Contains message processors for processing messages (doh)
  *
  * @author jo
  */
-public class Processor {
+class Processor {
 
     private interface MessageProcessor {
         void process(Message.Request request, Message.Response response);
@@ -24,29 +20,14 @@ public class Processor {
 
     private final Database database;
     private final PwGenerator pwGenerator;
-    private Map<String, MessageProcessor> processors = new HashMap<String, MessageProcessor>();
+    private Map<String, MessageProcessor> processors = new HashMap<>();
 
 
-    public Processor(Database database, PwGenerator pwGenerator) {
+    Processor(Database database, PwGenerator pwGenerator) {
         this.database = database;
         this.pwGenerator = pwGenerator;
-        processors.put(Message.Type.TEST_ASSOCIATE, new MessageProcessor() {
-            @Override
-            public void process(Message.Request request, Message.Response response) {
-                response.Success = false;
-                if (request.Id != null) {
-                    response.Success = request.Id.equals(makeId());
-                    response.Id = makeId();
-                }
-            }
-        });
-        processors.put(Message.Type.ASSOCIATE, new MessageProcessor() {
-            @Override
-            public void process(Message.Request request, Message.Response response) {
-                response.Id = makeId();
-                response.Success = true;
-            }
-        });
+        processors.put(Message.Type.TEST_ASSOCIATE, new TestAssociate());
+        processors.put(Message.Type.ASSOCIATE, new Associate());
         processors.put(Message.Type.GET_LOGINS, new GetLogins());
         processors.put(Message.Type.GET_LOGINS_COUNT, new GetLoginsCount());
         processors.put(Message.Type.GET_ALL_LOGINS, new GetAllLogins());
@@ -54,7 +35,7 @@ public class Processor {
         processors.put(Message.Type.GENERATE_PASSWORD, new GeneratePassword());
     }
 
-    public void process(Message.Request request, Message.Response response) {
+    void process(Message.Request request, Message.Response response) {
         processors.get(request.RequestType).process(request, response);
     }
 
@@ -73,7 +54,7 @@ public class Processor {
                 }
             });
 
-            for (Entry entry: entries) {
+            for (Entry entry : entries) {
                 resp.Entries.add(new ResponseEntry(entry.getTitle(), entry.getUsername(), entry.getPassword(), entry.getUuid().toString()));
             }
             resp.Count = resp.Entries.size();
@@ -105,14 +86,19 @@ public class Processor {
             List<Entry> entries = database.findEntries(new Entry.Matcher() {
                 @Override
                 public boolean matches(Entry entry) {
-                    return false; //entry.getUrl().equals(url);
+                    return true;
                 }
             });
+            for (Entry entry : entries) {
+                resp.Entries.add(new ResponseEntry(entry.getTitle(), entry.getUsername(), entry.getPassword(), entry.getUuid().toString()));
+            }
             resp.Count = resp.Entries.size();
             resp.Id = makeId();
             resp.Success = true;
         }
     }
+
+    private static SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     private class SetLogin implements MessageProcessor {
         public void process(final Message.Request r, Message.Response resp) {
@@ -128,17 +114,38 @@ public class Processor {
             }
             if (entry == null) {
                 entry = database.newEntry();
+                entry.setTitle("New Entry " + format.format(new Date()));
             }
-            entry.setTitle("New Entry");
             entry.setPassword(r.Password);
             entry.setUsername(r.Login);
             entry.setUrl(r.Url);
             entry.setProperty("SubmitUrl", r.SubmitUrl);
             entry.setNotes("Created automatically");
+            //noinspection unchecked
             database.getRootGroup().addEntry(entry);
             resp.Id = makeId();
             resp.Success = true;
         }
     }
 
+    private class Associate implements MessageProcessor {
+        @Override
+        public void process(Message.Request request, Message.Response response) {
+            response.Id = makeId();
+            response.Success = true;
+        }
+
+    }
+
+    private class TestAssociate implements MessageProcessor {
+        @Override
+        public void process(Message.Request request, Message.Response response) {
+            response.Success = false;
+            if (request.Id != null) {
+                response.Success = request.Id.equals(makeId());
+                response.Id = makeId();
+            }
+        }
+
+    }
 }
