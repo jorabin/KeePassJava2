@@ -2,7 +2,6 @@ package org.linguafranca.pwdb.keepasshttp;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.stream.JsonWriter;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.linguafranca.pwdb.kdbx.Helpers;
@@ -24,6 +23,7 @@ public class KeePassHttpHandler extends AbstractHandler {
     private Logger logger = LoggerFactory.getLogger(KeePassHttpHandler.class);
     private Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
     private Processor processor = new Processor();
+    private Crypto crypto = new Crypto();
 
     @Override
     public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
@@ -46,35 +46,32 @@ public class KeePassHttpHandler extends AbstractHandler {
         }
 
         Message.Response response = new Message.Response(request1.RequestType, processor.getHash());
-        Processor.RequestHandler handler = processor.getHandler(request1.RequestType);
-
-        if (handler == null) {
-            httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            request.setHandled(true);
-            response.Success = false;
-            response.Error = "No valid request type found " + request1.RequestType;
-            httpServletResponse.getWriter().write(gson.toJson(response));
-            return;
-        }
 
         if (request1.RequestType.equals(Message.Type.ASSOCIATE)) {
-            processor.getCrypto().setKey(Helpers.decodeBase64Content(request1.Key.getBytes(), false));
+            crypto.setKey(Helpers.decodeBase64Content(request1.Key.getBytes(), false));
         }
 
-        // normal part of the protocol to fail verfication on test-associate
-        if (!processor.getCrypto().verify(request1)) {
+        httpServletResponse.setStatus(HttpServletResponse.SC_OK);
+
+        // normal part of the protocol to fail verification on test-associate
+        if (!crypto.verify(request1)) {
             logger.debug("Request failed verification");
             response.Success = false;
             response.Error = "";
             response.Hash="";
         } else {
-            handler.process(request1, response);
-            processor.getCrypto().makeVerifiable(response);
+            try {
+                processor.process(request1, response);
+                crypto.makeVerifiable(response);
+            } catch (Exception e) {
+                httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.Success = false;
+                response.Error = "Error processing request " + e.getMessage();
+            }
         }
-        // create a logging outputstream to see what is being sent
+        // create a logging outputStream to see what is being sent
         OutputStream outputStream = new LogginOutputStream(httpServletResponse.getOutputStream(), logger);
         Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-        httpServletResponse.setStatus(HttpServletResponse.SC_OK);
         gson.toJson(response, writer);
         writer.flush();
         request.setHandled(true);

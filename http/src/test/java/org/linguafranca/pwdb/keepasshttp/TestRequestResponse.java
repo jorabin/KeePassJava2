@@ -32,49 +32,52 @@ public class TestRequestResponse {
     @Test
     public void testVerifyAssociate() {
         Message.Request r = gson.fromJson(associate, Message.Request.class);
-        Processor processor = new Processor(r.Key);
-        assertArrayEquals(r.Key.getBytes(), Helpers.encodeBase64Content(processor.getCrypto().getKey()).getBytes());
+        Processor processor = new Processor();
+        Crypto crypto = new Crypto(r.Key);
+        assertArrayEquals(r.Key.getBytes(), Helpers.encodeBase64Content(crypto.getKey()).getBytes());
 
         byte[] iv = new SecureRandom().generateSeed(16);
-        String secret = processor.getCrypto().encryptToBase64("Secret", iv);
-        assertEquals("Secret", processor.getCrypto().decryptFromBase64(secret, iv));
+        String secret = crypto.encryptToBase64("Secret", iv);
+        assertEquals("Secret", crypto.decryptFromBase64(secret, iv));
 
-        assertTrue(processor.getCrypto().verify(r));
-        assertTrue(processor.getCrypto().verify(gson.fromJson(response, Message.Response.class)));
-        assertTrue(processor.getCrypto().verify(gson.fromJson(reTest, Message.Request.class)));
-        assertTrue(processor.getCrypto().verify(gson.fromJson(reResponse, Message.Response.class)));
+        assertTrue(crypto.verify(r));
+        assertTrue(crypto.verify(gson.fromJson(response, Message.Response.class)));
+        assertTrue(crypto.verify(gson.fromJson(reTest, Message.Request.class)));
+        assertTrue(crypto.verify(gson.fromJson(reResponse, Message.Response.class)));
     }
 
 
     @Test
     public void testVerifyAssociateRequestResponse() {
         Message.Request r = gson.fromJson(requestString, Message.Request.class);
-        Processor processor = new Processor(r.Key);
-        assertTrue(processor.getCrypto().verify(r));
+        Processor processor = new Processor();
+        Crypto crypto = new Crypto(r.Key);
+        assertTrue(crypto.verify(r));
 
         Message.Response response = new Message.Response(r.RequestType,"");
-        processor.getCrypto().makeVerifiable(response);
+        crypto.makeVerifiable(response);
 
-        assertTrue(processor.getCrypto().verify(response));
+        assertTrue(crypto.verify(response));
 
     }
     @Test
     public void testGetLogins() {
         Message.Request r = gson.fromJson(getLoginsAssociate, Message.Request.class);
-        Processor processor = new Processor(r.Key);
-        processor.getCrypto().verify(r);
+        Processor processor = new Processor();
+        Crypto crypto = new Crypto(r.Key);
+        crypto.verify(r);
 
         Message.Request l = gson.fromJson(getLogins, Message.Request.class);
-        assertTrue(processor.getCrypto().verify(l));
+        assertTrue(crypto.verify(l));
         String encodedUrl = l.Url;
-        PaddedBufferedBlockCipher cipher = processor.getCrypto().getCipher(Crypto.CMode.DECRYPT, Helpers.decodeBase64Content(l.Nonce.getBytes(), false));
-        String unencodedUrl = processor.getCrypto().CryptoTransform(encodedUrl, true, false, cipher);
+        PaddedBufferedBlockCipher cipher = crypto.getCipher(Crypto.CMode.DECRYPT, Helpers.decodeBase64Content(l.Nonce.getBytes(), false));
+        String unencodedUrl = crypto.CryptoTransform(encodedUrl, true, false, cipher);
         System.out.println(unencodedUrl);
         assertEquals("https://www.facebook.com", unencodedUrl);
 
         cipher.reset();
         String encodedSubmitUrl = l.SubmitUrl;
-        String unencodedSubmitUrl = processor.getCrypto().CryptoTransform(encodedSubmitUrl,true,false, cipher);
+        String unencodedSubmitUrl = crypto.CryptoTransform(encodedSubmitUrl,true,false, cipher);
         System.out.println(unencodedSubmitUrl);
         assertEquals("https://www.facebook.com/login.php?login_attempt=1&lwv=110", unencodedSubmitUrl);
 
@@ -82,9 +85,9 @@ public class TestRequestResponse {
         response.Success=true;
         response.Count=1;
         response.Entries.add(new Message.ResponseEntry("a", "b", "c","uuid", new ArrayList<Message.ResponseStringField>()));
-        processor.getCrypto().makeVerifiable(response);
+        crypto.makeVerifiable(response);
 
-        assertTrue(processor.getCrypto().verify(response));
+        assertTrue(crypto.verify(response));
     }
 
 

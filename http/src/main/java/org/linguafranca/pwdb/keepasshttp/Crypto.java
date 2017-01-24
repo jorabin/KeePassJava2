@@ -17,6 +17,12 @@ class Crypto {
 
     private byte[] binaryKey;
 
+    Crypto () {}
+
+    Crypto (String key) {
+        this.binaryKey = Helpers.decodeBase64Content(key.getBytes());
+    }
+
     byte[] getKey() {
         return binaryKey;
     }

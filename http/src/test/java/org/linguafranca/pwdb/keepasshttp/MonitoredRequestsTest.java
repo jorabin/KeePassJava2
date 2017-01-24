@@ -30,18 +30,19 @@ public class MonitoredRequestsTest {
         Processor processor = new Processor();
 
         Message.Request request = gson.fromJson(associateRequest, Message.Request.class);
+        Crypto crypto = new Crypto(request.Key);
         Message.Response actualResponse = gson.fromJson(associateResponse, Message.Response.class);
 
         Message.Response computedResponse = new Message.Response(request.RequestType, "eefc4faf792a59d034da69c69f3643ef34ba7d8d");
-        processor.getHandler(request.RequestType).process(request, computedResponse);
+        processor.process(request, computedResponse);
         computedResponse.Id = "NEW coNECTION";
 
-        processor.getCrypto().makeVerifiable(computedResponse);
+        crypto.makeVerifiable(computedResponse);
 
         System.out.println(gson.toJson(computedResponse));
-        processor.getCrypto().verify(computedResponse);
+        crypto.verify(computedResponse);
         System.out.println(gson.toJson(actualResponse));
-        processor.getCrypto().verify(actualResponse);
+        crypto.verify(actualResponse);
 
 
 
@@ -49,34 +50,34 @@ public class MonitoredRequestsTest {
         actualResponse = gson.fromJson(testAssociateResponseWithId, Message.Response.class);
 
         computedResponse = new Message.Response(request.RequestType, "eefc4faf792a59d034da69c69f3643ef34ba7d8d");
-        processor.getHandler(request.RequestType).process(request, computedResponse);
-        processor.getCrypto().makeVerifiable(computedResponse);
+        processor.process(request, computedResponse);
+        crypto.makeVerifiable(computedResponse);
         computedResponse.Id = "NEW coNECTION";
 
         System.out.println(gson.toJson(computedResponse));
-        processor.getCrypto().verify(computedResponse);
+        crypto.verify(computedResponse);
         System.out.println(gson.toJson(actualResponse));
-        processor.getCrypto().verify(actualResponse);
+        crypto.verify(actualResponse);
 
 
         request = gson.fromJson(getLoginsRequest, Message.Request.class);
         actualResponse = gson.fromJson(getLoginsResponse, Message.Response.class);
 
         computedResponse = new Message.Response(request.RequestType, "eefc4faf792a59d034da69c69f3643ef34ba7d8d");
-        processor.getHandler(request.RequestType).process(request, computedResponse);
-        processor.getCrypto().makeVerifiable(computedResponse);
+        processor.process(request, computedResponse);
+        crypto.makeVerifiable(computedResponse);
         computedResponse.Id = "NEW coNECTION";
 
         System.out.println(gson.toJson(computedResponse));
-        processor.getCrypto().verify(computedResponse);
+        crypto.verify(computedResponse);
         System.out.println(gson.toJson(actualResponse));
-        processor.getCrypto().verify(actualResponse);
+        crypto.verify(actualResponse);
         byte[] iv = Helpers.decodeBase64Content(actualResponse.Nonce.getBytes(), false);
         for (Message.ResponseEntry entry: actualResponse.Entries) {
-            System.out.println(processor.getCrypto().decryptFromBase64(entry.Login, iv));
-            System.out.println(processor.getCrypto().decryptFromBase64(entry.Name, iv));
-            System.out.println(processor.getCrypto().decryptFromBase64(entry.Password, iv));
-            System.out.println(processor.getCrypto().decryptFromBase64(entry.Uuid, iv));
+            System.out.println(crypto.decryptFromBase64(entry.Login, iv));
+            System.out.println(crypto.decryptFromBase64(entry.Name, iv));
+            System.out.println(crypto.decryptFromBase64(entry.Password, iv));
+            System.out.println(crypto.decryptFromBase64(entry.Uuid, iv));
         }
 
 

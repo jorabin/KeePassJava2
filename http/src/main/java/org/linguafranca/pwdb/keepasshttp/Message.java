@@ -5,12 +5,22 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * @author jo
+ * Message definitions for the protocol
+ * <p>
+ * Note non idiomatic case on field names, this allows correct
+ * serialization as JSON without annotations
  */
+@SuppressWarnings("WeakerAccess")
 public class Message {
 
+    /**
+     * Protocol version
+     */
     public static final String VERSION = "1.8.4.1";
 
+    /**
+     * The valid message types
+     */
     public static final class Type {
         public static final String GET_LOGINS = "get-logins";
         public static final String GET_LOGINS_COUNT = "get-logins-count";
@@ -22,6 +32,9 @@ public class Message {
 
     }
 
+    /**
+     * Base class for requests and responses, they can be cryptographically verified
+     */
     public static class Verifiable {
         /**
          * Nonce value used in conjunction with all encrypted fields,
@@ -35,6 +48,9 @@ public class Message {
         public String Verifier="";
     }
 
+    /**
+     * From client to server
+     */
     public static class Request extends Verifiable {
 
         public String RequestType;
@@ -83,6 +99,9 @@ public class Message {
         public String Realm;
     }
 
+    /**
+     * From server to client
+     */
     public static class Response extends Verifiable {
         public Response(String request, String hash) {
             RequestType = request;
