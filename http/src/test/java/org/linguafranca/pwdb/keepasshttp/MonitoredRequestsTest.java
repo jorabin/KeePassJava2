@@ -24,7 +24,12 @@ public class MonitoredRequestsTest {
 
     @Test
     public void sessionTest() {
-        Processor processor = new Processor(new SimpleDatabase());
+        Processor processor = new Processor(new SimpleDatabase(), new PwGenerator() {
+            @Override
+            public String generate() {
+                return "123";
+            }
+        });
 
         Message.Request request = gson.fromJson(associateRequest, Message.Request.class);
         Crypto crypto = new Crypto(request.Key);

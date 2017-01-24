@@ -27,9 +27,9 @@ public class KeePassHttpHandler extends AbstractHandler {
     private Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
     private Crypto crypto = new Crypto();
 
-    KeePassHttpHandler(Database database) {
+    KeePassHttpHandler(Database database, PwGenerator pwGenerator) {
         this.adaptor = new DatabaseAdaptor.Default(database);
-        this.processor = new Processor(database);
+        this.processor = new Processor(database, pwGenerator);
     }
 
     @Override
@@ -65,7 +65,6 @@ public class KeePassHttpHandler extends AbstractHandler {
             logger.debug("Request failed verification");
             response.Success = false;
             response.Error = "";
-            response.Hash="";
         } else {
             try {
                 processor.process(request1, response);
