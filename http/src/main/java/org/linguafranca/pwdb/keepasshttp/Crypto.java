@@ -45,7 +45,13 @@ public class Crypto {
             return false;
         }
         byte[] verifier = Helpers.decodeBase64Content(verifiable.Verifier.getBytes(), false);
+        if (verifier.length == 0) {
+            return false;
+        }
         byte[] iv = Helpers.decodeBase64Content(verifiable.Nonce.getBytes(), false);
+        if (iv.length == 0) {
+            return false;
+        }
 
         PaddedBufferedBlockCipher cipher = getCipher(Crypto.CMode.DECRYPT, iv);
 

@@ -111,7 +111,7 @@ public class Message {
          * The user selected String as a result of 'associate',
          * always returned on every request
          */
-        public String Id;
+        public String Id="";
 
         /**
          * response to get-logins-count, number of entries for requested Url

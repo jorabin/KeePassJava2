@@ -63,26 +63,21 @@ public class KeePassJavaHttpHandler extends AbstractHandler {
             processor.getCrypto().setKey(Helpers.decodeBase64Content(request1.Key.getBytes(), false));
         }
 
-        if (request1.RequestType.equals(Message.Type.TEST_ASSOCIATE) && request1.Id == null ||
-                !processor.getCrypto().verify(request1)) {
-            httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.Success = false;
-            response.Error = "Request did not verify";
-            processor.getCrypto().makeVerifiable(response);
-            httpServletResponse.getWriter().write(gson.toJson(response));
-            request.setHandled(true);
-            return;
-        }
-
-        handler.process(request1, response);
-
-        processor.getCrypto().makeVerifiable(response);
-
         OutputStream outputStream = new LogginOutputStream(httpServletResponse.getOutputStream(), logger);
         Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+        
+        if (!processor.getCrypto().verify(request1)) {
+            logger.info("Request failed verification");
+            response.Success = false;
+            response.Error = "";
+            response.Hash="";
+        } else {
+            handler.process(request1, response);
+            processor.getCrypto().makeVerifiable(response);
+        }
+        httpServletResponse.setStatus(HttpServletResponse.SC_OK);
         gson.toJson(response, writer);
         writer.flush();
-        httpServletResponse.setStatus(HttpServletResponse.SC_OK);
         request.setHandled(true);
     }
 
