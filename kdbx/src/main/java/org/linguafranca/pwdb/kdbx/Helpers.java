@@ -111,7 +111,7 @@ public class Helpers {
     }
 
     public static String encodeBase64Content(byte[] value) {
-        return encodeBase64Content(value);
+        return encodeBase64Content(value, false);
     }
 
     public static String encodeBase64Content(byte[] value, boolean isCompressed) {
