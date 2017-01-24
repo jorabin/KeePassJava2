@@ -24,7 +24,7 @@ import java.util.UUID;
 public class KeePassJavaHttpHandler extends AbstractHandler {
 
     private Logger logger = LoggerFactory.getLogger(KeePassJavaHttpHandler.class);
-    private Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+    private Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
     Processor processor = new Processor();
 
     @Override
@@ -59,11 +59,17 @@ public class KeePassJavaHttpHandler extends AbstractHandler {
             return;
         }
 
-        if (!processor.getCrypto().verify(request1)) {
-            httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+        if (request1.RequestType.equals(Message.Type.ASSOCIATE)) {
+            processor.getCrypto().setKey(Helpers.decodeBase64Content(request1.Key.getBytes(), false));
+        }
+
+        if (request1.RequestType.equals(Message.Type.TEST_ASSOCIATE) && request1.Id == null ||
+                !processor.getCrypto().verify(request1)) {
+            httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
             response.Success = false;
             response.Error = "Request did not verify";
             processor.getCrypto().makeVerifiable(response);
+            httpServletResponse.getWriter().write(gson.toJson(response));
             request.setHandled(true);
             return;
         }

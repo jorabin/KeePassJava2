@@ -72,6 +72,7 @@ public class Processor {
             response.Success = false;
             if (request.Id != null) {
                 response.Success = request.Id.equals(adaptor.getId());
+                response.Id = adaptor.getId();
             }
         }
     }
@@ -85,7 +86,7 @@ public class Processor {
                     Helpers.base64FromUuid(UUID.randomUUID())));
             resp.Id = adaptor.getId();
             resp.Success = true;
-            resp.Count = 0;
+            resp.Count = resp.Entries.size();
 
 /*
         string submithost = null;

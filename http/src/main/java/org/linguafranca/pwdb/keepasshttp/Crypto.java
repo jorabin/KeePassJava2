@@ -78,11 +78,13 @@ public class Crypto {
         response.Verifier = CryptoTransform(response.Nonce, false, true, cipher);
 */
 
-        for (Message.ResponseEntry entry: response.Entries) {
-            entry.Login = encryptToBase64(entry.Login, iv);
-            entry.Uuid = encryptToBase64(entry.Uuid, iv);
-            entry.Name = encryptToBase64(entry.Name, iv);
-            entry.Password = encryptToBase64(entry.Password, iv);
+        if (response.Entries != null) {
+            for (Message.ResponseEntry entry : response.Entries) {
+                entry.Login = encryptToBase64(entry.Login, iv);
+                entry.Uuid = encryptToBase64(entry.Uuid, iv);
+                entry.Name = encryptToBase64(entry.Name, iv);
+                entry.Password = encryptToBase64(entry.Password, iv);
+            }
         }
     }
 

@@ -27,12 +27,12 @@ public class Message {
          * Nonce value used in conjunction with all encrypted fields,
          * randomly generated for each request
          */
-        public String Nonce;
+        public String Nonce="";
 
         /**
          * Used to check that the correct key has been chosen
          */
-        public String Verifier;
+        public String Verifier="";
     }
 
     public static class Request extends Verifiable {
@@ -103,7 +103,7 @@ public class Message {
          */
         public String RequestType;
 
-        public String Error = null;
+        public String Error = "";
 
         public boolean Success = false;
 
@@ -116,7 +116,7 @@ public class Message {
         /**
          * response to get-logins-count, number of entries for requested Url
          */
-        public int Count = 0;
+        public Integer Count;
 
         /**
          * response the current version of KeePassHttp
@@ -132,6 +132,8 @@ public class Message {
          * The resulting entries for a get-login request
          */
         public List<ResponseEntry> Entries;
+
+//        public String objectName = "";
     }
 
     public static class ResponseEntry {
