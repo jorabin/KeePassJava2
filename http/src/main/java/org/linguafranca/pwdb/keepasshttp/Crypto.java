@@ -9,22 +9,23 @@ import org.spongycastle.crypto.params.KeyParameter;
 import org.spongycastle.crypto.params.ParametersWithIV;
 
 import java.security.SecureRandom;
-import java.util.Arrays;
 
 /**
  * Cryptography for KeePassHttp emulator
  */
-public class Crypto {
+class Crypto {
 
     private byte[] binaryKey;
-    public byte[] getKey() {
+
+    byte[] getKey() {
         return binaryKey;
     }
-    public void setKey(byte[] binaryKey) {
+
+    void setKey(byte[] binaryKey) {
         this.binaryKey = binaryKey;
     }
 
-    public enum CMode {
+    enum CMode {
         ENCRYPT(true),
         DECRYPT(false);
 
@@ -39,51 +40,40 @@ public class Crypto {
         }
     }
 
-    /** TODO this can be simplified using the helpers below (it's what they are for) */
-    public boolean verify(Message.Verifiable verifiable) {
-        if (getKey() == null || verifiable.Verifier == null || verifiable.Nonce == null) {
+    /**
+     * Return true if the Nonce and the Verifier on a message match
+     * @param verifiable a message containing those fields
+     */
+    boolean verify(Message.Verifiable verifiable) {
+        if (getKey() == null || verifiable.Verifier == null || verifiable.Nonce == null ||
+            verifiable.Verifier.equals("") || verifiable.Nonce.equals("")) {
             return false;
         }
-        byte[] verifier = Helpers.decodeBase64Content(verifiable.Verifier.getBytes(), false);
-        if (verifier.length == 0) {
-            return false;
-        }
+        // The nonce is base64 encoded version of an iv
         byte[] iv = Helpers.decodeBase64Content(verifiable.Nonce.getBytes(), false);
-        if (iv.length == 0) {
-            return false;
-        }
-
-        PaddedBufferedBlockCipher cipher = getCipher(Crypto.CMode.DECRYPT, iv);
-
-        byte[] output = new byte[cipher.getOutputSize(verifier.length)];
-        int outputlen = cipher.processBytes(verifier, 0, verifier.length, output, 0);
-
-        try {
-            cipher.doFinal(output, outputlen);
-            byte[] comparison = new byte[output.length];
-            System.arraycopy(verifiable.Nonce.getBytes(),0,comparison,0,verifiable.Nonce.length());
-            return Arrays.equals(output, comparison);
-        } catch (InvalidCipherTextException e) {
-            return false;
-        }
+        // The verifier is the base64 encoded encrypted version of the nonce
+        String decrypted = decryptFromBase64(verifiable.Verifier, iv);
+        // the decrypted verifier should be the same as the nonce
+        return decrypted.equals(verifiable.Nonce);
     }
 
-    public void makeVerifiable(Message.Response response) {
+    /**
+     * Add a Nonce and a Verifier to a message to make it verifiable
+     * @param response a message to make verifiable
+     */
+    void makeVerifiable(Message.Response response) {
         // we don't have a key? we can't do anything
         if (getKey() == null) {
             return;
         }
 
         // The nonce is base64 encoded version of an iv
-        // The verifier is the base64 encoded encrypted version of the nonce
         byte[] iv = new SecureRandom().generateSeed(16);
         response.Nonce = Helpers.encodeBase64Content(iv, false);
+        // The verifier is the base64 encoded encrypted version of the nonce
         response.Verifier = encryptToBase64(response.Nonce, iv);
-/*
-        PaddedBufferedBlockCipher cipher = getCipher(Crypto.CMode.ENCRYPT, iv);
-        response.Verifier = CryptoTransform(response.Nonce, false, true, cipher);
-*/
 
+        // encrypt any entries
         if (response.Entries != null) {
             for (Message.ResponseEntry entry : response.Entries) {
                 entry.Login = encryptToBase64(entry.Login, iv);
@@ -94,22 +84,47 @@ public class Crypto {
         }
     }
 
-
-    public PaddedBufferedBlockCipher getCipher(CMode mode, byte[] iv) {
+    /**
+     * Get a cipher
+     * @param mode encryption or decryption
+     * @param iv a 16 byte iv
+     * @return an initialised Cipher
+     */
+    PaddedBufferedBlockCipher getCipher(CMode mode, byte[] iv) {
         PaddedBufferedBlockCipher result = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESFastEngine()));
         result.init(mode.getEncrypt(), new ParametersWithIV(new KeyParameter(getKey()), iv));
         return result;
     }
 
-    public String decryptFromBase64(String input, byte[] iv){
+    /**
+     * Return an unencrypted non encoded copy of an encrypted base 64 encoded string
+     * @param input cipher text
+     * @param iv an iv
+     * @return plain text
+     */
+    String decryptFromBase64(String input, byte[] iv){
         return CryptoTransform(input, true, false, getCipher(CMode.DECRYPT, iv));
     }
 
-    public String encryptToBase64(String input, byte[] iv){
+    /**
+     * Return an encrypted base 64 encoded copy of plain text string
+     * @param input plain text
+     * @param iv an iv
+     * @return cipher text
+     */
+    String encryptToBase64(String input, byte[] iv){
         return CryptoTransform(input, false, true, getCipher(CMode.ENCRYPT, iv));
     }
 
-    public static String CryptoTransform(String input, boolean base64in, boolean base64out, PaddedBufferedBlockCipher cipher) {
+    /**
+     * Encryption and Decryption Helper
+     * @param input the candidate for transformation
+     * @param base64in true if base 64 encoded
+     * @param base64out true if we require base 64 out
+     * @param cipher a Cipher initialised for Encrypt or Decrypt
+     * @return the transformed result
+     */
+    static String CryptoTransform(String input, boolean base64in, boolean base64out, PaddedBufferedBlockCipher cipher) {
         byte[] bytes;
         if (base64in) {
             bytes = Helpers.decodeBase64Content(input.getBytes(), false);

@@ -1,3 +1,5 @@
+package org.linguafranca.pwdb.keepasshttp;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Test;
@@ -7,11 +9,10 @@ import org.linguafranca.pwdb.keepasshttp.Processor;
 import org.linguafranca.pwdb.keepasshttp.Message;
 import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 /**
  * @author jo
@@ -32,6 +33,12 @@ public class TestRequestResponse {
     public void testVerifyAssociate() {
         Message.Request r = gson.fromJson(associate, Message.Request.class);
         Processor processor = new Processor(r.Key);
+        assertArrayEquals(r.Key.getBytes(), Helpers.encodeBase64Content(processor.getCrypto().getKey()).getBytes());
+
+        byte[] iv = new SecureRandom().generateSeed(16);
+        String secret = processor.getCrypto().encryptToBase64("Secret", iv);
+        assertEquals("Secret", processor.getCrypto().decryptFromBase64(secret, iv));
+
         assertTrue(processor.getCrypto().verify(r));
         assertTrue(processor.getCrypto().verify(gson.fromJson(response, Message.Response.class)));
         assertTrue(processor.getCrypto().verify(gson.fromJson(reTest, Message.Request.class)));
