@@ -12,7 +12,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 
 /**
- * @author jo
+ * Cryptography for KeePassHttp emulator
  */
 public class Crypto {
 

@@ -2,7 +2,7 @@ package org.linguafranca.pwdb.keepasshttp;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.apache.commons.codec.binary.Hex;
+import com.google.gson.stream.JsonWriter;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.linguafranca.pwdb.kdbx.Helpers;
@@ -10,22 +10,20 @@ import org.linguafranca.pwdb.keepasshttp.util.LogginInputStream;
 import org.linguafranca.pwdb.keepasshttp.util.LogginOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongycastle.crypto.digests.SHA1Digest;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.util.UUID;
 
 /**
- * @author jo
+ * Jetty Handler for PassIFox and ChromeIPass clients - emulates KeePassHttp plugin.
  */
-public class KeePassJavaHttpHandler extends AbstractHandler {
+public class KeePassHttpHandler extends AbstractHandler {
 
-    private Logger logger = LoggerFactory.getLogger(KeePassJavaHttpHandler.class);
+    private Logger logger = LoggerFactory.getLogger(KeePassHttpHandler.class);
     private Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
-    Processor processor = new Processor();
+    private Processor processor = new Processor();
 
     @Override
     public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
@@ -63,11 +61,9 @@ public class KeePassJavaHttpHandler extends AbstractHandler {
             processor.getCrypto().setKey(Helpers.decodeBase64Content(request1.Key.getBytes(), false));
         }
 
-        OutputStream outputStream = new LogginOutputStream(httpServletResponse.getOutputStream(), logger);
-        Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-        
+        // normal part of the protocol to fail verfication on test-associate
         if (!processor.getCrypto().verify(request1)) {
-            logger.info("Request failed verification");
+            logger.debug("Request failed verification");
             response.Success = false;
             response.Error = "";
             response.Hash="";
@@ -75,6 +71,9 @@ public class KeePassJavaHttpHandler extends AbstractHandler {
             handler.process(request1, response);
             processor.getCrypto().makeVerifiable(response);
         }
+        // create a logging outputstream to see what is being sent
+        OutputStream outputStream = new LogginOutputStream(httpServletResponse.getOutputStream(), logger);
+        Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream));
         httpServletResponse.setStatus(HttpServletResponse.SC_OK);
         gson.toJson(response, writer);
         writer.flush();

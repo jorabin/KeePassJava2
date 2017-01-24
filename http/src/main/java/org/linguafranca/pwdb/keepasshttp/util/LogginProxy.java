@@ -100,9 +100,7 @@ public class LogginProxy {
                 forwardSocket.shutdownOutput();
                 clientSocket.shutdownOutput();
                 logger.info("Connection finished");
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
             return true;

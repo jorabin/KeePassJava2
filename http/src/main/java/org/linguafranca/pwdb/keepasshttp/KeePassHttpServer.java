@@ -4,9 +4,9 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 
 /**
- * @author jo
+ * Embedded server
  */
-public class KeePassJavaJettyServer {
+public class KeePassHttpServer {
     public static void main(String[] args) throws Exception {
         Server server = new Server();
         ServerConnector http = new ServerConnector(server);
@@ -14,7 +14,7 @@ public class KeePassJavaJettyServer {
         http.setPort(19455);
         http.setIdleTimeout(300000);
         server.addConnector(http);
-        server.setHandler(new KeePassJavaHttpHandler());
+        server.setHandler(new KeePassHttpHandler());
         server.start();
         server.join();
     }
