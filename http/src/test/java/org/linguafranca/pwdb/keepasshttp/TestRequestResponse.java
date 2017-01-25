@@ -86,17 +86,8 @@ public class TestRequestResponse {
 
         Message.Request l = gson.fromJson(getLogins, Message.Request.class);
         assertTrue(crypto.verify(l));
-        String encodedUrl = l.Url;
-        PaddedBufferedBlockCipher cipher = crypto.getCipher(Crypto.CMode.DECRYPT, Helpers.decodeBase64Content(l.Nonce.getBytes(), false));
-        String unencodedUrl = Crypto.CryptoTransform(encodedUrl, true, false, cipher);
-        System.out.println(unencodedUrl);
-        assertEquals("https://www.facebook.com", unencodedUrl);
-
-        cipher.reset();
-        String encodedSubmitUrl = l.SubmitUrl;
-        String unencodedSubmitUrl = Crypto.CryptoTransform(encodedSubmitUrl,true,false, cipher);
-        System.out.println(unencodedSubmitUrl);
-        assertEquals("https://www.facebook.com/login.php?login_attempt=1&lwv=110", unencodedSubmitUrl);
+        assertEquals("https://www.facebook.com", l.Url);
+        assertEquals("https://www.facebook.com/login.php?login_attempt=1&lwv=110", l.SubmitUrl);
 
         Message.Response response = new Message.Response(l.RequestType, new DatabaseAdaptor.Default(tempFile,
                 new KdbxCreds("123".getBytes()),
