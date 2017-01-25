@@ -4,12 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.Helpers;
+import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import org.linguafranca.pwdb.keepasshttp.Crypto;
 import org.linguafranca.pwdb.keepasshttp.Processor;
 import org.linguafranca.pwdb.keepasshttp.Message;
 import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 
@@ -30,6 +35,20 @@ public class TestRequestResponse {
     private static String reResponse = "{\"RequestType\":\"test-associate\",\"Error\":\"\",\"Success\":true,\"Id\":null,\"Count\":null,\"Version\":\"1.8.4.1\",\"Hash\":\"d51377aeb06c1707f56c0b323662ddf41c777b0c\",\"Entries\":null,\"Nonce\":\"QaYPVoWvF+k31MQGuyLEEA==\",\"Verifier\":\"kOReuG3a0l+do6/8xC58QjNVqgMrAADvt7agyczuPtk=\"}";
     private Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
+    File tempFile;
+    public TestRequestResponse() {
+        KdbxCreds creds = new KdbxCreds("123".getBytes());
+
+        SimpleDatabase db = new SimpleDatabase();
+        db.setName("Test Database");
+        try {
+            tempFile = File.createTempFile("pwdb", "tmp");
+            db.save(creds, new FileOutputStream(tempFile));
+        }catch (Exception e) {
+            fail();
+        }
+
+    }
     @Test
     public void testVerifyAssociate() {
         Message.Request r = gson.fromJson(associate, Message.Request.class);
@@ -60,7 +79,7 @@ public class TestRequestResponse {
 
     }
     @Test
-    public void testGetLogins() {
+    public void testGetLogins() throws Exception {
         Message.Request r = gson.fromJson(getLoginsAssociate, Message.Request.class);
         Crypto crypto = new Crypto(r.Key);
         crypto.verify(r);
@@ -79,7 +98,14 @@ public class TestRequestResponse {
         System.out.println(unencodedSubmitUrl);
         assertEquals("https://www.facebook.com/login.php?login_attempt=1&lwv=110", unencodedSubmitUrl);
 
-        Message.Response response = new Message.Response(l.RequestType, new DatabaseAdaptor.Default(new SimpleDatabase()).getHash());
+        Message.Response response = new Message.Response(l.RequestType, new DatabaseAdaptor.Default(tempFile,
+                new KdbxCreds("123".getBytes()),
+                new PwGenerator() {
+                    @Override
+                    public String generate() {
+                        return "123";
+                    }
+                }).getHash());
         response.Success=true;
         response.Count=1;
         response.Entries.add(new Message.ResponseEntry("a", "b", "c","uuid", new ArrayList<Message.ResponseStringField>()));

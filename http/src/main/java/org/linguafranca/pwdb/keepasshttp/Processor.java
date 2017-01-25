@@ -4,6 +4,7 @@ import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.keepasshttp.Message.ResponseEntry;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -20,12 +21,16 @@ class Processor {
 
     private final Database database;
     private final PwGenerator pwGenerator;
+    private final DatabaseAdaptor adaptor;
+
     private Map<String, MessageProcessor> processors = new HashMap<>();
 
 
-    Processor(Database database, PwGenerator pwGenerator) {
-        this.database = database;
-        this.pwGenerator = pwGenerator;
+    Processor(DatabaseAdaptor adaptor) {
+        this.database = adaptor.getDatabase();
+        this.pwGenerator = adaptor.getPwGenerator();
+        this.adaptor = adaptor;
+
         processors.put(Message.Type.TEST_ASSOCIATE, new TestAssociate());
         processors.put(Message.Type.ASSOCIATE, new Associate());
         processors.put(Message.Type.GET_LOGINS, new GetLogins());
@@ -37,10 +42,6 @@ class Processor {
 
     void process(Message.Request request, Message.Response response) {
         processors.get(request.RequestType).process(request, response);
-    }
-
-    private String makeId() {
-        return database.getName() + " (" + database.getRootGroup().getUuid().toString() + ")";
     }
 
     private class GetLogins implements MessageProcessor {
@@ -58,7 +59,6 @@ class Processor {
                 resp.Entries.add(new ResponseEntry(entry.getTitle(), entry.getUsername(), entry.getPassword(), entry.getUuid().toString()));
             }
             resp.Count = resp.Entries.size();
-            resp.Id = makeId();
             resp.Success = true;
         }
     }
@@ -75,7 +75,6 @@ class Processor {
             String p = pwGenerator.generate();
             resp.Entries.add(new ResponseEntry("Password", "login", p, UUID.randomUUID().toString()));
             resp.Count = resp.Entries.size();
-            resp.Id = makeId();
             resp.Success = true;
         }
     }
@@ -93,7 +92,6 @@ class Processor {
                 resp.Entries.add(new ResponseEntry(entry.getTitle(), entry.getUsername(), entry.getPassword(), entry.getUuid().toString()));
             }
             resp.Count = resp.Entries.size();
-            resp.Id = makeId();
             resp.Success = true;
         }
     }
@@ -115,15 +113,21 @@ class Processor {
             if (entry == null) {
                 entry = database.newEntry();
                 entry.setTitle("New Entry " + format.format(new Date()));
+                entry.setNotes("Created automatically");
+            } else {
+                entry.setNotes(entry.getNotes() + "\nUpdated " + format.format(new Date()));
             }
             entry.setPassword(r.Password);
             entry.setUsername(r.Login);
             entry.setUrl(r.Url);
             entry.setProperty("SubmitUrl", r.SubmitUrl);
-            entry.setNotes("Created automatically");
             //noinspection unchecked
             database.getRootGroup().addEntry(entry);
-            resp.Id = makeId();
+            try {
+                database.save(adaptor.getCredentials(), adaptor.getOutputStream());
+            } catch (IOException e) {
+                throw new IllegalStateException(e);
+            }
             resp.Success = true;
         }
     }
@@ -131,7 +135,6 @@ class Processor {
     private class Associate implements MessageProcessor {
         @Override
         public void process(Message.Request request, Message.Response response) {
-            response.Id = makeId();
             response.Success = true;
         }
 
@@ -142,8 +145,7 @@ class Processor {
         public void process(Message.Request request, Message.Response response) {
             response.Success = false;
             if (request.Id != null) {
-                response.Success = request.Id.equals(makeId());
-                response.Id = makeId();
+                response.Success = request.Id.equals(adaptor.getId());
             }
         }
 

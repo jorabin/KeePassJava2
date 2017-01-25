@@ -2,8 +2,14 @@ package org.linguafranca.pwdb.keepasshttp;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
+import org.linguafranca.pwdb.keepasshttp.PwGenerator.HexPwGenerator;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.Random;
 
@@ -11,28 +17,29 @@ import java.util.Random;
  * Embedded server
  */
 public class KeePassHttpServer {
+    private static final String DEFAULT_DB_FILE = "HttpDatabase.kdbx";
     public static void main(String[] args) throws Exception {
+
         Server server = new Server();
+
         ServerConnector http = new ServerConnector(server);
         http.setHost("0.0.0.0");
         http.setPort(19455);
         http.setIdleTimeout(300000);
         server.addConnector(http);
-        server.setHandler(new KeePassHttpHandler(new SimpleDatabase(), new PwGenerator() {
-            @Override
-            public String generate() {
-                String[] symbols = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"};
-                int length = 10;
-                Random random = new SecureRandom();
-                StringBuilder sb = new StringBuilder(length);
-                for (int i = 0; i < length; i++) {
-                    int indexRandom = random.nextInt( symbols.length );
-                    sb.append( symbols[indexRandom] );
-                }
-                return sb.toString();
-            }
-        }));
+
+        KdbxCreds creds = new KdbxCreds("123".getBytes());
+        // create a database if we don't have one already
+        if (Files.notExists(Paths.get(DEFAULT_DB_FILE))) {
+            SimpleDatabase db = new SimpleDatabase();
+            db.setName("HTTP Database");
+            db.save(creds,new FileOutputStream(DEFAULT_DB_FILE));
+        }
+
+        DatabaseAdaptor adaptor = new DatabaseAdaptor.Default(new File(DEFAULT_DB_FILE), creds, new HexPwGenerator(10));
+        server.setHandler(new KeePassHttpHandler(adaptor));
+
         server.start();
         server.join();
     }
-}
+ }

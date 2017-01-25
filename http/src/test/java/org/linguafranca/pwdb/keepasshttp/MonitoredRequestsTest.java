@@ -4,7 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.Helpers;
+import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import static org.junit.Assert.fail;
 
 /**
  * @author jo
@@ -21,15 +28,31 @@ public class MonitoredRequestsTest {
 
     Gson gson = new GsonBuilder().disableHtmlEscaping().create();
 
+    File tempFile;
+
+    public MonitoredRequestsTest() {
+        KdbxCreds creds = new KdbxCreds("123".getBytes());
+
+        SimpleDatabase db = new SimpleDatabase();
+        db.setName("Test Database");
+        try {
+            tempFile = File.createTempFile("pwdb", "tmp");
+            db.save(creds, new FileOutputStream(tempFile));
+        } catch (Exception e) {
+            fail();
+        }
+    }
 
     @Test
-    public void sessionTest() {
-        Processor processor = new Processor(new SimpleDatabase(), new PwGenerator() {
-            @Override
-            public String generate() {
-                return "123";
-            }
-        });
+    public void sessionTest() throws Exception {
+        Processor processor = new Processor(new DatabaseAdaptor.Default(tempFile,
+                new KdbxCreds("123".getBytes()),
+                new PwGenerator() {
+                    @Override
+                    public String generate() {
+                        return "123";
+                    }
+                }));
 
         Message.Request request = gson.fromJson(associateRequest, Message.Request.class);
         Crypto crypto = new Crypto(request.Key);
@@ -45,7 +68,6 @@ public class MonitoredRequestsTest {
         crypto.verify(computedResponse);
         System.out.println(gson.toJson(actualResponse));
         crypto.verify(actualResponse);
-
 
 
         request = gson.fromJson(testAssociateRequestWithId, Message.Request.class);
@@ -75,7 +97,7 @@ public class MonitoredRequestsTest {
         System.out.println(gson.toJson(actualResponse));
         crypto.verify(actualResponse);
         byte[] iv = Helpers.decodeBase64Content(actualResponse.Nonce.getBytes(), false);
-        for (Message.ResponseEntry entry: actualResponse.Entries) {
+        for (Message.ResponseEntry entry : actualResponse.Entries) {
             System.out.println(crypto.decryptFromBase64(entry.Login, iv));
             System.out.println(crypto.decryptFromBase64(entry.Name, iv));
             System.out.println(crypto.decryptFromBase64(entry.Password, iv));

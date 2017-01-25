@@ -40,12 +40,12 @@ public class Message {
          * Nonce value used in conjunction with all encrypted fields,
          * randomly generated for each request
          */
-        public String Nonce="";
+        public String Nonce;
 
         /**
          * Used to check that the correct key has been chosen
          */
-        public String Verifier="";
+        public String Verifier;
     }
 
     /**
@@ -122,7 +122,7 @@ public class Message {
          */
         public String RequestType;
 
-        public String Error = "";
+        public String Error;
 
         public boolean Success = false;
 
@@ -130,12 +130,12 @@ public class Message {
          * The user selected String as a result of 'associate',
          * always returned on every request
          */
-        public String Id="";
+        public String Id;
 
         /**
          * response to get-logins-count, number of entries for requested Url
          */
-        public Integer Count;
+        public Integer Count=0;
 
         /**
          * response the current version of KeePassHttp

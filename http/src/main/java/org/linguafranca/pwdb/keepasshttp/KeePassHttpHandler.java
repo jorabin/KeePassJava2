@@ -22,14 +22,14 @@ import java.io.*;
 public class KeePassHttpHandler extends AbstractHandler {
 
     private final DatabaseAdaptor adaptor;
-    private Processor processor;
+    private final Processor processor;
     private Logger logger = LoggerFactory.getLogger(KeePassHttpHandler.class);
-    private Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().create();
+    private Gson gson = new GsonBuilder().disableHtmlEscaping().create();
     private Crypto crypto = new Crypto();
 
-    KeePassHttpHandler(Database database, PwGenerator pwGenerator) {
-        this.adaptor = new DatabaseAdaptor.Default(database);
-        this.processor = new Processor(database, pwGenerator);
+    KeePassHttpHandler(DatabaseAdaptor adaptor) {
+        this.adaptor = adaptor;
+        this.processor = new Processor(adaptor);
     }
 
     @Override
@@ -64,11 +64,11 @@ public class KeePassHttpHandler extends AbstractHandler {
         if (!crypto.verify(request1)) {
             logger.debug("Request failed verification");
             response.Success = false;
-            response.Error = "";
         } else {
             try {
                 processor.process(request1, response);
                 crypto.makeVerifiable(response);
+                response.Id = adaptor.getId();
             } catch (Exception e) {
                 httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 response.Success = false;
@@ -82,5 +82,4 @@ public class KeePassHttpHandler extends AbstractHandler {
         writer.flush();
         request.setHandled(true);
     }
-
 }
