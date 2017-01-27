@@ -2,12 +2,13 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-## Next
+##[2.1.1] 2017-01-27
 
 ### Fixed
 
 - Simple implementation not reading DeletedObjects correctly per Nigel Rook
 - Simple implementation CustomIcons optional per @Kin-k
+- Simple implementation saving protected fields with Protected="true" instead of "True"
 
 ### Added
 
