@@ -50,7 +50,8 @@ public class KdbxOutputTransformer implements XmlEventTransformer {
             case START_ELEMENT: {
                 Attribute attribute = event.asStartElement().getAttributeByName(new QName("Protected"));
                 if (attribute != null) {
-                    encryptContent = Helpers.toBoolean(attribute.getValue());                    // this is a workaround for Simple XML not calling converter on attributes
+                    encryptContent = Helpers.toBoolean(attribute.getValue());
+                    // this is a workaround for Simple XML not calling converter on attributes
                     List<Attribute> attributes = new ArrayList<>();
                     if (attribute.getValue().toLowerCase().equals("true")) {
                         attributes.add(eventFactory.createAttribute("Protected", "True"));

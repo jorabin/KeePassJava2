@@ -34,9 +34,9 @@ The composite POM is
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.1.0</version>
+        <version>2.1.1</version>
         
- at Maven Central. Note that the artifactId has become Camel Case compared with release 2.0.1.
+ at Maven Central. Note that the artifactId has become Camel Case from release 2.1.x onwards.
  
  There are also separate POMs for the various modules. The module structure is illustrated below
  under [Build from Source](#bfs).
