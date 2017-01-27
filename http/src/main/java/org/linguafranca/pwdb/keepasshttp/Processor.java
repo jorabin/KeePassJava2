@@ -10,8 +10,6 @@ import java.util.*;
 
 /**
  * Contains message processors for processing messages (doh)
- *
- * @author jo
  */
 class Processor {
 
@@ -41,7 +39,11 @@ class Processor {
     }
 
     void process(Message.Request request, Message.Response response) {
-        processors.get(request.RequestType).process(request, response);
+        MessageProcessor mp = processors.get(request.RequestType);
+        if (mp == null) {
+            throw new IllegalStateException("Unknown message type " + request.RequestType);
+        }
+        mp.process(request, response);
     }
 
     private class GetLogins implements MessageProcessor {

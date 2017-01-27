@@ -152,7 +152,6 @@ public class Message {
          */
         public List<ResponseEntry> Entries;
 
-//        public String objectName = "";
     }
 
     public static class ResponseEntry {

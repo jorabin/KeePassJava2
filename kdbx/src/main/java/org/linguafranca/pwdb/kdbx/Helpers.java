@@ -71,7 +71,7 @@ public class Helpers {
     }
 
     public static String fromBoolean(Boolean value) {
-        return value == null ? "False" : value ? "True" : "False";
+        return value == null ? "False" : (value ? "True" : "False");
     }
 
     private static SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");

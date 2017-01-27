@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.handler.AbstractHandler;
-import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.keepasshttp.util.LogginInputStream;
 import org.linguafranca.pwdb.keepasshttp.util.LogginOutputStream;
@@ -36,28 +35,33 @@ public class KeePassHttpHandler extends AbstractHandler {
     public void handle(String s, Request request, HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException, ServletException {
 
         logger.debug("Got a request");
+
         InputStream is = new LogginInputStream(request.getInputStream(), logger);
+        OutputStream outputStream = new LogginOutputStream(httpServletResponse.getOutputStream(), logger);
+        Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream));
 
         Message.Request request1 = gson.fromJson(new BufferedReader(new InputStreamReader(is)),Message.Request.class);
         if (request1 == null) {
             httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             request.setHandled(true);
-            httpServletResponse.getWriter().write("That's a 400. JSON not parsed. " + request.getRemoteAddr());
+            writer.write("That's a 400. JSON not parsed. " + request.getRemoteAddr());
             return;
         }
         if (request1.RequestType == null) {
             httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             request.setHandled(true);
-            httpServletResponse.getWriter().write("That's a 400. No request type found. " + request.getRemoteAddr());
+            writer.write("That's a 400. No request type found. " + request.getRemoteAddr());
             return;
         }
 
         Message.Response response = new Message.Response(request1.RequestType, adaptor.getHash());
 
+        // set the crypto key on associate
         if (request1.RequestType.equals(Message.Type.ASSOCIATE)) {
             crypto.setKey(Helpers.decodeBase64Content(request1.Key.getBytes(), false));
         }
 
+        // send OK even when it's fail
         httpServletResponse.setStatus(HttpServletResponse.SC_OK);
 
         // normal part of the protocol to fail verification on test-associate
@@ -66,8 +70,8 @@ public class KeePassHttpHandler extends AbstractHandler {
             response.Success = false;
         } else {
             try {
+                // processor is responsible for setting success
                 processor.process(request1, response);
-                crypto.makeVerifiable(response);
                 response.Id = adaptor.getId();
             } catch (Exception e) {
                 httpServletResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -75,9 +79,8 @@ public class KeePassHttpHandler extends AbstractHandler {
                 response.Error = "Error processing request " + e.getMessage();
             }
         }
-        // create a logging outputStream to see what is being sent
-        OutputStream outputStream = new LogginOutputStream(httpServletResponse.getOutputStream(), logger);
-        Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+        // presumably errors need to be verifiable?
+        crypto.makeVerifiable(response);
         gson.toJson(response, writer);
         writer.flush();
         request.setHandled(true);

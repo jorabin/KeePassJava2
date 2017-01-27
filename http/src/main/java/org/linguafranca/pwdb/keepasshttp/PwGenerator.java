@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 import java.util.Random;
 
 /**
- * @author jo
+ * Interface for an injectable password generator
  */
 public interface PwGenerator {
     String generate();

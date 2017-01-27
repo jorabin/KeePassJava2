@@ -7,28 +7,59 @@ import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import org.spongycastle.crypto.digests.SHA1Digest;
 
-
 import java.io.*;
-import java.util.UUID;
 
 /**
- * @author jo
+ * Adaptor for {@link Database} supporting the requirements of the KeePassHttp protocol.
  */
 public interface DatabaseAdaptor {
 
+    /**
+     * The Id by which this database is known following association
+     */
     String getId();
+
+    /**
+     * Each database has a Hash
+     */
     String getHash();
-    Database getDatabase();
+
+    /**
+     * A password generator
+     */
     PwGenerator getPwGenerator();
+
+    /**
+     * Where to save, when saving. To be closed by caller.
+     */
     OutputStream getOutputStream();
+
+    /**
+     * Credentials to use, when saving
+     */
     Credentials getCredentials();
 
+    /**
+     * The underlying Database
+     */
+    Database getDatabase();
+
+    /**
+     * Default implementation of Adaptor
+     */
     class Default implements DatabaseAdaptor {
-        private Database database;
-        private PwGenerator pwGenerator;
-        private File databaseFile;
+        private final Database database;
+        private final PwGenerator pwGenerator;
+        private final File databaseFile;
         private final Credentials credentials;
 
+        /**
+         * Constructor for Databse from File
+         * @param file the file containing the databse
+         * @param credentials credentials for the databse
+         * @param pwGenerator a password generator
+         * @throws Exception if the database can't be constructed
+         */
         Default(File file, Credentials credentials, PwGenerator pwGenerator) throws Exception {
             this.databaseFile = file;
             this.pwGenerator = pwGenerator;
@@ -41,6 +72,8 @@ public interface DatabaseAdaptor {
             return database.getName() + " (" + database.getRootGroup().getUuid().toString() + ")";
         }
 
+        // in the C# version this is a hash of the root group UUID and the recycle bin UUID
+        // we don't have the concept of recycle bin (yet)
         @Override
         public String getHash() {
             byte[] toHash = Helpers.hexStringFromUuid(database.getRootGroup().getUuid()).getBytes();

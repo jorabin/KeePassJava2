@@ -10,20 +10,18 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.SecureRandom;
-import java.util.Random;
 
 /**
- * Embedded server
+ * Minimal embedded server - local host origin only but no meaningful security
  */
-public class KeePassHttpServer {
+public class ExampleKeePassHttpServer {
     private static final String DEFAULT_DB_FILE = "HttpDatabase.kdbx";
     public static void main(String[] args) throws Exception {
 
         Server server = new Server();
 
         ServerConnector http = new ServerConnector(server);
-        http.setHost("0.0.0.0");
+        http.setHost("127.0.0.1");
         http.setPort(19455);
         http.setIdleTimeout(300000);
         server.addConnector(http);
