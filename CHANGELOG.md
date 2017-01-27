@@ -2,6 +2,13 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+##[2.1.2-SNAPSHOT]
+
+### Added
+
+An experimental implementation of [keepasshttp](https://github.com/pfn/keepasshttp/) see
+[thereadme](http/readme.md) for warnings, limitations, etc. about this.
+
 ##[2.1.1] 2017-01-27
 
 ### Fixed

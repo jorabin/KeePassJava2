@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>KeePassJava2-http</artifactId>
-    <name>KeePassJava2 :: HTTP</name>
+    <artifactId>keepasshttp</artifactId>
+    <name>PWDB :: keepasshttp</name>
     <dependencies>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>

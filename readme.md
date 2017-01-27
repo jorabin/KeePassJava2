@@ -170,6 +170,9 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 bindings might be useful for building other interfaces.</td></tr>
 <tr><td><a href="dom">dom</a></td><td>KeePassJava2-dom</td><td>A DOM based implementation of KDBX. Being DOM based it is rather slow, but 
 messes less with existing content than the other two implementations. Known to work on Android.</td></tr>
+<tr><td><a href="http">http</a></td><td>keepasshttp</td><td>An implementation of <a href="https://github.com/pfn/keepasshttp/">keepasshttp</a>, which is a plugin for Windows Keepass
+supporting communication with Chrome (chromeIPass) and Firefox(PassIFox) extensions. It is experimental and usafe. Please 
+read and inwardly digest the <a href="http/reamdme.md">readme</a>.</td></tr>
 </tbody>
 </table>
 
