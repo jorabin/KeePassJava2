@@ -17,7 +17,6 @@
 package org.linguafranca.pwdb.kdbx.simple.model;
 
 import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import org.linguafranca.pwdb.kdbx.simple.SimpleGroup;
 import org.linguafranca.pwdb.kdbx.simple.converter.Base64ByteArrayConverter;
 import org.linguafranca.pwdb.kdbx.simple.converter.KeePassBooleanConverter;
@@ -25,7 +24,6 @@ import org.linguafranca.pwdb.kdbx.simple.converter.TimeConverter;
 import org.linguafranca.pwdb.kdbx.simple.converter.UuidConverter;
 import org.simpleframework.xml.*;
 import org.simpleframework.xml.convert.Convert;
-import org.simpleframework.xml.util.Dictionary;
 
 import java.util.ArrayList;
 import java.util.Date;

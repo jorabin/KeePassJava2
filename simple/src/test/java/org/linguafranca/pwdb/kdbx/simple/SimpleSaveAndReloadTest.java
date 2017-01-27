@@ -16,15 +16,18 @@
 
 package org.linguafranca.pwdb.kdbx.simple;
 
+import org.junit.Test;
 import org.linguafranca.pwdb.checks.SaveAndReloadChecks;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxHeader;
+import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxSerializer;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author jo
@@ -58,6 +61,34 @@ public class SimpleSaveAndReloadTest extends SaveAndReloadChecks {
             throw new IOException(e);
         }
     }
+
+
+    // check that boolean comes out in upper case - Simple Converters don't work on attributes
+    // so this is done in the output transformer
+    @Test
+    public void uppercaseBooleanTest() throws IOException {
+        SimpleDatabase s = new SimpleDatabase();
+        SimpleEntry e = s.newEntry();
+        e.setPassword("12345");
+        s.getRootGroup().addEntry(e);
+        File file = File.createTempFile("kdbx", "kdbx");
+        s.save(new KdbxCreds("123".getBytes()), new FileOutputStream(file));
+        InputStream inputStream = new FileInputStream(file);
+        Credentials credentials = new KdbxCreds("123".getBytes());
+        InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
+        BufferedReader br = new BufferedReader(new InputStreamReader(decryptedInputStream));
+        boolean foundValue = false;
+        while (br.ready()) {
+            String string = br.readLine();
+            if (string.trim().startsWith("<Value Protected=")) {
+                assertTrue(string.contains("True"));
+                foundValue = true;
+            }
+            System.out.println(string);
+        }
+        assertTrue(foundValue);
+    }
+
 
     @Override
     public Credentials getCreds(byte[] creds) {

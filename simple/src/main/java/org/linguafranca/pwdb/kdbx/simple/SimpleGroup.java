@@ -35,7 +35,7 @@ import java.util.UUID;
  * Implementation of {@link Group} using the Simple XML framework.
  * @author jo
  */
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "unused"})
 @Root(name = "Group")
 public class SimpleGroup extends org.linguafranca.pwdb.base.AbstractGroup<SimpleDatabase, SimpleGroup, SimpleEntry, SimpleIcon> {
     @Element(name = "UUID", type = UUID.class)
