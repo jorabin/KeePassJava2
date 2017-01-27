@@ -46,6 +46,9 @@ public abstract class AbstractGroup<D extends Database<D, G, E, I>, G extends or
     @Override
     public List<? extends E> findEntries(String find, boolean recursive) {
         List <E> result = new ArrayList<>(getEntries().size());
+        if (isRecycleBin()) {
+            return result;
+        }
         for (E entry: getEntries()){
             if (entry.match(find)){
                 result.add(entry);
@@ -62,6 +65,9 @@ public abstract class AbstractGroup<D extends Database<D, G, E, I>, G extends or
     @Override
     public List<? extends E> findEntries(Entry.Matcher matcher, boolean recursive) {
         List <E> result = new ArrayList<>(getEntries().size());
+        if (isRecycleBin()) {
+            return result;
+        }
         for (E entry: getEntries()){
             if (entry.match(matcher)){
                 result.add(entry);

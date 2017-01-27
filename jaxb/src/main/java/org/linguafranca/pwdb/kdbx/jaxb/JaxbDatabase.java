@@ -93,6 +93,32 @@ public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, Jaxb
     }
 
     @Override
+    public JaxbGroup getRecycleBin() {
+        UUID recycleBinUuid = this.keePassFile.getMeta().getRecycleBinUUID();
+        JaxbGroup g = findGroup(recycleBinUuid);
+        if (g == null && !isRecycleBinEnabled()) {
+            return null;
+        }
+        if (g== null) {
+            g = newGroup("Recycle Bin");
+            getRootGroup().addGroup(g);
+            this.keePassFile.getMeta().setRecycleBinUUID(g.getUuid());
+            this.keePassFile.getMeta().setRecycleBinChanged(new Date());
+        }
+        return g;
+    }
+
+    @Override
+    public boolean isRecycleBinEnabled() {
+        return this.keePassFile.getMeta().getRecycleBinEnabled();
+    }
+
+    @Override
+    public void enableRecycleBin(boolean enable) {
+        this.keePassFile.getMeta().setRecycleBinEnabled(enable);
+    }
+
+    @Override
     public JaxbGroup newGroup() {
         return new JaxbGroup(this);
     }

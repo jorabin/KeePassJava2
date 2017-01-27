@@ -94,6 +94,11 @@ public class SimpleGroup extends org.linguafranca.pwdb.base.AbstractGroup<Simple
     }
 
     @Override
+    public boolean isRecycleBin() {
+        return database.keePassFile.meta.recycleBinUUID.equals(this.uuid);
+    }
+
+    @Override
     public SimpleGroup getParent() {
         return parent;
     }

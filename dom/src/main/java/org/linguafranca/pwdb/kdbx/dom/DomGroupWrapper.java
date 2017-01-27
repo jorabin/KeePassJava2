@@ -67,6 +67,15 @@ public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupW
         return parent != null && (parent.getTagName().equals("Root"));
     }
 
+    @Override
+    public boolean isRecycleBin() {
+        String UUIDcontent = getElementContent(RECYCLE_BIN_UUID_ELEMENT_NAME, database.dbMeta);
+        if (UUIDcontent != null){
+            UUID uuid = Helpers.uuidFromBase64(UUIDcontent);
+            return uuid.equals(this.getUuid());
+        }
+        return false;
+    }
 
     @Override
     public @Nullable DomGroupWrapper getParent() {

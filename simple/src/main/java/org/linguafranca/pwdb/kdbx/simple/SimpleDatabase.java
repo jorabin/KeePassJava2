@@ -48,7 +48,7 @@ import java.util.*;
 @SuppressWarnings("WeakerAccess")
 public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup, SimpleEntry, SimpleIcon>{
 
-    private KeePassFile keePassFile;
+    KeePassFile keePassFile;
 
     /**
      * Create a new empty database
@@ -97,6 +97,29 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
         SimpleIcon ic = newIcon();
         ic.setIndex(integer);
         return ic;
+    }
+
+    @Override
+    public boolean isRecycleBinEnabled() {
+        return this.keePassFile.meta.recycleBinEnabled;
+    }
+
+    @Override
+    public void enableRecycleBin(boolean enable) {
+        this.keePassFile.meta.recycleBinEnabled = enable;
+    }
+
+    @Override
+    public SimpleGroup getRecycleBin() {
+        UUID recycleBinUuid = this.keePassFile.meta.recycleBinUUID;
+        SimpleGroup g = findGroup(recycleBinUuid);
+        if (g == null && isRecycleBinEnabled()) {
+            g = newGroup("Recycle Bin");
+            getRootGroup().addGroup(g);
+            this.keePassFile.meta.recycleBinUUID = g.getUuid();
+            this.keePassFile.meta.recycleBinChanged = new Date();
+        }
+        return g;
     }
 
     @Override

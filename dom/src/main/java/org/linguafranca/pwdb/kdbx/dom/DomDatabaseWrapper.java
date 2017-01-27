@@ -16,7 +16,9 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
+import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.base.AbstractDatabase;
+import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.pwdb.Credentials;
@@ -28,6 +30,10 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.UUID;
+
+import static org.linguafranca.pwdb.kdbx.Helpers.base64FromUuid;
+import static org.linguafranca.pwdb.kdbx.dom.DomHelper.*;
 
 /**
  * The class wraps a {@link DomSerializableDatabase} as a {@link org.linguafranca.pwdb.Database}.
@@ -38,7 +44,7 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
 
     private Document document;
     private Element dbRootGroup;
-    private Element dbMeta;
+    Element dbMeta;
 
     private DomSerializableDatabase domDatabase = DomSerializableDatabase.createEmptyDatabase();
 
@@ -110,6 +116,44 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
         DomIconWrapper icon =  newIcon();
         icon.setIndex(i);
         return icon;
+    }
+
+    @Override
+    public DomGroupWrapper getRecycleBin() {
+        String UUIDcontent = getElementContent(RECYCLE_BIN_UUID_ELEMENT_NAME, dbMeta);
+        if (UUIDcontent != null){
+            final UUID uuid = Helpers.uuidFromBase64(UUIDcontent);
+            if (uuid.getLeastSignificantBits() != 0 && uuid.getMostSignificantBits() != 0) {
+                for (DomGroupWrapper g: getRootGroup().getGroups()) {
+                    if (g.getUuid().equals(uuid)) {
+                        return g;
+                    }
+                }
+                // the recycle bin seems to have been lost, better create another one
+            }
+            // uuid was 0 i.e. there isn't one
+        }
+        // no recycle bin group set up
+        if (!isRecycleBinEnabled()) {
+            return null;
+        }
+
+        DomGroupWrapper g = newGroup();
+        g.setName("Recycle Bin");
+        getRootGroup().addGroup(g);
+        ensureElementContent(RECYCLE_BIN_UUID_ELEMENT_NAME, dbMeta, base64FromUuid(g.getUuid()));
+        touchElement(RECYCLE_BIN_CHANGED_ELEMENT_NAME, dbMeta);
+        return g;
+    }
+
+    @Override
+    public boolean isRecycleBinEnabled() {
+        return Boolean.valueOf(getElementContent(RECYCLE_BIN_ENABLED_ELEMENT_NAME, dbMeta));
+    }
+
+    @Override
+    public void enableRecycleBin(boolean enable) {
+        setElementContent(RECYCLE_BIN_ENABLED_ELEMENT_NAME, dbMeta, ((Boolean) enable).toString());
     }
 
     public String getName() {

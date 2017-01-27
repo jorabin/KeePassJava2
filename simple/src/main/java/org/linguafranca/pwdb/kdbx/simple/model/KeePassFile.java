@@ -96,13 +96,13 @@ public class KeePassFile {
         protected ArrayList<Icon> customIcons;
         @Element(name = "RecycleBinEnabled", type = Boolean.class)
         @Convert(KeePassBooleanConverter.class)
-        protected Boolean recycleBinEnabled;
+        public Boolean recycleBinEnabled;
         @Element(name = "RecycleBinUUID", type = UUID.class)
         @Convert(UuidConverter.class)
-        protected UUID recycleBinUUID;
+        public UUID recycleBinUUID;
         @Element(name = "RecycleBinChanged", type = Date.class)
         @Convert(TimeConverter.class)
-        protected Date recycleBinChanged;
+        public Date recycleBinChanged;
         @Element(name = "EntryTemplatesGroup", type = UUID.class)
         @Convert(UuidConverter.class)
         protected UUID entryTemplatesGroup;

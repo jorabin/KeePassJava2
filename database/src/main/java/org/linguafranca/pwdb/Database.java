@@ -21,6 +21,7 @@ import org.linguafranca.pwdb.Credentials;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Interface for a password database consisting of Groups, sub-Groups and Entries.
@@ -111,6 +112,61 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
      * @return the created icon
      */
     I newIcon(Integer i);
+
+    /**
+     * Find an entry with this UUID anywhere in the database except the recycle bin
+     * @param uuid the UUID
+     * @return an entry or null if not found
+     */
+    E findEntry(UUID uuid);
+
+    /**
+     * Delete an entry with this UUID from anywhere in the database except the recycle bin
+     * if recycle is enabled then the entry is moved to the recycle bin
+     * @param uuid the UUID
+     * @return true if an entry was deleted
+     */
+    boolean deleteEntry(UUID uuid);
+
+    /**
+     * Find a group with this UUID anywhere in the database except the recycle bin
+     * @param uuid the UUID
+     * @return a group or null if not found
+     */
+    G findGroup(UUID uuid);
+
+    /**
+     * Delete a group with this UUID from anywhere in the database except the recycle bin
+     * if recycle is enabled then the group is moved to the recycle bin
+     * @param uuid the UUID
+     * @return true if a group was deleted
+     */
+    boolean deleteGroup(UUID uuid);
+
+    /**
+     * if a database has a recycle bin then it is enabled by default
+     * @return true if the recycle bin is enabled
+     */
+    boolean isRecycleBinEnabled();
+
+
+    /**
+     * change the recycle bin state
+     */
+    void enableRecycleBin(boolean enable);
+
+    /**
+     * If the recycle bin is enabled or it's disabled but there is a pre-existing
+     * recycle bin, then return the recycle bin, creating one if necessary.
+     * If the recycle bin is disabled and there is no pre-existing recycle bin
+     * then return null.
+     */
+    G getRecycleBin();
+
+    /**
+     * empty the recycle bin whether it is enabled or disabled
+     */
+    void emptyRecycleBin();
 
     /**
      * Visit all entries

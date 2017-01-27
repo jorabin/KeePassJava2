@@ -18,7 +18,9 @@ package org.linguafranca.pwdb.base;
 
 import org.linguafranca.pwdb.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Base implementation of Database
@@ -125,5 +127,94 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
         result.setIcon(this.newIcon(entry.getIcon().getIndex()));
         // everything else should have been copied via properties
         return result;
+    }
+
+    @Override
+    public E findEntry(final UUID uuid) {
+        List<? extends E> entries = findEntries(new Entry.Matcher() {
+            @Override
+            public boolean matches(Entry entry) {
+                return entry.getUuid().equals(uuid);
+            }
+        });
+        if (entries.size() > 1) {
+            throw new IllegalStateException("Two entries same UUID");
+        }
+        if (entries.size() == 0) {
+            return null;
+        }
+        return entries.get(0);
+    }
+
+    @Override
+    public boolean deleteEntry(final UUID uuid) {
+        E e = findEntry(uuid);
+        if (e == null) {
+            return false;
+        }
+        e.getParent().removeEntry(e);
+        if (isRecycleBinEnabled()) {
+            getRecycleBin().addEntry(e);
+        }
+        return true;
+    }
+
+    @Override
+    public G findGroup(final UUID uuid){
+        final List<G> groups = new ArrayList<>();
+        visit(new Visitor.Default() {
+            // ignore sub groups of the recycle bin
+            boolean recycle;
+            @Override
+            public void startVisit(Group group) {
+                if (!recycle && group.getUuid().equals(uuid)) {
+                    groups.add((G) group);
+                }
+                if (group.isRecycleBin()) {
+                    recycle = true;
+                }
+            }
+
+            @Override
+            public void endVisit(Group group) {
+                if (group.isRecycleBin()) {
+                    recycle = false;
+                }
+            }
+        });
+        if (groups.size() > 1) {
+            throw new IllegalStateException("Two groups same UUID");
+        }
+        if (groups.size() == 0) {
+            return null;
+        }
+        return groups.get(0);
+    }
+
+    @Override
+    public boolean deleteGroup(final UUID uuid) {
+        G g = findGroup(uuid);
+        if (g==null) {
+            return false;
+        }
+        g.getParent().removeGroup(g);
+        if (isRecycleBinEnabled()) {
+            getRecycleBin().addGroup(g);
+        }
+        return true;
+    }
+
+    @Override
+    public void emptyRecycleBin() {
+        G recycle = getRecycleBin();
+        if (recycle == null) {
+            return;
+        }
+        for (G g: recycle.getGroups()){
+            recycle.removeGroup(g);
+        }
+        for (E e: recycle.getEntries()){
+            recycle.removeEntry(e);
+        }
     }
 }

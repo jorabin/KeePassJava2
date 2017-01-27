@@ -37,6 +37,11 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
     boolean isRootGroup();
 
     /**
+     * Returns true if this is the recycle bin of a database
+     */
+    boolean isRecycleBin();
+
+    /**
      * Returns the parent of this group, or null if either this
      * group is the root group, or if the group does not have
      * a parent - e.g. if it is newly created or if it has

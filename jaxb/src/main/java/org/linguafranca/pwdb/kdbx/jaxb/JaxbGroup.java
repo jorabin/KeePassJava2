@@ -64,6 +64,11 @@ public class JaxbGroup extends AbstractGroup<JaxbDatabase, JaxbGroup, JaxbEntry,
     }
 
     @Override
+    public boolean isRecycleBin() {
+        return database.getKeePassFile().getMeta().getRecycleBinUUID().equals(this.getUuid());
+    }
+
+    @Override
     public JaxbGroup getParent() {
         if (delegate.parent == null) {
             return null;

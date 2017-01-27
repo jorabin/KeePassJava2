@@ -212,4 +212,9 @@ public class KdbGroup extends AbstractGroup<KdbDatabase, KdbGroup, KdbEntry, Kdb
     public KdbDatabase getDatabase() {
         return database;
     }
+
+    @Override
+    public boolean isRecycleBin() {
+        return false;
+    }
 }

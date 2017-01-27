@@ -66,6 +66,10 @@ class DomHelper {
     static final String BINARY_PROPERTY_ELEMENT_FORMAT = "Binary[Key/text()='%s']";
     static final String VALUE_ELEMENT_NAME = "Value";
 
+    static final String RECYCLE_BIN_UUID_ELEMENT_NAME = "RecycleBinUuid";
+    static final String RECYCLE_BIN_ENABLED_ELEMENT_NAME = "RecycleBinEnabled";
+    static final String RECYCLE_BIN_CHANGED_ELEMENT_NAME = "RecycleBinChanged";
+
     interface ValueCreator {
         String getValue();
     }
