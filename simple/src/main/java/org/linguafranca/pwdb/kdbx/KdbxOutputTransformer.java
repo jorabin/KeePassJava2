@@ -23,6 +23,9 @@ import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Attribute;
 import javax.xml.stream.events.XMLEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
@@ -48,6 +51,15 @@ public class KdbxOutputTransformer implements XmlEventTransformer {
                 Attribute attribute = event.asStartElement().getAttributeByName(new QName("Protected"));
                 if (attribute != null) {
                     encryptContent = Helpers.toBoolean(attribute.getValue());
+                    // this is a workaround for Simple XML not calling converter on attributes
+                    List<Attribute> attributes = new ArrayList<>();
+                    if (attribute.getValue().toLowerCase().equals("true")) {
+                        attributes.add(eventFactory.createAttribute("Protected", "True"));
+                    }
+                    event = eventFactory.createStartElement(
+                            event.asStartElement().getName(),
+                            attributes.iterator(),
+                            null);
                 }
                 break;
             }

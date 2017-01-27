@@ -18,20 +18,17 @@ package org.linguafranca.pwdb.checks;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Visitor;
+import org.linguafranca.pwdb.*;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author jo
  */
-public abstract class DatabaseLoaderChecks {
-    protected Database database;
+public abstract class DatabaseLoaderChecks <D extends Database<D,G,E,I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon>{
+    protected Database<D,G,E,I> database;
 
     /**
      * a test123 file for each format. Should contain the same thing. This is a basic sanity check.
@@ -44,11 +41,11 @@ public abstract class DatabaseLoaderChecks {
 
         // find all entries in the database
         // the kdb version has three additional system related entries
-        List<Entry> anything = database.findEntries("");
+        List<? extends E> anything = database.findEntries("");
         Assert.assertTrue(10 <= anything.size());
 
         // find all entries in the database that have the string "test" in them
-        List<Entry> tests = database.findEntries("test");
+        List<? extends E> tests = database.findEntries("test");
         for (Entry tes: tests) {
             System.out.println(tes.getTitle());
         }
@@ -67,14 +64,14 @@ public abstract class DatabaseLoaderChecks {
             Assert.assertEquals("123", pass2);
         }
 
-        List<Entry> passwords = database.findEntries("password");
+        List<? extends E> passwords = database.findEntries("password");
         Assert.assertEquals(4, passwords.size());
         for (Entry passwordEntry : passwords) {
             assertEquals(passwordEntry.getTitle(), passwordEntry.getPassword());
             System.out.println(passwordEntry.getTitle());
         }
 
-        List<Entry> entries = database.findEntries(new Entry.Matcher() {
+        List<? extends E> entries = database.findEntries(new Entry.Matcher() {
             @Override
             public boolean matches(Entry entry) {
                 return entry.getTitle().equals("hello world");

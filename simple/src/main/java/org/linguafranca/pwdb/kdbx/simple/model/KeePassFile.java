@@ -17,7 +17,6 @@
 package org.linguafranca.pwdb.kdbx.simple.model;
 
 import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import org.linguafranca.pwdb.kdbx.simple.SimpleGroup;
 import org.linguafranca.pwdb.kdbx.simple.converter.Base64ByteArrayConverter;
 import org.linguafranca.pwdb.kdbx.simple.converter.KeePassBooleanConverter;
@@ -25,7 +24,6 @@ import org.linguafranca.pwdb.kdbx.simple.converter.TimeConverter;
 import org.linguafranca.pwdb.kdbx.simple.converter.UuidConverter;
 import org.simpleframework.xml.*;
 import org.simpleframework.xml.convert.Convert;
-import org.simpleframework.xml.util.Dictionary;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,8 +49,8 @@ public class KeePassFile {
     public static class Root {
         @Element(name = "Group")
         public SimpleGroup group;
-        @ElementList(name = "DeletedObjects", required = false, type=ArrayList.class)
-        protected ArrayList<KeePassFile.Binaries.Binary> deletedObjects;
+        @ElementList(name = "DeletedObjects", required = false)
+        protected ArrayList<DeletedObject> deletedObjects;
 
         public SimpleGroup getGroup() {
             return group;
@@ -94,7 +92,7 @@ public class KeePassFile {
         protected int masterKeyChangeForce;
         @Element(name = "MemoryProtection")
         public KeePassFile.MemoryProtection memoryProtection;
-        @ElementList(name = "CustomIcons")
+        @ElementList(name = "CustomIcons", required = false)
         protected ArrayList<Icon> customIcons;
         @Element(name = "RecycleBinEnabled", type = Boolean.class)
         @Convert(KeePassBooleanConverter.class)
@@ -239,5 +237,15 @@ public class KeePassFile {
 
     public static class CustomData {
         protected List<Object> any;
+    }
+
+    @org.simpleframework.xml.Root(name = "DeletedObject")
+    public static class DeletedObject {
+        @Element(name = "UUID", type = UUID.class)
+        @Convert(UuidConverter.class)
+        protected UUID uuid;
+        @Element(name = "DeletionTime", type = Date.class)
+        @Convert(TimeConverter.class)
+        protected Date deletionTime;
     }
 }

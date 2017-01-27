@@ -16,7 +16,6 @@
 
 package org.linguafranca.pwdb.kdbx.simple.model;
 
-import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.simple.SimpleEntry;
 import org.linguafranca.pwdb.kdbx.simple.converter.KeePassBooleanConverter;
 import org.simpleframework.xml.Attribute;
@@ -30,6 +29,7 @@ import java.util.List;
 /**
  * @author jo
  */
+@SuppressWarnings("unused")
 public abstract class EntryClasses {
     public static StringProperty getStringProperty(String name, List<StringProperty> string) {
         for (StringProperty property : string) {
@@ -74,7 +74,6 @@ public abstract class EntryClasses {
             protected String window;
             @Element(name="KeystrokeSequence")
             protected String keystrokeSequence;
-            @SuppressWarnings("unused")
             protected List<Object> windowAndKeystrokeSequence;
         }
     }
@@ -91,10 +90,10 @@ public abstract class EntryClasses {
         }
 
         @Element(name="Key")
-        protected String key;
+        String key;
 
         @Element(name="Value")
-        protected Value value;
+        Value value;
 
         @Override
         public String getName() {
@@ -126,12 +125,14 @@ public abstract class EntryClasses {
 
             @Attribute(name = "ProtectInMemory", required = false)
             @Convert(KeePassBooleanConverter.class)
+            // NB converters don't work on attributes -see KdbxOutputTransformer
             protected Boolean protectInMemory;
             @Attribute(name = "Protected", required = false)
             @Convert(KeePassBooleanConverter.class)
-            protected Boolean _protected;
+            // NB converters don't work on attributes -see KdbxOutputTransformer
+            Boolean _protected;
             @Text
-            protected String text;
+            String text;
 
             public void setProtected(boolean aProtected) {
                 this._protected = aProtected;
@@ -143,10 +144,10 @@ public abstract class EntryClasses {
     public static class BinaryProperty implements org.simpleframework.xml.util.Entry {
 
         @Element(name="Key")
-        protected String key;
+        String key;
 
         @Element(name="Value")
-        protected Value value;
+        Value value;
 
         public String getKey() {
             return key;
@@ -168,7 +169,7 @@ public abstract class EntryClasses {
         @Root(name="Value")
         public static class Value {
             @Attribute(name="Ref")
-            protected String ref;
+            String ref;
 
             public void setRef(String ref) {
                 this.ref = ref;

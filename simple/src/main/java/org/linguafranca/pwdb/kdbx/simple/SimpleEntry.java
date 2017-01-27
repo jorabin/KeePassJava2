@@ -40,7 +40,7 @@ import static org.linguafranca.pwdb.kdbx.simple.model.EntryClasses.*;
  *
  * @author jo
  */
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings({"WeakerAccess", "unused"})
 @Root(name="Entry")
 public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, SimpleEntry, SimpleIcon> {
     @Element(name = "UUID", type=UUID.class)

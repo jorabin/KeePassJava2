@@ -16,9 +16,13 @@
 
 package org.linguafranca.pwdb.kdb;
 
+import com.google.common.io.ByteStreams;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.security.Encryption;
+import org.spongycastle.util.encoders.Hex;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.MessageDigest;
 
 /**
@@ -31,8 +35,9 @@ public interface KdbCredentials extends Credentials {
     /**
      * Password only credentials
      */
-    public static class Password implements KdbCredentials {
-        private byte [] key;
+    class Password implements KdbCredentials {
+
+        private final byte [] key;
 
         public Password(byte[] password) {
             MessageDigest md = Encryption.getMessageDigestInstance();
@@ -43,5 +48,35 @@ public interface KdbCredentials extends Credentials {
         public byte[] getKey() {
             return key;
         }
+    }
+
+    /**
+     * Key file credentials
+     */
+    class KeyFile implements KdbCredentials {
+
+        private final byte[] key;
+
+        public KeyFile(byte[] password, InputStream inputStream) {
+            MessageDigest md = Encryption.getMessageDigestInstance();
+            byte[] pwKey = md.digest(password);
+            md.update(pwKey);
+
+            try {
+                byte [] keyFileData = ByteStreams.toByteArray(inputStream);
+                if (keyFileData.length == 64) {
+                    keyFileData = Hex.decode(keyFileData);
+                }
+                key = md.digest(keyFileData);
+            } catch (IOException e) {
+                throw new IllegalStateException("Could not read key file", e);
+            }
+        }
+
+        @Override
+        public byte[] getKey() {
+            return this.key;
+        }
+
     }
 }

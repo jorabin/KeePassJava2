@@ -27,26 +27,27 @@ import java.util.Date;
 /**
  * @author jo
  */
+@SuppressWarnings({"unused", "WeakerAccess"})
 @Root
 public class Times {
-    @Element(name = "LastModificationTime", required = true, type = Date.class)
+    @Element(name = "LastModificationTime", type = Date.class)
     @Convert(TimeConverter.class)
     protected Date lastModificationTime;
-    @Element(name = "CreationTime", required = true, type = Date.class)
+    @Element(name = "CreationTime", type = Date.class)
     @Convert(TimeConverter.class)
     protected Date creationTime;
-    @Element(name = "LastAccessTime", required = true, type = Date.class)
+    @Element(name = "LastAccessTime", type = Date.class)
     @Convert(TimeConverter.class)
     protected Date lastAccessTime;
-    @Element(name = "ExpiryTime", required = true, type = Date.class)
+    @Element(name = "ExpiryTime", type = Date.class)
     @Convert(TimeConverter.class)
     protected Date expiryTime;
-    @Element(name = "Expires", required = true, type = Boolean.class)
+    @Element(name = "Expires", type = Boolean.class)
     @Convert(KeePassBooleanConverter.class)
     protected Boolean expires;
     @Element(name = "UsageCount")
     protected int usageCount;
-    @Element(name = "LocationChanged", required = true, type = Date.class)
+    @Element(name = "LocationChanged", type = Date.class)
     @Convert(TimeConverter.class)
     protected Date locationChanged;
 

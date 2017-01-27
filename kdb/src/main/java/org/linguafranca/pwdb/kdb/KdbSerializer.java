@@ -212,7 +212,7 @@ public class KdbSerializer {
                     group.setFlags(readInt(dataInput));
                     break;
                 default:
-                    throw new IllegalStateException("Unknown field type");
+                    throw new IllegalStateException("Unknown field type " + String.valueOf(fieldType));
             }
         }
         dataInput.readInt();

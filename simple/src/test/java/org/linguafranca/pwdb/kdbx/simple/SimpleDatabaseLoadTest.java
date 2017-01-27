@@ -46,4 +46,11 @@ public class SimpleDatabaseLoadTest {
         System.out.println(database.getDescription());
     }
 
+    @Test
+    public void dbWithDeleted() throws Exception {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("testDeleted.kdbx");
+        SimpleDatabase database = SimpleDatabase.load(new KdbxCreds("123".getBytes()), inputStream);
+        database.visit(new Visitor.Print());
+    }
+
 }
