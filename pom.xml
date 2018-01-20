@@ -34,7 +34,7 @@
     </modules>
     <packaging>pom</packaging>
 
-    <name>KeepassJava2</name>
+    <name>KeePassJava2</name>
     <description>A Java 7 API for databases compatible with the renowned KeePass password safe for Windows</description>
     <url>https://github.com/jorabin/KeePassJava2</url>
 

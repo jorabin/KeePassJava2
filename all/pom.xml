@@ -25,7 +25,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>KeePassJava2</artifactId>
-    <name>KeepassJava2 :: All</name>
+    <name>KeePassJava2 :: All</name>
     <description>KDB Database support as well as KDBX 3.1: DOM, JAXB and Simple implementations.</description>
 
     <dependencies>
