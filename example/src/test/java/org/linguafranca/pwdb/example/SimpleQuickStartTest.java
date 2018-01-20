@@ -60,7 +60,7 @@ public class SimpleQuickStartTest extends QuickStart<SimpleDatabase, SimpleGroup
         super.loadKdbx();
     }
 
-    @Test @Ignore
+    @Test
     public void loadKdbSaveVernacular() throws IOException {
         super.loadKdb();
     }
