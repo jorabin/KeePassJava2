@@ -17,8 +17,8 @@
 package org.linguafranca.pwdb.kdbx.simple;
 
 import org.linguafranca.pwdb.base.AbstractDatabase;
-import org.linguafranca.pwdb.kdbx.KdbxInputTransformer;
-import org.linguafranca.pwdb.kdbx.KdbxOutputTransformer;
+import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxInputTransformer;
+import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxOutputTransformer;
 import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxSerializer;
 import org.linguafranca.pwdb.kdbx.stream_3_1.Salsa20StreamEncryptor;
