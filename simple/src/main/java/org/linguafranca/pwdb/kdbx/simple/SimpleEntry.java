@@ -224,6 +224,22 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
         return times.getExpiryTime();
     }
 
+    /**
+     * Sets the expiration time for this Entry.
+     * If <i>expiryTime</i> is null, this Entry is set to not expire.
+     */
+    @Override
+    public void setExpires(Date expiryTime) {
+        if (expiryTime == null) {
+            times.setExpires(false);
+        } else {
+            times.setExpires(true);
+            times.setExpiryTime(expiryTime);
+        }
+
+        touch();
+    }
+
     @Override
     public Date getLastModificationTime() {
         return times.getLastModificationTime();

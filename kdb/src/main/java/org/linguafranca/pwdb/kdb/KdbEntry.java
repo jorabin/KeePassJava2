@@ -182,6 +182,11 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
         return expiryTime;
     }
 
+    @Override
+    public void setExpires(Date expiryTime) {
+        setExpiryTime(expiryTime);
+    }
+
     public String getBinaryDescription() {
         return binaryDescription;
     }

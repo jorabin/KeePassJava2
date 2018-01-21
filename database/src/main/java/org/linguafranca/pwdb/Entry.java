@@ -299,5 +299,10 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
 
     Date getExpiryTime();
 
+    /**
+     * Sets the expiration time for this Entry.
+     */
+    void setExpires(Date expiryTime);
+
     Date getLastModificationTime();
 }
