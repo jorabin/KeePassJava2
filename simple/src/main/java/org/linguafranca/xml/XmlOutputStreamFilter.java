@@ -42,36 +42,40 @@ import java.util.concurrent.Future;
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class XmlOutputStreamFilter extends PipedOutputStream {
 
-    Future<Boolean> future;
+    protected Future<Boolean> future;
+    protected PipedInputStream pipedInputStream;
 
     public XmlOutputStreamFilter(final OutputStream outputStream, final XmlEventTransformer eventTransformer) throws IOException {
 
+        super();
+        pipedInputStream = new PipedInputStream(this);
+
         Callable<Boolean> output = new Callable<Boolean>() {
             public Boolean call() {
-                    try {
-                        XMLEventReader eventReader = new com.fasterxml.aalto.stax.InputFactoryImpl()
-                                .createXMLEventReader(new PipedInputStream(XmlOutputStreamFilter.this));
-                        XMLEventWriter eventWriter = new com.fasterxml.aalto.stax.OutputFactoryImpl()
-                                .createXMLEventWriter(outputStream);
+                try {
+                    XMLEventReader eventReader = new com.fasterxml.aalto.stax.InputFactoryImpl()
+                            .createXMLEventReader(pipedInputStream);
+                    XMLEventWriter eventWriter = new com.fasterxml.aalto.stax.OutputFactoryImpl()
+                            .createXMLEventWriter(outputStream);
 
-                        XMLEvent event = null;
-                        while (eventReader.hasNext()) {
-                            event = eventReader.nextEvent();
-                            event = eventTransformer.transform(event);
-                            eventWriter.add(event);
-                            eventWriter.flush();
-                        }
-
-                        eventReader.close();
+                    XMLEvent event = null;
+                    while (eventReader.hasNext()) {
+                        event = eventReader.nextEvent();
+                        event = eventTransformer.transform(event);
+                        eventWriter.add(event);
                         eventWriter.flush();
-                        eventWriter.close();
-                        outputStream.flush();
-                        outputStream.close();
-                    } catch (XMLStreamException | IOException e) {
-                        throw new IllegalStateException(e);
                     }
-                    return true;
-             }
+
+                    eventReader.close();
+                    eventWriter.flush();
+                    eventWriter.close();
+                    outputStream.flush();
+                    outputStream.close();
+                } catch (XMLStreamException | IOException e) {
+                    throw new IllegalStateException(e);
+                }
+                return true;
+            }
         };
         future = Executors.newSingleThreadExecutor().submit(output);
     }
