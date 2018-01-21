@@ -19,18 +19,15 @@ package org.linguafranca.pwdb.kdbx;
 import com.google.common.io.ByteStreams;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import org.linguafranca.pwdb.kdbx.simple.SimpleEntry;
-import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxOutputTransformer;
 import org.linguafranca.xml.XmlEventTransformer;
 import org.linguafranca.xml.XmlInputStreamFilter;
 import org.linguafranca.xml.XmlOutputStreamFilter;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.*;
-import java.security.SecureRandom;
 
 import static org.junit.Assert.assertEquals;
 

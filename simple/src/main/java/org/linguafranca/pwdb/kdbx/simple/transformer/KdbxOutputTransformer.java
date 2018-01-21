@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx;
+package org.linguafranca.pwdb.kdbx.simple.transformer;
 
+import org.linguafranca.pwdb.kdbx.Helpers;
+import org.linguafranca.pwdb.kdbx.StreamEncryptor;
 import org.linguafranca.xml.XmlEventTransformer;
 
 import javax.xml.namespace.QName;
@@ -31,6 +33,8 @@ import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
 import static javax.xml.stream.XMLStreamConstants.START_ELEMENT;
 
 /**
+ * Transform protected elements on output
+ *
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")

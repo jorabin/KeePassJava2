@@ -2,12 +2,24 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-##[2.1.2-SNAPSHOT]
+##[2.1.3]
+
+### Fixed
+
+- Travis test failures relating to update to Openjdk 7 and a bug in Simple serialization
 
 ### Added
 
-An experimental implementation of [keepasshttp](https://github.com/pfn/keepasshttp/) see
-[thereadme](http/readme.md) for warnings, limitations, etc. about this.
+- Various functionality for searching databases
+- Recycle bin functionality
+- An experimental implementation of [keepasshttp](https://github.com/pfn/keepasshttp/) see
+[the readme](http/readme.md) for warnings, limitations, etc. about this.
+
+##[2.1.2] 2018-01-20
+
+### Fixed
+
+- [Issue #16] Fix for split package
 
 ##[2.1.1] 2017-01-27
 

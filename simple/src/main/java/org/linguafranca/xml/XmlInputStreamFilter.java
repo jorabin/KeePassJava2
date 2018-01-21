@@ -27,7 +27,7 @@ import java.io.InputStream;
 
 
 /**
- * A filter to accept a stream, interpret as XML, allow transformation
+ * A input stream filter to accept a stream, interpret as XML, allow transformation
  * as XML then forward as a stream.
  *
  * <p>Although this means that the interpretation of the XML will happen
@@ -47,7 +47,7 @@ public class XmlInputStreamFilter extends InputStream {
     private boolean done = false;
 
 
-    private InputStream inputStream;
+    private InputStream inputStream; // the underlying input stream to read from
     private XmlEventTransformer eventTransformer;
 
     public XmlInputStreamFilter(InputStream is, XmlEventTransformer transformer) throws XMLStreamException {
@@ -76,6 +76,7 @@ public class XmlInputStreamFilter extends InputStream {
         }
         int totalBytesRead = 0;
         int bytesRead;
+        // read bytes from the transformed inputstream
         while ((bytesRead = xmlInStream.read(b, offset, length)) < length && !done) {
             if (bytesRead == -1) {
                 try {
@@ -102,12 +103,17 @@ public class XmlInputStreamFilter extends InputStream {
             done = true;
             return;
         }
-
+        // get the next xml input event
         XMLEvent event = xmlEventReader.nextEvent();
+        // transform it
         event = eventTransformer.transform(event);
+        // reset ouput buffer
         xmlWriteStream.reset();
+        // write event to buffer
         xmlEventWriter.add(event);
+        // flush the written bytes
         xmlEventWriter.flush();
+        // create an input stream from the bytes created
         xmlInStream = new ByteArrayInputStream(xmlWriteStream.toByteArray());
     }
 

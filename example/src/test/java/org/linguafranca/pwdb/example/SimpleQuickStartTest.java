@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.example;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.QuickStart;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;

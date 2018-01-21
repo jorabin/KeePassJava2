@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx;
 
 import org.junit.Test;
+import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxInputTransformer;
 import org.linguafranca.xml.XmlInputStreamFilter;
 
 import javax.xml.stream.XMLStreamException;
