@@ -189,6 +189,24 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
         }
     }
 
+    /**
+     * Sets the expiration time for this Entry.
+     * If <i>expiryTime</i> is null, this Entry is set to not expire.
+     */
+    @Override
+    public void setExpires(Date expiryTime) {
+        if (expiryTime == null) {
+            DomHelper.getElement(DomHelper.EXPIRES_ELEMENT_NAME, element, false).setTextContent("False");
+        } else {
+            DomHelper.getElement(DomHelper.EXPIRES_ELEMENT_NAME, element, false).setTextContent("True");
+            String formattedDate = DomHelper.dateFormatter.format(expiryTime);
+            DomHelper.getElement(DomHelper.EXPIRY_TIME_ELEMENT_NAME, element, false).setTextContent(formattedDate);
+        }
+
+        DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element);
+        database.setDirty(true);
+    }
+
     @Override
     public Date getLastModificationTime() {
         try {

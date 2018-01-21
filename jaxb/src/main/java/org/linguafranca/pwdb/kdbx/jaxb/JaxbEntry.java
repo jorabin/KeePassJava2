@@ -224,6 +224,22 @@ public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry,
         return delegate.getTimes().getExpiryTime();
     }
 
+    /**
+     * Sets the expiration time for this Entry.
+     * If <i>expiryTime</i> is null, this Entry is set to not expire.
+     */
+    @Override
+    public void setExpires(Date expiryTime) {
+        if (expiryTime == null) {
+            delegate.getTimes().setExpires(false);
+        } else {
+            delegate.getTimes().setExpires(true);
+            delegate.getTimes().setExpiryTime(expiryTime);
+        }
+
+        touch();
+    }
+
     @Override
     public Date getLastModificationTime() {
         return delegate.getTimes().getLastModificationTime();
