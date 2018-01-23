@@ -1,5 +1,6 @@
 # KeePassJava2
 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2) 
 Master: [![Build Status](https://travis-ci.org/jorabin/KeePassJava2.svg?branch=master)](https://travis-ci.org/jorabin/KeePassJava2) Develop: [![Build Status](https://travis-ci.org/jorabin/KeePassJava2.svg?branch=develop)](https://travis-ci.org/jorabin/KeePassJava2)
 
 A Java 7 API for databases compatible with the renowned [KeePass](http://keepass.info) password
