@@ -297,7 +297,15 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
 
     boolean getExpires();
 
+    void setExpires(boolean expires);
+
     Date getExpiryTime();
+
+    /**
+     * Sets the expiration date of this element. See {@link org.linguafranca.pwdb.Entry#setExpires(boolean)}
+     * @throws IllegalArgumentException if expiryTime is null.
+     */
+    void setExpiryTime(Date expiryTime) throws IllegalArgumentException;
 
     Date getLastModificationTime();
 }

@@ -43,6 +43,7 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     private Date creationTime = new Date();
     private Date lastModificationTime = new Date();
     private Date lastAccessTime = new Date(Long.MIN_VALUE);
+    private boolean expires = false;
     private Date expiryTime = new Date(Long.MAX_VALUE);
     private String binaryDescription = "";
     private byte[] binaryData = new byte[0];
@@ -174,7 +175,8 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
         return lastAccessTime;
     }
 
-    void setExpiryTime(Date expiryTime) {
+    public void setExpiryTime(Date expiryTime) {
+        if (expiryTime == null) throw new IllegalArgumentException("expiryTime may not be null");
         this.expiryTime = expiryTime;
     }
 
@@ -224,8 +226,13 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     }
 
     @Override
+    public void setExpires(boolean expires) {
+        this.expires = expires;
+    }
+
+    @Override
     public boolean getExpires() {
-        return false;
+        return expires;
     }
 
     @Override
