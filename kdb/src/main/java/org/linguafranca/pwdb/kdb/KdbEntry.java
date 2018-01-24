@@ -72,6 +72,16 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     }
 
     @Override
+    public boolean removePropery(String name) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Cannot remove non-standard properties in KDB format");
+    }
+
+    @Override
+    public boolean removeBinaryProperty(String name) throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Cannot remove binary properties in KDB format");
+    }
+
+    @Override
     public List<String> getPropertyNames() {
         return new ArrayList<>(Entry.STANDARD_PROPERTY_NAMES);
     }

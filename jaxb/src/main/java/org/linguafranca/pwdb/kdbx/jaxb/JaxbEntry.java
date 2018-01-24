@@ -104,6 +104,26 @@ public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry,
     }
 
     @Override
+    public boolean removePropery(String name) throws IllegalArgumentException {
+        if (STANDARD_PROPERTY_NAMES.contains(name)) throw new IllegalArgumentException("may not remove property: " + name);
+
+        StringField toRemove = null;
+        for (StringField field: delegate.getString()){
+            if (field.getKey().equals(name)) {
+                toRemove = field;
+                break;
+            }
+        }
+        if (toRemove == null) {
+            return false;
+        } else {
+            delegate.getString().remove(toRemove);
+            touch();
+            return true;
+        }
+    }
+
+    @Override
     public List<String> getPropertyNames() {
         List<String> result = new ArrayList<>();
         for (StringField stringField : delegate.getString()) {
@@ -169,6 +189,25 @@ public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry,
         binaryField.setValue(fieldValue);
         delegate.getBinary().add(binaryField);
         touch();
+    }
+
+    @Override
+    public boolean removeBinaryProperty(String name) throws UnsupportedOperationException {
+        BinaryField toRemove = null;
+        for (BinaryField binaryField : delegate.getBinary()) {
+            if (binaryField.getKey().equals(name)) {
+                toRemove = binaryField;
+                break;
+            }
+        }
+
+        if (toRemove == null) {
+            return false;
+        } else {
+            delegate.getBinary().remove(toRemove);
+            touch();
+            return true;
+        }
     }
 
     @Override

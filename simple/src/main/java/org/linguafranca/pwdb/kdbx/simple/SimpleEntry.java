@@ -114,6 +114,20 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
     }
 
     @Override
+    public boolean removePropery(String name) throws IllegalArgumentException {
+        if (STANDARD_PROPERTY_NAMES.contains(name)) throw new IllegalArgumentException("may not remove property: " + name);
+
+        EntryClasses.StringProperty sp = getStringProperty(name, string);
+        if (sp == null) {
+            return false;
+        } else {
+            this.string.remove(sp);
+            touch();
+            return true;
+        }
+    }
+
+    @Override
     public List<String> getPropertyNames() {
         List<String> result = new ArrayList<>();
         for (EntryClasses.StringProperty property: this.string) {
@@ -173,6 +187,18 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
         binaryProperty.setValue(fieldValue);
         binary.add(binaryProperty);
         touch();
+    }
+
+    @Override
+    public boolean removeBinaryProperty(String name) throws UnsupportedOperationException {
+        BinaryProperty bp = getBinaryProp(name, binary);
+        if (bp == null) {
+            return true;
+        } else {
+            binary.remove(bp);
+            touch();
+            return true;
+        }
     }
 
     @Override
