@@ -120,6 +120,16 @@ class DomHelper {
         }
     }
 
+    static boolean removeElement(String elementPath, Element parentElement) {
+        Element toRemove = getElement(elementPath, parentElement, false);
+        if (toRemove == null) {
+            return false;
+        } else {
+            toRemove.getParentNode().removeChild(toRemove);
+            return true;
+        }
+    }
+
     static List<Element> getElements (String elementPath, Element parentElement) {
         try {
             NodeList nodes = (NodeList) xpath.evaluate(elementPath, parentElement, XPathConstants.NODESET);
@@ -142,6 +152,7 @@ class DomHelper {
         }
     }
 
+    @Nullable
     static Element newElement(String elementName, Element parentElement) {
         Element newElement = parentElement.getOwnerDocument().createElement(elementName);
         parentElement.appendChild(newElement);
@@ -213,7 +224,6 @@ class DomHelper {
             throw new IllegalStateException(e);
         }
     }
-
 
     @NotNull
     static Element touchElement(String elementPath, Element parentElement) {

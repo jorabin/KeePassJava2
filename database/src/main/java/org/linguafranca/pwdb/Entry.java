@@ -114,6 +114,16 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
     void setProperty(String name, String value);
 
     /**
+     * Removes this non-standard  property, if it exists.
+     *
+     * @return true if the property exists and was removed, false otherwise
+     * @param name the value of the property to remove
+     * @throws UnsupportedOperationException if non-standard properties are not supported
+     * @throws IllegalArgumentException if <i>name</i> is a standard property
+     */
+    boolean removePropery(String name) throws IllegalArgumentException, UnsupportedOperationException;
+
+    /**
      * Returns a list of property names known to the entry.
      *
      * <p>All implementations of Entry are required to support reading and writing of
@@ -142,6 +152,15 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * @throws UnsupportedOperationException if binary properties are not supported.
      */
     void setBinaryProperty(String name, byte[] value);
+
+    /**
+     * Removes this binary property, if it exists.
+     *
+     * @return true if the property was removed, false otherwise
+     * @param name the value of the property to remove
+     * @throws UnsupportedOperationException if non-standard properties are not supported
+     */
+    boolean removeBinaryProperty(String name) throws UnsupportedOperationException;
 
     /**
      * Returns a list of binary property names known to the entry.
