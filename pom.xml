@@ -76,6 +76,7 @@
         <maven-javadoc-plugin.version>2.10.3</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <maven-release-plugin.version>2.5</maven-release-plugin.version>
+        <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
 
         <guava.version>19.0</guava.version>
         <commons-codec.version>1.10</commons-codec.version>
