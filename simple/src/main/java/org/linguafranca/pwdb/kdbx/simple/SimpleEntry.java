@@ -220,8 +220,19 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
     }
 
     @Override
+    public void setExpires(boolean expires) {
+        times.setExpires(expires);
+    }
+
+    @Override
     public Date getExpiryTime() {
         return times.getExpiryTime();
+    }
+
+    @Override
+    public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
+        if (expiryTime == null) throw new IllegalArgumentException("expiryTime may not be null");
+        times.setExpiryTime(expiryTime);
     }
 
     @Override

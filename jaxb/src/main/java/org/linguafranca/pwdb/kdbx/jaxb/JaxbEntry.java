@@ -220,8 +220,19 @@ public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry,
     }
 
     @Override
+    public void setExpires(boolean expires) {
+        delegate.getTimes().setExpires(true);
+    }
+
+    @Override
     public Date getExpiryTime() {
         return delegate.getTimes().getExpiryTime();
+    }
+
+    @Override
+    public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
+        if (expiryTime == null) throw new IllegalArgumentException("expiryTime may not be null");
+        delegate.getTimes().setExpiryTime(expiryTime);
     }
 
     @Override

@@ -181,12 +181,24 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
     }
 
     @Override
+    public void setExpires(boolean expires) {
+        DomHelper.setElementContent(DomHelper.EXPIRES_ELEMENT_NAME, element, expires ? "True" : "False");
+    }
+
+    @Override
     public Date getExpiryTime() {
         try {
             return DomHelper.dateFormatter.parse(DomHelper.getElementContent(DomHelper.EXPIRY_TIME_ELEMENT_NAME, element));
         } catch (ParseException e) {
             return new Date(0);
         }
+    }
+
+    @Override
+    public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
+        if (expiryTime == null) throw new IllegalArgumentException("expiryTime may not be null");
+        String formatted = DomHelper.dateFormatter.format(expiryTime);
+        DomHelper.setElementContent(DomHelper.EXPIRY_TIME_ELEMENT_NAME, element, formatted);
     }
 
     @Override
