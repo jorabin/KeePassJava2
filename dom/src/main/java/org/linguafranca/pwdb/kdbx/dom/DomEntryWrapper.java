@@ -81,7 +81,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
     }
 
     @Override
-    public boolean removePropery(String name) throws IllegalArgumentException {
+    public boolean removeProperty(String name) throws IllegalArgumentException {
         if (STANDARD_PROPERTY_NAMES.contains(name)) throw new IllegalArgumentException("may not remove property: " + name);
         boolean wasRemoved = DomHelper.removeElement(String.format(DomHelper.PROPERTY_ELEMENT_FORMAT, name), element);
         if (wasRemoved) database.setDirty(true);

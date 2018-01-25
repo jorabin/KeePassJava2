@@ -17,7 +17,7 @@
 package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.checks.EntryChecks;
+import org.linguafranca.pwdb.checks.BinaryPropertyChecks;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.Credentials;
 
@@ -28,7 +28,7 @@ import java.io.OutputStream;
 /**
  * @author jo
  */
-public class JaxbEntryTest extends EntryChecks {
+public class JaxbEntryTest extends BinaryPropertyChecks {
 
     public JaxbEntryTest() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");

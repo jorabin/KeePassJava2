@@ -177,4 +177,6 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
         DomHelper.touchElement("DatabaseDescriptionChanged", dbMeta);
         setDirty(true);
     }
+
+
 }

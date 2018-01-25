@@ -16,6 +16,8 @@
 
 package org.linguafranca.pwdb;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 
 /**
@@ -98,6 +100,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * {@link #STANDARD_PROPERTY_NAMES}.
      * @param name the name of the property to get
      * @return a value or null if the property is not known, or if setting of arbitrary properties is not supported
+     * @see Database#supportsNonStandardPropertyNames()
      */
     String getProperty(String name);
 
@@ -109,7 +112,8 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * @param name the name of the property to set
      * @param value the value to set it to
      * @throws UnsupportedOperationException if the name is not one of the standard properties and
-     * non-standard properties are not supported.
+     * non-standard properties are not supported
+     * @see Database#supportsNonStandardPropertyNames()
      */
     void setProperty(String name, String value);
 
@@ -120,8 +124,9 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * @param name the value of the property to remove
      * @throws UnsupportedOperationException if non-standard properties are not supported
      * @throws IllegalArgumentException if <i>name</i> is a standard property
+     * @see Database#supportsNonStandardPropertyNames()
      */
-    boolean removePropery(String name) throws IllegalArgumentException, UnsupportedOperationException;
+    boolean removeProperty(String name) throws IllegalArgumentException, UnsupportedOperationException;
 
     /**
      * Returns a list of property names known to the entry.
@@ -139,6 +144,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      *
      * @param name the name of the property to get
      * @return a value or null if the property is not known, or if setting of arbitrary properties is not supported
+     * @see Database#supportsBinaryProperties
      */
     byte[] getBinaryProperty(String name);
 
@@ -149,7 +155,8 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      *
      * @param name the name of the property to set
      * @param value the value to set it to
-     * @throws UnsupportedOperationException if binary properties are not supported.
+     * @throws UnsupportedOperationException if binary properties are not supported
+     * @see Database#supportsBinaryProperties()
      */
     void setBinaryProperty(String name, byte[] value);
 
@@ -158,7 +165,8 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      *
      * @return true if the property was removed, false otherwise
      * @param name the value of the property to remove
-     * @throws UnsupportedOperationException if non-standard properties are not supported
+     * @throws UnsupportedOperationException if binary properties are not supported
+     * @see Database#supportsBinaryProperties()
      */
     boolean removeBinaryProperty(String name) throws UnsupportedOperationException;
 
@@ -168,7 +176,8 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * <p>All implementations of Entry are required to support reading and writing of
      * {@link #STANDARD_PROPERTY_NAMES}.
      * @return a list that is modifiable by the caller without affecting the Entry.
-     * @throws UnsupportedOperationException if binary properties are not supported.
+     * @throws UnsupportedOperationException if binary properties are not supported
+     * @see Database#supportsBinaryProperties()
      */
     List<String> getBinaryPropertyNames();
 
@@ -176,7 +185,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * Get the parent of this entry
      * @return a parent
      */
-    G getParent();
+    @NotNull G getParent();
 
     /**
      * Get the UUID of this entry. Databases (like KDB) that do not natively support
@@ -184,7 +193,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      *
      * @return a UUID
      */
-    UUID getUuid();
+    @NotNull UUID getUuid();
 
     /**
      * Get the username field of this entry
@@ -310,21 +319,46 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      */
     void setIcon(I icon);
 
+    /**
+     * Returns the date at which any value was retrieved from this entry.
+     * <p>
+     * Implementations SHOULD set this to the creation date or earlier if the entry has never been used.
+     */
     Date getLastAccessTime();
 
+    /**
+     * Returns the date at which this entry was created
+     */
     Date getCreationTime();
 
+    /**
+     * Returns true if this entry is to be considered as expired at some point
+     */
     boolean getExpires();
 
+    /**
+     * Set true for the date returned by {@link #getExpiryTime()} to be considered an expiry time
+     * @see #setExpiryTime(Date)
+     */
     void setExpires(boolean expires);
 
+    /**
+     * Returns a date at which the entry should be considered to have expired, if {@link #getExpires()} is true -
+     * otherwise returns an arbitrary date.
+     */
     Date getExpiryTime();
 
     /**
-     * Sets the expiration date of this element. See {@link org.linguafranca.pwdb.Entry#setExpires(boolean)}
+     * Sets the expiry date of this element.
      * @throws IllegalArgumentException if expiryTime is null.
+     * @see  org.linguafranca.pwdb.Entry#setExpires(boolean)
      */
     void setExpiryTime(Date expiryTime) throws IllegalArgumentException;
 
+    /**
+     * Returns the date that the entry was last modified
+     * <p>
+     *     Implementations SHOULD set this to the creation date or earlier if the entry has never been used.
+     */
     Date getLastModificationTime();
 }

@@ -157,4 +157,19 @@ public class KdbDatabase extends AbstractDatabase<KdbDatabase, KdbGroup, KdbEntr
     public KdbGroup getRecycleBin() {
         return null;
     }
+
+    @Override
+    public boolean supportsNonStandardPropertyNames() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsBinaryProperties() {
+        return false;
+    }
+
+    @Override
+    public boolean supportsRecycleBin() {
+        return false;
+    }
 }

@@ -40,9 +40,9 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     private KdbIcon icon = new KdbIcon(0);
     private String username = "";
     private String password = "";
-    private Date creationTime = new Date();
-    private Date lastModificationTime = new Date();
-    private Date lastAccessTime = new Date(Long.MIN_VALUE);
+    private Date creationTime = new Date((System.currentTimeMillis()/1000L)*1000L); // to the next lower second
+    private Date lastModificationTime = creationTime;
+    private Date lastAccessTime = creationTime;
     private boolean expires = false;
     private Date expiryTime = new Date(Long.MAX_VALUE);
     private String binaryDescription = "";
@@ -73,7 +73,7 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     }
 
     @Override
-    public boolean removePropery(String name) throws UnsupportedOperationException {
+    public boolean removeProperty(String name) throws UnsupportedOperationException {
         throw new UnsupportedOperationException("Cannot remove non-standard properties in KDB format");
     }
 

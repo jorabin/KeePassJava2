@@ -16,7 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
-import org.linguafranca.pwdb.checks.EntryChecks;
+import org.linguafranca.pwdb.checks.BinaryPropertyChecks;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.Credentials;
@@ -28,7 +28,7 @@ import java.io.OutputStream;
 /**
  * @author jo
  */
-public class DomEntryWrapperTest extends EntryChecks {
+public class DomEntryWrapperTest extends BinaryPropertyChecks {
 
     public DomEntryWrapperTest () throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");

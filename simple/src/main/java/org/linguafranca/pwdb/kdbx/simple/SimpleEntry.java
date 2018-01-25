@@ -78,7 +78,7 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
     protected SimpleEntry() {
         string = new ArrayList<>();
         binary = new ArrayList<>();
-        times = new Times(new Date());
+        times = new Times();
         uuid = UUID.randomUUID();
         iconID = 0;
     }
@@ -92,8 +92,9 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
         SimpleEntry result = new SimpleEntry();
         result.database = database;
         result.parent = null;
+        // avoiding setProperty as it does a touch();
         for (String p: STANDARD_PROPERTY_NAMES) {
-            result.setProperty(p, "");
+            result.string.add(new EntryClasses.StringProperty(p, new EntryClasses.StringProperty.Value("")));
         }
         return result;
     }
@@ -114,7 +115,7 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
     }
 
     @Override
-    public boolean removePropery(String name) throws IllegalArgumentException {
+    public boolean removeProperty(String name) throws IllegalArgumentException {
         if (STANDARD_PROPERTY_NAMES.contains(name)) throw new IllegalArgumentException("may not remove property: " + name);
 
         EntryClasses.StringProperty sp = getStringProperty(name, string);
@@ -192,13 +193,12 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
     @Override
     public boolean removeBinaryProperty(String name) throws UnsupportedOperationException {
         BinaryProperty bp = getBinaryProp(name, binary);
-        if (bp == null) {
-            return true;
-        } else {
+        if (bp != null) {
             binary.remove(bp);
             touch();
             return true;
         }
+        return false;
     }
 
     @Override

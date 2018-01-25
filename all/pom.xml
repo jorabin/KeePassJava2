@@ -22,6 +22,7 @@
         <version>2.1.4-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>KeePassJava2</artifactId>

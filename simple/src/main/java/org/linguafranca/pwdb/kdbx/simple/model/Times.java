@@ -108,7 +108,7 @@ public class Times {
     }
 
     public Times() {
-        this(new Date());
+        this(new Date(System.currentTimeMillis()/1000*1000));
     }
     public Times(Date date) {
         lastModificationTime = date;

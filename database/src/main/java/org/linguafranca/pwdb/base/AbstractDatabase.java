@@ -217,4 +217,19 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
             recycle.removeEntry(e);
         }
     }
+
+    @Override
+    public boolean supportsNonStandardPropertyNames() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsBinaryProperties() {
+        return true;
+    }
+
+    @Override
+    public boolean supportsRecycleBin() {
+        return true;
+    }
 }

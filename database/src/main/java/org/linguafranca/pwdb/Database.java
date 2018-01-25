@@ -16,7 +16,7 @@
 
 package org.linguafranca.pwdb;
 
-import org.linguafranca.pwdb.Credentials;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -118,7 +118,7 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
      * @param uuid the UUID
      * @return an entry or null if not found
      */
-    E findEntry(UUID uuid);
+    @Nullable E findEntry(UUID uuid);
 
     /**
      * Delete an entry with this UUID from anywhere in the database except the recycle bin
@@ -133,7 +133,7 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
      * @param uuid the UUID
      * @return a group or null if not found
      */
-    G findGroup(UUID uuid);
+    @Nullable G findGroup(UUID uuid);
 
     /**
      * Delete a group with this UUID from anywhere in the database except the recycle bin
@@ -145,13 +145,14 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
 
     /**
      * if a database has a recycle bin then it is enabled by default
-     * @return true if the recycle bin is enabled
+     * @return true if the recycle bin is enabled - false if it is not or is not supported
      */
     boolean isRecycleBinEnabled();
 
-
     /**
      * change the recycle bin state
+     * @throws UnsupportedOperationException if recycle bin functions are not supported
+     * @see #supportsRecycleBin()
      */
     void enableRecycleBin(boolean enable);
 
@@ -159,12 +160,15 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
      * If the recycle bin is enabled or it's disabled but there is a pre-existing
      * recycle bin, then return the recycle bin, creating one if necessary.
      * If the recycle bin is disabled and there is no pre-existing recycle bin
-     * then return null.
+     * or if recycle bin is not supported then return null.
+     * @see #supportsRecycleBin()
      */
-    G getRecycleBin();
+    @Nullable G getRecycleBin();
 
     /**
      * empty the recycle bin whether it is enabled or disabled
+     * @throws UnsupportedOperationException if recycle bin functions are not supported
+     * @see #supportsRecycleBin()
      */
     void emptyRecycleBin();
 
@@ -238,5 +242,20 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
      * @return true if it should be encrypted
      */
     boolean shouldProtect(String propertyName);
+
+    /**
+     * returns true if the database supports non-standard property names
+     */
+    boolean supportsNonStandardPropertyNames();
+
+    /**
+     * returns true if the database supports binary properties
+     */
+    boolean supportsBinaryProperties();
+
+    /**
+     * returns true if the database supports recycle bin
+     */
+    boolean supportsRecycleBin();
 
 }

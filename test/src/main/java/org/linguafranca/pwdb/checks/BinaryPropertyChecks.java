@@ -29,13 +29,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.*;
 
 
 /**
  * @author jo
  */
-public abstract class EntryChecks {
+public abstract class BinaryPropertyChecks {
     public Database<?,?,?,?> database;
     @SuppressWarnings("unused")
     public abstract void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException;
@@ -77,5 +77,30 @@ public abstract class EntryChecks {
 
         entry = database.findEntries("Test 2 attachment").get(0);
         assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
+    }
+
+    @Test
+    public void checkSupported(){
+        assertTrue(database.supportsBinaryProperties());
+    }
+
+    @Test
+    public void checkAddChangeRemoveBinaryProperty() {
+        byte[] test = new byte[] {0, 1, 2 ,3};
+        byte[] test2 = new byte[] {3, 2, 1, 0};
+        Entry entry = database.findEntries("Test attachment").get(0);
+        assertEquals(1, entry.getBinaryPropertyNames().size());
+        entry.setBinaryProperty("test", test);
+        assertArrayEquals(test, entry.getBinaryProperty("test"));
+        entry.setBinaryProperty("test", test2);
+        assertArrayEquals(test2, entry.getBinaryProperty("test"));
+        // true that property was removed
+        assertTrue(entry.removeBinaryProperty("test"));
+        // false that same property was removed
+        assertFalse(entry.removeBinaryProperty("test"));
+        // false that non existent was removed
+        assertFalse(entry.removeBinaryProperty("test-test"));
+        // same number of properties as we started with
+        assertEquals(1, entry.getBinaryPropertyNames().size());
     }
 }

@@ -51,7 +51,7 @@ public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry,
             delegate.getString().add(field);
         }
 
-        Date now = new Date();
+        Date now = new Date(System.currentTimeMillis() / 1000L * 1000L); // to nearest lower second
         Times times = new Times();
         times.setLastModificationTime(now);
         times.setCreationTime(now);
@@ -104,7 +104,7 @@ public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry,
     }
 
     @Override
-    public boolean removePropery(String name) throws IllegalArgumentException {
+    public boolean removeProperty(String name) throws IllegalArgumentException {
         if (STANDARD_PROPERTY_NAMES.contains(name)) throw new IllegalArgumentException("may not remove property: " + name);
 
         StringField toRemove = null;

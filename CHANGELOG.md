@@ -2,7 +2,16 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-##[2.1.3]
+##[2.1.4-Snapshot]
+
+### Added
+
+- removeProperty for custom property via @AugustNagro
+- AutomaticModuleNames for Java 9 via @AugustNagro
+- expires functionality on Entry via @AugustNagro
+- database reports support for optional features
+
+##[2.1.3] 2018-01-21
 
 ### Fixed
 

@@ -25,6 +25,7 @@ import org.linguafranca.pwdb.Icon;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -34,7 +35,7 @@ import static org.junit.Assert.*;
  */
 public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon> {
 
-    private Database<D,G,E,I> database;
+    protected Database<D,G,E,I> database;
 
     public abstract Database<D,G,E,I> createDatabase() throws IOException;
 
@@ -154,6 +155,7 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
             Assert.assertEquals(0, properties.size());
         } catch (UnsupportedOperationException e) {
             // databases don't have to support arbitrary properties
+            assertTrue(!database.supportsNonStandardPropertyNames());
             assertArrayEquals(e1.getPropertyNames().toArray(), Entry.STANDARD_PROPERTY_NAMES.toArray());
         }
 
@@ -163,6 +165,55 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
         assertEquals("Entry 2", e1.getTitle());
         assertEquals("Entry 2", e1.getPath());
     }
+
+    @Test
+    public void testTimes() {
+        long before = (new Date().getTime() / 1000L) * 1000L; // round to next lower second
+        E entry = database.newEntry();
+        long after = (new Date().getTime()/ 1000L) * 1000L; // round to next lower second
+        long created = entry.getCreationTime().getTime();
+        assertTrue(created >= before && created <= after);
+        assertFalse(entry.getExpires());
+        assertTrue(entry.getLastAccessTime().getTime() <= created);
+        assertTrue(entry.getLastModificationTime().getTime() <= created);
+
+        entry.setExpires(true);
+        entry.setExpiryTime(new Date(created));
+
+        assertTrue(entry.getExpires());
+        assertEquals(created, entry.getExpiryTime().getTime());
+
+
+    }
+
+    @Test
+    public void checkAddChangeRemoveProperty() {
+        // only applies to databases that support arbitrary properties
+        E entry = database.newEntry();
+        assertEquals(Entry.STANDARD_PROPERTY_NAMES.size(), entry.getPropertyNames().size());
+        try {
+            entry.setProperty("test", "test1");
+        } catch (UnsupportedOperationException e) {
+            if (!database.supportsNonStandardPropertyNames()) {
+                return;
+            }
+            fail("Database must report that it doesn't support non standrad properties");
+        }
+        assertEquals("test1", entry.getProperty("test"));
+        entry.setProperty("test", "test2");
+        assertEquals("test2", entry.getProperty("test"));
+        assertTrue(entry.removeProperty("test"));
+        assertFalse(entry.removeProperty("test"));
+        assertFalse(entry.removeProperty("test-test"));
+        assertEquals(Entry.STANDARD_PROPERTY_NAMES.size(), entry.getPropertyNames().size());
+        try {
+            entry.removeProperty(Entry.STANDARD_PROPERTY_NAME_USER_NAME);
+            fail("Should not be able to remove standard property");
+        } catch (IllegalArgumentException ignore) {
+            // ignore as expected
+        }
+    }
+
 
     @Test
     public void testNewEntry() {
