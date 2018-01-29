@@ -16,7 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
-import org.linguafranca.pwdb.kdbx.stream_3_1.Salsa20StreamEncryptor;
+
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.StreamEncryptor;
 import org.apache.commons.codec.binary.Base64;
@@ -74,7 +74,6 @@ public class DomSerializableDatabase implements SerializableDatabase {
         } catch (XPathExpressionException e) {
             throw new IllegalStateException(e);
         }
-        result.setEncryption(new Salsa20StreamEncryptor(SecureRandom.getSeed(32)));
         return result;
     }
 

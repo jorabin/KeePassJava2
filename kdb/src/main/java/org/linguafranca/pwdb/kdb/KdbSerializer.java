@@ -17,7 +17,6 @@
 package org.linguafranca.pwdb.kdb;
 
 import com.google.common.io.LittleEndianDataInputStream;
-import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.security.Encryption;
@@ -79,7 +78,7 @@ public class KdbSerializer {
         InputStream decryptedInputStream = kdbHeader.createDecryptedInputStream(credentials.getKey(), inputStream);
 
         // Wrap the decrypted stream in a digest stream
-        MessageDigest digest = Encryption.getMessageDigestInstance();
+        MessageDigest digest = Encryption.getSha256MessageDigestInstance();
         DigestInputStream digestInputStream = new DigestInputStream(decryptedInputStream, digest);
 
         // Start the dataInput at wherever we have got to in the stream

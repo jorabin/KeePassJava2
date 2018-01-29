@@ -17,8 +17,6 @@
 package org.linguafranca.pwdb.kdbx;
 
 import org.junit.Test;
-import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxHeader;
-import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxSerializer;
 import org.linguafranca.pwdb.Credentials;
 
 import java.io.*;

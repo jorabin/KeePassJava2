@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx.stream_3_1;
+package org.linguafranca.pwdb.kdbx;
 
-import org.linguafranca.pwdb.kdbx.SerializableDatabase;
-import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.pwdb.Credentials;
 
 import java.io.IOException;
@@ -35,7 +33,7 @@ public class KdbxStreamFormat implements StreamFormat {
     public void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream encryptedInputStream) throws IOException {
         KdbxHeader kdbxHeader = new KdbxHeader();
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, encryptedInputStream);
-        serializableDatabase.setEncryption(new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey()));
+        serializableDatabase.setEncryption(kdbxHeader.getStreamEncryptor());
         serializableDatabase.load(decryptedInputStream);
         decryptedInputStream.close();
     }
@@ -46,7 +44,7 @@ public class KdbxStreamFormat implements StreamFormat {
         KdbxHeader kdbxHeader = new KdbxHeader();
         OutputStream unencrytedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, encryptedOutputStream);
         serializableDatabase.setHeaderHash(kdbxHeader.getHeaderHash());
-        serializableDatabase.setEncryption(new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey()));
+        serializableDatabase.setEncryption(kdbxHeader.getStreamEncryptor());
         serializableDatabase.save(unencrytedOutputStream);
         unencrytedOutputStream.flush();
         unencrytedOutputStream.close();

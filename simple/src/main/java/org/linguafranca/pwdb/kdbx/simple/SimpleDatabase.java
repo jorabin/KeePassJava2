@@ -17,11 +17,11 @@
 package org.linguafranca.pwdb.kdbx.simple;
 
 import org.linguafranca.pwdb.base.AbstractDatabase;
+import org.linguafranca.pwdb.kdbx.StreamEncryptor;
 import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxInputTransformer;
 import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxOutputTransformer;
-import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxHeader;
-import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxSerializer;
-import org.linguafranca.pwdb.kdbx.stream_3_1.Salsa20StreamEncryptor;
+import org.linguafranca.pwdb.kdbx.KdbxHeader;
+import org.linguafranca.pwdb.kdbx.KdbxSerializer;
 import org.linguafranca.pwdb.kdbx.simple.converter.*;
 import org.linguafranca.pwdb.kdbx.simple.model.EntryClasses;
 import org.linguafranca.pwdb.kdbx.simple.model.KeePassFile;
@@ -186,7 +186,7 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
 
         // decrypt the encrypted fields in the inner XML stream
         InputStream plainTextXmlStream = new XmlInputStreamFilter(kdbxInnerStream,
-                new KdbxInputTransformer(new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey())));
+                new KdbxInputTransformer(new StreamEncryptor.Salsa20(kdbxHeader.getInnerRandomStreamKey())));
 
         // read the now entirely decrypted stream into database
         KeePassFile result = getSerializer().read(KeePassFile.class, plainTextXmlStream);
@@ -227,7 +227,7 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
 
             // encrypt the fields in the XML inner stream
             XmlOutputStreamFilter plainTextOutputStream = new XmlOutputStreamFilter(kdbxInnerStream,
-                    new KdbxOutputTransformer(new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey())));
+                    new KdbxOutputTransformer(new StreamEncryptor.Salsa20(kdbxHeader.getInnerRandomStreamKey())));
 
             // set up the "protected" attributes of fields that need inner stream encryption
             prepareForSave(keePassFile.root.group);

@@ -40,7 +40,7 @@ public interface KdbCredentials extends Credentials {
         private final byte [] key;
 
         public Password(byte[] password) {
-            MessageDigest md = Encryption.getMessageDigestInstance();
+            MessageDigest md = Encryption.getSha256MessageDigestInstance();
             this.key = md.digest(password);
         }
 
@@ -58,7 +58,7 @@ public interface KdbCredentials extends Credentials {
         private final byte[] key;
 
         public KeyFile(byte[] password, InputStream inputStream) {
-            MessageDigest md = Encryption.getMessageDigestInstance();
+            MessageDigest md = Encryption.getSha256MessageDigestInstance();
             byte[] pwKey = md.digest(password);
             md.update(pwKey);
 

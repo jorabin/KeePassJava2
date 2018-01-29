@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx.stream_3_1;
+package org.linguafranca.pwdb.kdbx;
 
-import org.linguafranca.pwdb.kdbx.StreamFormat;
-import org.linguafranca.pwdb.security.Encryption;
+import org.linguafranca.pwdb.security.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -56,26 +58,43 @@ public class KdbxHeader {
      */
     @SuppressWarnings("WeakerAccess, unused")
     public enum ProtectedStreamAlgorithm {
-        NONE, ARC_FOUR, SALSA_20
+        NONE, ARC_FOUR, SALSA_20, CHA_CHA_20
     }
 
     /**
-     * This UUID denotes that AES Cipher is in use. No other values are known.
+     * UUIDs of Ciphers for encryption
      */
     public static final UUID AES_CIPHER = UUID.fromString("31C1F2E6-BF71-4350-BE58-05216AFC5AFF");
+    public static final UUID CHACHA_CIPHER = UUID.fromString("d6038a2b-8b6f-4cb5-a524-339a31dbb59a");
 
-    /* the cipher in use */
-    private UUID cipherUuid;
+    private List<Integer> allowableVersions = new ArrayList<>(Arrays.asList(3,4));
+
+
+    /* version of the file */
+    private int version;
+
+    protected UUID cipherUuid;
+    private byte [] masterSeed;
+    private byte[] encryptionIv;
+
     /* whether the data is compressed */
     private CompressionFlags compressionFlags;
-    private byte [] masterSeed;
+
+    /* V3 fields */
     private byte[] transformSeed;
     private long transformRounds;
-    private byte[] encryptionIv;
-    private byte[] protectedStreamKey;
+
+    /* header (V3) inner header (v4) */
+    private byte[] innerRandomStreamKey;
     private ProtectedStreamAlgorithm protectedStreamAlgorithm;
-    /* these bytes appear in cipher text immediately following the header */
+
+    /* these bytes appear in cipher text immediately following the header (V3) */
     private byte[] streamStartBytes;
+
+    /* dictionaries in V4 */
+    private VariantDictionary kdfparameters;
+    private VariantDictionary customData;
+
     /* not transmitted as part of the header, used in the XML payload, so calculated
      * on transmission or receipt */
     private byte[] headerHash;
@@ -91,9 +110,10 @@ public class KdbxHeader {
         transformSeed = random.generateSeed(32);
         transformRounds = 6000;
         encryptionIv = random.generateSeed(16);
-        protectedStreamKey = random.generateSeed(32);
+        innerRandomStreamKey = random.generateSeed(32);
         streamStartBytes = new byte[32];
         protectedStreamAlgorithm = ProtectedStreamAlgorithm.SALSA_20;
+        version = 3;
     }
 
     /**
@@ -106,8 +126,27 @@ public class KdbxHeader {
      * @throws IOException if something bad happens
      */
     public InputStream createDecryptedStream(byte[] digest, InputStream inputStream) throws IOException {
-        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
-        return Encryption.getDecryptedInputStream(inputStream, finalKeyDigest, getEncryptionIv());
+        byte[] finalKeyDigest;
+
+        UUID kdf = null;
+        if (kdfparameters != null) {
+            kdf = kdfparameters.get("$UUID").asUuid();
+        }
+        // v3 doesn't have a kdf therefore AES
+        if (kdf == null || Aes.KDF.equals(kdf)){
+            finalKeyDigest = Aes.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
+        } else if (Argon.argon2_kdf.equals(kdf)) {
+            finalKeyDigest = Argon.getArgonFinalKeyDigest(digest, getMasterSeed(), kdfparameters);
+        } else {
+            throw new UnsupportedOperationException("Unknown transform KDF " + kdf);
+        }
+
+        if (AES_CIPHER.equals(cipherUuid)) {
+            return Encryption.getDecryptedInputStream(inputStream, Aes.getCipher(), finalKeyDigest, getEncryptionIv());
+        } else if (CHACHA_CIPHER.equals(cipherUuid)) {
+            return Encryption.getDecryptedInputStream(inputStream, ChaCha.getCipher(), finalKeyDigest, getEncryptionIv());
+        }
+        throw new UnsupportedOperationException("Unknown encryption cipher " + cipherUuid);
     }
 
     /**
@@ -119,8 +158,22 @@ public class KdbxHeader {
      * @throws IOException  if something bad happens
      */
     public OutputStream createEncryptedStream(byte[] digest, OutputStream outputStream) throws IOException {
-        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
+        byte[] finalKeyDigest = Aes.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
         return Encryption.getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
+    }
+
+    public byte[] getTransformSeed() {
+        if (version < 4) {
+            return transformSeed;
+        }
+        return kdfparameters.get(Aes.KdfKeys.ParamSeed).asByteArray();
+    }
+
+    public long getTransformRounds() {
+        if (version < 4) {
+            return transformRounds;
+        }
+        return kdfparameters.get(Aes.KdfKeys.ParamRounds).asLong();
     }
 
     public UUID getCipherUuid() {
@@ -135,20 +188,12 @@ public class KdbxHeader {
         return masterSeed;
     }
 
-    public byte[] getTransformSeed() {
-        return transformSeed;
-    }
-
-    public long getTransformRounds() {
-        return transformRounds;
-    }
-
     public byte[] getEncryptionIv() {
         return encryptionIv;
     }
 
-    public byte[] getProtectedStreamKey() {
-        return protectedStreamKey;
+    public byte[] getInnerRandomStreamKey() {
+        return innerRandomStreamKey;
     }
 
     public byte[] getStreamStartBytes() {
@@ -163,13 +208,18 @@ public class KdbxHeader {
         return headerHash;
     }
 
-    public void setCipherUuid(byte[] uuid) {
-        ByteBuffer b = ByteBuffer.wrap(uuid);
-        UUID incoming = new UUID(b.getLong(), b.getLong(8));
-        if (!incoming.equals(AES_CIPHER)) {
-            throw new IllegalStateException("Unknown Cipher UUID " + incoming.toString());
+    public int getVersion() {
+        return version;
+    }
+
+    public StreamEncryptor getStreamEncryptor() {
+        switch (getProtectedStreamAlgorithm()) {
+            case NONE: {throw new IllegalStateException("Inner stream encoding of NONE");}
+            case ARC_FOUR: {throw new UnsupportedOperationException("Arc Four inner stream not supported");}
+            case SALSA_20: {return new StreamEncryptor.Salsa20(this.innerRandomStreamKey);}
+            case CHA_CHA_20: {return new StreamEncryptor.ChaCha20(this.innerRandomStreamKey);}
         }
-        this.cipherUuid = incoming;
+        throw new IllegalStateException("Inner stream encoding unsupported");
     }
 
     public void setCompressionFlags(int flags) {
@@ -192,8 +242,8 @@ public class KdbxHeader {
         this.encryptionIv = encryptionIv;
     }
 
-    public void setProtectedStreamKey(byte[] protectedStreamKey) {
-        this.protectedStreamKey = protectedStreamKey;
+    public void setInnerRandomStreamKey(byte[] key) {
+        this.innerRandomStreamKey = key;
     }
 
     public void setStreamStartBytes(byte[] streamStartBytes) {
@@ -207,4 +257,33 @@ public class KdbxHeader {
     public void setHeaderHash(byte[] headerHash) {
         this.headerHash = headerHash;
     }
+
+    public void setCipherUuid(byte[] uuid) {
+        ByteBuffer b = ByteBuffer.wrap(uuid);
+        UUID incoming = new UUID(b.getLong(), b.getLong(8));
+        if (!incoming.equals(AES_CIPHER) && !incoming.equals(CHACHA_CIPHER)) {
+            throw new IllegalStateException("Unknown Cipher UUID " + incoming.toString());
+        }
+        this.cipherUuid = incoming;
+    }
+
+    public void setVersion(int version) {
+        if (!allowableVersions.contains(version)) {
+            throw new IllegalStateException("File version must be in " + allowableVersions.toString());
+        }
+        this.version = version;
+    }
+
+    public void setKdfparameters(VariantDictionary kdfparameters) {
+        this.kdfparameters = kdfparameters;
+    }
+
+    public void setCustomData(VariantDictionary customData) {
+        this.customData = customData;
+    }
+
+    public void addBinary(byte[] bytes) {
+
+    }
+
 }

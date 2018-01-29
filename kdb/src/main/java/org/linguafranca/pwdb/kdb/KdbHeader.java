@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdb;
 
+import org.linguafranca.pwdb.security.Aes;
 import org.linguafranca.pwdb.security.Encryption;
 
 import javax.crypto.Cipher;
@@ -61,8 +62,8 @@ public class KdbHeader {
             throw new IllegalStateException("StreamEncryptor algorithm is not supported");
         }
 
-        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(key, masterSeed, transformSeed, transformRounds);
-        return Encryption.getDecryptedInputStream(inputStream, finalKeyDigest, encryptionIv);
+        byte[] finalKeyDigest = Aes.getFinalKeyDigest(key, masterSeed, transformSeed, transformRounds);
+        return Encryption.getDecryptedInputStream(inputStream, Aes.getCipher(), finalKeyDigest, encryptionIv);
     }
 
     public int getFlags() {

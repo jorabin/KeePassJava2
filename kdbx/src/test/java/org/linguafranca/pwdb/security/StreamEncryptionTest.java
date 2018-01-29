@@ -17,7 +17,8 @@
 package org.linguafranca.pwdb.security;
 
 import org.junit.Test;
-import org.linguafranca.pwdb.kdbx.stream_3_1.Salsa20StreamEncryptor;
+import org.linguafranca.pwdb.kdbx.StreamEncryptor;
+import org.linguafranca.pwdb.kdbx.StreamEncryptor.*;
 
 import java.security.SecureRandom;
 
@@ -26,18 +27,32 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author jo
  */
-public class Salsa20EncryptionTest {
+public class StreamEncryptionTest {
 
     @Test
-    public void encrypt() {
+    public void salsa20() {
         byte[] key = SecureRandom.getSeed(32);
+        StreamEncryptor ss = new Salsa20(key);
+        StreamEncryptor tt = new Salsa20(key);
 
-        Salsa20StreamEncryptor ss = new Salsa20StreamEncryptor(key);
+        verifyTwoWay(ss, tt);
+    }
+
+    @Test
+    public void chacha20() {
+        byte[] key = SecureRandom.getSeed(32);
+        StreamEncryptor ss = new ChaCha20(key);
+        StreamEncryptor tt = new ChaCha20(key);
+
+        verifyTwoWay(ss, tt);
+    }
+
+    private void verifyTwoWay(StreamEncryptor ss, StreamEncryptor tt) {
+
         byte[] e = ss.encrypt("new secret".getBytes());
         byte[] f = ss.encrypt("secret 2".getBytes());
 
 
-        Salsa20StreamEncryptor tt = new Salsa20StreamEncryptor(key);
         String s1 = new String(tt.encrypt(e));
         String t1 = new String(tt.encrypt(f));
 
@@ -46,8 +61,6 @@ public class Salsa20EncryptionTest {
 
         System.out.println(s1);
         System.out.println(t1);
-
-
     }
 
 }

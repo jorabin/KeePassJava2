@@ -16,10 +16,9 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
-import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.base.AbstractDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
-import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxStreamFormat;
+import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.pwdb.Credentials;
 import org.w3c.dom.Document;

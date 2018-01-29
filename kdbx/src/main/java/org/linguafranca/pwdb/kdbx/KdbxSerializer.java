@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx.stream_3_1;
+package org.linguafranca.pwdb.kdbx;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
+import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.hashedblock.HashedBlockInputStream;
 import org.linguafranca.pwdb.hashedblock.HashedBlockOutputStream;
-import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.hashedblock.HmacBlockInputStream;
 import org.linguafranca.pwdb.security.Encryption;
+import org.linguafranca.pwdb.security.VariantDictionary;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
@@ -33,7 +36,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * This class provides static methods for the encryption and decryption of Keepass KDBX files.
+ * This class provides static methods for the encryption and decryption of Keepass KDBX V4 files.
  * <p/>
  * A KDBX file is little-endian and consists of the following:
  * <ol>
@@ -74,29 +77,45 @@ public class KdbxSerializer {
     /**
      * Provides the payload of a KDBX file as an unencrypted {@link InputStream}.
      * @param credentials credentials for decryption of the stream
-     * @param kdbxHeader a header instance to be populated with values from the stream
+     * @param kdbxHeader a KdbxHeader for the encryption parameters and so on
      * @param inputStream a KDBX formatted input stream
      * @return an unencrypted input stream, to be read and closed by the caller
      * @throws IOException on error
      */
     public static InputStream createUnencryptedInputStream(Credentials credentials, KdbxHeader kdbxHeader, InputStream inputStream) throws IOException {
 
-        readKdbxHeader(kdbxHeader, inputStream);
+        readOuterHeader(inputStream, kdbxHeader);
 
-        InputStream decryptedInputStream = kdbxHeader.createDecryptedStream(credentials.getKey(), inputStream);
+        InputStream plainTextStream;
 
-        checkStartBytes(kdbxHeader, decryptedInputStream);
+        if (kdbxHeader.getVersion() >= 4) {
 
-        HashedBlockInputStream blockInputStream = new HashedBlockInputStream(decryptedInputStream, true);
+            HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(inputStream, true);
 
-        if (kdbxHeader.getCompressionFlags().equals(KdbxHeader.CompressionFlags.NONE)) {
-            return blockInputStream;
+            plainTextStream = kdbxHeader.createDecryptedStream(credentials.getKey(), hmacBlockInputStream);
+        } else {
+
+            InputStream decryptedInputStream = kdbxHeader.createDecryptedStream(credentials.getKey(), inputStream);
+
+            checkStartBytes(kdbxHeader, decryptedInputStream);
+
+            plainTextStream = new HashedBlockInputStream(decryptedInputStream, true);
         }
-        return new GZIPInputStream(blockInputStream);
+
+        if (kdbxHeader.getCompressionFlags().equals(KdbxHeader.CompressionFlags.GZIP)) {
+            plainTextStream = new GZIPInputStream(plainTextStream);
+        }
+
+        if (kdbxHeader.getVersion() >= 4) {
+            readInnerHeader(kdbxHeader, plainTextStream);
+        }
+
+        return plainTextStream;
     }
 
     /**
      * Provides an {@link OutputStream} to be encoded and encrypted in KDBX format
+     * // TODO only writes in V3 format
      * @param credentials credentials for encryption of the stream
      * @param kdbxHeader a KDBX header to control the formatting and encryption operation
      * @param outputStream output stream to contain the KDBX formatted output
@@ -139,6 +158,7 @@ public class KdbxSerializer {
     private static final int SIG2 = 0xB54BFB67;
     private static final int FILE_VERSION_CRITICAL_MASK = 0xFFFF0000;
     private static final int FILE_VERSION_32 = 0x00030001;
+    private static final int FILE_VERSION_4 = 0x00040000;
 
     private static class HeaderType {
         static final byte END = 0;
@@ -149,9 +169,11 @@ public class KdbxSerializer {
         static final byte TRANSFORM_SEED = 5;
         static final byte TRANSFORM_ROUNDS = 6;
         static final byte ENCRYPTION_IV = 7;
-        static final byte PROTECTED_STREAM_KEY = 8;
+        static final byte INNER_RANDOM_STREAM_KEY = 8;
         static final byte STREAM_START_BYTES = 9;
         static final byte INNER_RANDOM_STREAM_ID = 10;
+        static final byte KDF_PARAMETERS = 11;
+        static final byte CUSTOM_DATA = 12;
     }
     
     /**
@@ -168,92 +190,211 @@ public class KdbxSerializer {
     }
 
     /**
-     * Read 4 bytes and make sure they conform to expectations of file version
-     * @param ledis an input stream
-     * @return true if it looks like we understand this file version
-     * @throws IOException on error
-     */
-    private static boolean verifyFileVersion(LittleEndianDataInputStream ledis) throws IOException {
-        return ((ledis.readInt() & FILE_VERSION_CRITICAL_MASK) <= (FILE_VERSION_32 & FILE_VERSION_CRITICAL_MASK));
-    }
-
-    /**
-     * Populate a KdbxHeader from the input stream supplied
-     * @param kdbxHeader a header to be populated
+     * Create and populate a KdbxHeader from the input stream supplied
      * @param inputStream an input stream
      * @return the populated KdbxHeader
      * @throws IOException on error
      */
-    public static KdbxHeader readKdbxHeader(KdbxHeader kdbxHeader, InputStream inputStream) throws IOException {
+    public static KdbxHeader readOuterHeader(InputStream inputStream, KdbxHeader kdbxHeader) throws IOException {
 
-        MessageDigest digest = Encryption.getMessageDigestInstance();
+        // header is digested to verify correctness
+        MessageDigest digest = Encryption.getSha256MessageDigestInstance();
         // we do not close this stream, otherwise we lose our place in the underlying stream
-        DigestInputStream digestInputStream = new DigestInputStream(inputStream, digest);
+        DigestInputStream shaDigestInputStream = new DigestInputStream(inputStream, digest);
         // we do not close this stream, otherwise we lose our place in the underlying stream
-        LittleEndianDataInputStream ledis = new LittleEndianDataInputStream(digestInputStream);
-
+        LittleEndianDataInputStream ledis = new LittleEndianDataInputStream(shaDigestInputStream);
+        // file starts with magic number
         if (!verifyMagicNumber(ledis)) {
             throw new IllegalStateException("Magic number did not match");
         }
+        // followed by a file vesion number
+        int fullVersion = ledis.readInt();
+        kdbxHeader.setVersion(fullVersion >> 16);
 
-        if (!verifyFileVersion(ledis)) {
-            throw new IllegalStateException("File version did not match");
+        // read header fields
+        getOuterHeaderFields(kdbxHeader, digest, ledis);
+
+        if (kdbxHeader.getVersion() > 3) {
+            // v4 contains header hashes
+            verifyOuterHeader(kdbxHeader, ledis);
         }
-        
+
+        return kdbxHeader;
+    }
+
+    /**
+     * V4 header is followed by an SHA256 and then contains an HMACSHA256 after that.
+     * @param kdbxHeader the header containing the relevant parameters
+     * @param input an input source
+     * @throws IOException on error
+     */
+    private static void verifyOuterHeader(KdbxHeader kdbxHeader, DataInput input) throws IOException {
+        byte [] sha256 = getBytes(32, input);
+        if (!Arrays.equals(kdbxHeader.getHeaderHash(), sha256)) {
+            throw new IllegalStateException("Header hash does not match");
+        }
+        byte [] hmacSha256 = getBytes(32, input);
+        // TODO verify HMAC
+    }
+
+    private static void getOuterHeaderFields(KdbxHeader kdbxHeader, MessageDigest digest, DataInput input) throws IOException {
         byte headerType;
-        while ((headerType = ledis.readByte()) != HeaderType.END) {
+        do {
+            headerType = input.readByte();
+            int length = (kdbxHeader.getVersion() == 3 ? input.readShort() : input.readInt());
+
             switch (headerType) {
 
+                case HeaderType.END: {
+                    getBytes(length, input);
+                    break;
+                }
+
                 case HeaderType.COMMENT:
-                    getByteArray(ledis);
+                    getBytes(length, input);
                     break;
 
                 case HeaderType.CIPHER_ID:
-                    kdbxHeader.setCipherUuid(getByteArray(ledis));
+                    kdbxHeader.setCipherUuid(getBytes(length, input));
                     break;
 
                 case HeaderType.COMPRESSION_FLAGS:
-                    kdbxHeader.setCompressionFlags(getInt(ledis));
+                    kdbxHeader.setCompressionFlags(getInt(length, input));
                     break;
 
                 case HeaderType.MASTER_SEED:
-                    kdbxHeader.setMasterSeed(getByteArray(ledis));
+                    kdbxHeader.setMasterSeed(getBytes(length, input));
                     break;
 
                 case HeaderType.TRANSFORM_SEED:
-                    kdbxHeader.setTransformSeed(getByteArray(ledis));
+                    kdbxHeader.setTransformSeed(getBytes(length, input));
                     break;
 
                 case HeaderType.TRANSFORM_ROUNDS:
-                    kdbxHeader.setTransformRounds(getLong(ledis));
+                    kdbxHeader.setTransformRounds(getLong(length, input));
                     break;
 
                 case HeaderType.ENCRYPTION_IV:
-                    kdbxHeader.setEncryptionIv(getByteArray(ledis));
+                    kdbxHeader.setEncryptionIv(getBytes(length, input));
                     break;
 
-                case HeaderType.PROTECTED_STREAM_KEY:
-                    kdbxHeader.setProtectedStreamKey(getByteArray(ledis));
+                case HeaderType.INNER_RANDOM_STREAM_KEY:
+                    kdbxHeader.setInnerRandomStreamKey(getBytes(length, input));
                     break;
 
                 case HeaderType.STREAM_START_BYTES:
-                    kdbxHeader.setStreamStartBytes(getByteArray(ledis));
+                    kdbxHeader.setStreamStartBytes(getBytes(length, input));
                     break;
 
                 case HeaderType.INNER_RANDOM_STREAM_ID:
-                    kdbxHeader.setInnerRandomStreamId(getInt(ledis));
+                    kdbxHeader.setInnerRandomStreamId(getInt(length, input));
+                    break;
+
+                case HeaderType.KDF_PARAMETERS:
+                    kdbxHeader.setKdfparameters(makeVariantDictionary(length, input));
+                    break;
+
+                case HeaderType.CUSTOM_DATA:
+                    kdbxHeader.setCustomData(makeVariantDictionary(length, input));
                     break;
 
                 default: throw new IllegalStateException("Unknown File Header");
             }
-        }
-
-        // consume length etc. following END flag
-        getByteArray(ledis);
+        } while (headerType != HeaderType.END);
 
         kdbxHeader.setHeaderHash(digest.digest());
-        return kdbxHeader;
     }
+
+    /**
+     * Type fieds for inner headers
+     * @see KdbxSerializer#readInnerHeader
+     */
+    private static class InnerHeaderType {
+        private static final byte END = 0;
+        private static final byte INNER_RANDOM_STREAM_ID = 1; // Supersedes KdbxHeaderFieldID.InnerRandomStreamID
+        private static final byte INNER_RANDOM_STREAM_KEY = 2; // Supersedes KdbxHeaderFieldID.InnerRandomStreamKey
+        private static final byte BINARY = 3;
+    }
+
+    /**
+     * From V4 the inner stream encryption parameters are contained in
+     * a set of headers immediately preceding the XML payload
+     * @param kdbxHeader the header whose values are to be read
+     * @param plainTextStream a stream to read them from
+     * @throws IOException on error
+     */
+    private static void readInnerHeader(KdbxHeader kdbxHeader, InputStream plainTextStream) throws IOException {
+        DataInput input = new LittleEndianDataInputStream(plainTextStream);
+
+        byte headerType;
+        do {
+            headerType = input.readByte();
+            int length = input.readInt();
+
+            switch (headerType) {
+                case InnerHeaderType.END: {
+                    getBytes(length, input);
+                    break;
+                }
+
+                case InnerHeaderType.INNER_RANDOM_STREAM_ID: {
+                    kdbxHeader.setInnerRandomStreamId(getInt(length, input));
+                    break;
+                }
+
+                case InnerHeaderType.INNER_RANDOM_STREAM_KEY: {
+                    kdbxHeader.setInnerRandomStreamKey(getBytes(length, input));
+                    break;
+                }
+
+                case InnerHeaderType.BINARY: {
+                    kdbxHeader.addBinary(getBytes(length, input));
+                    break;
+                }
+
+                default: throw new IllegalStateException("Invalid inner header field");
+            }
+        } while (headerType != HeaderType.END);
+    }
+
+    /**
+     * Read a VariantDictionary from the supplied input
+     * @param input source of data
+     * @return a VariantDictionary
+     * @throws IOException on error
+     */
+    private static VariantDictionary makeVariantDictionary(int length, DataInput input) throws IOException {
+        // read the buffer containing the dictionary, which starts with a 4 byte length
+        ByteBuffer buf = ByteBuffer.wrap(getBytes(length, input));
+        buf.order(ByteOrder.LITTLE_ENDIAN);
+        // version number must be 0x01??
+
+        VariantDictionary vd = new VariantDictionary(buf.getShort());
+        if ((vd.getVersion() & 0xFF00) != 0x0100) {
+            throw new IllegalStateException("Variant dictionary must have version 0x0100");
+        }
+
+        // sequence of entries followed by a byte 0
+        byte type = buf.get();
+        while (type != 0) {
+            // get key
+            int keylength = buf.getInt();
+            byte [] key = new byte[keylength];
+            buf.get(key);
+
+            // get value
+            int valueLength = buf.getInt();
+            byte [] value = new byte[valueLength];
+            buf.get(value);
+
+            // add entry
+            vd.put(new String(key), type, value);
+
+            type = buf.get();
+        }
+        return vd;
+    }
+
 
     /**
      * Write a KdbxHeader to the output stream supplied. The header is updated with the
@@ -263,7 +404,7 @@ public class KdbxSerializer {
      * @throws IOException on error
      */
     public static void writeKdbxHeader(KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
-        MessageDigest messageDigest = Encryption.getMessageDigestInstance();
+        MessageDigest messageDigest = Encryption.getSha256MessageDigestInstance();
         DigestOutputStream digestOutputStream = new DigestOutputStream(outputStream, messageDigest);
         LittleEndianDataOutputStream ledos = new LittleEndianDataOutputStream(digestOutputStream);
 
@@ -301,9 +442,9 @@ public class KdbxSerializer {
         ledos.writeShort(kdbxHeader.getEncryptionIv().length);
         ledos.write(kdbxHeader.getEncryptionIv());
 
-        ledos.writeByte(HeaderType.PROTECTED_STREAM_KEY);
-        ledos.writeShort(kdbxHeader.getProtectedStreamKey().length);
-        ledos.write(kdbxHeader.getProtectedStreamKey());
+        ledos.writeByte(HeaderType.INNER_RANDOM_STREAM_KEY);
+        ledos.writeShort(kdbxHeader.getInnerRandomStreamKey().length);
+        ledos.write(kdbxHeader.getInnerRandomStreamKey());
 
         ledos.writeByte(HeaderType.STREAM_START_BYTES);
         ledos.writeShort(kdbxHeader.getStreamStartBytes().length);
@@ -321,26 +462,23 @@ public class KdbxSerializer {
     }
 
 
-    private static int getInt(LittleEndianDataInputStream ledis) throws IOException {
-        short fieldLength = ledis.readShort();
-        if (fieldLength != 4) {
-            throw new IllegalStateException("Int required but length was " + fieldLength);
+    private static int getInt(int length, DataInput input) throws IOException {
+        if (length != 4) {
+            throw new IllegalStateException("Int required but length was " + length);
         }
-        return ledis.readInt();
+        return input.readInt();
     }
 
-    private static long getLong(LittleEndianDataInputStream ledis) throws IOException {
-        short fieldLength = ledis.readShort();
-        if (fieldLength != 8) {
-            throw new IllegalStateException("Long required but length was " + fieldLength);
+     private static long getLong(int length, DataInput input) throws IOException {
+        if (length != 8) {
+            throw new IllegalStateException("Long required but length was " + length);
         }
-        return ledis.readLong();
+        return input.readLong();
     }
 
-    private static byte [] getByteArray(LittleEndianDataInputStream ledis) throws IOException {
-        short fieldLength = ledis.readShort();
-        byte [] value = new byte[fieldLength];
-        ledis.readFully(value);
-        return value;
+    private static byte[] getBytes(int numBytes, DataInput input) throws IOException {
+        byte [] result = new byte[numBytes];
+        input.readFully(result);
+        return result;
     }
 }

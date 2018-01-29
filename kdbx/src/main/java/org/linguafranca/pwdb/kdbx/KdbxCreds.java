@@ -38,7 +38,7 @@ public class KdbxCreds implements Credentials {
      * @param inputStream inputstream of the keyfile
      */
     public KdbxCreds(@NotNull byte[] password, @NotNull InputStream inputStream) {
-        MessageDigest md = Encryption.getMessageDigestInstance();
+        MessageDigest md = Encryption.getSha256MessageDigestInstance();
         byte[] pwKey = md.digest(password);
         md.update(pwKey);
 
@@ -54,7 +54,7 @@ public class KdbxCreds implements Credentials {
      * @param inputStream inputstream of the keyfile
      */
     public KdbxCreds(@NotNull InputStream inputStream) {
-        MessageDigest md = Encryption.getMessageDigestInstance();
+        MessageDigest md = Encryption.getSha256MessageDigestInstance();
         byte[] keyFileData = KdbxKeyFile.load(inputStream);
         if (keyFileData == null) {
             throw new IllegalStateException("Could not read key file");
@@ -64,7 +64,7 @@ public class KdbxCreds implements Credentials {
 
 
     public KdbxCreds(@NotNull byte[] password) {
-        MessageDigest md = Encryption.getMessageDigestInstance();
+        MessageDigest md = Encryption.getSha256MessageDigestInstance();
         byte[] digest = md.digest(password);
         key = md.digest(digest);
     }

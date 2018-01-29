@@ -46,7 +46,7 @@ public interface KdbxCredentials extends Credentials {
          * @param inputStream inputstream of the keyfile
          */
         public KeyFile(@NotNull byte[] password, @NotNull InputStream inputStream) {
-            MessageDigest md = Encryption.getMessageDigestInstance();
+            MessageDigest md = Encryption.getSha256MessageDigestInstance();
             byte[] pwKey = md.digest(password);
             md.update(pwKey);
 
@@ -62,7 +62,7 @@ public interface KdbxCredentials extends Credentials {
          * @param inputStream inputstream of the keyfile
          */
         public KeyFile(@NotNull InputStream inputStream) {
-            MessageDigest md = Encryption.getMessageDigestInstance();
+            MessageDigest md = Encryption.getSha256MessageDigestInstance();
 
             byte[] keyFileData = KdbxKeyFile.load(inputStream);
             if (keyFileData == null) {
@@ -85,7 +85,7 @@ public interface KdbxCredentials extends Credentials {
         private final byte[] key;
 
         public Password(@NotNull byte[] password) {
-            MessageDigest md = Encryption.getMessageDigestInstance();
+            MessageDigest md = Encryption.getSha256MessageDigestInstance();
             byte[] digest = md.digest(password);
             key = md.digest(digest);
         }

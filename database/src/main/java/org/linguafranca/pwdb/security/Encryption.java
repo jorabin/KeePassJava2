@@ -17,7 +17,7 @@
 package org.linguafranca.pwdb.security;
 
 // use spongycastle repackaging of bouncycastle in deference to Android needs
-import org.spongycastle.crypto.engines.AESEngine;
+import org.spongycastle.crypto.StreamCipher;
 import org.spongycastle.crypto.engines.AESFastEngine;
 import org.spongycastle.crypto.io.CipherInputStream;
 import org.spongycastle.crypto.io.CipherOutputStream;
@@ -26,6 +26,7 @@ import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
 import org.spongycastle.crypto.params.KeyParameter;
 import org.spongycastle.crypto.params.ParametersWithIV;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
@@ -64,7 +65,7 @@ public class Encryption {
         if (encoding == null || encoding.length() == 0)
             throw new IllegalArgumentException("Encoding cannot be null or empty");
 
-        MessageDigest md = getMessageDigestInstance();
+        MessageDigest md = getSha256MessageDigestInstance();
 
         try {
             byte[] bytes = string.getBytes(encoding);
@@ -80,7 +81,7 @@ public class Encryption {
      *
      * @return A MessageDigest
      */
-    public static MessageDigest getMessageDigestInstance() {
+    public static MessageDigest getSha256MessageDigestInstance() {
         try {
             return MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
@@ -89,38 +90,34 @@ public class Encryption {
     }
 
     /**
-     * Create a final key from the parameters passed
+     * Gets a SHA-512 message digest instance
+     *
+     * @return A MessageDigest
      */
-    public static byte[] getFinalKeyDigest(byte[] key, byte[] masterSeed, byte[] transformSeed, long transformRounds) {
-
-        AESEngine engine = new AESEngine();
-        engine.init(true, new KeyParameter(transformSeed));
-
-        // copy input key
-        byte[] transformedKey = new byte[key.length];
-        System.arraycopy(key, 0, transformedKey, 0, transformedKey.length);
-
-        // transform rounds times
-        for (long rounds = 0; rounds < transformRounds; rounds++) {
-            engine.processBlock(transformedKey, 0, transformedKey, 0);
-            engine.processBlock(transformedKey, 16, transformedKey, 16);
+    public static MessageDigest getSha512MessageDigestInstance() {
+        try {
+            return MessageDigest.getInstance("SHA-512");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-512 is not supported");
         }
-
-        MessageDigest md = getMessageDigestInstance();
-        byte[] transformedKeyDigest = md.digest(transformedKey);
-
-        md.update(masterSeed);
-        return md.digest(transformedKeyDigest);
     }
 
     /**
      * Create a decrypted input stream from an encrypted one
      */
-    public static InputStream getDecryptedInputStream (InputStream encryptedInputStream, byte[] keyData, byte[] ivData) {
+    public static InputStream getDecryptedInputStream(InputStream encryptedInputStream, PaddedBufferedBlockCipher pbbc, byte[] keyData, byte[] ivData) {
         final ParametersWithIV keyAndIV = new ParametersWithIV(new KeyParameter(keyData), ivData);
-        PaddedBufferedBlockCipher pbbc = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESFastEngine()));
         pbbc.init(false, keyAndIV);
         return new CipherInputStream(encryptedInputStream, pbbc);
+    }
+
+    /**
+     * Create a decrypted input stream from an encrypted one
+     */
+    public static InputStream getDecryptedInputStream(InputStream encryptedInputStream, StreamCipher cipher, byte[] keyData, byte[] ivData) throws IOException {
+        final ParametersWithIV keyAndIV = new ParametersWithIV(new KeyParameter(keyData), ivData);
+        cipher.init(false, keyAndIV);
+        return new CipherInputStream(encryptedInputStream, cipher);
     }
 
     /**
