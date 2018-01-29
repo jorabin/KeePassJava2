@@ -36,9 +36,9 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * This class provides static methods for the encryption and decryption of Keepass KDBX V4 files.
+ * This class provides static methods for the encryption and decryption of Keepass KDBX V3 and V4 files.
  * <p/>
- * A KDBX file is little-endian and consists of the following:
+ * A KDBX files are little-endian and consist of the following:
  * <ol>
  *      <li>An unencrypted portion</li>
  *      <ol>
@@ -46,17 +46,27 @@ import java.util.zip.GZIPOutputStream;
  *          <li>4 bytes version</li>
  *          <li>A header containing details of the encryption of the remainder of the file</li>
  *          <p>The header fields are encoded using a TLV style. The Type is an enumeration encoded in 1 byte.
- *          The length is encoded in 2 bytes and the value according to the length denoted. The sequence is
- *          terminated by a zero type with 0 length.</p>
+ *          The length is encoded in 4 bytes (V3: 2 bytes) and the value according to the length denoted. The sequence is
+ *          terminated by a zero type with 0 length. {@link #readOuterHeader}</p>
+ *          <p>In V4 there follows a 32 byte SHA-256 hash of the file so far</p>
+ *          <p>In V4 there follows a 32 byte HMAC-256 hash of the file so far</p>
  *          <p>{@link KdbxHeader} details the fields of the header.</p>
  *      </ol>
- *      <li>An encrypted portion</li>
+ *      <li>In V3 the remainder of the file is encrypted as follows:</li>
  *      <ol>
  *          <li>A sequence of bytes contained in the header. If they don't match, decryption has not worked.</li>
  *          <li>A payload serialized in Hashed Block format, see e.g. {@link HashedBlockInputStream} for details of this.</li>
  *          <li>The content of this payload may be GZIP compressed.</li>
  *          <li>The content is now a character stream, which is expected to be
  *          XML representing a KeePass Database. Assumed UTF-8 encoding.</li>
+ *      </ol>
+ *      <li>In V4 the remainder of the file is encoded as HMacHasedBlocks:</li>
+ *      <ol>
+ *          <li>A sequence of blocks encoded using Hmac Blocks see {@link HmacBlockInputStream}</li>
+ *          <li>Those blocks contain an encrypted input stream.</li>
+ *          <li>The encrypted input stream optionally contains a Gzipped input stream.</li>
+ *          <li>The content is now a character stream, which is an inner header {@link #readInnerHeader}
+ *          followed by XML representing a KeePass Database. Assumed UTF-8 encoding.</li>
  *      </ol>
  * </ol>
  * <p>The methods in this class provide support for serializing and deserializing plain text payload content
@@ -66,6 +76,7 @@ import java.util.zip.GZIPOutputStream;
  *      are stream encrypted, meaning they have to be decrypted in the
  *      same order as they were encrypted, namely actual XML document order. Or at least that
  *      is the way it seems. The methods of this class do not perform this aspect of encryption/decryption.
+ * @see <a href="https://github.com/jorabin/KeePassJava2/blob/master/Format%20Diagram.svg">this diagram</a>
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")

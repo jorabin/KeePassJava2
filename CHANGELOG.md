@@ -2,6 +2,12 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+##[2.2-Snapshot]
+
+### Added
+
+- Preliminary readonly support for V4 files
+
 ##[2.1.4-Snapshot]
 
 ### Added

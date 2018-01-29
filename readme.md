@@ -8,7 +8,7 @@ safe for Windows.
 
 Features to date:
 
-- Read and write KeePass 2.x format
+- Read and write KeePass 2.x format (File format V3 supported, V4 in development)
 - Keepass 2.x Password and Keyfile Credentials
 - Read KeePass 1.x format (Rijndael only)
 - *No* requirement for JCE Policy Files
@@ -124,9 +124,11 @@ KeePass is in effect defined by the code that Dominik writes to create and maint
 Hence there are no definitive specification of KeePass files other than that code. For the sake of
 clarification and my own satisfaction I have written about my understanding of KeePass formats in the following locations:
 
-1. The Javadoc header to [KdbxSerializer](kdbx/src/main/java/org/linguafranca/pwdb/kdbx/stream_3_1/KdbxSerializer.java) describes KDBX stream formatting.
+1. The Javadoc header to [KdbxSerializer](kdbx/src/main/java/org/linguafranca/pwdb/kdbx/KdbxSerializer.java) describes KDBX stream formatting.
 2. The XSD Schema [KDBX.3.1.xsd](KDBX.3.1.xsd) documents my understanding of the Keepass XML, and also my lack of understanding, in parts.
-3. [This graphic](Format Diagram.svg) illustrates KDBX 3.1 stream format and also illustrates proposals for the revised KDBX 4.0 format. 
+3. The following graphic  illustrates KDBX 3.1 and 4 file formats:
+
+[![This graphic](FormatDiagram.svg)](FormatDiagram.svg) 
 
 ## Dependencies
 
@@ -135,6 +137,7 @@ Aside from the JRE the API depends on:
 - [Google Guava](https://github.com/google/guava/wiki) ([Apache 2 license](https://github.com/google/guava/blob/master/COPYING)).
 - [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
 - [Spongy Castle](https://rtyley.github.io/spongycastle/) which is a repackaging for Android of [Bouncy Castle](https://www.bouncycastle.org/java.html) ([Apache 2 license](https://www.bouncycastle.org/licence.html)).
+- [Jargon2](https://github.com/kosprov/jargon2-api) for KDBX format version 4 Argon2 Key Derivation Function (Apache2 license)
 
 The Simple XML implementation additionally depends on:
 
@@ -151,7 +154,7 @@ Included POM is for Maven 3.
 
 There are rather a lot of modules, this is in order to allow loading of minimal necessary functionality. The module dependencies are illustrated below.
 
-[![Module Structure](./Module Structure.svg "Module Structure")](./Module Structure.svg)
+[![Module Structure](ModuleStructure.svg "Module Structure")](./ModuleStructure.svg)
 
 Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pwdb`. The version id is as noted [above](#mvn).
 

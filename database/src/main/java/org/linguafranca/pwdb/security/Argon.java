@@ -9,12 +9,16 @@ import static org.linguafranca.pwdb.security.Encryption.getSha256MessageDigestIn
 
 
 /**
+ * KDBX V4 files may use Argon2 for key derivation.
+ *
  * @author jo
  */
 public class Argon {
 
+    /** UUID indicating that Argon is being used as the KDF */
     public static final UUID argon2_kdf = UUID.fromString("EF636DDF-8C29-444B-91F7-A9A403E30A0C");
 
+    /** keys into the variant dictionary supplied as a KDBX header */
     public static class ArgonParameterKeys {
         @SuppressWarnings("unused")
         public static class ArgonKeys {
@@ -40,10 +44,6 @@ public class Argon {
         int parallelism = argonParameterKeys.get(paramParallelism).asInteger();
         int memoryCost = (int) argonParameterKeys.get(paramMemory).asLong();
         int timeCost = (int) argonParameterKeys.get(paramIterations).asLong();
-/*
-        byte [] secretKey = argonParameterKeys.entries.get(paramSecretKey).value;
-        byte [] assocData = argonParameterKeys.entries.get(paramAssocData).value;
-*/
 
         // Configure the hasher
         Hasher hasher = jargon2Hasher()
@@ -51,18 +51,16 @@ public class Argon {
                 .version(version)
                 .salt(salt)
                 .parallelism(parallelism)
-                .memoryCost(memoryCost/1024)
+                .memoryCost(memoryCost/1024) // block size 1024
                 .timeCost(timeCost)
                 .hashLength(32);
 
-
+        // do the hash
         byte [] hash = hasher.password(digest).rawHash();
 
+        // return digest of master seed and hash
         MessageDigest md = getSha256MessageDigestInstance();
-        byte [] transformedKeyDigest = hash; // md.digest(hash);
-
         md.update(masterSeed);
-        return md.digest(transformedKeyDigest);
-
+        return md.digest(hash);
     }
 }

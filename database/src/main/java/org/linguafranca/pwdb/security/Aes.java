@@ -11,12 +11,16 @@ import java.util.UUID;
 import static org.linguafranca.pwdb.security.Encryption.getSha256MessageDigestInstance;
 
 /**
+ * AES may be used for Key Derivation and aslo as the underlying stream cipher
+ *
  * @author jo
  */
 public class Aes {
 
+    /** UUID specifying that AES is to be used as the Key Derivation Function */
     public static final UUID KDF = UUID.fromString("C9D9F39A-628A-4460-BF74-0D08C18A4FEA");
 
+    /** v4 variant dictionary keys for use of AES as the KDF */
     public static class KdfKeys {
         public static final String ParamRounds = "R"; // UInt64
         public static final String ParamSeed = "S"; // Byte[32]

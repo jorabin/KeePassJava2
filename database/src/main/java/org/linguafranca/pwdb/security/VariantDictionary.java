@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Implementation of a storage for KDBX Header field parameters
+ * Implementation of a storage for V4 KDBX Header field parameters
  *
  * @author jo
  */
