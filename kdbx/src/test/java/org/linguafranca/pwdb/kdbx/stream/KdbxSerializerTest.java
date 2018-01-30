@@ -1,8 +1,10 @@
 package org.linguafranca.pwdb.kdbx.stream;
 
+import com.google.common.io.LittleEndianDataInputStream;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.hashedblock.HmacBlockInputStream;
+import org.linguafranca.pwdb.kdbx.KdbxCredentials;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxSerializer;
@@ -28,7 +30,8 @@ public class KdbxSerializerTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx");
         KdbxHeader header = KdbxSerializer.readOuterHeader(inputStream, new KdbxHeader());
         System.out.println("Version " + header.getVersion());
-        HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(inputStream, true);
+        byte [] hmacKey = KdbxSerializer.verifyOuterHeader(header, new KdbxCredentials.Password("123".getBytes()), new LittleEndianDataInputStream(inputStream));
+        HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(hmacKey, inputStream, true);
         byte [] buf = new byte [1024];
         int bytesRead;
         while ((bytesRead = hmacBlockInputStream.read(buf)) != -1) {

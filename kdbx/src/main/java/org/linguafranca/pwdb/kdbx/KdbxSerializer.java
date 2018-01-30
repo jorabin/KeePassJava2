@@ -19,18 +19,20 @@ package org.linguafranca.pwdb.kdbx;
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
 import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.hashedblock.CollectingInputStream;
 import org.linguafranca.pwdb.hashedblock.HashedBlockInputStream;
 import org.linguafranca.pwdb.hashedblock.HashedBlockOutputStream;
 import org.linguafranca.pwdb.hashedblock.HmacBlockInputStream;
 import org.linguafranca.pwdb.security.Encryption;
 import org.linguafranca.pwdb.security.VariantDictionary;
+import org.spongycastle.crypto.digests.SHA256Digest;
+import org.spongycastle.crypto.macs.HMac;
+import org.spongycastle.crypto.params.KeyParameter;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.security.DigestInputStream;
-import java.security.DigestOutputStream;
-import java.security.MessageDigest;
+import java.security.*;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -101,9 +103,12 @@ public class KdbxSerializer {
 
         if (kdbxHeader.getVersion() >= 4) {
 
-            HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(inputStream, true);
+            byte[] hmacKey = verifyOuterHeader(kdbxHeader, credentials, new DataInputStream(inputStream));
+
+            HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(hmacKey, inputStream, true);
 
             plainTextStream = kdbxHeader.createDecryptedStream(credentials.getKey(), hmacBlockInputStream);
+
         } else {
 
             InputStream decryptedInputStream = kdbxHeader.createDecryptedStream(credentials.getKey(), inputStream);
@@ -188,8 +193,7 @@ public class KdbxSerializer {
     }
     
     /**
-     * Read two lots of 4 bytes and verify that they satisfy the signature of a
-     * kdbx file;
+     * Read two lots of 4 bytes and verify that they satisfy the signature of a kdbx file;
      * @param ledis an input stream
      * @return true if it looks like this is a kdbx file
      * @throws IOException on error
@@ -210,10 +214,12 @@ public class KdbxSerializer {
 
         // header is digested to verify correctness
         MessageDigest digest = Encryption.getSha256MessageDigestInstance();
-        // we do not close this stream, otherwise we lose our place in the underlying stream
         DigestInputStream shaDigestInputStream = new DigestInputStream(inputStream, digest);
-        // we do not close this stream, otherwise we lose our place in the underlying stream
-        LittleEndianDataInputStream ledis = new LittleEndianDataInputStream(shaDigestInputStream);
+        // collect the bytes of the header, we'll need them later
+        CollectingInputStream collectingInputStream = new CollectingInputStream(shaDigestInputStream, true);
+        // make values available from LittleEndian
+        LittleEndianDataInputStream ledis = new LittleEndianDataInputStream(collectingInputStream);
+
         // file starts with magic number
         if (!verifyMagicNumber(ledis)) {
             throw new IllegalStateException("Magic number did not match");
@@ -225,10 +231,9 @@ public class KdbxSerializer {
         // read header fields
         getOuterHeaderFields(kdbxHeader, digest, ledis);
 
-        if (kdbxHeader.getVersion() > 3) {
-            // v4 contains header hashes
-            verifyOuterHeader(kdbxHeader, ledis);
-        }
+        // stop collecting the bytes of the header
+        collectingInputStream.setCollecting(false);
+        kdbxHeader.setHeaderBytes(collectingInputStream.getCollectedBytes());
 
         return kdbxHeader;
     }
@@ -236,16 +241,43 @@ public class KdbxSerializer {
     /**
      * V4 header is followed by an SHA256 and then contains an HMACSHA256 after that.
      * @param kdbxHeader the header containing the relevant parameters
+     * @param credentials
      * @param input an input source
+     * @return Hmac Key Digest for use in the HmacBlockInputStream
      * @throws IOException on error
      */
-    private static void verifyOuterHeader(KdbxHeader kdbxHeader, DataInput input) throws IOException {
+    public static byte[] verifyOuterHeader(KdbxHeader kdbxHeader, Credentials credentials, DataInput input) throws IOException {
+        // check the SHA
         byte [] sha256 = getBytes(32, input);
         if (!Arrays.equals(kdbxHeader.getHeaderHash(), sha256)) {
             throw new IllegalStateException("Header hash does not match");
         }
-        byte [] hmacSha256 = getBytes(32, input);
-        // TODO verify HMAC
+
+        // Compute the Hmac Key Digest
+        // KdbxFile.cs Computekeys
+        MessageDigest md = Encryption.getSha512MessageDigestInstance();
+        md.update(kdbxHeader.getMasterSeed());
+        md.update(kdbxHeader.getTransformedKeyDigest(credentials.getKey()));
+        byte [] hmacKey = md.digest(new byte [] {1});
+
+        // get the key for the header Hmac (using sequence number -1)
+        // KdbxFile.cs ComputeHeaderHmac
+        byte [] hmacKey64 = HmacBlockInputStream.getHmacBlockKey(hmacKey, -1L, ByteOrder.LITTLE_ENDIAN);
+
+        HMac hmac = new HMac(new SHA256Digest());
+        hmac.init(new KeyParameter(hmacKey64));
+        hmac.update(kdbxHeader.getHeaderBytes(), 0, kdbxHeader.getHeaderBytes().length);
+        byte[] computedHmacSha256 = new byte[32];
+        hmac.doFinal(computedHmacSha256, 0);
+
+        // check for correctness
+        byte [] storedHmacSha256 = getBytes(32, input);
+
+        if (!Arrays.equals(computedHmacSha256, storedHmacSha256)) {
+            throw new IllegalStateException("Header HMAC does not match");
+        }
+        return hmacKey;
+
     }
 
     private static void getOuterHeaderFields(KdbxHeader kdbxHeader, MessageDigest digest, DataInput input) throws IOException {

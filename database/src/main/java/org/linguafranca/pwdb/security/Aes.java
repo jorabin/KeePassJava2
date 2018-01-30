@@ -29,10 +29,8 @@ public class Aes {
     public static PaddedBufferedBlockCipher getCipher() {
         return new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESEngine()));
     }
-    /**
-     * Create a final key from the parameters passed
-     */
-    public static byte[] getFinalKeyDigest(byte[] key, byte[] masterSeed, byte[] transformSeed, long transformRounds) {
+
+    public  static byte [] getTransformedKey (byte [] key, byte [] transformSeed, long transformRounds) {
 
         AESEngine engine = new AESEngine();
         engine.init(true, new KeyParameter(transformSeed));
@@ -48,9 +46,6 @@ public class Aes {
         }
 
         MessageDigest md = getSha256MessageDigestInstance();
-        byte[] transformedKeyDigest = md.digest(transformedKey);
-
-        md.update(masterSeed);
-        return md.digest(transformedKeyDigest);
+        return md.digest(transformedKey);
     }
 }

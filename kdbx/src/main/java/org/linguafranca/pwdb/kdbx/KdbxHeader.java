@@ -22,11 +22,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
+import static org.linguafranca.pwdb.security.Encryption.getSha256MessageDigestInstance;
 
 /**
  * This class represents the header portion of a KeePass KDBX file or stream. The header is received in
@@ -99,6 +102,8 @@ public class KdbxHeader {
      * on transmission or receipt */
     private byte[] headerHash;
 
+    private byte[] headerBytes;
+
     /**
      * Construct a default KDBX header
      */
@@ -126,20 +131,10 @@ public class KdbxHeader {
      * @throws IOException if something bad happens
      */
     public InputStream createDecryptedStream(byte[] digest, InputStream inputStream) throws IOException {
-        byte[] finalKeyDigest;
-
-        UUID kdf = null;
-        if (kdfparameters != null) {
-            kdf = kdfparameters.get("$UUID").asUuid();
-        }
-        // v3 doesn't have a kdf therefore AES
-        if (kdf == null || Aes.KDF.equals(kdf)){
-            finalKeyDigest = Aes.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
-        } else if (Argon.argon2_kdf.equals(kdf)) {
-            finalKeyDigest = Argon.getArgonFinalKeyDigest(digest, getMasterSeed(), kdfparameters);
-        } else {
-            throw new UnsupportedOperationException("Unknown transform KDF " + kdf);
-        }
+        // return digest of master seed and hash
+        MessageDigest md = getSha256MessageDigestInstance();
+        md.update(masterSeed);
+        byte[] finalKeyDigest = md.digest(getTransformedKeyDigest(digest));
 
         if (AES_CIPHER.equals(cipherUuid)) {
             return Encryption.getDecryptedInputStream(inputStream, Aes.getCipher(), finalKeyDigest, getEncryptionIv());
@@ -147,6 +142,24 @@ public class KdbxHeader {
             return Encryption.getDecryptedInputStream(inputStream, ChaCha.getCipher(), finalKeyDigest, getEncryptionIv());
         }
         throw new UnsupportedOperationException("Unknown encryption cipher " + cipherUuid);
+    }
+
+    public byte[] getTransformedKeyDigest(byte[] digest) {
+        byte[] transformedKeyDigest;
+
+        UUID kdf = null;
+        if (kdfparameters != null) {
+            kdf = kdfparameters.get("$UUID").asUuid();
+        }
+        // v3 doesn't have a kdf therefore AES
+        if (kdf == null || Aes.KDF.equals(kdf)){
+            transformedKeyDigest = Aes.getTransformedKey(digest, getTransformSeed(), getTransformRounds());
+        } else if (Argon.argon2_kdf.equals(kdf)) {
+            transformedKeyDigest = Argon.getTransformedKey(digest, kdfparameters);
+        } else {
+            throw new UnsupportedOperationException("Unknown transform KDF " + kdf);
+        }
+        return transformedKeyDigest;
     }
 
     /**
@@ -158,7 +171,10 @@ public class KdbxHeader {
      * @throws IOException  if something bad happens
      */
     public OutputStream createEncryptedStream(byte[] digest, OutputStream outputStream) throws IOException {
-        byte[] finalKeyDigest = Aes.getFinalKeyDigest(digest, getMasterSeed(), getTransformSeed(), getTransformRounds());
+        // return digest of master seed and hash
+        MessageDigest md = getSha256MessageDigestInstance();
+        md.update(masterSeed);
+        byte[] finalKeyDigest = md.digest(getTransformedKeyDigest(digest));
         return Encryption.getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
     }
 
@@ -285,5 +301,13 @@ public class KdbxHeader {
     public void addBinary(byte[] bytes) {
 
     }
+    public byte[] getHeaderBytes() {
+        return headerBytes;
+    }
 
+    public void setHeaderBytes(byte[] headerBytes) {
+        byte [] copy = new byte[headerBytes.length];
+        System.arraycopy(headerBytes, 0, copy, 0, headerBytes.length);
+        this.headerBytes = copy;
+    }
 }

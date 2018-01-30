@@ -1,5 +1,7 @@
 package org.linguafranca.pwdb.security;
 
+import com.kosprov.jargon2.api.Jargon2;
+
 import java.security.MessageDigest;
 import java.util.UUID;
 
@@ -35,9 +37,8 @@ public class Argon {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
-    public static byte [] getArgonFinalKeyDigest(byte [] digest, byte [] masterSeed, VariantDictionary argonParameterKeys) {
 
+    public static byte[] getTransformedKey(byte[] digest, VariantDictionary argonParameterKeys) {
         byte bVersion = argonParameterKeys.get(paramVersion).asByteArray()[0];
         Version version = bVersion == 0x13 ? Version.V13 : Version.V10;
         byte [] salt = argonParameterKeys.get(paramSalt).asByteArray();
@@ -56,11 +57,6 @@ public class Argon {
                 .hashLength(32);
 
         // do the hash
-        byte [] hash = hasher.password(digest).rawHash();
-
-        // return digest of master seed and hash
-        MessageDigest md = getSha256MessageDigestInstance();
-        md.update(masterSeed);
-        return md.digest(hash);
+        return hasher.password(digest).rawHash();
     }
 }
