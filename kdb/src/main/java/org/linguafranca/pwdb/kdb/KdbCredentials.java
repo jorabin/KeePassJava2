@@ -66,8 +66,10 @@ public interface KdbCredentials extends Credentials {
                 byte [] keyFileData = ByteStreams.toByteArray(inputStream);
                 if (keyFileData.length == 64) {
                     keyFileData = Hex.decode(keyFileData);
+                    key = md.digest(keyFileData);
+                    return;
                 }
-                key = md.digest(keyFileData);
+                throw new IllegalStateException("Invalid length key file " + keyFileData.length);
             } catch (IOException e) {
                 throw new IllegalStateException("Could not read key file", e);
             }

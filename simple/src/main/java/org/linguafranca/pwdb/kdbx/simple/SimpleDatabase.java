@@ -184,13 +184,15 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
         KdbxHeader kdbxHeader = new KdbxHeader();
         InputStream kdbxInnerStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, inputStream);
 
+        StreamEncryptor streamEncyptor = kdbxHeader.getInnerStreamEncryptor();
+
         // decrypt the encrypted fields in the inner XML stream
-        InputStream plainTextXmlStream = new XmlInputStreamFilter(kdbxInnerStream,
-                new KdbxInputTransformer(new StreamEncryptor.Salsa20(kdbxHeader.getInnerRandomStreamKey())));
+        InputStream plainTextXmlStream = new XmlInputStreamFilter(kdbxInnerStream, new KdbxInputTransformer(streamEncyptor));
 
         // read the now entirely decrypted stream into database
         KeePassFile result = getSerializer().read(KeePassFile.class, plainTextXmlStream);
-        if (!Arrays.equals(result.meta.headerHash.getContent(), kdbxHeader.getHeaderHash())) {
+
+        if (kdbxHeader.getVersion() == 3 && !Arrays.equals(result.meta.headerHash.getContent(), kdbxHeader.getHeaderHash())) {
             throw new IllegalStateException("Header Hash Mismatch");
         }
 

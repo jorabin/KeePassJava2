@@ -144,6 +144,12 @@ public class KdbxHeader {
         throw new UnsupportedOperationException("Unknown encryption cipher " + cipherUuid);
     }
 
+    public StreamEncryptor getInnerStreamEncryptor () {
+        return getVersion() == 4 ?
+                new StreamEncryptor.ChaCha20(getInnerRandomStreamKey()) :
+                new StreamEncryptor.Salsa20(getInnerRandomStreamKey());
+    }
+
     public byte[] getTransformedKeyDigest(byte[] digest) {
         byte[] transformedKeyDigest;
 

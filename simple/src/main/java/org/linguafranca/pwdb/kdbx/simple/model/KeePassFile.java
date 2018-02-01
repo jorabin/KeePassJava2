@@ -123,6 +123,12 @@ public class KeePassFile {
         protected List<Binaries.Binary> binaries;
         @Element(name = "CustomData", required = false)
         protected KeePassFile.CustomData customData;
+
+        /* version 4 */
+
+        @Element(name = "SettingsChanged", required = false, type = Date.class)
+        @Convert(TimeConverter.class)
+        protected Date settingsChanged;
     }
 
 

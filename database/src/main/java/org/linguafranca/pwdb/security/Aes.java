@@ -11,7 +11,7 @@ import java.util.UUID;
 import static org.linguafranca.pwdb.security.Encryption.getSha256MessageDigestInstance;
 
 /**
- * AES may be used for Key Derivation and aslo as the underlying stream cipher
+ * AES may be used for Key Derivation and also as the underlying stream cipher
  *
  * @author jo
  */

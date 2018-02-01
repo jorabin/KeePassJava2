@@ -9,8 +9,7 @@ import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxSerializer;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Scanner;
 
 /**
@@ -53,15 +52,18 @@ public class KdbxSerializerTest {
         System.out.println("Version " + header.getVersion());
     }
 
-    @Test @Ignore
+    @Test
     public void getDecryptedArgonInputStream() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx");
         InputStream is = KdbxSerializer.createUnencryptedInputStream(new KdbxCreds("123".getBytes()), new KdbxHeader(), inputStream);
+
+        PrintWriter pw = new PrintWriter(new FileOutputStream("temp.xml"));
         Scanner s = new Scanner(is);
         while (s.hasNext()) {
-            System.out.println(s.nextLine());
+            pw.println(s.nextLine());
         }
         s.close();
+        pw.close();
     }
 
     @Test
