@@ -2,7 +2,7 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-##[2.1.4-Snapshot]
+##[2.1.4] 2018-02-03
 
 ### Added
 
