@@ -35,7 +35,7 @@ The composite POM is
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.1.3</version>
+        <version>2.1.4</version>
         
  at Maven Central. Note that the artifactId has become Camel Case from release 2.1.x onwards.
  
@@ -126,7 +126,7 @@ clarification and my own satisfaction I have written about my understanding of K
 
 1. The Javadoc header to [KdbxSerializer](kdbx/src/main/java/org/linguafranca/pwdb/kdbx/stream_3_1/KdbxSerializer.java) describes KDBX stream formatting.
 2. The XSD Schema [KDBX.3.1.xsd](KDBX.3.1.xsd) documents my understanding of the Keepass XML, and also my lack of understanding, in parts.
-3. [This graphic](Format Diagram.svg) illustrates KDBX 3.1 stream format and also illustrates proposals for the revised KDBX 4.0 format. 
+3. [![KDBX Formats](./FormatDiagram.svg "KDBX Formats")](./FormatDiagram.svg)
 
 ## Dependencies
 
@@ -151,7 +151,7 @@ Included POM is for Maven 3.
 
 There are rather a lot of modules, this is in order to allow loading of minimal necessary functionality. The module dependencies are illustrated below.
 
-[![Module Structure](./Module Structure.svg "Module Structure")](./Module Structure.svg)
+[![Module Structure](./ModuleStructure.svg "Module Structure")](./ModuleStructure.svg)
 
 Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pwdb`. The version id is as noted [above](#mvn).
 
