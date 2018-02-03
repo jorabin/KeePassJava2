@@ -108,6 +108,10 @@ public class KdbxHeader {
      * Construct a default KDBX header
      */
     public KdbxHeader() {
+        this(3);
+    }
+
+    public KdbxHeader(int version) {
         SecureRandom random = new SecureRandom();
         cipherUuid = AES_CIPHER;
         compressionFlags = CompressionFlags.GZIP;
@@ -118,7 +122,6 @@ public class KdbxHeader {
         innerRandomStreamKey = random.generateSeed(32);
         streamStartBytes = new byte[32];
         protectedStreamAlgorithm = ProtectedStreamAlgorithm.SALSA_20;
-        version = 3;
     }
 
     /**

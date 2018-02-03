@@ -7,6 +7,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 ### Added
 
 - Preliminary readonly support for V4 files
+- updated documentation of various sorts
 
 ##[2.1.4-Snapshot]
 

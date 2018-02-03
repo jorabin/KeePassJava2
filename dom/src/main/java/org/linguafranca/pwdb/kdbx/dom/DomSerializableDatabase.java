@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx.dom;
 
 
+import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.StreamEncryptor;
 import org.apache.commons.codec.binary.Base64;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
+import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -62,12 +64,14 @@ public class DomSerializableDatabase implements SerializableDatabase {
         // read in the template KeePass XML database
         result.load(result.getClass().getClassLoader().getResourceAsStream("base.kdbx.xml"));
         try {
-            // replace all placeholder dates with now
+            // replace all placeholder dates with now (this is now already done in the loader)
+/*
             String now = DomHelper.dateFormatter.format(new Date());
             NodeList list = (NodeList) DomHelper.xpath.evaluate("//*[contains(text(),'${creationDate}')]", result.doc.getDocumentElement(), XPathConstants.NODESET);
             for (int i = 0; i < list.getLength(); i++) {
                 list.item(i).setTextContent(now);
             }
+*/
             // set the root group UUID
             Node uuid = (Node) DomHelper.xpath.evaluate("//"+ DomHelper.UUID_ELEMENT_NAME, result.doc.getDocumentElement(), XPathConstants.NODE);
             uuid.setTextContent(DomHelper.base64RandomUuid());
@@ -97,13 +101,32 @@ public class DomSerializableDatabase implements SerializableDatabase {
                 element.removeAttribute("Protected");
             }
 
+            // we need to convert all V4 dates - we'll convert them all anyway TODO find a way of not converting V3 dates
+            // finding all elements name ending Changed and Time
+            NodeList dateContent = (NodeList) DomHelper.xpath.evaluate("//*[substring(local-name(), string-length(local-name()) -3) = 'Time']", doc, XPathConstants.NODESET);
+            processDates(dateContent);
+
+            dateContent = (NodeList) DomHelper.xpath.evaluate("//*[substring(local-name(), string-length(local-name()) -6) = 'Changed']", doc, XPathConstants.NODESET);
+            processDates(dateContent);
+
             return this;
+
         } catch (ParserConfigurationException e) {
             throw new IllegalStateException("Instantiating Document Builder", e);
         } catch (SAXException e) {
             throw new IllegalStateException("Parsing exception", e);
         } catch (XPathExpressionException e) {
             throw new IllegalStateException("XPath Exception", e);
+        }
+    }
+
+    private void processDates(NodeList dateContent) {
+        Date now = new Date();
+        for (int i = 0; i < dateContent.getLength(); i++){
+            Element element = ((Element) dateContent.item(i));
+            String content = DomHelper.getElementContent(".", element);
+            Date d = content == null || content.equals("${creationDate}") ? now :Helpers.toDate(content);
+            DomHelper.setElementContent(".", element, DomHelper.dateFormatter.format(d));
         }
     }
 
