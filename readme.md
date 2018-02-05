@@ -1,7 +1,8 @@
 # KeePassJava2
 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent) 
-Master: [![Build Status](https://travis-ci.org/jorabin/KeePassJava2.svg?branch=master)](https://travis-ci.org/jorabin/KeePassJava2) Develop: [![Build Status](https://travis-ci.org/jorabin/KeePassJava2.svg?branch=develop)](https://travis-ci.org/jorabin/KeePassJava2)
+Master: [![Build Status](https://travis-ci.org/jorabin/KeePassJava2.svg?branch=master)](https://travis-ci.org/jorabin/KeePassJava2) 
+Develop: [![Build Status](https://travis-ci.org/jorabin/KeePassJava2.svg?branch=develop)](https://travis-ci.org/jorabin/KeePassJava2)
 
 A Java 7 API for databases compatible with the renowned [KeePass](http://keepass.info) password
 safe for Windows.
@@ -121,12 +122,13 @@ Hence the creation of abstract Database interfaces rather than following the Kee
 exactly.
 
 KeePass is in effect defined by the code that Dominik writes to create and maintain the project.
-Hence there are no definitive specification of KeePass files other than that code. For the sake of
+Hence there is no definitive specification of KeePass files other than that code. For the sake of
 clarification and my own satisfaction I have written about my understanding of KeePass formats in the following locations:
 
-1. The Javadoc header to [KdbxSerializer](kdbx/src/main/java/org/linguafranca/pwdb/kdbx/stream_3_1/KdbxSerializer.java) describes KDBX stream formatting.
+1. The Javadoc header to [KdbxSerializer](http://static.javadoc.io/org.linguafranca.pwdb/KeePassJava2-kdbx/2.1.4/org/linguafranca/pwdb/kdbx/stream_3_1/KdbxSerializer.html) describes version 3.1 KDBX stream formatting.
 2. The XSD Schema [KDBX.3.1.xsd](KDBX.3.1.xsd) documents my understanding of the Keepass XML, and also my lack of understanding, in parts.
-3. [![KDBX Formats](./FormatDiagram.svg "KDBX Formats")](./FormatDiagram.svg)
+3. The following graphic illustrates KDBX 3.1 and 4 file formats:
+[![KDBX Formats](./FormatDiagram.svg "KDBX Formats")](./FormatDiagram.svg)
 
 ## Dependencies
 
@@ -134,7 +136,7 @@ Aside from the JRE the API depends on:
 
 - [Google Guava](https://github.com/google/guava/wiki) ([Apache 2 license](https://github.com/google/guava/blob/master/COPYING)).
 - [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
-- [Spongy Castle](https://rtyley.github.io/spongycastle/) which is a repackaging for Android of [Bouncy Castle](https://www.bouncycastle.org/java.html) ([Apache 2 license](https://www.bouncycastle.org/licence.html)).
+- [Spongy Castle](https://rtyley.github.io/spongycastle/) ([License](https://github.com/rtyley/spongycastle/blob/spongy-master/LICENSE.html)) which is a repackaging for Android of [Bouncy Castle](https://www.bouncycastle.org/java.html) ([License](https://www.bouncycastle.org/licence.html)).
 
 The Simple XML implementation additionally depends on:
 
@@ -157,21 +159,51 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 
 <table>
 <thead>
-<tr><th>Module</th><th>ArtifactId</th><th>Description</th></tr>
+<tr><th>Module</th><th>ArtifactId</th><th>JavaDoc<th>Description</th></tr>
 </thead>
 <tbody>
-<tr><td><a href="database">database</a></td><td>database</td><td>Base definition of the Database APIs.</td></tr>
-<tr><td><a href="">example</a></td><td>example</td><td>Worked examples of loading, saving, splicing etc. using the APIs</td></tr>
-<tr><td><a href="test">test</a></td><td>test</td><td>Shared tests to assess the viability of the implementation.</td></tr>
-<tr><td><a href="all">all</a></td><td><strong>KeePassJava2</strong></td><td>This is the main KeePassJava2 Maven dependency. Provides a route to all artifacts (other than test and examples) via transitive dependency.</td></tr>
-<tr><td><a href="kdb">kdb</a></td><td>KeePassJava2-kdb</td><td>An implementation of the Database APIs supporting KeePass KDB format.</td></tr>
-<tr><td><a href="kdbx">kdbx</a></td><td>KeePassJava2-kdbx</td><td>Provides support for KDBX streaming and security.</td></tr>
-<tr><td><a href="simple">simple</a></td><td>KeePassJava2-simple</td><td>A Simple XML Platform implementation of KDBX. Could be useful for Android.</td></tr>
-<tr><td><a href="jaxb">jaxb</a></td><td>KeePassJava2-jaxb</td><td>A JAXB implementation of KDBX. Probably not useful for Android. The generated class
+
+<tr><td><a href="database">database</a></td><td>database</td>
+<td>
+<a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/database"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/database.svg" alt="Javadocs"></a>
+</td>
+<td>Base definition of the Database APIs.</td></tr>
+<tr><td><a href="">example</a></td><td>example</td>
+<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/example"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/example.svg" alt="Javadocs"></a></td>
+<td>Worked examples of loading, saving, splicing etc. using the APIs</td></tr>
+
+<tr><td><a href="test">test</a></td><td>test</td>
+<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/test"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/test.svg" alt="Javadocs"></a></td>
+<td>Shared tests to assess the viability of the implementation.</td></tr>
+
+<tr><td><a href="all">all</a></td><td><strong>KeePassJava2</strong></td>
+<td>(no JavaDoc)</td>
+<td>This is the main KeePassJava2 Maven dependency. Provides a route to all artifacts (other than test and examples) via transitive dependency.</td></tr>
+
+<tr><td><a href="kdb">kdb</a></td><td>KeePassJava2-kdb</td>
+<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdb"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdb.svg" alt="Javadocs"></a></td>
+<td>An implementation of the Database APIs supporting KeePass KDB format.</td></tr>
+
+<tr><td><a href="kdbx">kdbx</a></td><td>KeePassJava2-kdbx</td>
+<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx.svg" alt="Javadocs"></a></td>
+<td>Provides support for KDBX streaming and security.</td></tr>
+<tr><td><a href="simple">simple</a></td><td>KeePassJava2-simple</td>
+<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx.svg" alt="Javadocs"></a></td>
+<td>A Simple XML Platform implementation of KDBX. Could be useful for Android.</td></tr>
+
+<tr><td><a href="jaxb">jaxb</a></td><td>KeePassJava2-jaxb</td>
+<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jaxb"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-jaxb.svg" alt="Javadocs"></a></td>
+<td>A JAXB implementation of KDBX. Probably not useful for Android. The generated class
 bindings might be useful for building other interfaces.</td></tr>
-<tr><td><a href="dom">dom</a></td><td>KeePassJava2-dom</td><td>A DOM based implementation of KDBX. Being DOM based it is rather slow, but 
+
+<tr><td><a href="dom">dom</a></td><td>KeePassJava2-dom</td>
+<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-dom"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-dom.svg" alt="Javadocs"></a></td>
+<td>A DOM based implementation of KDBX. Being DOM based it is rather slow, but 
 messes less with existing content than the other two implementations. Known to work on Android.</td></tr>
-<tr><td><a href="http">http</a></td><td>keepasshttp</td><td>An implementation of a server 
+
+<tr><td><a href="http">http</a></td><td>keepasshttp</td>
+<td></td>
+<td>An implementation of a server 
 intended to be the equivalent of 
 <a href="https://github.com/pfn/keepasshttp/">keepasshttp</a>, which is a plugin for Windows Keepass
 supporting communication with Chrome (chromeIPass) and Firefox(PassIFox) extensions. 
