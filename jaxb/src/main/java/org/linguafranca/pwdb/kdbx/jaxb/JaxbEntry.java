@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.jaxb;
 
+import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
@@ -228,7 +229,7 @@ public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry,
     }
 
     @Override
-    public UUID getUuid() {
+    public @NotNull UUID getUuid() {
         return delegate.getUUID();
     }
 

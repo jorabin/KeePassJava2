@@ -16,9 +16,10 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.security.*;
 
-import java.io.IOException;
+import javax.crypto.Mac;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -34,12 +35,10 @@ import static org.linguafranca.pwdb.security.Encryption.getSha256MessageDigestIn
 /**
  * This class represents the header portion of a KeePass KDBX file or stream. The header is received in
  * plain text and describes the encryption and compression of the remainder of the file.
- *
- * <p>It is a factory for encryption and decryption streams and contains a hash of its own serialization.
- *
+ * <p>
+ * <p>It is a factory for encryption and decryption streams. It provides for verification of its own serialization.
+ * <p>
  * <p>While KDBX streams are Little-Endian, data is passed to and from this class in standard Java byte order.
- *
- * @author jo
  */
 @SuppressWarnings("WeakerAccess")
 public class KdbxHeader {
@@ -64,20 +63,14 @@ public class KdbxHeader {
         NONE, ARC_FOUR, SALSA_20, CHA_CHA_20
     }
 
-    /**
-     * UUIDs of Ciphers for encryption
-     */
-    public static final UUID AES_CIPHER = UUID.fromString("31C1F2E6-BF71-4350-BE58-05216AFC5AFF");
-    public static final UUID CHACHA_CIPHER = UUID.fromString("d6038a2b-8b6f-4cb5-a524-339a31dbb59a");
-
-    private List<Integer> allowableVersions = new ArrayList<>(Arrays.asList(3,4));
+    private List<Integer> allowableVersions = new ArrayList<>(Arrays.asList(3, 4));
 
 
     /* version of the file */
     private int version;
 
     protected UUID cipherUuid;
-    private byte [] masterSeed;
+    private byte[] masterSeed;
     private byte[] encryptionIv;
 
     /* whether the data is compressed */
@@ -96,6 +89,7 @@ public class KdbxHeader {
 
     /* dictionaries in V4 */
     private VariantDictionary kdfparameters;
+    // TODO implement V4 custom data
     private VariantDictionary customData;
 
     /* not transmitted as part of the header, used in the XML payload, so calculated
@@ -113,7 +107,9 @@ public class KdbxHeader {
 
     public KdbxHeader(int version) {
         SecureRandom random = new SecureRandom();
-        cipherUuid = AES_CIPHER;
+
+        this.version = version;
+        cipherUuid = Aes.getInstance().getCipherUuid();
         compressionFlags = CompressionFlags.GZIP;
         masterSeed = random.generateSeed(32);
         transformSeed = random.generateSeed(32);
@@ -122,83 +118,114 @@ public class KdbxHeader {
         innerRandomStreamKey = random.generateSeed(32);
         streamStartBytes = new byte[32];
         protectedStreamAlgorithm = ProtectedStreamAlgorithm.SALSA_20;
+
+        kdfparameters = Aes.createKdfParameters();
     }
+
+    /**
+     * Compute the Hmac Key Digest
+     * KdbxFile.cs Computekeys
+     *
+     * @param credentials the credentials
+     * @return the digest
+     */
+    public byte[] getHmacKey(Credentials credentials) {
+        // Compute the Hmac Key Digest
+        // KdbxFile.cs Computekeys
+        MessageDigest md = Encryption.getSha512MessageDigestInstance();
+        md.update(getMasterSeed());
+        md.update(getTransformedKeyDigest(credentials.getKey()));
+        return md.digest(new byte[]{1});
+    }
+
+    /**
+     * Verify the header Hmac
+     *
+     * @param key   the transformed Hmac Key for the header
+     * @param bytes the bytes to compare to verify
+     */
+    public void verifyHeaderHmac(byte[] key, byte[] bytes) {
+        Mac mac = Encryption.getHMacSha256Instance(key);
+        byte[] computedHmacSha256 = mac.doFinal(getHeaderBytes());
+        if (!Arrays.equals(computedHmacSha256, bytes)) {
+            throw new IllegalStateException("Header HMAC does not match");
+        }
+    }
+
+    // Alternative implementation of above using bouncy castle
+    /*
+        HMac hmac = new HMac(new SHA256Digest());
+        hmac.init(new KeyParameter(hmacKey64));
+        hmac.update(kdbxHeader.getHeaderBytes(), 0, kdbxHeader.getHeaderBytes().length);
+        byte[] computedHmacSha256 = new byte[32];
+        hmac.doFinal(computedHmacSha256, 0);
+     */
 
     /**
      * Create a decrypted input stream using supplied digest and this header
      * apply decryption to the passed encrypted input stream
      *
-     * @param digest the key digest
+     * @param digest      the key digest
      * @param inputStream the encrypted input stream
      * @return a decrypted stream
-     * @throws IOException if something bad happens
      */
-    public InputStream createDecryptedStream(byte[] digest, InputStream inputStream) throws IOException {
+    public InputStream createDecryptedStream(byte[] digest, InputStream inputStream) {
         // return digest of master seed and hash
         MessageDigest md = getSha256MessageDigestInstance();
         md.update(masterSeed);
         byte[] finalKeyDigest = md.digest(getTransformedKeyDigest(digest));
-
-        if (AES_CIPHER.equals(cipherUuid)) {
-            return Encryption.getDecryptedInputStream(inputStream, Aes.getCipher(), finalKeyDigest, getEncryptionIv());
-        } else if (CHACHA_CIPHER.equals(cipherUuid)) {
-            return Encryption.getDecryptedInputStream(inputStream, ChaCha.getCipher(), finalKeyDigest, getEncryptionIv());
-        }
-        throw new UnsupportedOperationException("Unknown encryption cipher " + cipherUuid);
+        CipherAlgorithm ca = Encryption.Cipher.getCipherAlgorithm(cipherUuid);
+        return ca.getDecryptedInputStream(inputStream, finalKeyDigest, encryptionIv);
     }
 
-    public StreamEncryptor getInnerStreamEncryptor () {
+    public StreamEncryptor getInnerStreamEncryptor() {
         return getVersion() == 4 ?
                 new StreamEncryptor.ChaCha20(getInnerRandomStreamKey()) :
                 new StreamEncryptor.Salsa20(getInnerRandomStreamKey());
     }
 
+    /**
+     * Takes the composite credentials and transforms them according to the underlying KDF algorithm.
+     * @param digest the credentials digested
+     * @return the transformed digest
+     */
     public byte[] getTransformedKeyDigest(byte[] digest) {
-        byte[] transformedKeyDigest;
-
-        UUID kdf = null;
-        if (kdfparameters != null) {
-            kdf = kdfparameters.get("$UUID").asUuid();
-        }
         // v3 doesn't have a kdf therefore AES
-        if (kdf == null || Aes.KDF.equals(kdf)){
-            transformedKeyDigest = Aes.getTransformedKey(digest, getTransformSeed(), getTransformRounds());
-        } else if (Argon.argon2_kdf.equals(kdf)) {
-            transformedKeyDigest = Argon.getTransformedKey(digest, kdfparameters);
-        } else {
-            throw new UnsupportedOperationException("Unknown transform KDF " + kdf);
+        if (kdfparameters == null) {
+            return Aes.getTransformedKey(digest, transformSeed, transformRounds);
         }
-        return transformedKeyDigest;
+        KeyDerivationFunction kdf = Encryption.Kdf.getKdf(kdfparameters.mustGet("$UUID").asUuid());
+        return kdf.getTransformedKey(digest, kdfparameters);
     }
 
     /**
      * Create an unencrypted outputstream using the supplied digest and this header
      * and use the supplied output stream to write encrypted data.
-     * @param digest the key digest
+     *
+     * @param digest       the key digest
      * @param outputStream the output stream which is the destination for encrypted data
      * @return an output stream to write unencrypted data to
-     * @throws IOException  if something bad happens
      */
-    public OutputStream createEncryptedStream(byte[] digest, OutputStream outputStream) throws IOException {
+    public OutputStream createEncryptedStream(byte[] digest, OutputStream outputStream) {
         // return digest of master seed and hash
         MessageDigest md = getSha256MessageDigestInstance();
         md.update(masterSeed);
         byte[] finalKeyDigest = md.digest(getTransformedKeyDigest(digest));
-        return Encryption.getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
+        return Aes.getInstance().getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
     }
 
     public byte[] getTransformSeed() {
         if (version < 4) {
             return transformSeed;
         }
-        return kdfparameters.get(Aes.KdfKeys.ParamSeed).asByteArray();
+        return kdfparameters.mustGet(Aes.KdfKeys.ParamSeed).asByteArray();
     }
 
     public long getTransformRounds() {
         if (version < 4) {
             return transformRounds;
         }
-        return kdfparameters.get(Aes.KdfKeys.ParamRounds).asLong();
+        return kdfparameters.mustGet(Aes.KdfKeys.ParamRounds).asLong();
     }
 
     public UUID getCipherUuid() {
@@ -239,10 +266,18 @@ public class KdbxHeader {
 
     public StreamEncryptor getStreamEncryptor() {
         switch (getProtectedStreamAlgorithm()) {
-            case NONE: {throw new IllegalStateException("Inner stream encoding of NONE");}
-            case ARC_FOUR: {throw new UnsupportedOperationException("Arc Four inner stream not supported");}
-            case SALSA_20: {return new StreamEncryptor.Salsa20(this.innerRandomStreamKey);}
-            case CHA_CHA_20: {return new StreamEncryptor.ChaCha20(this.innerRandomStreamKey);}
+            case NONE: {
+                throw new IllegalStateException("Inner stream encoding of NONE");
+            }
+            case ARC_FOUR: {
+                throw new UnsupportedOperationException("Arc Four inner stream not supported");
+            }
+            case SALSA_20: {
+                return new StreamEncryptor.Salsa20(this.innerRandomStreamKey);
+            }
+            case CHA_CHA_20: {
+                return new StreamEncryptor.ChaCha20(this.innerRandomStreamKey);
+            }
         }
         throw new IllegalStateException("Inner stream encoding unsupported");
     }
@@ -286,7 +321,7 @@ public class KdbxHeader {
     public void setCipherUuid(byte[] uuid) {
         ByteBuffer b = ByteBuffer.wrap(uuid);
         UUID incoming = new UUID(b.getLong(), b.getLong(8));
-        if (!incoming.equals(AES_CIPHER) && !incoming.equals(CHACHA_CIPHER)) {
+        if (!incoming.equals(Aes.getInstance().getCipherUuid()) && !incoming.equals(ChaCha.getInstance().getCipherUuid())) {
             throw new IllegalStateException("Unknown Cipher UUID " + incoming.toString());
         }
         this.cipherUuid = incoming;
@@ -308,14 +343,15 @@ public class KdbxHeader {
     }
 
     public void addBinary(byte[] bytes) {
-
+        // TODO something about binaries in V4
     }
+
     public byte[] getHeaderBytes() {
         return headerBytes;
     }
 
     public void setHeaderBytes(byte[] headerBytes) {
-        byte [] copy = new byte[headerBytes.length];
+        byte[] copy = new byte[headerBytes.length];
         System.arraycopy(headerBytes, 0, copy, 0, headerBytes.length);
         this.headerBytes = copy;
     }

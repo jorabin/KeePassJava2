@@ -122,7 +122,10 @@ Hence the creation of abstract Database interfaces rather than following the Kee
 exactly.
 
 KeePass is in effect defined by the code that Dominik writes to create and maintain the project.
-Hence there is no definitive specification of KeePass files other than that code. For the sake of
+Hence there is not much by way of definitive specification of KeePass files other than that code. There 
+is [a discussion](https://keepass.info/help/kb/kdbx_4.html) of the differences between KDBX version 3.1 and version 4.
+
+For the sake of
 clarification and my own satisfaction I have written about my understanding of KeePass formats in the following locations:
 
 1. The Javadoc header to [KdbxSerializer](http://javadoc.io/page/org.linguafranca.pwdb/KeePassJava2-kdbx/latest/org/linguafranca/pwdb/kdbx/stream_3_1/KdbxSerializer.html) describes KDBX stream formatting.

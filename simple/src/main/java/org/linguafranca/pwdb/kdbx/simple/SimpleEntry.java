@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.simple;
 
+import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.simple.converter.UuidConverter;
@@ -216,7 +217,7 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
     }
 
     @Override
-    public UUID getUuid() {
+    public @NotNull UUID getUuid() {
         return uuid;
     }
 

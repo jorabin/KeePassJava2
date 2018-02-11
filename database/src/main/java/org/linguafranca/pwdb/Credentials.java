@@ -38,5 +38,8 @@ public interface Credentials {
         }
     }
 
-    byte [] getKey();
+    /**
+     * Returns a digest of the composition of credentials supplied
+     */
+    byte[] getKey();
 }

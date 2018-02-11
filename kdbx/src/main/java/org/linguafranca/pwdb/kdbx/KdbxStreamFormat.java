@@ -26,13 +26,25 @@ import java.util.Arrays;
 /**
  * This class implements KDBX formatted saving and loading of databases
  *
- * @author jo
  */
 public class KdbxStreamFormat implements StreamFormat {
 
     private final Version version;
 
-    public static enum Version {KDBX31, KDBX4}
+    public enum Version {
+        KDBX31(3),
+        KDBX4(4);
+
+        private final int version;
+
+        Version(int num) {
+            this.version = num;
+        }
+
+        int getVersionNum() {
+            return this.version;
+        }
+    }
 
     /**
      * Create a StreamFormat for reading or for writing v3
@@ -64,7 +76,7 @@ public class KdbxStreamFormat implements StreamFormat {
     @Override
     public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream encryptedOutputStream) throws IOException {
         // fresh kdbx header
-        KdbxHeader kdbxHeader = new KdbxHeader(4);
+        KdbxHeader kdbxHeader = new KdbxHeader(version.getVersionNum());
         OutputStream unencrytedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, encryptedOutputStream);
         if (version == Version.KDBX31) {
             serializableDatabase.setHeaderHash(kdbxHeader.getHeaderHash());

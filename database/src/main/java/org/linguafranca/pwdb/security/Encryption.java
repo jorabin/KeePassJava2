@@ -16,65 +16,22 @@
 
 package org.linguafranca.pwdb.security;
 
-// use spongycastle repackaging of bouncycastle in deference to Android needs
-import org.spongycastle.crypto.StreamCipher;
-import org.spongycastle.crypto.engines.AESFastEngine;
-import org.spongycastle.crypto.io.CipherInputStream;
-import org.spongycastle.crypto.io.CipherOutputStream;
-import org.spongycastle.crypto.modes.CBCBlockCipher;
-import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
-import org.spongycastle.crypto.params.KeyParameter;
-import org.spongycastle.crypto.params.ParametersWithIV;
-
-import java.io.IOException;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 /**
- * Encryption and decryption utilities..
- *
- * @author jo
+ * Contains the key transform functions and cipher algorithms used in other modules.
+ * <p>
+ * Also some convenience utilities that hide the checked exceptions that would otherwise need to be checked for
+ * when using digests.
  */
 public class Encryption {
-
-    /**
-     * Gets a digest for a UTF-8 encoded string
-     *
-     * @param string the string
-     * @return a digest as a byte array
-     */
-    @SuppressWarnings("unused")
-    public static byte[] getDigest(String string) {
-        return getDigest(string, "UTF-8");
-    }
-
-    /**
-     * Gets a digest for a string
-     *
-     * @param string the string
-     * @param encoding the encoding of the String
-     * @return a digest as a byte array
-     */
-    public static byte[] getDigest(String string, String encoding) {
-        if (string == null || string.length() == 0)
-            throw new IllegalArgumentException("String cannot be null or empty");
-
-        if (encoding == null || encoding.length() == 0)
-            throw new IllegalArgumentException("Encoding cannot be null or empty");
-
-        MessageDigest md = getSha256MessageDigestInstance();
-
-        try {
-            byte[] bytes = string.getBytes(encoding);
-            md.update(bytes, 0, bytes.length);
-            return md.digest();
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(encoding + " is not supported");
-        }
-    }
 
     /**
      * Gets a SHA-256 message digest instance
@@ -103,30 +60,118 @@ public class Encryption {
     }
 
     /**
-     * Create a decrypted input stream from an encrypted one
+     * Gets an HMacSha256 Mac
+     *
+     * @param key the key
+     * @return the Mac initialised with the key
      */
-    public static InputStream getDecryptedInputStream(InputStream encryptedInputStream, PaddedBufferedBlockCipher pbbc, byte[] keyData, byte[] ivData) {
-        final ParametersWithIV keyAndIV = new ParametersWithIV(new KeyParameter(keyData), ivData);
-        pbbc.init(false, keyAndIV);
-        return new CipherInputStream(encryptedInputStream, pbbc);
+    public static Mac getHMacSha256Instance(byte[] key) {
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(new SecretKeySpec(key, "HmacSHA256"));
+            return mac;
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new IllegalStateException("HmacSHA256 is not supported", e);
+        }
     }
 
     /**
-     * Create a decrypted input stream from an encrypted one
+     * From HmacBlockStream.cs GetHmacKey64
+     * Calculates the block key for the block number ...
+     *
+     * @param digest    the HMAC key digest
+     * @param transform the transform seed (the block number, 8 bytes)
+     * @return a key
      */
-    public static InputStream getDecryptedInputStream(InputStream encryptedInputStream, StreamCipher cipher, byte[] keyData, byte[] ivData) throws IOException {
-        final ParametersWithIV keyAndIV = new ParametersWithIV(new KeyParameter(keyData), ivData);
-        cipher.init(false, keyAndIV);
-        return new CipherInputStream(encryptedInputStream, cipher);
+    public static byte[] transformHmacKey(byte[] digest, byte[] transform) {
+        MessageDigest md = Encryption.getSha512MessageDigestInstance();
+        md.update(transform);
+        return md.digest(digest);
     }
 
     /**
-     * Create an encrypted output stream from an unencrypted output stream
+     * A list of functions that we can use to transform keys
+     * Enum constants forward to underlying implementation.
      */
-    public static OutputStream getEncryptedOutputStream (OutputStream decryptedOutputStream, byte[] keyData, byte[] ivData) {
-        final ParametersWithIV keyAndIV = new ParametersWithIV(new KeyParameter(keyData), ivData);
-        PaddedBufferedBlockCipher pbbc = new PaddedBufferedBlockCipher(new CBCBlockCipher(new AESFastEngine()));
-        pbbc.init(true, keyAndIV);
-        return new CipherOutputStream(decryptedOutputStream, pbbc);
+    public enum Kdf implements KeyDerivationFunction {
+        AES(Aes.getInstance()),
+        ARGON2(Argon2.getInstance());
+
+        private final KeyDerivationFunction kdf;
+
+        Kdf(KeyDerivationFunction kdf) {
+            this.kdf = kdf;
+        }
+
+        /**
+         * Find a KDF that matches this Uuid
+         *
+         * @param kdfUuid the Uuid to match
+         * @throws IllegalArgumentException if the Uuid is not known
+         */
+        public static KeyDerivationFunction getKdf(UUID kdfUuid) {
+            for (KeyDerivationFunction kdf : values()) {
+                if (kdf.getKdfUuid().equals(kdfUuid)) {
+                    return kdf;
+                }
+            }
+            throw new IllegalArgumentException("Unknown Cipher UUID");
+        }
+
+        @Override
+        public UUID getKdfUuid() {
+            return kdf.getKdfUuid();
+        }
+
+        @Override
+        public byte[] getTransformedKey(byte[] key, VariantDictionary transformParams) {
+            return kdf.getTransformedKey(key, transformParams);
+        }
+    }
+
+    /**
+     * A list of ciphers that we may apply to the database contents.
+     * Enum constants forward to underlying implementation.
+     */
+    public enum Cipher implements CipherAlgorithm {
+        CHACHA(ChaCha.getInstance()),
+        AES(Aes.getInstance());
+
+        private final CipherAlgorithm ef;
+
+        /**
+         * Find a cipher that matches this Uuid
+         *
+         * @param cipherUuid the Uuid
+         * @return a cipher
+         * @throws IllegalArgumentException if the Uuid is not known
+         */
+        public static CipherAlgorithm getCipherAlgorithm(UUID cipherUuid) {
+            for (CipherAlgorithm ca : values()) {
+                if (ca.getCipherUuid().equals(cipherUuid)) {
+                    return ca;
+                }
+            }
+            throw new IllegalArgumentException("Unknown Cipher UUID");
+        }
+
+        Cipher(CipherAlgorithm ef) {
+            this.ef = ef;
+        }
+
+        @Override
+        public UUID getCipherUuid() {
+            return ef.getCipherUuid();
+        }
+
+        @Override
+        public InputStream getDecryptedInputStream(InputStream encryptedInputStream, byte[] key, byte[] iv) {
+            return ef.getDecryptedInputStream(encryptedInputStream, key, iv);
+        }
+
+        @Override
+        public OutputStream getEncryptedOutputStream(OutputStream decryptedOutputStream, byte[] key, byte[] iv) {
+            return ef.getEncryptedOutputStream(decryptedOutputStream, key, iv);
+        }
     }
 }

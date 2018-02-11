@@ -148,4 +148,20 @@ public class Helpers {
         }
         return baos.toByteArray();
     }
+
+    public static byte[] toBytes(long value, ByteOrder byteOrder) {
+        byte[] longBuffer = new byte [8];
+        ByteBuffer.wrap(longBuffer)
+                .order(byteOrder)
+                .putLong(value);
+        return longBuffer;
+    }
+
+    public static byte[] toBytes(int value, ByteOrder byteOrder) {
+        byte[] longBuffer = new byte [4];
+        ByteBuffer.wrap(longBuffer)
+                .order(byteOrder)
+                .putInt(value);
+        return longBuffer;
+    }
 }

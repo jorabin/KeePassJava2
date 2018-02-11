@@ -29,8 +29,9 @@ public class KdbxSerializerTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx");
         KdbxHeader header = KdbxSerializer.readOuterHeader(inputStream, new KdbxHeader());
         System.out.println("Version " + header.getVersion());
-        byte [] hmacKey = KdbxSerializer.verifyOuterHeader(header, new KdbxCredentials.Password("123".getBytes()), new LittleEndianDataInputStream(inputStream));
-        HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(hmacKey, inputStream, true);
+        KdbxCreds creds = new KdbxCreds("123".getBytes());
+        KdbxSerializer.verifyOuterHeader(header, creds, new LittleEndianDataInputStream(inputStream));
+        HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(header.getHmacKey(creds), inputStream, true);
         byte [] buf = new byte [1024];
         int bytesRead;
         while ((bytesRead = hmacBlockInputStream.read(buf)) != -1) {
