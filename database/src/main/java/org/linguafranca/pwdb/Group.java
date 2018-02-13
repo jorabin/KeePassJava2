@@ -16,13 +16,20 @@
 
 package org.linguafranca.pwdb;
 
+import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
 
 /**
- * Interface for a Database Group. Databases have exactly one Root Group.
- * Further Groups of the database are help as sub-Groups of other Groups.
- * A Database may contain Groups to an indefinite level.
+ * Interface for a Database Group.
+ *
+ * <p>Databases have exactly one Root Group.
+ *
+ * <p>Other Groups of the database are a child of another Group.
+ *
+ * <p>A Database may contain Groups to an indefinite level.
  *
  * <p>Any Group may contain {@link Entry} items.
  *
@@ -47,7 +54,7 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * a parent - e.g. if it is newly created or if it has
      * been removed from a previous parent.
       */
-    G getParent();
+    @Nullable G getParent();
 
     /**
      * Add this group to a parent. The group must be of a type compatible with the database
@@ -124,9 +131,11 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
 
     /**
      * Finds all entries in this group that match the string supplied.
-     * Optionally in subgroups as well.
+     * Optionally recurse over subgroups, excluding recycle bin.
      *
      * <p>Entry match is described under {@link Entry#match(String)}
+     *
+     * <p><em>Note:</em> finding within recycle bin is supported, recusion into recycle bin is inhibited
      *
      * @param match the text to match
      * @param recursive whether to include sub groups in the process
@@ -137,14 +146,16 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
 
     /**
      * Finds all entries in this group that match using the matcher supplied.
-     * Optionally in subgroups as well.
+     * Optionally recurse over subgroups, excluding recycle bin.
      *
-     * <p>Entry match is described under {@link Entry#match(String)}
+     * <p>Entry match is described under {@link Entry#match(Entry.Matcher)}
+     *
+     * <p><em>Note:</em> finding within recycle bin is supported, recusion into recycle bin is inhibited
      *
      * @param matcher the mathcher to use
      * @param recursive whether to include sub groups in the process
      * @return a modifiable-by-caller list
-     * @see Entry#match(String)
+     * @see Entry#match(Entry.Matcher)
      */
     List<? extends E> findEntries(Entry.Matcher matcher, boolean recursive);
 
@@ -165,7 +176,7 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
     E removeEntry(E entry);
 
     /**
-     * Make a deep copy of the children a group in this group. Does not copy the parent group.
+     * Make a deep copy of the children a group and add to this group. Does not copy the parent group.
      * @param parent the group to deep copy
      */
     void copy(Group<? extends Database, ? extends Group, ? extends Entry, ? extends Icon> parent);
@@ -176,15 +187,33 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      */
     String getPath();
 
+    /**
+     * Get the name of this group
+     */
     String getName();
 
+    /**
+     * Set the name of this group
+     */
     void setName(String name);
 
+    /**
+     * Get the UUID of this group
+     */
     UUID getUuid();
 
+    /**
+     * Get the Icon of this group
+     */
     Icon getIcon();
 
+    /**
+     * Set the Icon of this group
+     */
     void setIcon(I icon);
 
-    D getDatabase();
+    /**
+     * Get the database this group was created from
+     */
+    @NotNull D getDatabase();
 }

@@ -19,6 +19,7 @@ package org.linguafranca.pwdb.checks;
 import com.google.common.io.ByteStreams;
 import org.junit.Assert;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
@@ -31,15 +32,35 @@ import java.io.OutputStream;
 
 import static org.junit.Assert.*;
 
-
 /**
+ * Tests to verify that binary properties work correctly. Resources associated with this module contain files
+ * named "Attachment*.kdbx" which contain two entries:
+ *
+ * <dl>
+ *     <dt>"Test Attachment"</dt>
+ *     <dd>Contains an attachment "Letter J" which is also present in the resources directory</dd>
+ *     <dt>"Test 2 Attachment"</dt>
+ *     <dd>Contains an attachment "Letter L" which is also present in the resources directory</dd>
+ * </dl>
+ *
+ * When used as a test suite for a concrete implementation, subclass and name the class *Test etc to conform
+ * with Junit rules
+ * <p>
+ * Subclasses should test both V3 KDBX files (Attachment.kdbx) and V4 (Attachment-ChaCha20-Argon2.kdbx) since
+ * attachments are handled differently in the two versions.
+ *
  * @author jo
  */
 public abstract class BinaryPropertyChecks {
+
     public Database<?,?,?,?> database;
+
     @SuppressWarnings("unused")
     public abstract void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException;
 
+    /**
+     * Retrieve and verify attachment "letter J"
+     */
     @Test
     public void getBinaryProperty() throws Exception {
         Entry entry = database.findEntries("Test attachment").get(0);
@@ -49,6 +70,9 @@ public abstract class BinaryPropertyChecks {
         Assert.assertArrayEquals(original, letterJ);
     }
 
+    /**
+     * Retrieve and verify attachment "letter L"
+     */
     @Test
     public void getAnotherBinaryProperty() throws Exception {
         Entry entry = database.findEntries("Test 2 attachment").get(0);
@@ -58,6 +82,9 @@ public abstract class BinaryPropertyChecks {
         Assert.assertArrayEquals(original, letterL);
     }
 
+    /**
+     * Add the Letter L to the entry containing letter J
+     */
     @Test
     public void setBinaryProperty() throws Exception {
         InputStream testfile = getClass().getClassLoader().getResourceAsStream("letter L.jpeg");
@@ -70,8 +97,11 @@ public abstract class BinaryPropertyChecks {
         Assert.assertTrue(database.isDirty());
     }
 
+    /**
+     * Verify that the entries have the right attachments
+     */
     @Test
-    public void getBinaryPropertyNames() throws Exception {
+    public void getBinaryPropertyNames() {
         Entry entry = database.findEntries("Test attachment").get(0);
         assertArrayEquals(new String[] {"letter J.jpeg"}, entry.getBinaryPropertyNames().toArray());
 
@@ -79,11 +109,18 @@ public abstract class BinaryPropertyChecks {
         assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
     }
 
+    /**
+     * Verify that the database correctly reports that its supports binary attachments - override for
+     * databases that don't
+     */
     @Test
     public void checkSupported(){
         assertTrue(database.supportsBinaryProperties());
     }
 
+    /**
+     * Verify that the binary properties can be added and removed correctly
+     */
     @Test
     public void checkAddChangeRemoveBinaryProperty() {
         byte[] test = new byte[] {0, 1, 2 ,3};
@@ -103,4 +140,14 @@ public abstract class BinaryPropertyChecks {
         // same number of properties as we started with
         assertEquals(1, entry.getBinaryPropertyNames().size());
     }
+
+    /**
+     * Checks that a database with binary properties saves and reloads correctly
+     */
+    @Test @Ignore
+    public void saveAndReloadCheck() {
+        // TODO
+    }
+
+
 }

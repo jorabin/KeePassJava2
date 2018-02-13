@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
+import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.base.AbstractDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
@@ -31,6 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.linguafranca.pwdb.kdbx.Helpers.base64FromUuid;
 import static org.linguafranca.pwdb.kdbx.dom.DomHelper.*;
 
@@ -57,8 +59,10 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
         init();
     }
 
-    public static DomDatabaseWrapper load (Credentials credentials, InputStream inputStream) throws IOException {
-        return new DomDatabaseWrapper(new KdbxStreamFormat(), credentials, inputStream);
+    public static DomDatabaseWrapper load (@NotNull Credentials credentials, @NotNull InputStream inputStream) throws IOException {
+        return new DomDatabaseWrapper(new KdbxStreamFormat(),
+                checkNotNull(credentials, "Credentials must not be null"),
+                checkNotNull(inputStream, "InputStream must not be null"));
     }
 
     private void init() {
