@@ -46,4 +46,6 @@ public interface SerializableDatabase {
     byte[] getHeaderHash();
 
     void setHeaderHash(byte[] hash);
+
+    void addBinary(int index, byte[] payload);
 }

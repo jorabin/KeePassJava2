@@ -235,7 +235,7 @@ public class KdbxSerializer {
         if (!verifyMagicNumber(ledis)) {
             throw new IllegalStateException("Magic number did not match");
         }
-        // followed by a file vesion number
+        // followed by a file version number
         int fullVersion = ledis.readInt();
         kdbxHeader.setVersion(fullVersion >> 16);
 
@@ -270,7 +270,6 @@ public class KdbxSerializer {
         byte [] hmacKey64 = Encryption.transformHmacKey(hmacKey, Helpers.toBytes(-1L, ByteOrder.LITTLE_ENDIAN));
 
         kdbxHeader.verifyHeaderHmac(hmacKey64, getBytes(32, input));
-
     }
 
     private static void getOuterHeaderFields(KdbxHeader kdbxHeader, MessageDigest digest, DataInput input) throws IOException {
@@ -327,7 +326,7 @@ public class KdbxSerializer {
                     break;
 
                 case HeaderType.KDF_PARAMETERS:
-                    kdbxHeader.setKdfparameters(makeVariantDictionary(length, input));
+                    kdbxHeader.setKdfParameters(makeVariantDictionary(length, input));
                     break;
 
                 case HeaderType.CUSTOM_DATA:

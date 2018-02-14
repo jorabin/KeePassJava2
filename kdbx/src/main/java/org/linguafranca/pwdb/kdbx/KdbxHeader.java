@@ -60,7 +60,22 @@ public class KdbxHeader {
      */
     @SuppressWarnings("WeakerAccess, unused")
     public enum ProtectedStreamAlgorithm {
-        NONE, ARC_FOUR, SALSA_20, CHA_CHA_20
+        NONE(0), ARC_FOUR(1), SALSA_20(2), CHA_CHA_20(3);
+
+        private int value;
+
+        ProtectedStreamAlgorithm(int value) {
+            this.value = value;
+        }
+
+        public static ProtectedStreamAlgorithm getAlgorithm(int innerRandomStreamId) {
+            for (ProtectedStreamAlgorithm pse: values()) {
+                if (pse.value == innerRandomStreamId) {
+                    return pse;
+                }
+            }
+            throw new IllegalArgumentException("Inner Random Stream Id " + innerRandomStreamId + "is not known");
+        }
     }
 
     private List<Integer> allowableVersions = new ArrayList<>(Arrays.asList(3, 4));
@@ -88,14 +103,22 @@ public class KdbxHeader {
     private byte[] streamStartBytes;
 
     /* dictionaries in V4 */
-    private VariantDictionary kdfparameters;
+    private VariantDictionary kdfParameters;
     // TODO implement V4 custom data
+    @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private VariantDictionary customData;
 
-    /* not transmitted as part of the header, used in the XML payload, so calculated
+    /*
+    * binaries in V4
+    * first byte, if set to 1 indicates "protected" remainder is the payload
+    */
+    List<byte[]> binaries = new ArrayList<>();
+
+    /* V3 not transmitted as part of the header, used in the XML payload, so calculated
      * on transmission or receipt */
     private byte[] headerHash;
 
+    /* the bytes that compose the outer header, required for V4 to calculate the HMac */
     private byte[] headerBytes;
 
     /**
@@ -119,7 +142,7 @@ public class KdbxHeader {
         streamStartBytes = new byte[32];
         protectedStreamAlgorithm = ProtectedStreamAlgorithm.SALSA_20;
 
-        kdfparameters = Aes.createKdfParameters();
+        kdfParameters = Aes.createKdfParameters();
     }
 
     /**
@@ -191,11 +214,11 @@ public class KdbxHeader {
      */
     public byte[] getTransformedKeyDigest(byte[] digest) {
         // v3 doesn't have a kdf therefore AES
-        if (kdfparameters == null) {
+        if (kdfParameters == null) {
             return Aes.getTransformedKey(digest, transformSeed, transformRounds);
         }
-        KeyDerivationFunction kdf = Encryption.Kdf.getKdf(kdfparameters.mustGet("$UUID").asUuid());
-        return kdf.getTransformedKey(digest, kdfparameters);
+        KeyDerivationFunction kdf = Encryption.Kdf.getKdf(kdfParameters.mustGet("$UUID").asUuid());
+        return kdf.getTransformedKey(digest, kdfParameters);
     }
 
     /**
@@ -218,14 +241,14 @@ public class KdbxHeader {
         if (version < 4) {
             return transformSeed;
         }
-        return kdfparameters.mustGet(Aes.KdfKeys.ParamSeed).asByteArray();
+        return kdfParameters.mustGet(Aes.KdfKeys.ParamSeed).asByteArray();
     }
 
     public long getTransformRounds() {
         if (version < 4) {
             return transformRounds;
         }
-        return kdfparameters.mustGet(Aes.KdfKeys.ParamRounds).asLong();
+        return kdfParameters.mustGet(Aes.KdfKeys.ParamRounds).asLong();
     }
 
     public UUID getCipherUuid() {
@@ -311,7 +334,7 @@ public class KdbxHeader {
     }
 
     public void setInnerRandomStreamId(int innerRandomStreamId) {
-        this.protectedStreamAlgorithm = ProtectedStreamAlgorithm.values()[innerRandomStreamId];
+        this.protectedStreamAlgorithm = ProtectedStreamAlgorithm.getAlgorithm(innerRandomStreamId);
     }
 
     public void setHeaderHash(byte[] headerHash) {
@@ -334,22 +357,41 @@ public class KdbxHeader {
         this.version = version;
     }
 
-    public void setKdfparameters(VariantDictionary kdfparameters) {
-        this.kdfparameters = kdfparameters;
+    /**
+     * V4 add Key Definition Function Parameters
+     */
+    public void setKdfParameters(VariantDictionary kdfParameters) {
+        this.kdfParameters = kdfParameters;
     }
 
+    /**
+     * V4 Add custom data
+     */
     public void setCustomData(VariantDictionary customData) {
         this.customData = customData;
     }
 
+    /**
+     * V4 add binary from inner header
+     */
     public void addBinary(byte[] bytes) {
-        // TODO something about binaries in V4
+        binaries.add(bytes);
     }
 
+    public List<byte[]> getBinaries() {
+        return binaries;
+    }
+
+    /**
+     * V4 provide access to the header as bytes for verification
+     */
     public byte[] getHeaderBytes() {
         return headerBytes;
     }
 
+    /**
+     * V4 provide access to the header as bytes for verification
+     */
     public void setHeaderBytes(byte[] headerBytes) {
         byte[] copy = new byte[headerBytes.length];
         System.arraycopy(headerBytes, 0, copy, 0, headerBytes.length);

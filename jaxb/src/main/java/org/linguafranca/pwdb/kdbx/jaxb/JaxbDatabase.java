@@ -19,8 +19,10 @@ package org.linguafranca.pwdb.kdbx.jaxb;
 import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.base.AbstractDatabase;
+import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.Binaries;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.ObjectFactory;
 
@@ -182,5 +184,9 @@ public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, Jaxb
 
     ObjectFactory getObjectFactory() {
         return objectFactory;
+    }
+
+    public void createBinary(byte[] value, Integer index) {
+        JaxbSerializableDatabase.addBinary(getKeePassFile(), getObjectFactory(), index, value);
     }
 }

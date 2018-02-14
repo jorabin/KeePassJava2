@@ -28,9 +28,9 @@ import java.io.OutputStream;
 /**
  * @author jo
  */
-public class SimpleEntryTest extends BinaryPropertyChecks {
+public class SimpleBinaryPropertyV3Test extends BinaryPropertyChecks {
 
-    public SimpleEntryTest() {
+    public SimpleBinaryPropertyV3Test() {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
         try {
             database = SimpleDatabase.load(new KdbxCreds("123".getBytes()),inputStream);

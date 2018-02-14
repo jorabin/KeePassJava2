@@ -101,14 +101,6 @@ public class DomSerializableDatabase implements SerializableDatabase {
                 element.removeAttribute("Protected");
             }
 
-            // we need to convert all V4 dates - we'll convert them all anyway TODO find a way of not converting V3 dates
-            // finding all elements name ending Changed and Time
-            NodeList dateContent = (NodeList) DomHelper.xpath.evaluate("//*[substring(local-name(), string-length(local-name()) -3) = 'Time']", doc, XPathConstants.NODESET);
-            processDates(dateContent);
-
-            dateContent = (NodeList) DomHelper.xpath.evaluate("//*[substring(local-name(), string-length(local-name()) -6) = 'Changed']", doc, XPathConstants.NODESET);
-            processDates(dateContent);
-
             return this;
 
         } catch (ParserConfigurationException e) {
@@ -120,6 +112,27 @@ public class DomSerializableDatabase implements SerializableDatabase {
         }
     }
 
+/*
+    public void dateConvert() {
+        try {
+            // finding all elements name ending Changed and Time
+            NodeList dateContent = (NodeList) DomHelper.xpath.evaluate("//*[substring(local-name(), string-length(local-name()) -3) = 'Time']", doc, XPathConstants.NODESET);
+            processDates(dateContent);
+
+            dateContent = (NodeList) DomHelper.xpath.evaluate("//*[substring(local-name(), string-length(local-name()) -6) = 'Changed']", doc, XPathConstants.NODESET);
+            processDates(dateContent);
+        } catch (XPathExpressionException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+*/
+
+    @Override
+    public void addBinary(int index, byte[] payload) {
+        DomHelper.addBinary(doc.getDocumentElement(), Helpers.encodeBase64Content(payload, true),index);
+    }
+
+/*
     private void processDates(NodeList dateContent) {
         Date now = new Date();
         for (int i = 0; i < dateContent.getLength(); i++){
@@ -130,6 +143,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
         }
     }
 
+*/
     @Override
     public void save(OutputStream outputStream) {
         Document copyDoc = (Document) doc.cloneNode(true);

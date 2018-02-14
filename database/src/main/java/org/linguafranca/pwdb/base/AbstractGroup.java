@@ -43,26 +43,26 @@ public abstract class AbstractGroup<D extends Database<D, G, E, I>, G extends or
         return result;
     }
 
-    /**
-     * Local helper class to avoid violating DRY in {@link AbstractGroup#findEntries(String, boolean)}
-     */
-    private static class TextMatcher implements Entry.Matcher {
-
-        private final String text;
-
-        private TextMatcher(String text) {
-            this.text = text;
-        }
-
-        @Override
-        public boolean matches(Entry entry) {
-            return entry.match(text);
-        }
-    }
-
-
     @Override
     public List<? extends E> findEntries(String find, boolean recursive) {
+        /*
+         * Local helper class to avoid violating DRY in {@link AbstractGroup#findEntries(String, boolean)}.
+         * Would-be lambda in Java 8.
+         */
+        class TextMatcher implements Entry.Matcher {
+
+            private final String text;
+
+            private TextMatcher(String text) {
+                this.text = text;
+            }
+
+            @Override
+            public boolean matches(Entry entry) {
+                return entry.match(text);
+            }
+        }
+
         return findEntries(new TextMatcher(find), recursive);
     }
 

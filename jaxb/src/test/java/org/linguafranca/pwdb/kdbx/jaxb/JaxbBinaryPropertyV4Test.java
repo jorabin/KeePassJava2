@@ -16,10 +16,11 @@
 
 package org.linguafranca.pwdb.kdbx.jaxb;
 
+import org.junit.Ignore;
+import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.checks.BinaryPropertyChecks;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,15 +29,16 @@ import java.io.OutputStream;
 /**
  * @author jo
  */
-public class JaxbEntryTest extends BinaryPropertyChecks {
+@Ignore
+public class JaxbBinaryPropertyV4Test extends BinaryPropertyChecks {
 
-    public JaxbEntryTest() {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
-        database = JaxbDatabase.load(new KdbxCreds("123".getBytes()),inputStream);
+    public JaxbBinaryPropertyV4Test() throws IOException {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment-ChaCha20-Argon2.kdbx");
+        database = JaxbDatabase.load(new KdbxCreds("123".getBytes()), inputStream);
     }
 
     @Override
     public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
-        database.save(credentials,outputStream);
+        database.save(credentials, outputStream);
     }
 }

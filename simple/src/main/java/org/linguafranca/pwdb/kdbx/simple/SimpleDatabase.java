@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx.simple;
 
 import org.linguafranca.pwdb.base.AbstractDatabase;
+import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.StreamEncryptor;
 import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxInputTransformer;
 import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxOutputTransformer;
@@ -196,8 +197,33 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
             throw new IllegalStateException("Header Hash Mismatch");
         }
 
+        if (kdbxHeader.getVersion() == 4) {
+            int index = 0;
+            for (byte[] binary : kdbxHeader.getBinaries()) {
+                addBinary(result, binary, index);
+                index++;
+            }
+        }
+
         return new SimpleDatabase(result);
     }
+
+    public void addBinary(byte[] bytes, Integer index) {
+        addBinary(keePassFile, bytes, index);
+    }
+
+    public static void addBinary(KeePassFile keePassFile, byte[] bytes, Integer index) {
+        // create a new binary to put in the store
+        KeePassFile.Binary newBin = new KeePassFile.Binary();
+        newBin.setId(index);
+        newBin.setValue(Helpers.encodeBase64Content(bytes, true));
+        newBin.setCompressed(true);
+        if (keePassFile.getBinaries() == null) {
+            keePassFile.createBinaries();
+        }
+        keePassFile.getBinaries().add(newBin);
+    }
+
 
     /**
      * Save as plaintext XML
@@ -251,7 +277,7 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
     }
 
 
-    public List<KeePassFile.Binaries.Binary> getBinaries() {
+    public List<KeePassFile.Binary> getBinaries() {
         return keePassFile.getBinaries();
     }
 

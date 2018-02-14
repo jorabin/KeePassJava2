@@ -70,6 +70,13 @@ public class KdbxStreamFormat implements StreamFormat {
         if (kdbxHeader.getVersion() == 3 && !Arrays.equals(serializableDatabase.getHeaderHash(), kdbxHeader.getHeaderHash())) {
             throw new IllegalStateException("Header hash does not match");
         }
+        if (kdbxHeader.getVersion() == 4) {
+            int count = 0;
+            for (byte[] binary: kdbxHeader.getBinaries()) {
+                serializableDatabase.addBinary(count, Arrays.copyOfRange(binary,1, binary.length));
+                count++;
+            }
+        }
         decryptedInputStream.close();
     }
 
