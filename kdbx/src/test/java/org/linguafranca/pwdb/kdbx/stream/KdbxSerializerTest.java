@@ -10,6 +10,9 @@ import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxSerializer;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
 import java.util.Scanner;
 
 /**
@@ -58,7 +61,7 @@ public class KdbxSerializerTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx");
         InputStream is = KdbxSerializer.createUnencryptedInputStream(new KdbxCreds("123".getBytes()), new KdbxHeader(), inputStream);
 
-        PrintWriter pw = new PrintWriter(new FileOutputStream("temp.xml"));
+        PrintWriter pw = new PrintWriter(new FileOutputStream(Files.createTempFile("temp", "xml").toFile()));
         Scanner s = new Scanner(is);
         while (s.hasNext()) {
             pw.println(s.nextLine());
