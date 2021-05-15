@@ -143,6 +143,8 @@ The Simple XML implementation additionally depends on:
 - [Simple XML Serialisation Framework](http://simple.sourceforge.net/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
 - [Faster XML Aalto](https://github.com/FasterXML/aalto-xml) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0.txt)).
 
+On a Java 11 (or later) runtime, [JAXB](https://javaee.github.io/jaxb-v2/) is required at runtime.
+
 It also depends on SLF4J and Junit for tests.
 
 ## Build from Source
