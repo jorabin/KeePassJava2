@@ -16,14 +16,14 @@
 
 package org.linguafranca.pwdb.hashedblock;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Takes a stream of data and formats as Hashed Blocks to the underlying output stream.
@@ -47,18 +47,11 @@ import java.security.NoSuchAlgorithmException;
  */
 public class HashedBlockOutputStream extends OutputStream {
 
-    private static  MessageDigest md5;
-    static {
-        try {
-            md5 = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-    }
     private static final int BLOCK_SIZE = 8 * 1024;
     private static final int HASH_SIZE = 32;
     private static final byte[] ZERO_HASH = new byte[HASH_SIZE];
 
+    private final MessageDigest sha256;
     private int nextSequenceNumber = 0;
     private boolean littleEndian = false;
     private OutputStream outputStream;
@@ -81,6 +74,14 @@ public class HashedBlockOutputStream extends OutputStream {
     public HashedBlockOutputStream(OutputStream outputStream, boolean littleEndian) {
         this.outputStream = outputStream;
         this.littleEndian = littleEndian;
+        try
+        {
+            sha256 = MessageDigest.getInstance( "SHA-256" );
+        }
+        catch( NoSuchAlgorithmException e )
+        {
+            throw new IllegalStateException( e );
+        }
     }
 
     @Override
@@ -152,8 +153,8 @@ public class HashedBlockOutputStream extends OutputStream {
 
         // calculate the hash of the buffer
         byte[] buffer = blockOutputStream.toByteArray();
-        md5.update(buffer);
-        outputStream.write(md5.digest());
+        sha256.update(buffer);
+        outputStream.write(sha256.digest());
 
         // write the buffer's length
         writeInt(buffer.length);
