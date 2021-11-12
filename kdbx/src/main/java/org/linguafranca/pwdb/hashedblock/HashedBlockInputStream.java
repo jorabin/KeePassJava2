@@ -16,8 +16,6 @@
 
 package org.linguafranca.pwdb.hashedblock;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -25,6 +23,8 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Takes an underlying input stream formatted as Hashed Blocks
@@ -49,17 +49,10 @@ import java.util.Arrays;
  */
 public class HashedBlockInputStream extends InputStream {
 
-    private static  MessageDigest md5;
-    static {
-        try {
-            md5 = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
-    }
     private static final int HASH_SIZE = 32;
     private static final byte[] ZERO_HASH = new byte[HASH_SIZE];
 
+    private final MessageDigest sha256;
     private long expectedSequenceNumber = 0;
     private boolean littleEndian = false;
     private boolean done = false;
@@ -82,6 +75,12 @@ public class HashedBlockInputStream extends InputStream {
     public HashedBlockInputStream(InputStream inputStream, boolean littleEndian) {
         this.inputStream = inputStream;
         this.littleEndian = littleEndian;
+        try {
+            sha256 = MessageDigest.getInstance( "SHA-256" );
+        }
+        catch( NoSuchAlgorithmException e ) {
+            throw new IllegalStateException( e );
+        }
     }
 
     @Override
@@ -165,8 +164,8 @@ public class HashedBlockInputStream extends InputStream {
         readFully(readBuffer);
 
         // check the hash
-        md5.update(readBuffer);
-        if (!Arrays.equals(md5.digest(), hash)) {
+        sha256.update(readBuffer);
+        if (!Arrays.equals(sha256.digest(), hash)) {
             throw new IllegalStateException("MD5 check failed while reading HashBlock");
         }
         blockInputStream = new ByteArrayInputStream(readBuffer);
