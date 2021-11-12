@@ -17,11 +17,12 @@
 package org.linguafranca.pwdb.kdbx.simple;
 
 import org.linguafranca.pwdb.base.AbstractDatabase;
+import org.linguafranca.pwdb.kdbx.Helpers;
+import org.linguafranca.pwdb.kdbx.StreamEncryptor;
 import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxInputTransformer;
 import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxOutputTransformer;
-import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxHeader;
-import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxSerializer;
-import org.linguafranca.pwdb.kdbx.stream_3_1.Salsa20StreamEncryptor;
+import org.linguafranca.pwdb.kdbx.KdbxHeader;
+import org.linguafranca.pwdb.kdbx.KdbxSerializer;
 import org.linguafranca.pwdb.kdbx.simple.converter.*;
 import org.linguafranca.pwdb.kdbx.simple.model.EntryClasses;
 import org.linguafranca.pwdb.kdbx.simple.model.KeePassFile;
@@ -184,18 +185,45 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
         KdbxHeader kdbxHeader = new KdbxHeader();
         InputStream kdbxInnerStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, inputStream);
 
+        StreamEncryptor streamEncyptor = kdbxHeader.getInnerStreamEncryptor();
+
         // decrypt the encrypted fields in the inner XML stream
-        InputStream plainTextXmlStream = new XmlInputStreamFilter(kdbxInnerStream,
-                new KdbxInputTransformer(new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey())));
+        InputStream plainTextXmlStream = new XmlInputStreamFilter(kdbxInnerStream, new KdbxInputTransformer(streamEncyptor));
 
         // read the now entirely decrypted stream into database
         KeePassFile result = getSerializer().read(KeePassFile.class, plainTextXmlStream);
-        if (!Arrays.equals(result.meta.headerHash.getContent(), kdbxHeader.getHeaderHash())) {
+
+        if (kdbxHeader.getVersion() == 3 && !Arrays.equals(result.meta.headerHash.getContent(), kdbxHeader.getHeaderHash())) {
             throw new IllegalStateException("Header Hash Mismatch");
+        }
+
+        if (kdbxHeader.getVersion() == 4) {
+            int index = 0;
+            for (byte[] binary : kdbxHeader.getBinaries()) {
+                addBinary(result, binary, index);
+                index++;
+            }
         }
 
         return new SimpleDatabase(result);
     }
+
+    public void addBinary(byte[] bytes, Integer index) {
+        addBinary(keePassFile, bytes, index);
+    }
+
+    public static void addBinary(KeePassFile keePassFile, byte[] bytes, Integer index) {
+        // create a new binary to put in the store
+        KeePassFile.Binary newBin = new KeePassFile.Binary();
+        newBin.setId(index);
+        newBin.setValue(Helpers.encodeBase64Content(bytes, true));
+        newBin.setCompressed(true);
+        if (keePassFile.getBinaries() == null) {
+            keePassFile.createBinaries();
+        }
+        keePassFile.getBinaries().add(newBin);
+    }
+
 
     /**
      * Save as plaintext XML
@@ -227,7 +255,7 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
 
             // encrypt the fields in the XML inner stream
             XmlOutputStreamFilter plainTextOutputStream = new XmlOutputStreamFilter(kdbxInnerStream,
-                    new KdbxOutputTransformer(new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey())));
+                    new KdbxOutputTransformer(new StreamEncryptor.Salsa20(kdbxHeader.getInnerRandomStreamKey())));
 
             // set up the "protected" attributes of fields that need inner stream encryption
             prepareForSave(keePassFile.root.group);
@@ -249,7 +277,7 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
     }
 
 
-    public List<KeePassFile.Binaries.Binary> getBinaries() {
+    public List<KeePassFile.Binary> getBinaries() {
         return keePassFile.getBinaries();
     }
 

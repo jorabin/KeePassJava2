@@ -14,39 +14,81 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx.stream_3_1;
+package org.linguafranca.pwdb.kdbx;
 
-import org.linguafranca.pwdb.kdbx.SerializableDatabase;
-import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.pwdb.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 
 /**
  * This class implements KDBX formatted saving and loading of databases
  *
- * @author jo
  */
 public class KdbxStreamFormat implements StreamFormat {
+
+    private final Version version;
+
+    public enum Version {
+        KDBX31(3),
+        KDBX4(4);
+
+        private final int version;
+
+        Version(int num) {
+            this.version = num;
+        }
+
+        int getVersionNum() {
+            return this.version;
+        }
+    }
+
+    /**
+     * Create a StreamFormat for reading or for writing v3
+     */
+    public KdbxStreamFormat() {
+        this.version = Version.KDBX31;
+    }
+
+    /**
+     * Specify a version for writing
+     * @param version the version
+     */
+    public KdbxStreamFormat(Version version) {
+        this.version = version;
+    }
 
     @Override
     public void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream encryptedInputStream) throws IOException {
         KdbxHeader kdbxHeader = new KdbxHeader();
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, encryptedInputStream);
-        serializableDatabase.setEncryption(new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey()));
+        serializableDatabase.setEncryption(kdbxHeader.getStreamEncryptor());
         serializableDatabase.load(decryptedInputStream);
+        if (kdbxHeader.getVersion() == 3 && !Arrays.equals(serializableDatabase.getHeaderHash(), kdbxHeader.getHeaderHash())) {
+            throw new IllegalStateException("Header hash does not match");
+        }
+        if (kdbxHeader.getVersion() == 4) {
+            int count = 0;
+            for (byte[] binary: kdbxHeader.getBinaries()) {
+                serializableDatabase.addBinary(count, Arrays.copyOfRange(binary,1, binary.length));
+                count++;
+            }
+        }
         decryptedInputStream.close();
     }
 
     @Override
     public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream encryptedOutputStream) throws IOException {
         // fresh kdbx header
-        KdbxHeader kdbxHeader = new KdbxHeader();
+        KdbxHeader kdbxHeader = new KdbxHeader(version.getVersionNum());
         OutputStream unencrytedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, encryptedOutputStream);
-        serializableDatabase.setHeaderHash(kdbxHeader.getHeaderHash());
-        serializableDatabase.setEncryption(new Salsa20StreamEncryptor(kdbxHeader.getProtectedStreamKey()));
+        if (version == Version.KDBX31) {
+            serializableDatabase.setHeaderHash(kdbxHeader.getHeaderHash());
+        }
+        serializableDatabase.setEncryption(kdbxHeader.getStreamEncryptor());
         serializableDatabase.save(unencrytedOutputStream);
         unencrytedOutputStream.flush();
         unencrytedOutputStream.close();

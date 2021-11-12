@@ -20,6 +20,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.linguafranca.pwdb.*;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -29,12 +32,13 @@ import static org.junit.Assert.assertEquals;
  */
 public abstract class DatabaseLoaderChecks <D extends Database<D,G,E,I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon>{
     protected Database<D,G,E,I> database;
-
+    protected boolean skipDateCheck = false;
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX");
     /**
      * a test123 file for each format. Should contain the same thing. This is a basic sanity check.
      */
     @Test
-    public void test123File() {
+    public void test123File() throws ParseException {
 
         // visit all groups and entries and list them to console
         database.visit(new Visitor.Print());
@@ -79,5 +83,14 @@ public abstract class DatabaseLoaderChecks <D extends Database<D,G,E,I>, G exten
 
         Assert.assertEquals(1, entries.size());
         assertEquals("pass", entries.get(0).getPassword());
+
+        // kdb files don't have a time zone so can't make head or tail of the date - test file seems to have a local time in it
+        if (skipDateCheck) {
+            return;
+        }
+
+        Date c = entries.get(0).getCreationTime();
+        Date expected = sdf.parse("2015-10-24T17:20:41Z");
+        Assert.assertEquals(expected, c);
     }
 }

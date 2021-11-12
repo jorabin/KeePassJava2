@@ -41,7 +41,7 @@ class DomHelper {
 
     static XPath xpath = XPathFactory.newInstance().newXPath();
 
-    static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+//    static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
 
     static final String GROUP_ELEMENT_NAME = "Group";
     static final String ENTRY_ELEMENT_NAME = "Entry";
@@ -88,7 +88,7 @@ class DomHelper {
     static class DateValueCreator implements ValueCreator {
         @Override
         public String getValue() {
-            return dateFormatter.format(new Date());
+            return Helpers.fromDate(new Date());
         }
     }
 
@@ -205,14 +205,7 @@ class DomHelper {
             String max = xpath.evaluate("//Binaries/Binary/@ID[not(. < ../../Binary/@ID)][1]", parentElement.getOwnerDocument().getDocumentElement());
             Integer newIndex = Integer.valueOf(max) + 1;
 
-            Element binaries = getElement("//Binaries", parentElement.getOwnerDocument().getDocumentElement(),false);
-            if (binaries == null) {
-                throw new IllegalStateException("Binaries not found");
-            }
-            Element binary = (Element) binaries.appendChild(binaries.getOwnerDocument().createElement("Binary"));
-            binary.setTextContent(b64);
-            binary.setAttribute("Compressed", "True");
-            binary.setAttribute("ID", newIndex.toString());
+            addBinary(parentElement.getOwnerDocument().getDocumentElement(), b64, newIndex);
 
             Element result = getElement(elementPath, parentElement, true);
             result.setAttribute("Ref", newIndex.toString());
@@ -225,9 +218,24 @@ class DomHelper {
         }
     }
 
+    /**
+     * Add a binary property value to the V3 Meta/Binaries element
+     *
+     * @param documentElement the document element
+     * @param b64 a base64 gzipped encoded representation of the binary content
+     * @param index the index by which it is known
+     */
+    public static void addBinary(Element documentElement, String b64, Integer index) {
+        Element binaries = getElement("Meta/Binaries", documentElement,true);
+        Element binary = (Element) binaries.appendChild(binaries.getOwnerDocument().createElement("Binary"));
+        binary.setTextContent(b64);
+        binary.setAttribute("Compressed", "True");
+        binary.setAttribute("ID", index.toString());
+    }
+
     @NotNull
     static Element touchElement(String elementPath, Element parentElement) {
-        return setElementContent(elementPath, parentElement, dateFormatter.format(new Date()));
+        return setElementContent(elementPath, parentElement, Helpers.fromDate(new Date()));
     }
 
     private static Element createHierarchically(String elementPath, Element startElement) {

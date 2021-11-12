@@ -67,7 +67,7 @@ public interface Visitor {
     }
 
     /**
-     * Visitor prints the Groups and Entries it visits
+     * Visitor prints the Groups and Entries it visits to console
      */
     class Print extends Default {
         @Override

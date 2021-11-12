@@ -28,9 +28,9 @@ import java.io.OutputStream;
 /**
  * @author jo
  */
-public class DomEntryWrapperTest extends BinaryPropertyChecks {
+public class DomBinaryPropertyV3Test extends BinaryPropertyChecks {
 
-    public DomEntryWrapperTest () throws IOException {
+    public DomBinaryPropertyV3Test() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
         database = DomDatabaseWrapper.load(new KdbxCreds("123".getBytes()), inputStream);
     }

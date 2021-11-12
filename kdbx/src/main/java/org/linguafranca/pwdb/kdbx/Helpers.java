@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -74,14 +75,27 @@ public class Helpers {
         return value == null ? "False" : (value ? "True" : "False");
     }
 
-    private static SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    private static SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
 
+    private static Date baseDate;
+
+    static {
+        try {
+            baseDate = inFormat.parse("0001-01-01T00:00:00Z");
+        } catch (ParseException ignore) {
+            // hmm, cannot happen
+        }
+    }
+
+    // in V3 this is just a date, in V4 it's a base64 encoded serial number of seconds after the base date above
     public static Date toDate(String value) {
         try {
             return inFormat.parse(value);
-        } catch (ParseException e) {
-            throw new IllegalStateException(e);
-        }
+        } catch (ParseException ignored) {}
+        // V4
+        byte [] b = decodeBase64Content(value.getBytes());
+        long secondsSinceBaseDate = ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getLong();
+        return new Date(secondsSinceBaseDate * 1000 + baseDate.getTime());
     }
 
     public static String fromDate(Date value) {
@@ -133,5 +147,21 @@ public class Helpers {
             throw new IllegalStateException(e);
         }
         return baos.toByteArray();
+    }
+
+    public static byte[] toBytes(long value, ByteOrder byteOrder) {
+        byte[] longBuffer = new byte [8];
+        ByteBuffer.wrap(longBuffer)
+                .order(byteOrder)
+                .putLong(value);
+        return longBuffer;
+    }
+
+    public static byte[] toBytes(int value, ByteOrder byteOrder) {
+        byte[] longBuffer = new byte [4];
+        ByteBuffer.wrap(longBuffer)
+                .order(byteOrder)
+                .putInt(value);
+        return longBuffer;
     }
 }

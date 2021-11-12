@@ -17,7 +17,6 @@
 package org.linguafranca.pwdb.kdb;
 
 import com.google.common.io.LittleEndianDataInputStream;
-import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.security.Encryption;
@@ -28,10 +27,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This class provides support for reading a KDB stream and constructing an in memory database.
@@ -79,7 +75,7 @@ public class KdbSerializer {
         InputStream decryptedInputStream = kdbHeader.createDecryptedInputStream(credentials.getKey(), inputStream);
 
         // Wrap the decrypted stream in a digest stream
-        MessageDigest digest = Encryption.getMessageDigestInstance();
+        MessageDigest digest = Encryption.getSha256MessageDigestInstance();
         DigestInputStream digestInputStream = new DigestInputStream(decryptedInputStream, digest);
 
         // Start the dataInput at wherever we have got to in the stream
@@ -363,7 +359,14 @@ public class KdbSerializer {
         int year = (int) longValue & 0xFFF;
 
         // just to work around the deprecation on the similar Date constructor
-        return new GregorianCalendar(year, month - 1, day, hour, minute, second).getTime();
+        GregorianCalendar cal = new GregorianCalendar();
+        // I think the time is stored in local time but anyway, let's say it's UTC for the sake of argument
+        cal.setTimeZone(TimeZone.getTimeZone("UTC"));
+        //noinspection MagicConstant
+        cal.set(year, month - 1, day, hour, minute, second);
+        // otherwise we seems to end up with arbitrary millis
+        cal.set(GregorianCalendar.MILLISECOND, 0);
+        return cal.getTime();
     }
 
     /****

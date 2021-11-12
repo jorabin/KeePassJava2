@@ -17,12 +17,14 @@
 package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.jetbrains.annotations.NotNull;
+import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.base.AbstractDatabase;
-import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxStreamFormat;
+import org.linguafranca.pwdb.kdbx.Helpers;
+import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.Binaries;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.ObjectFactory;
-import org.linguafranca.pwdb.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +37,7 @@ import java.util.UUID;
  *
  * @author jo
  */
-@SuppressWarnings("WeakerAccess")
+
 public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, JaxbEntry, JaxbIcon> {
 
     private KeePassFile keePassFile;
@@ -46,13 +48,12 @@ public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, Jaxb
         this(createEmptyDatabase().getKeePassFile());
     }
 
-    public JaxbDatabase(KeePassFile keePassFile) {
+    private JaxbDatabase(KeePassFile keePassFile) {
         this.keePassFile = keePassFile;
         this.root = new JaxbGroup(this, keePassFile.getRoot().getGroup());
     }
 
     public static JaxbDatabase createEmptyDatabase() {
-
         InputStream inputStream = JaxbDatabase.class.getClassLoader().getResourceAsStream("base.kdbx.xml");
         KeePassFile keePassFile = new JaxbSerializableDatabase().load(inputStream).keePassFile;
         keePassFile.getRoot().getGroup().setUUID(UUID.randomUUID());
@@ -99,7 +100,7 @@ public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, Jaxb
         if (g == null && !isRecycleBinEnabled()) {
             return null;
         }
-        if (g== null) {
+        if (g == null) {
             g = newGroup("Recycle Bin");
             getRootGroup().addGroup(g);
             this.keePassFile.getMeta().setRecycleBinUUID(g.getUuid());
@@ -183,5 +184,9 @@ public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, Jaxb
 
     ObjectFactory getObjectFactory() {
         return objectFactory;
+    }
+
+    public void createBinary(byte[] value, Integer index) {
+        JaxbSerializableDatabase.addBinary(getKeePassFile(), getObjectFactory(), index, value);
     }
 }

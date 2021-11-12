@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.simple;
 
+import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.simple.converter.UuidConverter;
@@ -144,8 +145,8 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
             return null;
         }
 
-        KeePassFile.Binaries.Binary binary = null;
-        for (KeePassFile.Binaries.Binary b : database.getBinaries()) {
+        KeePassFile.Binary binary = null;
+        for (KeePassFile.Binary b : database.getBinaries()) {
             if (b.getId().equals(Integer.valueOf(getBinaryContent(bp)))) {
                 binary = b;
             }
@@ -166,19 +167,14 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
 
         // what is the next free index in the binary store?
         Integer max = -1;
-        for (KeePassFile.Binaries.Binary binary: database.getBinaries()){
+        for (KeePassFile.Binary binary: database.getBinaries()){
             if (binary.getId() > max) {
                 max = binary.getId();
             }
         }
         max++;
 
-        // create a new binary to put in the store
-        KeePassFile.Binaries.Binary newBin = new KeePassFile.Binaries.Binary();
-        newBin.setId(max);
-        newBin.setValue(Helpers.encodeBase64Content(bytes, true));
-        newBin.setCompressed(true);
-        database.getBinaries().add(newBin);
+        database.addBinary(bytes, max);
 
         // make a reference to it from the entry
         BinaryProperty binaryProperty = new BinaryProperty();
@@ -216,7 +212,7 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
     }
 
     @Override
-    public UUID getUuid() {
+    public @NotNull UUID getUuid() {
         return uuid;
     }
 

@@ -152,8 +152,11 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
         if (e == null) {
             return false;
         }
+
+        //noinspection ConstantConditions
         e.getParent().removeEntry(e);
         if (isRecycleBinEnabled()) {
+            //noinspection ConstantConditions
             getRecycleBin().addEntry(e);
         }
         return true;
@@ -163,11 +166,12 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     public G findGroup(final UUID uuid){
         final List<G> groups = new ArrayList<>();
         visit(new Visitor.Default() {
-            // ignore sub groups of the recycle bin
+            // set to true while visiting sub groups of recycle bin
             boolean recycle;
             @Override
             public void startVisit(Group group) {
                 if (!recycle && group.getUuid().equals(uuid)) {
+                    //noinspection unchecked
                     groups.add((G) group);
                 }
                 if (group.isRecycleBin()) {
@@ -197,8 +201,11 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
         if (g==null) {
             return false;
         }
+
+        //noinspection ConstantConditions
         g.getParent().removeGroup(g);
         if (isRecycleBinEnabled()) {
+            //noinspection ConstantConditions
             getRecycleBin().addGroup(g);
         }
         return true;

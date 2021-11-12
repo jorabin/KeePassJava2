@@ -42,8 +42,12 @@ public class KeePassFile {
     @Element(name = "Root")
     public Root root;
 
-    public List<Binaries.Binary> getBinaries() {
+    public List<Binary> getBinaries() {
         return meta.binaries;
+    }
+
+    public void createBinaries() {
+        meta.binaries = new ArrayList<>();
     }
 
     public static class Root {
@@ -120,9 +124,15 @@ public class KeePassFile {
         @Element(name = "HistoryMaxSize")
         protected int historyMaxSize;
         @ElementList(name = "Binaries", required = false)
-        protected List<Binaries.Binary> binaries;
+        protected List<Binary> binaries;
         @Element(name = "CustomData", required = false)
         protected KeePassFile.CustomData customData;
+
+        /* version 4 */
+
+        @Element(name = "SettingsChanged", required = false, type = Date.class)
+        @Convert(TimeConverter.class)
+        protected Date settingsChanged;
     }
 
 
@@ -156,48 +166,47 @@ public class KeePassFile {
     }
 
     public static class Binaries {
-        @ElementList(name = "Binary")
-        protected List<Binary> binary;
 
-        @org.simpleframework.xml.Root(name = "Binary")
-        public static class Binary implements org.simpleframework.xml.util.Entry {
-            @Text
-            protected String value;
+    }
 
-            @Attribute(name = "ID")
-            protected Integer id;
-            @Attribute(name = "Compressed")
-            @Convert(KeePassBooleanConverter.class)
-            protected Boolean compressed;
+    @org.simpleframework.xml.Root(name = "Binary")
+    public static class Binary implements org.simpleframework.xml.util.Entry {
+        @Text
+        protected String value;
 
-            @Override
-            public String getName() {
-                return String.valueOf(id);
-            }
+        @Attribute(name = "ID")
+        protected Integer id;
+        @Attribute(name = "Compressed")
+        @Convert(KeePassBooleanConverter.class)
+        protected Boolean compressed;
 
-            public String getValue() {
-                return value;
-            }
+        @Override
+        public String getName() {
+            return String.valueOf(id);
+        }
 
-            public Boolean getCompressed() {
-                return compressed;
-            }
+        public String getValue() {
+            return value;
+        }
 
-            public Integer getId() {
-                return id;
-            }
+        public Boolean getCompressed() {
+            return compressed;
+        }
 
-            public void setId(Integer Id) {
-                this.id = Id;
-            }
+        public Integer getId() {
+            return id;
+        }
 
-            public void setValue(String value) {
-                this.value = value;
-            }
+        public void setId(Integer Id) {
+            this.id = Id;
+        }
 
-            public void setCompressed(boolean compressed) {
-                this.compressed = compressed;
-            }
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public void setCompressed(boolean compressed) {
+            this.compressed = compressed;
         }
     }
 

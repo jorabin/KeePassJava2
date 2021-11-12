@@ -45,29 +45,30 @@ public abstract class AbstractGroup<D extends Database<D, G, E, I>, G extends or
 
     @Override
     public List<? extends E> findEntries(String find, boolean recursive) {
-        List <E> result = new ArrayList<>(getEntries().size());
-        if (isRecycleBin()) {
-            return result;
-        }
-        for (E entry: getEntries()){
-            if (entry.match(find)){
-                result.add(entry);
+        /*
+         * Local helper class to avoid violating DRY in {@link AbstractGroup#findEntries(String, boolean)}.
+         * Would-be lambda in Java 8.
+         */
+        class TextMatcher implements Entry.Matcher {
+
+            private final String text;
+
+            private TextMatcher(String text) {
+                this.text = text;
+            }
+
+            @Override
+            public boolean matches(Entry entry) {
+                return entry.match(text);
             }
         }
-        if (recursive) {
-            for (G group : getGroups()) {
-                result.addAll(group.findEntries(find, true));
-            }
-        }
-        return result;
+
+        return findEntries(new TextMatcher(find), recursive);
     }
 
     @Override
     public List<? extends E> findEntries(Entry.Matcher matcher, boolean recursive) {
         List <E> result = new ArrayList<>(getEntries().size());
-        if (isRecycleBin()) {
-            return result;
-        }
         for (E entry: getEntries()){
             if (entry.match(matcher)){
                 result.add(entry);
@@ -75,6 +76,10 @@ public abstract class AbstractGroup<D extends Database<D, G, E, I>, G extends or
         }
         if (recursive) {
             for (G group : getGroups()) {
+                // don't recurse into recycle bin
+                if (group.isRecycleBin()) {
+                    continue;
+                }
                 result.addAll(group.findEntries(matcher, true));
             }
         }
@@ -100,11 +105,11 @@ public abstract class AbstractGroup<D extends Database<D, G, E, I>, G extends or
         while ((parent=parent.getParent()) != null) {
             parents.push(parent);
         }
-        String result = "/";
+        StringBuilder result = new StringBuilder("/");
         while (parents.size() > 0) {
-            result = result + parents.pop().getName() + "/";
+            result.append(parents.pop().getName()).append("/");
         }
-        return result;
+        return result.toString();
     }
 
     @Override
