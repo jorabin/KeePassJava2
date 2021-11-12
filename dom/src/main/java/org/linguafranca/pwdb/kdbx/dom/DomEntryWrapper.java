@@ -20,7 +20,6 @@ import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.w3c.dom.Element;
 
-import java.text.ParseException;
 import java.util.*;
 
 /**
@@ -173,20 +172,12 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
 
     @Override
     public Date getLastAccessTime() {
-        try {
-            return DomHelper.dateFormatter.parse(DomHelper.getElementContent(DomHelper.LAST_ACCESS_TIME_ELEMENT_NAME, element));
-        } catch (ParseException e) {
-            return new Date(0);
-        }
+        return Helpers.toDate(DomHelper.getElementContent(DomHelper.LAST_ACCESS_TIME_ELEMENT_NAME, element));
     }
 
     @Override
     public Date getCreationTime() {
-        try {
-            return DomHelper.dateFormatter.parse(DomHelper.getElementContent(DomHelper.CREATION_TIME_ELEMENT_NAME, element));
-        } catch (ParseException e) {
-            return new Date(0);
-        }
+        return Helpers.toDate(DomHelper.getElementContent(DomHelper.CREATION_TIME_ELEMENT_NAME, element));
     }
 
     @Override
@@ -202,32 +193,24 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
 
     @Override
     public Date getExpiryTime() {
-        try {
-            return DomHelper.dateFormatter.parse(DomHelper.getElementContent(DomHelper.EXPIRY_TIME_ELEMENT_NAME, element));
-        } catch (ParseException e) {
-            return new Date(0);
-        }
+        return Helpers.toDate(DomHelper.getElementContent(DomHelper.EXPIRY_TIME_ELEMENT_NAME, element));
     }
 
     @Override
     public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
         if (expiryTime == null) throw new IllegalArgumentException("expiryTime may not be null");
-        String formatted = DomHelper.dateFormatter.format(expiryTime);
+        String formatted = Helpers.fromDate(expiryTime);
         DomHelper.setElementContent(DomHelper.EXPIRY_TIME_ELEMENT_NAME, element, formatted);
     }
 
     @Override
     public Date getLastModificationTime() {
-        try {
-            return DomHelper.dateFormatter.parse(DomHelper.getElementContent(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element));
-        } catch (ParseException e) {
-            return new Date(0);
-        }
+        return Helpers.toDate(DomHelper.getElementContent(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element));
     }
 
     @Override
     protected void touch() {
-        DomHelper.setElementContent(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element, DomHelper.dateFormatter.format(new Date()));
+        DomHelper.setElementContent(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element, Helpers.fromDate(new Date()));
     }
 
     @Override

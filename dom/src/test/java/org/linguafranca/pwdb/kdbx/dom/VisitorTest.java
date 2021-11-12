@@ -22,7 +22,7 @@ import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxStreamFormat;
+import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 
 import java.io.InputStream;
 import java.util.ArrayList;

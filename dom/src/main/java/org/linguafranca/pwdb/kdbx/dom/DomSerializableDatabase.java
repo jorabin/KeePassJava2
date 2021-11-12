@@ -16,7 +16,8 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
-import org.linguafranca.pwdb.kdbx.stream_3_1.Salsa20StreamEncryptor;
+
+import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.StreamEncryptor;
 import org.apache.commons.codec.binary.Base64;
@@ -38,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.SecureRandom;
+import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -62,19 +64,20 @@ public class DomSerializableDatabase implements SerializableDatabase {
         // read in the template KeePass XML database
         result.load(result.getClass().getClassLoader().getResourceAsStream("base.kdbx.xml"));
         try {
-            // replace all placeholder dates with now
+            // replace all placeholder dates with now (this is now already done in the loader)
+/*
             String now = DomHelper.dateFormatter.format(new Date());
             NodeList list = (NodeList) DomHelper.xpath.evaluate("//*[contains(text(),'${creationDate}')]", result.doc.getDocumentElement(), XPathConstants.NODESET);
             for (int i = 0; i < list.getLength(); i++) {
                 list.item(i).setTextContent(now);
             }
+*/
             // set the root group UUID
             Node uuid = (Node) DomHelper.xpath.evaluate("//"+ DomHelper.UUID_ELEMENT_NAME, result.doc.getDocumentElement(), XPathConstants.NODE);
             uuid.setTextContent(DomHelper.base64RandomUuid());
         } catch (XPathExpressionException e) {
             throw new IllegalStateException(e);
         }
-        result.setEncryption(new Salsa20StreamEncryptor(SecureRandom.getSeed(32)));
         return result;
     }
 
@@ -99,6 +102,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
             }
 
             return this;
+
         } catch (ParserConfigurationException e) {
             throw new IllegalStateException("Instantiating Document Builder", e);
         } catch (SAXException e) {
@@ -108,6 +112,38 @@ public class DomSerializableDatabase implements SerializableDatabase {
         }
     }
 
+/*
+    public void dateConvert() {
+        try {
+            // finding all elements name ending Changed and Time
+            NodeList dateContent = (NodeList) DomHelper.xpath.evaluate("//*[substring(local-name(), string-length(local-name()) -3) = 'Time']", doc, XPathConstants.NODESET);
+            processDates(dateContent);
+
+            dateContent = (NodeList) DomHelper.xpath.evaluate("//*[substring(local-name(), string-length(local-name()) -6) = 'Changed']", doc, XPathConstants.NODESET);
+            processDates(dateContent);
+        } catch (XPathExpressionException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+*/
+
+    @Override
+    public void addBinary(int index, byte[] payload) {
+        DomHelper.addBinary(doc.getDocumentElement(), Helpers.encodeBase64Content(payload, true),index);
+    }
+
+/*
+    private void processDates(NodeList dateContent) {
+        Date now = new Date();
+        for (int i = 0; i < dateContent.getLength(); i++){
+            Element element = ((Element) dateContent.item(i));
+            String content = DomHelper.getElementContent(".", element);
+            Date d = content == null || content.equals("${creationDate}") ? now :Helpers.toDate(content);
+            DomHelper.setElementContent(".", element, DomHelper.dateFormatter.format(d));
+        }
+    }
+
+*/
     @Override
     public void save(OutputStream outputStream) {
         Document copyDoc = (Document) doc.cloneNode(true);

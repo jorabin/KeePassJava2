@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractGroup;
@@ -194,6 +195,7 @@ public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupW
         database.setDirty(true);
     }
 
+    @NotNull
     @Override
     public DomDatabaseWrapper getDatabase() {
         return database;

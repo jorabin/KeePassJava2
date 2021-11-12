@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.jaxb;
 
+import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
@@ -174,12 +175,7 @@ public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry,
         }
         max++;
 
-        // create a new binary to put in the store
-        Binaries.Binary newBin = database.getObjectFactory().createBinariesBinary();
-        newBin.setID(max);
-        newBin.setValue(Helpers.zipBinaryContent(value));
-        newBin.setCompressed(true);
-        binaryList.add(newBin);
+        database.createBinary(value, max);
 
         // make a reference to it from the entry
         BinaryField binaryField = database.getObjectFactory().createBinaryField();
@@ -228,7 +224,7 @@ public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry,
     }
 
     @Override
-    public UUID getUuid() {
+    public @NotNull UUID getUuid() {
         return delegate.getUUID();
     }
 

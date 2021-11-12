@@ -16,11 +16,13 @@
 
 package org.linguafranca.pwdb.kdb;
 
-import org.linguafranca.pwdb.security.Encryption;
+import org.linguafranca.pwdb.security.Aes;
 
 import javax.crypto.Cipher;
-import java.io.IOException;
 import java.io.InputStream;
+import java.security.MessageDigest;
+
+import static org.linguafranca.pwdb.security.Encryption.getSha256MessageDigestInstance;
 
 /**
  * This class stores the encryption details of a KDB file and provides a method to create
@@ -53,16 +55,18 @@ public class KdbHeader {
      * @param key key
      * @param inputStream an encrypted stream
      * @return a decrypted stream
-     * @throws IOException
      */
-    public InputStream createDecryptedInputStream(byte[] key, InputStream inputStream) throws IOException {
+    public InputStream createDecryptedInputStream(byte[] key, InputStream inputStream) {
         Cipher cipher;
         if ((flags & FLAG_RIJNDAEL) == 0) {
             throw new IllegalStateException("StreamEncryptor algorithm is not supported");
         }
 
-        byte[] finalKeyDigest = Encryption.getFinalKeyDigest(key, masterSeed, transformSeed, transformRounds);
-        return Encryption.getDecryptedInputStream(inputStream, finalKeyDigest, encryptionIv);
+        byte[] transformedKeyDigest = Aes.getTransformedKey(key, transformSeed, transformRounds);
+        MessageDigest md = getSha256MessageDigestInstance();
+        md.update(masterSeed);
+        byte[] finalKeyDigest = md.digest(transformedKeyDigest);
+        return Aes.getInstance().getDecryptedInputStream(inputStream, finalKeyDigest, encryptionIv);
     }
 
     public int getFlags() {

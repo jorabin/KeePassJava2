@@ -16,8 +16,9 @@
 
 package org.linguafranca.pwdb;
 
+import org.linguafranca.pwdb.security.Encryption;
+
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * Supports a contract that yields a key for decryption of databases
@@ -32,15 +33,13 @@ public interface Credentials {
     class None implements Credentials {
         @Override
         public byte[] getKey() {
-            MessageDigest md = null;
-            try {
-                md = MessageDigest.getInstance("SHA-256");
-            } catch (NoSuchAlgorithmException e) {
-                throw new IllegalStateException(e);
-            }
+            MessageDigest md = Encryption.getSha256MessageDigestInstance();
             return md.digest(new byte[0]);
         }
     }
 
-    byte [] getKey();
+    /**
+     * Returns a digest of the composition of credentials supplied
+     */
+    byte[] getKey();
 }

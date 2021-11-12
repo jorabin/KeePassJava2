@@ -34,5 +34,6 @@ public class KdbDatabaseLoaderTest extends DatabaseLoaderChecks {
         Credentials credentials = new KdbCredentials.Password("123".getBytes());
         // open database.
         super.database = KdbDatabase.load(credentials, inputStream);
+        super.skipDateCheck = true;
     }
 }

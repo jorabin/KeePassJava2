@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -183,9 +184,9 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
 
     /**
      * Get the parent of this entry
-     * @return a parent
+     * @return a parent or null if this entry currently does not have a parent
      */
-    @NotNull G getParent();
+    @Nullable G getParent();
 
     /**
      * Get the UUID of this entry. Databases (like KDB) that do not natively support
@@ -358,7 +359,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
     /**
      * Returns the date that the entry was last modified
      * <p>
-     *     Implementations SHOULD set this to the creation date or earlier if the entry has never been used.
+     * Implementations SHOULD set this to the creation date or earlier if the entry has never been used.
      */
     Date getLastModificationTime();
 }

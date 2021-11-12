@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.simple;
 
+import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.kdbx.simple.converter.KeePassBooleanConverter;
 import org.linguafranca.pwdb.kdbx.simple.converter.UuidConverter;
@@ -227,6 +228,7 @@ public class SimpleGroup extends org.linguafranca.pwdb.base.AbstractGroup<Simple
         touch();
     }
 
+    @NotNull
     @Override
     public SimpleDatabase getDatabase() {
         return database;

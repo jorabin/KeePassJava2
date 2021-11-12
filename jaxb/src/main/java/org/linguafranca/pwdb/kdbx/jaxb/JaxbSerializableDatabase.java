@@ -17,12 +17,10 @@
 package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.apache.commons.codec.binary.Base64;
+import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.StreamEncryptor;
-import org.linguafranca.pwdb.kdbx.jaxb.binding.JaxbEntryBinding;
-import org.linguafranca.pwdb.kdbx.jaxb.binding.JaxbGroupBinding;
-import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
-import org.linguafranca.pwdb.kdbx.jaxb.binding.StringField;
+import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -43,6 +41,7 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
 
     protected KeePassFile keePassFile;
     private StreamEncryptor encryption;
+    private ObjectFactory objectFactory = new ObjectFactory();
 
 
     @Override
@@ -147,6 +146,22 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
         keePassFile.getMeta().setHeaderHash(hash);
     }
 
+    @Override
+    public void addBinary(int index, byte[] value) {
+        addBinary(keePassFile, objectFactory, index, value);
+    }
+
+    public static void addBinary(KeePassFile keePassFile, ObjectFactory objectFactory, int index, byte[] value) {
+        // create a new binary to put in the store
+        Binaries.Binary newBin = objectFactory.createBinariesBinary();
+        newBin.setID(index);
+        newBin.setValue(Helpers.zipBinaryContent(value));
+        newBin.setCompressed(true);
+        if (keePassFile.getMeta().getBinaries() == null) {
+            keePassFile.getMeta().setBinaries(objectFactory.createBinaries());
+        }
+        keePassFile.getMeta().getBinaries().getBinary().add(newBin);
+    }
 
     public KeePassFile getKeePassFile() {
         return keePassFile;

@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdb;
 
+import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Entry;
 
 import org.linguafranca.pwdb.Icon;
@@ -93,7 +94,7 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     }
 
     @Override
-    public UUID getUuid() {
+    public @NotNull UUID getUuid() {
         return uuid;
     }
 

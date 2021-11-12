@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.jaxb;
 
+import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.JaxbEntryBinding;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.JaxbGroupBinding;
@@ -201,6 +202,7 @@ public class JaxbGroup extends AbstractGroup<JaxbDatabase, JaxbGroup, JaxbEntry,
         this.delegate.setIconID(icon.getIndex());
     }
 
+    @NotNull
     @Override
     public JaxbDatabase getDatabase() {
         return database;

@@ -20,7 +20,7 @@ import org.linguafranca.pwdb.checks.BasicDatabaseChecks;
 import org.junit.Test;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.stream_3_1.KdbxStreamFormat;
+import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.pwdb.Credentials;
 
