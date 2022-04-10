@@ -29,6 +29,8 @@ import java.util.UUID;
  */
 public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon> implements Database<D, G, E, I> {
 
+    protected static final String RECYCLE_BIN_NAME = "Recycle Bin";
+
     private boolean isDirty;
 
     @Override
@@ -223,6 +225,11 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
         for (E e: recycle.getEntries()){
             recycle.removeEntry(e);
         }
+    }
+
+    protected G findRecycleBinCandidate() {
+        List<? extends G> candidates = getRootGroup().findGroups(RECYCLE_BIN_NAME);
+        return candidates.size() > 0 ? candidates.get(0) : null;
     }
 
     @Override

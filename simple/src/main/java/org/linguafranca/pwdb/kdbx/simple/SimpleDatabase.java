@@ -115,8 +115,11 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
         UUID recycleBinUuid = this.keePassFile.meta.recycleBinUUID;
         SimpleGroup g = findGroup(recycleBinUuid);
         if (g == null && isRecycleBinEnabled()) {
-            g = newGroup("Recycle Bin");
-            getRootGroup().addGroup(g);
+            g = findRecycleBinCandidate();
+            if (g == null) {
+                g = newGroup(RECYCLE_BIN_NAME);
+                getRootGroup().addGroup(g);
+            }
             this.keePassFile.meta.recycleBinUUID = g.getUuid();
             this.keePassFile.meta.recycleBinChanged = new Date();
         }

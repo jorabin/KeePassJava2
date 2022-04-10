@@ -101,8 +101,11 @@ public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, Jaxb
             return null;
         }
         if (g == null) {
-            g = newGroup("Recycle Bin");
-            getRootGroup().addGroup(g);
+            g = findRecycleBinCandidate();
+            if (g == null) {
+                g = newGroup("Recycle Bin");
+                getRootGroup().addGroup(g);
+            }
             this.keePassFile.getMeta().setRecycleBinUUID(g.getUuid());
             this.keePassFile.getMeta().setRecycleBinChanged(new Date());
         }

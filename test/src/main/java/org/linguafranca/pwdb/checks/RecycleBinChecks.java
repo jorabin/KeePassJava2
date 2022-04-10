@@ -76,4 +76,20 @@ public abstract class RecycleBinChecks  <D extends Database<D,G,E,I>, G extends 
         assertEquals(0, recycleBin.getGroupsCount());
     }
 
+    @Test
+    public void recycleBinSelectedByName() {
+        database.enableRecycleBin(true);
+        assertTrue(database.isRecycleBinEnabled());
+
+        // Add group with "Recycle Bin" name
+        G recycleBinCandidate = database.newGroup("Recycle Bin");
+        database.getRootGroup().addGroup(recycleBinCandidate);
+        assertEquals(1, database.getRootGroup().getGroups().size());
+
+        // Check that "Recycle Bin" was selected by its name
+        G recycleBin = database.getRecycleBin();
+        assertNotNull(recycleBin);
+        assertEquals(recycleBinCandidate.getUuid(), recycleBin.getUuid());
+    }
+
 }

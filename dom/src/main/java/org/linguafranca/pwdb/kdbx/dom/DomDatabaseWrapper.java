@@ -141,9 +141,12 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
             return null;
         }
 
-        DomGroupWrapper g = newGroup();
-        g.setName("Recycle Bin");
-        getRootGroup().addGroup(g);
+        DomGroupWrapper g = findRecycleBinCandidate();
+        if (g == null) {
+            g = newGroup(RECYCLE_BIN_NAME);
+            getRootGroup().addGroup(g);
+        }
+
         ensureElementContent(RECYCLE_BIN_UUID_ELEMENT_NAME, dbMeta, base64FromUuid(g.getUuid()));
         touchElement(RECYCLE_BIN_CHANGED_ELEMENT_NAME, dbMeta);
         return g;
