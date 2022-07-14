@@ -40,8 +40,8 @@ public abstract class EntryClasses {
         return null;
     }
 
-    public static String getStringContent(StringProperty property) {
-        return property == null || property.value == null? null:property.value.text;
+    public static char[] getStringContent(StringProperty property) {
+        return property == null || property.value == null? null:property.value.text.toCharArray();
     }
 
     public static BinaryProperty getBinaryProp(String name, List<BinaryProperty> binary) {
@@ -131,6 +131,9 @@ public abstract class EntryClasses {
             @Convert(KeePassBooleanConverter.class)
             // NB converters don't work on attributes -see KdbxOutputTransformer
             Boolean _protected;
+            
+            // possible security issue here?
+            // wouldn't entry password get stored in text, which is a String?
             @Text
             String text;
 
