@@ -35,12 +35,12 @@ import java.util.UUID;
 public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, KdbIcon> {
     KdbGroup parent;
     private UUID uuid = UUID.randomUUID();
-    private String title = "";
-    private String url = "";
-    private String notes = "";
+    private char[] title;
+    private char[] url;
+    private char[] notes;
     private KdbIcon icon = new KdbIcon(0);
-    private String username = "";
-    private String password = "";
+    private char[] username;
+    private char[] password;
     private Date creationTime = new Date((System.currentTimeMillis()/1000L)*1000L); // to the next lower second
     private Date lastModificationTime = creationTime;
     private Date lastAccessTime = creationTime;
@@ -50,7 +50,7 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     private byte[] binaryData = new byte[0];
 
     @Override
-    public String getProperty(String name) {
+    public char[] getProperty(String name) {
         switch (name) {
             case STANDARD_PROPERTY_NAME_USER_NAME: return getUsername();
             case STANDARD_PROPERTY_NAME_PASSWORD: return getPassword();
@@ -103,53 +103,53 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     }
 
     @Override
-    public String getUsername() {
+    public char[] getUsername() {
         return username;
     }
 
     @Override
     public void setUsername(String username) {
-        this.username = username;
+        this.username = username.toCharArray();
     }
 
     @Override
-    public String getPassword() {
+    public char[] getPassword() {
         return password;
     }
 
     @Override
     public void setPassword(String pass) {
-        this.password = pass;
+        this.password = pass.toCharArray();
     }
 
     @Override
-    public String getUrl() {
+    public char[] getUrl() {
         return url;
     }
 
     @Override
     public void setUrl(String url) {
-        this.url = url;
+        this.url = url.toCharArray();
     }
 
     @Override
-    public String getTitle() {
+    public char[] getTitle() {
         return title;
     }
 
     @Override
     public void setTitle(String title) {
-        this.title = title;
+        this.title = title.toCharArray();
     }
 
     @Override
-    public String getNotes() {
+    public char[] getNotes() {
         return notes;
     }
 
     @Override
     public void setNotes(String notes) {
-        this.notes = notes;
+        this.notes = notes.toCharArray();
     }
 
     @Override
@@ -213,7 +213,7 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
 
     public String toString() {
         String time = KdbDatabase.isoDateFormat.format(creationTime);
-        return getPath() + String.format(" (%s, %s, %s) %s [%s]", url, username, notes.substring(0,Math.min(notes.length(), 24)), time, binaryDescription);
+        return getPath() + String.format(" (%s, %s, %s) %s [%s]", String.valueOf(url), String.valueOf(username), String.valueOf(notes).substring(0,Math.min(String.valueOf(notes).length(), 24)), time, binaryDescription);
     }
 
     @Override
