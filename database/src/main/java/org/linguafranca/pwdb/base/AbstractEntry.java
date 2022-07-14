@@ -30,22 +30,22 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
 
     @Override
     public  boolean matchTitle(String text){
-        return (getTitle() != null && getTitle().toLowerCase().contains(text.toLowerCase()));
+        return (getTitle() != null && String.valueOf(getTitle()).toLowerCase().contains(text.toLowerCase()));
     }
 
     @Override
     public  boolean matchNotes(String text){
-        return (getNotes()!=null && getNotes().toLowerCase().contains(text.toLowerCase()));
+        return (getNotes()!= null && String.valueOf(getNotes()).toLowerCase().contains(text.toLowerCase()));
     }
 
     @Override
     public  boolean matchUsername(String text){
-        return (getUsername()!=null && getUsername().toLowerCase().contains(text.toLowerCase()));
+        return (getUsername()!= null && String.valueOf(getUsername()).toLowerCase().contains(text.toLowerCase()));
     }
 
     @Override
     public  boolean matchUrl(String text){
-        return (getUrl()!=null && getUrl().toLowerCase().contains(text.toLowerCase()));
+        return (getUrl()!= null && String.valueOf(getUrl()).toLowerCase().contains(text.toLowerCase()));
     }
 
     @Override
@@ -73,7 +73,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
     }
 
     @Override
-    public String getUsername() {
+    public char[] getUsername() {
         return getProperty(STANDARD_PROPERTY_NAME_USER_NAME);
     }
 
@@ -84,7 +84,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
     }
 
     @Override
-    public String getPassword() {
+    public char[] getPassword() {
         return getProperty(STANDARD_PROPERTY_NAME_PASSWORD);
     }
 
@@ -95,7 +95,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
     }
 
     @Override
-    public String getUrl() {
+    public char[] getUrl() {
         return getProperty(STANDARD_PROPERTY_NAME_URL);
     }
 
@@ -106,7 +106,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
     }
 
     @Override
-    public String getTitle() {
+    public char[] getTitle() {
         return getProperty(STANDARD_PROPERTY_NAME_TITLE);
     }
 
@@ -117,7 +117,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
     }
 
     @Override
-    public String getNotes() {
+    public char[] getNotes() {
         return getProperty(STANDARD_PROPERTY_NAME_NOTES);
     }
 
