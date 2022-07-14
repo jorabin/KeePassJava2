@@ -101,7 +101,7 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
     }
 
     @Override
-    public String getProperty(String s) {
+    public char[] getProperty(String s) {
         return getStringContent(getStringProperty(s, string));
     }
 
