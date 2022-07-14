@@ -39,5 +39,11 @@
             <version>1.1.1</version>
             <scope>runtime</scope>
         </dependency>
+        <!--Since javax.annotation has been removed since Java 11, this adds it as a dependency-->
+        <dependency>
+            <groupId>com.github.spotbugs</groupId>
+            <artifactId>spotbugs</artifactId>
+            <version>4.7.1</version>
+        </dependency>
     </dependencies>
 </project>
