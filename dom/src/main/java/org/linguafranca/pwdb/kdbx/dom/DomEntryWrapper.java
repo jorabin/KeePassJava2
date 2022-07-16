@@ -59,7 +59,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
     }
 
     @Override
-    public String getProperty(String name) {
+    public char[] getProperty(String name) {
         Element property = DomHelper.getElement(String.format(DomHelper.PROPERTY_ELEMENT_FORMAT, name), element, false);
         if (property == null) {
             return null;
@@ -92,7 +92,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
         ArrayList<String> result = new ArrayList<>();
         List<Element> list = DomHelper.getElements("String", element);
         for (Element listElement: list) {
-            result.add(DomHelper.getElementContent("Key", listElement));
+            result.add(String.valueOf(DomHelper.getElementContent("Key", listElement)));
         }
         return result;
     }
@@ -131,7 +131,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
         ArrayList<String> result = new ArrayList<>();
         List<Element> list = DomHelper.getElements("Binary", element);
         for (Element listElement: list) {
-            result.add(DomHelper.getElementContent("Key", listElement));
+        	result.add(String.valueOf(DomHelper.getElementContent("Key", listElement)));
         }
         return result;
     }
@@ -152,10 +152,10 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
         }
         return new DomGroupWrapper((Element) element.getParentNode(), database, false);
     }
-
+    
     @Override
     public UUID getUuid() {
-        return Helpers.uuidFromBase64(DomHelper.getElementContent(DomHelper.UUID_ELEMENT_NAME, element));
+        return Helpers.uuidFromBase64(String.valueOf(DomHelper.getElementContent(DomHelper.UUID_ELEMENT_NAME, element)));
     }
 
     @Override
@@ -172,17 +172,17 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
 
     @Override
     public Date getLastAccessTime() {
-        return Helpers.toDate(DomHelper.getElementContent(DomHelper.LAST_ACCESS_TIME_ELEMENT_NAME, element));
+        return Helpers.toDate(String.valueOf(DomHelper.getElementContent(DomHelper.LAST_ACCESS_TIME_ELEMENT_NAME, element)));
     }
 
     @Override
     public Date getCreationTime() {
-        return Helpers.toDate(DomHelper.getElementContent(DomHelper.CREATION_TIME_ELEMENT_NAME, element));
+        return Helpers.toDate(String.valueOf(DomHelper.getElementContent(DomHelper.CREATION_TIME_ELEMENT_NAME, element)));
     }
 
     @Override
     public boolean getExpires() {
-        String content = DomHelper.getElementContent(DomHelper.EXPIRES_ELEMENT_NAME, element);
+        String content = String.valueOf(DomHelper.getElementContent(DomHelper.EXPIRES_ELEMENT_NAME, element));
         return content != null && content.equalsIgnoreCase("true");
     }
 
@@ -192,8 +192,8 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
     }
 
     @Override
-    public Date getExpiryTime() {
-        return Helpers.toDate(DomHelper.getElementContent(DomHelper.EXPIRY_TIME_ELEMENT_NAME, element));
+    public Date getExpiryTime() {    	
+        return Helpers.toDate(String.valueOf(DomHelper.getElementContent(DomHelper.EXPIRY_TIME_ELEMENT_NAME, element)));
     }
 
     @Override
@@ -205,7 +205,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
 
     @Override
     public Date getLastModificationTime() {
-        return Helpers.toDate(DomHelper.getElementContent(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element));
+        return Helpers.toDate(String.valueOf(DomHelper.getElementContent(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element)));
     }
 
     @Override
