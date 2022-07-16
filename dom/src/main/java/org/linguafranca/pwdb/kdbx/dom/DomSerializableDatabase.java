@@ -16,7 +16,6 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
-
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.StreamEncryptor;
@@ -35,6 +34,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -93,7 +93,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
             NodeList protectedContent = (NodeList) DomHelper.xpath.evaluate("//*[@Protected='True']", doc, XPathConstants.NODESET);
             for (int i = 0; i < protectedContent.getLength(); i++){
                 Element element = ((Element) protectedContent.item(i));
-                String base64 = DomHelper.getElementContent(".", element);
+                String base64 = String.valueOf(DomHelper.getElementContent(".", element));
                 // Android compatibility
                 byte[] encrypted = Base64.decodeBase64(base64.getBytes());
                 String decrypted = new String(encryption.decrypt(encrypted), "UTF-8");
@@ -158,8 +158,8 @@ public class DomSerializableDatabase implements SerializableDatabase {
             // encrypt and base64 every element marked as protected
             NodeList protectedContent = (NodeList) DomHelper.xpath.evaluate("//*[@Protected='True']", copyDoc, XPathConstants.NODESET);
             for (int i = 0; i < protectedContent.getLength(); i++){
-                Element element = ((Element) protectedContent.item(i));
-                String decrypted = DomHelper.getElementContent(".", element);
+                Element element = ((Element) protectedContent.item(i));  
+                String decrypted = String.valueOf(DomHelper.getElementContent(".", element));
                 if (decrypted == null) {
                     decrypted = "";
                 }
