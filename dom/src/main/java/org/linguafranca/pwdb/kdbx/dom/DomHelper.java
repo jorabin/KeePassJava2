@@ -41,7 +41,7 @@ class DomHelper {
 
     static XPath xpath = XPathFactory.newInstance().newXPath();
 
-//    static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+    //static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
 
     static final String GROUP_ELEMENT_NAME = "Group";
     static final String ENTRY_ELEMENT_NAME = "Entry";
@@ -160,9 +160,9 @@ class DomHelper {
     }
 
     @Nullable
-    static String getElementContent(String elementPath, Element parentElement) {
+    static char[] getElementContent(String elementPath, Element parentElement) {
         Element result = getElement(elementPath, parentElement, false);
-        return (result == null) ? null : result.getTextContent();
+        return (result == null) ? null : result.getTextContent().toCharArray();
     }
 
     @NotNull
