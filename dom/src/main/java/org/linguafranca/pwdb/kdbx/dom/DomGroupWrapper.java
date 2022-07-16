@@ -70,7 +70,7 @@ public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupW
 
     @Override
     public boolean isRecycleBin() {
-        String UUIDcontent = getElementContent(RECYCLE_BIN_UUID_ELEMENT_NAME, database.dbMeta);
+        String UUIDcontent = String.valueOf(getElementContent(RECYCLE_BIN_UUID_ELEMENT_NAME, database.dbMeta));
         if (UUIDcontent != null){
             UUID uuid = Helpers.uuidFromBase64(UUIDcontent);
             return uuid.equals(this.getUuid());
@@ -169,7 +169,7 @@ public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupW
 
     @Override
     public String getName() {
-        return getElementContent(NAME_ELEMENT_NAME, element);
+        return String.valueOf(getElementContent(NAME_ELEMENT_NAME, element));
     }
 
     @Override
@@ -180,7 +180,7 @@ public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupW
 
     @Override
     public UUID getUuid() {
-        String encodedUuid = getElementContent(UUID_ELEMENT_NAME, element);
+        String encodedUuid = String.valueOf(getElementContent(UUID_ELEMENT_NAME, element));
         return Helpers.uuidFromBase64(encodedUuid);
     }
 
