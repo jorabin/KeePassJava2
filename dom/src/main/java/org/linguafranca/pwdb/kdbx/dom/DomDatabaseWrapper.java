@@ -123,7 +123,7 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
 
     @Override
     public DomGroupWrapper getRecycleBin() {
-        String UUIDcontent = getElementContent(RECYCLE_BIN_UUID_ELEMENT_NAME, dbMeta);
+        String UUIDcontent = String.valueOf(getElementContent(RECYCLE_BIN_UUID_ELEMENT_NAME, dbMeta));
         if (UUIDcontent != null){
             final UUID uuid = Helpers.uuidFromBase64(UUIDcontent);
             if (uuid.getLeastSignificantBits() != 0 && uuid.getMostSignificantBits() != 0) {
@@ -151,7 +151,7 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
 
     @Override
     public boolean isRecycleBinEnabled() {
-        return Boolean.valueOf(getElementContent(RECYCLE_BIN_ENABLED_ELEMENT_NAME, dbMeta));
+        return Boolean.valueOf(String.valueOf(getElementContent(RECYCLE_BIN_ENABLED_ELEMENT_NAME, dbMeta)));
     }
 
     @Override
@@ -159,8 +159,8 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
         setElementContent(RECYCLE_BIN_ENABLED_ELEMENT_NAME, dbMeta, ((Boolean) enable).toString());
     }
 
-    public String getName() {
-        return DomHelper.getElementContent("DatabaseName", dbMeta);
+    public String getName() {    	
+        return String.valueOf(DomHelper.getElementContent("DatabaseName", dbMeta));
     }
 
     public void setName(String name) {
@@ -170,8 +170,8 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
     }
 
     @Override
-    public String getDescription() {
-        return DomHelper.getElementContent("DatabaseDescription", dbMeta);
+    public String getDescription() {	
+        return String.valueOf(DomHelper.getElementContent("DatabaseDescription", dbMeta));
     }
 
     @Override
