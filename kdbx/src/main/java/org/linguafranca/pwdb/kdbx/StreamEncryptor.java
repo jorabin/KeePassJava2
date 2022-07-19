@@ -16,13 +16,13 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import org.bouncycastle.crypto.StreamCipher;
+import org.bouncycastle.crypto.engines.ChaCha7539Engine;
+import org.bouncycastle.crypto.engines.Salsa20Engine;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.util.encoders.Hex;
 import org.linguafranca.pwdb.security.Encryption;
-import org.spongycastle.crypto.StreamCipher;
-import org.spongycastle.crypto.engines.ChaCha7539Engine;
-import org.spongycastle.crypto.engines.Salsa20Engine;
-import org.spongycastle.crypto.params.KeyParameter;
-import org.spongycastle.crypto.params.ParametersWithIV;
-import org.spongycastle.util.encoders.Hex;
 
 import java.security.MessageDigest;
 
