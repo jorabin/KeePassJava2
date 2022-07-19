@@ -1,11 +1,11 @@
 package org.linguafranca.pwdb.security;
 
-import org.spongycastle.crypto.StreamCipher;
-import org.spongycastle.crypto.engines.ChaCha7539Engine;
-import org.spongycastle.crypto.io.CipherInputStream;
-import org.spongycastle.crypto.io.CipherOutputStream;
-import org.spongycastle.crypto.params.KeyParameter;
-import org.spongycastle.crypto.params.ParametersWithIV;
+import org.bouncycastle.crypto.StreamCipher;
+import org.bouncycastle.crypto.engines.ChaCha7539Engine;
+import org.bouncycastle.crypto.io.CipherInputStream;
+import org.bouncycastle.crypto.io.CipherOutputStream;
+import org.bouncycastle.crypto.params.KeyParameter;
+import org.bouncycastle.crypto.params.ParametersWithIV;
 
 import java.io.InputStream;
 import java.io.OutputStream;
