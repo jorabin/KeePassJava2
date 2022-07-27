@@ -136,7 +136,7 @@ public class KdbxHeader {
         compressionFlags = CompressionFlags.GZIP;
         masterSeed = random.generateSeed(32);
         transformSeed = random.generateSeed(32);
-        transformRounds = 6000;
+        transformRounds = 60000;
         encryptionIv = random.generateSeed(16);
         innerRandomStreamKey = random.generateSeed(32);
         streamStartBytes = new byte[32];
