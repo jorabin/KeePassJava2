@@ -6,8 +6,9 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.concurrent.Immutable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -24,7 +25,7 @@ import static org.linguafranca.pwdb.security.VariantDictionary.EntryType.UINT64;
 public class VariantDictionary {
 
     private final short version;
-    private final Map<String, Entry> entries = new HashMap<>();
+    private final Map<String, Entry> entries = new LinkedHashMap<>();
 
     private final static String knn = "VariantDictionary key must not be null";
     private final static String vnn = "VariantDictionary.Entry value must not be null";
@@ -58,7 +59,6 @@ public class VariantDictionary {
         }
     }
 
-
     @SuppressWarnings("WeakerAccess")
     @Immutable
     public static class Entry {
@@ -78,6 +78,10 @@ public class VariantDictionary {
 
         public byte getType() {
             return type;
+        }
+        
+        public int getValueLength() {
+        	return value.length;
         }
 
         public UUID asUuid() {
@@ -125,7 +129,7 @@ public class VariantDictionary {
         for (Map.Entry<String, VariantDictionary.Entry> e : this.entries.entrySet()) {
             vd.entries.put(e.getKey(), e.getValue());
         }
-        return null;
+        return vd;
     }
 
     /**
@@ -136,7 +140,48 @@ public class VariantDictionary {
     public short getVersion() {
         return version;
     }
-
+    
+    /*
+     * Get a Set containing the String keys 
+     */
+    public Set<String> getKeys() {
+    	return entries.keySet();
+    }
+    
+    /**
+     * Get the String key of a Entry object
+     * @param entry the entry object to get the key name of
+     * @return the String key name of entry or an empty String if no key was found
+     */
+    public String getKeyOfEntry(Entry entry) {
+    	String keyName = "";
+    	for(String key : entries.keySet()) {
+    		if(entries.get(key) == entry) {
+    			keyName = key;
+    			break;
+    		}	
+    	}
+    	return keyName;
+    }
+      
+    /**
+     * Get the total bytes that comprise the variant dictionary
+     * 
+     * @return the total size (in bytes) of the variant dictionary
+     */
+    public int getTotalBytes() {
+    	int bytes = 3; // version bytes (2) + null terminator byte (1)
+    	for(Entry entry : entries.values()) {
+    		int valueTypeBytes = 1;
+    		int keyNameLengthBytes = 4;
+    		int keyNameBytes = getKeyOfEntry(entry).length();
+    		int valueLengthBytes = 4;
+    		int valueBytes = entry.getValueLength();
+    		bytes += (valueTypeBytes+keyNameLengthBytes+keyNameBytes+valueLengthBytes+valueBytes);
+    	}
+    	return bytes;
+    }
+   
     /**
      * Return an entry for the key supplied
      *
@@ -154,7 +199,9 @@ public class VariantDictionary {
      * @return the entry corresponding to the key
      */
     public @NotNull Entry mustGet(@NotNull String key) {
+    	//System.out.println("VariantDictionary->mustGet->key=" + key);
         Entry entry = entries.get(key);
+        //System.out.println("VariantDictionary->mustGet->entry=" + entry);
         if (entry == null) {
             throw new IllegalArgumentException("There is no entry with key " + key);
         }
@@ -191,7 +238,7 @@ public class VariantDictionary {
     }
 
     /**
-     * Put a long as an unsigned64 undewr the key defined
+     * Put a long as an unsigned64 under the key defined
      */
     public void putLong(@NotNull String key, long value) {
         byte[] buf = new byte[8];
