@@ -19,6 +19,7 @@ package org.linguafranca.pwdb.kdbx.dom;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -29,6 +30,9 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
+import static org.linguafranca.pwdb.kdbx.dom.DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME;
+
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -71,42 +75,68 @@ class DomHelper {
     static final String RECYCLE_BIN_CHANGED_ELEMENT_NAME = "RecycleBinChanged";
 
     interface ValueCreator {
-        String getValue();
+    	/*
+    	 * Deprecated in favor of getFormattedValue,
+    	 * which really only matters for DateValueCreator right now but could be useful in future scenarios
+    	 * where other XML elements may be formatted differently depending on the KDBX version
+    	 */
+        //String getValue();
+        
+        String getFormattedValue(int formatVersion);
+       
     }
 
     static class ConstantValueCreator implements ValueCreator {
         String value;
         ConstantValueCreator(String value) {
             this.value = value;
+            
         }
-        @Override
-        public String getValue() {
-            return value;
-        }
+       
+		@Override
+		public String getFormattedValue(int formatVersion) {
+			if(formatVersion == 3 || formatVersion == 4) {
+				return value;
+			}
+			else {
+				throw new IllegalArgumentException("Only version formats of 3 or 4 are supported");
+			}
+		}
+
     }
 
     static class DateValueCreator implements ValueCreator {
-        @Override
-        public String getValue() {
-            return Helpers.fromDate(new Date());
-        }
+    	@Override
+		public String getFormattedValue(int versionFormat) {
+			if(versionFormat == 3 || versionFormat == 4) {
+				return Helpers.fromDate(new Date(), versionFormat);
+			}
+			else {
+				throw new IllegalArgumentException("Only version formats of 3 or 4 are supported");
+			}
+			
+		}
     }
 
     static class UuidValueCreator implements ValueCreator {
-        @Override
-        public String getValue() {
-            return base64RandomUuid();
-        }
+		@Override
+		public String getFormattedValue(int formatVersion) {
+			if(formatVersion == 3 || formatVersion == 4) {
+				return base64RandomUuid();
+			}
+			else {
+				throw new IllegalArgumentException("Only version formats of 3 or 4 are supported");
+			}
+		}
 
     }
 
-    static void ensureElements (Element element, Map<String, ValueCreator> childElements) {
+    static void ensureElements (Element element, Map<String, ValueCreator> childElements, int formatVersion) {
         for (Map.Entry<String, ValueCreator> entry: childElements.entrySet()) {
-            ensureElementContent(entry.getKey(), element, entry.getValue().getValue());
+            ensureElementContent(entry.getKey(), element, entry.getValue().getFormattedValue(formatVersion));
         }
     }
-
-
+    
     @Nullable @Contract("_,_,true -> !null")
     static  Element getElement(String elementPath, Element parentElement, boolean create) {
         try {
@@ -201,7 +231,7 @@ class DomHelper {
         try {
             String b64 = Helpers.encodeBase64Content(value, true);
 
-            //Find the highest numbered existing content
+            // Find the highest numbered existing content
             String max = xpath.evaluate("//Binaries/Binary/@ID[not(. < ../../Binary/@ID)][1]", parentElement.getOwnerDocument().getDocumentElement());
             Integer newIndex = Integer.valueOf(max) + 1;
 
@@ -234,8 +264,8 @@ class DomHelper {
     }
 
     @NotNull
-    static Element touchElement(String elementPath, Element parentElement) {
-        return setElementContent(elementPath, parentElement, Helpers.fromDate(new Date()));
+    static Element touchElement(String elementPath, Element parentElement, int dateFormatVersion) {
+        return setElementContent(elementPath, parentElement, Helpers.fromDate(new Date(), dateFormatVersion));
     }
 
     private static Element createHierarchically(String elementPath, Element startElement) {
