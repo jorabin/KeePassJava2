@@ -47,8 +47,17 @@ public interface StreamFormat {
             outputStream.flush();
             outputStream.close();
         }
+
+		@Override
+		public int getStreamFormatVersion() {
+			return 4;
+		}
     }
 
+    // May/may not keep this, try to find a way around forcing this restriction
+    // For KDBX streams this makes (some) sense, but other future stream types may/may not have distinct versions
+    int getStreamFormatVersion();
+    
     void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream encryptedInputStream) throws IOException;
 
     void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream encryptedOutputStream) throws IOException;
