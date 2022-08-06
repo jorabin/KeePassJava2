@@ -279,7 +279,6 @@ public class KdbxSerializer {
         // followed by a file version number
         int fullVersion = ledis.readInt();
         kdbxHeader.setVersion(fullVersion >> 16);
-        System.out.println("KdbxSerializer->readOuterHeader->post-byte shift set->version="+(fullVersion >> 16));
 
         // read header fields
         getOuterHeaderFields(kdbxHeader, digest, ledis);
@@ -318,7 +317,6 @@ public class KdbxSerializer {
         byte headerType;
         do {
             headerType = input.readByte();
-            System.out.println("KdbxSerializer->getOuterHeaderFields->headerType=" + headerType);
             int length = (kdbxHeader.getVersion() == 3 ? input.readShort() : input.readInt()); //short=2 bytes for KDBX3.1, int=4 bytes for KDBX4
 
             switch (headerType) {
@@ -407,9 +405,7 @@ public class KdbxSerializer {
         byte headerType;
         do {
             headerType = input.readByte();
-            System.out.println("Header type: " + headerType);
             int length = input.readInt();
-            System.out.println("Header len: " + length);
 
             switch (headerType) {
                 case InnerHeaderType.END: {
