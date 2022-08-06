@@ -18,13 +18,17 @@ package org.linguafranca.pwdb.kdbx;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import com.google.common.io.LittleEndianDataOutputStream;
+
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.hashedblock.CollectingInputStream;
 import org.linguafranca.pwdb.hashedblock.HashedBlockInputStream;
 import org.linguafranca.pwdb.hashedblock.HashedBlockOutputStream;
 import org.linguafranca.pwdb.hashedblock.HmacBlockInputStream;
+import org.linguafranca.pwdb.hashedblock.HmacBlockOutputStream;
+import org.linguafranca.pwdb.kdbx.KdbxHeader.ProtectedStreamAlgorithm;
 import org.linguafranca.pwdb.security.Encryption;
 import org.linguafranca.pwdb.security.VariantDictionary;
+import org.linguafranca.pwdb.security.VariantDictionary.Entry;
 
 import java.io.*;
 import java.nio.ByteBuffer;
@@ -32,9 +36,12 @@ import java.nio.ByteOrder;
 import java.security.DigestInputStream;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import javax.crypto.Mac;
 
 /**
  * This class provides static methods for the encryption and decryption of Keepass KDBX V3 and V4 files.
@@ -61,7 +68,7 @@ import java.util.zip.GZIPOutputStream;
  *          <li>The content is now a character stream, which is expected to be
  *          XML representing a KeePass Database. Assumed UTF-8 encoding.</li>
  *      </ol>
- *      <li>In V4 the remainder of the file is encoded as HMacHasedBlocks:</li>
+ *      <li>In V4 the remainder of the file is encoded as HMacHashedBlocks:</li>
  *      <ol>
  *          <li>A sequence of blocks encoded using Hmac Blocks see {@link HmacBlockInputStream}</li>
  *          <li>Those blocks contain an encrypted input stream.</li>
@@ -80,6 +87,7 @@ import java.util.zip.GZIPOutputStream;
  * @see <a href="https://github.com/jorabin/KeePassJava2/blob/master/Format%20Diagram.svg">this diagram</a>
  * @author jo
  */
+
 @SuppressWarnings("WeakerAccess")
 public class KdbxSerializer {
 
@@ -96,19 +104,20 @@ public class KdbxSerializer {
      */
     public static InputStream createUnencryptedInputStream(Credentials credentials, KdbxHeader kdbxHeader, InputStream inputStream) throws IOException {
 
-        readOuterHeader(inputStream, kdbxHeader);
+        readOuterHeader(inputStream, kdbxHeader); 
 
         InputStream plainTextStream;
 
         if (kdbxHeader.getVersion() >= 4) {
+        	
+            verifyOuterHeader(kdbxHeader, credentials, new DataInputStream(inputStream)); 
 
-            verifyOuterHeader(kdbxHeader, credentials, new DataInputStream(inputStream));
-
-            HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(kdbxHeader.getHmacKey(credentials), inputStream, true);
+            HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(kdbxHeader.getHmacKey(credentials), inputStream, true); 
 
             plainTextStream = kdbxHeader.createDecryptedStream(credentials.getKey(), hmacBlockInputStream);
-
-        } else {
+        } 
+        
+        else {
 
             InputStream decryptedInputStream = kdbxHeader.createDecryptedStream(credentials.getKey(), inputStream);
 
@@ -124,35 +133,66 @@ public class KdbxSerializer {
         if (kdbxHeader.getVersion() >= 4) {
             readInnerHeader(kdbxHeader, plainTextStream);
         }
-
+        
         return plainTextStream;
     }
 
     /**
-     * Provides an {@link OutputStream} to be encoded and encrypted in KDBX format
-     * // TODO only writes in V3 format
+     * Provides an {@link OutputStream} to be encoded and encrypted in either KDBX3.1 or KDBX4.x formats
      * @param credentials credentials for encryption of the stream
-     * @param kdbxHeader a KDBX header to control the formatting and encryption operation
-     * @param outputStream output stream to contain the KDBX formatted output
-     * @return an unencrypted output stream, to be written to, flushed and closed by the caller
+     * @param kdbxHeader a KDBX header to control the formatting and encryption operations
+     * @param outputStream output stream to contain the KDBX3.1/KDBX4.x formatted output
+     * @return an encrypted output stream to be written to, flushed, and closed by the caller
      * @throws IOException on error
+     * @throws NoSuchAlgorithmException 
      */
-    public static OutputStream createEncryptedOutputStream(Credentials credentials, KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
+    public static OutputStream createKdbxFormattedOutputStream(Credentials credentials, KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException, NoSuchAlgorithmException {
+    	writeKdbxHeader(kdbxHeader, outputStream);
+    	
+    	if(kdbxHeader.getVersion() == 3) {
+    		OutputStream encryptedOutputStream = kdbxHeader.createEncryptedStream(credentials.getKey(), outputStream);
+    		
+            writeStartBytes(kdbxHeader, encryptedOutputStream);
 
-        writeKdbxHeader(kdbxHeader, outputStream);
+            HashedBlockOutputStream blockOutputStream = new HashedBlockOutputStream(encryptedOutputStream, true);
+            
+            if(kdbxHeader.getCompressionFlags().equals(KdbxHeader.CompressionFlags.NONE)) {
+                return blockOutputStream;
+            }
+            
+            return new GZIPOutputStream(blockOutputStream);
+    	}
+    	
+    	else {
+    		writeHeaderHash(kdbxHeader, credentials, outputStream, true);
+    		writeHeaderHash(kdbxHeader, credentials, outputStream, false);
 
-        OutputStream encryptedOutputStream = kdbxHeader.createEncryptedStream(credentials.getKey(), outputStream);
-
-        writeStartBytes(kdbxHeader, encryptedOutputStream);
-
-        HashedBlockOutputStream blockOutputStream = new HashedBlockOutputStream(encryptedOutputStream, true);
-
-        if(kdbxHeader.getCompressionFlags().equals(KdbxHeader.CompressionFlags.NONE)) {
-            return blockOutputStream;
-        }
-        return new GZIPOutputStream(blockOutputStream);
+    		HmacBlockOutputStream hmacBlockOutputStream = new HmacBlockOutputStream(kdbxHeader, credentials, outputStream, true);
+    		return hmacBlockOutputStream;
+    	}
     }
+     
+    /*
+    This method has been replaced by createdKdbxFormattedOutputStream
+    Only keeping to not completely break the simple xml code
+    Eventually this should be entirely removed, even if simple xml has no future with this project
+    */
+    public static OutputStream createEncryptedOutputStream(Credentials credentials, KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
+    	if(kdbxHeader.getVersion() == 3) {
+    		writeKdbxHeader(kdbxHeader, outputStream);
+    		
+    		OutputStream encryptedOutputStream = kdbxHeader.createEncryptedStream(credentials.getKey(), outputStream);
 
+            writeStartBytes(kdbxHeader, encryptedOutputStream);
+
+            HashedBlockOutputStream blockOutputStream = new HashedBlockOutputStream(encryptedOutputStream, true);
+
+            if(kdbxHeader.getCompressionFlags().equals(KdbxHeader.CompressionFlags.NONE)) {
+                return blockOutputStream;
+            }
+            return new GZIPOutputStream(blockOutputStream);
+    	}
+    } 
 
     /**
      * Checks that the decrypted stream starts with the expected bytes in V3 format
@@ -173,7 +213,7 @@ public class KdbxSerializer {
     /**
      * Writes the expected stream start bytes to the encrypted stream for V3 format
      * @param kdbxHeader the header
-     * @param encryptedOutputStream the encypted stream
+     * @param encryptedOutputStream the encrypted stream
      * @throws IOException if the stream cannot be written, etc.
      */
     private static void writeStartBytes(KdbxHeader kdbxHeader, OutputStream encryptedOutputStream) throws IOException {
@@ -186,6 +226,7 @@ public class KdbxSerializer {
     private static final int FILE_VERSION_CRITICAL_MASK = 0xFFFF0000;
     private static final int FILE_VERSION_32 = 0x00030001;
     private static final int FILE_VERSION_4 = 0x00040000;
+    private static final int END = 0x0A0D0A0D;
 
     private static class HeaderType {
         static final byte END = 0;
@@ -204,9 +245,9 @@ public class KdbxSerializer {
     }
     
     /**
-     * Read two lots of 4 bytes and verify that they satisfy the signature of a kdbx file;
-     * @param ledis an input stream
-     * @return true if it looks like this is a kdbx file
+     * Read two lots of 4 bytes and verify that they satisfy the signature of a KDBX file;
+     * @param ledis a LittleEndianDataInputStream
+     * @return true if it looks like this is a KDBX file
      * @throws IOException on error
      */
     private static boolean verifyMagicNumber(LittleEndianDataInputStream ledis) throws IOException {
@@ -238,6 +279,7 @@ public class KdbxSerializer {
         // followed by a file version number
         int fullVersion = ledis.readInt();
         kdbxHeader.setVersion(fullVersion >> 16);
+        System.out.println("KdbxSerializer->readOuterHeader->post-byte shift set->version="+(fullVersion >> 16));
 
         // read header fields
         getOuterHeaderFields(kdbxHeader, digest, ledis);
@@ -276,7 +318,8 @@ public class KdbxSerializer {
         byte headerType;
         do {
             headerType = input.readByte();
-            int length = (kdbxHeader.getVersion() == 3 ? input.readShort() : input.readInt());
+            System.out.println("KdbxSerializer->getOuterHeaderFields->headerType=" + headerType);
+            int length = (kdbxHeader.getVersion() == 3 ? input.readShort() : input.readInt()); //short=2 bytes for KDBX3.1, int=4 bytes for KDBX4
 
             switch (headerType) {
 
@@ -352,7 +395,7 @@ public class KdbxSerializer {
     }
 
     /**
-     * From V4 the inner stream encryption parameters are contained in
+     * For KDBX4.x, the inner stream encryption parameters are contained in
      * a set of headers immediately preceding the XML payload
      * @param kdbxHeader the header whose values are to be read
      * @param plainTextStream a stream to read them from
@@ -364,7 +407,9 @@ public class KdbxSerializer {
         byte headerType;
         do {
             headerType = input.readByte();
+            System.out.println("Header type: " + headerType);
             int length = input.readInt();
+            System.out.println("Header len: " + length);
 
             switch (headerType) {
                 case InnerHeaderType.END: {
@@ -378,7 +423,7 @@ public class KdbxSerializer {
                 }
 
                 case InnerHeaderType.INNER_RANDOM_STREAM_KEY: {
-                    kdbxHeader.setInnerRandomStreamKey(getBytes(length, input));
+                    kdbxHeader.setInnerRandomStreamKey(getBytes(length, input)); //why is this read as 64 sometimes?
                     break;
                 }
 
@@ -390,6 +435,33 @@ public class KdbxSerializer {
                 default: throw new IllegalStateException("Invalid inner header field");
             }
         } while (headerType != HeaderType.END);
+    }
+    
+    
+    /**
+     * For KDBX4.x, writes the inner headers preceding the XML payload of an HmacBlock
+     * TODO: add ability to handle binary attachments
+     * @param kdbxHeader the header whose values are to be read
+     * @param encryptedOutputStream an encrypted (and optionally compressed) output stream to write the inner header to: Must also be the same stream the XML payload will be written to
+     * @throws IOException 
+     */
+    public static void writeInnerHeader(KdbxHeader kdbxHeader, OutputStream encryptedOutputStream) throws IOException {
+    	LittleEndianDataOutputStream ledosWrapper = new LittleEndianDataOutputStream(encryptedOutputStream);
+    	
+    	// write part of inner header for Inner Random Stream ID
+    	ledosWrapper.write(1);
+    	ledosWrapper.writeInt(4);
+    	ledosWrapper.writeInt(ProtectedStreamAlgorithm.getAlgorithmValue(kdbxHeader.getProtectedStreamAlgorithm()));
+
+    	// write part of inner header for Inner Random Stream Key
+    	ledosWrapper.write(2);
+    	ledosWrapper.writeInt(kdbxHeader.getInnerRandomStreamKey().length);
+    	ledosWrapper.write(kdbxHeader.getInnerRandomStreamKey());
+    	
+    	// write part of inner header indicating its end
+    	ledosWrapper.write(0);
+    	ledosWrapper.writeInt(0);
+
     }
 
     /**
@@ -427,7 +499,6 @@ public class KdbxSerializer {
         return vd;
     }
 
-
     /**
      * Write a KdbxHeader to the output stream supplied. The header is updated with the
      * message digest of the written stream.
@@ -436,63 +507,195 @@ public class KdbxSerializer {
      * @throws IOException on error
      */
     public static void writeKdbxHeader(KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
-        MessageDigest messageDigest = Encryption.getSha256MessageDigestInstance();
-        DigestOutputStream digestOutputStream = new DigestOutputStream(outputStream, messageDigest);
-        LittleEndianDataOutputStream ledos = new LittleEndianDataOutputStream(digestOutputStream);
-
+    	ByteArrayOutputStream tempBaos = new ByteArrayOutputStream();
+    	MessageDigest messageDigest = Encryption.getSha256MessageDigestInstance();
+        DigestOutputStream digestOutputStream = new DigestOutputStream(tempBaos, messageDigest);
+    	LittleEndianDataOutputStream ledos = new LittleEndianDataOutputStream(digestOutputStream);
+    	int databaseVersion = kdbxHeader.getVersion();
+        
         // write the magic number
         ledos.writeInt(SIG1);
         ledos.writeInt(SIG2);
-        // write a file version
-        ledos.writeInt(FILE_VERSION_32);
-
+        
+        // write appropriate file version
+        if(databaseVersion == 3) {
+        	ledos.writeInt(FILE_VERSION_32);
+        }
+        else {
+        	ledos.writeInt(FILE_VERSION_4); 
+        }
+        
+        // write cipher ID of encryption algo
         ledos.writeByte(HeaderType.CIPHER_ID);
-        ledos.writeShort(16);
+        if(databaseVersion == 3) {
+        	ledos.writeShort(16);
+        }
+        else {
+        	ledos.writeInt(16); // in KDBX4, the length in the TLV is stored in 4 bytes, not 2
+        }
         byte[] b = new byte[16];
         ByteBuffer bb = ByteBuffer.wrap(b);
         bb.putLong(kdbxHeader.getCipherUuid().getMostSignificantBits());
         bb.putLong(8, kdbxHeader.getCipherUuid().getLeastSignificantBits());
         ledos.write(b);
 
+        // write compression flag (whether we GZip or not)
         ledos.writeByte(HeaderType.COMPRESSION_FLAGS);
-        ledos.writeShort(4);
+        if(databaseVersion == 3) {
+        	ledos.writeShort(4);
+        }
+        else {
+        	ledos.writeInt(4);
+        }
         ledos.writeInt(kdbxHeader.getCompressionFlags().ordinal());
 
+        // write master seed
         ledos.writeByte(HeaderType.MASTER_SEED);
-        ledos.writeShort(kdbxHeader.getMasterSeed().length);
+        if(databaseVersion == 3) {
+        	ledos.writeShort(kdbxHeader.getMasterSeed().length);
+        }
+        else {
+        	ledos.writeInt(kdbxHeader.getMasterSeed().length);
+        }
         ledos.write(kdbxHeader.getMasterSeed());
 
-        ledos.writeByte(HeaderType.TRANSFORM_SEED);
-        ledos.writeShort(kdbxHeader.getTransformSeed().length);
-        ledos.write(kdbxHeader.getTransformSeed());
+        // write KDF algo transform seed and rounds
+        // in KDBX4, these are stored in the VariantDictionary as their own entries
+        if(databaseVersion == 3) {
+        	ledos.writeByte(HeaderType.TRANSFORM_SEED);
+            ledos.writeShort(kdbxHeader.getTransformSeed().length);
+            ledos.write(kdbxHeader.getTransformSeed());
 
-        ledos.writeByte(HeaderType.TRANSFORM_ROUNDS);
-        ledos.writeShort(8);
-        ledos.writeLong(kdbxHeader.getTransformRounds());
-
+            ledos.writeByte(HeaderType.TRANSFORM_ROUNDS);
+            ledos.writeShort(8);
+            ledos.writeLong(kdbxHeader.getTransformRounds());
+        }
+        else {
+        	VariantDictionary kdfParameters = kdbxHeader.getKdfParameters();
+        	ledos.writeByte(HeaderType.KDF_PARAMETERS);
+        	ledos.writeInt(kdfParameters.getTotalBytes());
+        	ledos.writeByte(0);
+        	ledos.writeByte(kdfParameters.getVersion());
+        	
+        	for(String key : kdfParameters.getKeys()) {
+        		Entry entry = kdfParameters.get(key);
+        		
+        		// write the Entry's type (byte array, String, etc.)
+        		ledos.writeByte(entry.getType());
+        		
+        		// write the Entry's key length
+        		ledos.writeInt(key.length());
+        		
+        		// write the String name of the Entry's key
+        		ledos.write(key.getBytes());
+        		
+        		// write the Entry's value length
+        		ledos.writeInt(entry.getValueLength());
+        		
+        		// write the bytes of Entry's value
+                // TODO: this needs reworked, not good
+        		if(entry.getType() == 0x42) { // byte array
+        			ledos.write(entry.asByteArray());
+        		}
+        		else if(entry.getType() == 0xc) { // signed 32-bit integer
+        			ledos.writeInt(entry.asInteger());
+        		}
+        		else if(entry.getType() == 0xD) {// signed 64-bit integer
+        			ledos.writeLong(entry.asLong());
+        		}
+        		else if(entry.getType() == 0x4) {// unsigned 32-bit integer
+        			if(entry.getValueLength() == 4) { // if value is an integer
+        				ledos.writeLong(Integer.toUnsignedLong(entry.asInteger()));
+        			}
+        			else { //entry.getValueLength() == 8 (if value is a long)
+        				ledos.writeLong(entry.asLong() & 0xffffffffL);
+        			}
+        		}
+        		else if(entry.getType() == 0x5) {
+        			if(entry.getValueLength() == 4) { // if value is an integer
+        				ledos.writeLong(Integer.toUnsignedLong(entry.asInteger()));
+        			}
+        			else { //entry.getValueLength() == 8 (if value is a long)
+        				ledos.writeLong(entry.asLong());
+        			}
+        		}
+        	}
+        	// write null terminator byte to signal end of VariantDictionary
+        	ledos.writeByte(0);
+        }
+        
+        // write initialization vector for encryption algo
         ledos.writeByte(HeaderType.ENCRYPTION_IV);
-        ledos.writeShort(kdbxHeader.getEncryptionIv().length);
+        if(databaseVersion == 3) {
+        	ledos.writeShort(kdbxHeader.getEncryptionIv().length);
+        }
+        else {
+        	ledos.writeInt(kdbxHeader.getEncryptionIv().length);
+        }
         ledos.write(kdbxHeader.getEncryptionIv());
 
-        ledos.writeByte(HeaderType.INNER_RANDOM_STREAM_KEY);
-        ledos.writeShort(kdbxHeader.getInnerRandomStreamKey().length);
-        ledos.write(kdbxHeader.getInnerRandomStreamKey());
+        // write some stream stuff that, in KDBX4, is stored in the inner header
+        if(databaseVersion == 3) {
+        	ledos.writeByte(HeaderType.INNER_RANDOM_STREAM_KEY);
+            ledos.writeShort(kdbxHeader.getInnerRandomStreamKey().length);
+            ledos.write(kdbxHeader.getInnerRandomStreamKey());
 
-        ledos.writeByte(HeaderType.STREAM_START_BYTES);
-        ledos.writeShort(kdbxHeader.getStreamStartBytes().length);
-        ledos.write(kdbxHeader.getStreamStartBytes());
+            ledos.writeByte(HeaderType.STREAM_START_BYTES);
+            ledos.writeShort(kdbxHeader.getStreamStartBytes().length);
+            ledos.write(kdbxHeader.getStreamStartBytes());
 
-        ledos.writeByte(HeaderType.INNER_RANDOM_STREAM_ID);
-        ledos.writeShort(4);
-        ledos.writeInt(kdbxHeader.getProtectedStreamAlgorithm().ordinal());
-
+            ledos.writeByte(HeaderType.INNER_RANDOM_STREAM_ID);
+            ledos.writeShort(4);
+            ledos.writeInt(kdbxHeader.getProtectedStreamAlgorithm().ordinal());
+        }
+        
+        // write bytes to signify end of header
         ledos.writeByte(HeaderType.END);
-        ledos.writeShort(0);
+        if(databaseVersion == 3) {
+        	ledos.writeShort(4);
+        }
+        else {
+        	ledos.writeInt(4);
+        }
+        ledos.writeInt(END);
 
         MessageDigest digest = digestOutputStream.getMessageDigest();
         kdbxHeader.setHeaderHash(digest.digest());
+        
+        byte[] leba = tempBaos.toByteArray();
+        kdbxHeader.setHeaderBytes(leba);
+        outputStream.write(leba);
     }
-
+    
+    /**
+     * In KDBX4, following the outer header data are 2 hashes.
+     * 1st is a SHA256 hash of all the outer header data,
+     * 2nd is an HMACSHA256 hash of all the outer header data.
+     * 
+     * @param kdbxHeader the header of the KDBX database
+     * @param credentials the master key of the KDBX database, required for computing HMAC
+     * @param outputStream the outputStream to write the bytes of the resulting hash to
+     * @param isSha256 signifies whether or not to create the hash with SHA256 algorithm
+     */
+    public static void writeHeaderHash(KdbxHeader kdbxHeader, Credentials credentials, OutputStream outputStream, boolean isSha256) throws NoSuchAlgorithmException, IOException {
+    	byte[] headerBytes = kdbxHeader.getHeaderBytes();
+    	byte[] hashedHeaderBytes;
+    	
+    	if(isSha256) {
+    		MessageDigest hashDigest = MessageDigest.getInstance("SHA-256");
+			hashedHeaderBytes = hashDigest.digest(headerBytes);
+			outputStream.write(hashedHeaderBytes);
+    	}
+    	
+    	else {
+    		byte[] hmacKey = kdbxHeader.getHmacKey(credentials);
+            byte [] hmacKey64 = Encryption.transformHmacKey(hmacKey, Helpers.toBytes(-1L, ByteOrder.LITTLE_ENDIAN));
+    		Mac mac = Encryption.getHMacSha256Instance(hmacKey64);
+    		hashedHeaderBytes = mac.doFinal(headerBytes);
+    		outputStream.write(hashedHeaderBytes);
+    	}
+    	
+    }
 
     private static int getInt(int length, DataInput input) throws IOException {
         if (length != 4) {
