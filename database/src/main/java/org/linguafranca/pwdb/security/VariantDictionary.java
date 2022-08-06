@@ -199,9 +199,7 @@ public class VariantDictionary {
      * @return the entry corresponding to the key
      */
     public @NotNull Entry mustGet(@NotNull String key) {
-    	//System.out.println("VariantDictionary->mustGet->key=" + key);
         Entry entry = entries.get(key);
-        //System.out.println("VariantDictionary->mustGet->entry=" + entry);
         if (entry == null) {
             throw new IllegalArgumentException("There is no entry with key " + key);
         }
