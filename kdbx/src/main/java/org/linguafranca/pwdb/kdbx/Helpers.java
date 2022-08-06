@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx;
 
 import com.google.common.io.ByteStreams;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 
@@ -92,14 +93,44 @@ public class Helpers {
         try {
             return inFormat.parse(value);
         } catch (ParseException ignored) {}
+        
         // V4
         byte [] b = decodeBase64Content(value.getBytes());
         long secondsSinceBaseDate = ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getLong();
         return new Date(secondsSinceBaseDate * 1000 + baseDate.getTime());
     }
 
+    /**
+     * Formats the date String of an XML element in KDBX4 format.
+     * Only keeping this while Simple XML is around.
+     */
     public static String fromDate(Date value) {
-        return inFormat.format(value);
+    	return fromDate(value, 4);
+    }
+    
+    /**
+     * Formats the date String of an XML element according to KDBX database version.
+     * KDBX3.1 databases format date Strings differently than KDBX4.x database, so this accounts for that.
+     * @param value
+     * @param dateFormatversion the KDBX database version to format the date according to
+     * @return
+     */
+    public static String fromDate(Date value, int dateFormatVersion) {
+    	if(dateFormatVersion == 4) {
+        	long secondsSinceBaseData = System.currentTimeMillis()/1000;
+        	byte[] buffer = ByteBuffer.allocate(Long.SIZE/Byte.SIZE).order(ByteOrder.LITTLE_ENDIAN).putLong(secondsSinceBaseData).array();
+        	
+        	String date = Base64.encodeBase64String(buffer);
+        	return date;
+    	}
+    	
+    	else if(dateFormatVersion == 3) {
+    		return inFormat.format(value);
+    	}
+    	
+    	else {
+    		throw new IllegalArgumentException("Version must be 3 or 4");
+    	}
     }
 
     public static byte[] decodeBase64Content(byte[] content) {
