@@ -4,42 +4,40 @@ import java.security.SecureRandom;
 import java.util.UUID;
 
 import static com.kosprov.jargon2.api.Jargon2.*;
-import static org.linguafranca.pwdb.security.Argon2.KdfKeys.*;
+import static org.linguafranca.pwdb.security.Argon2d.KdfKeys.*;
 
 /**
- * KDBX V4 files may use Argon2d/id for key derivation.
+ * KDBX V4 files may use Argon2d for key derivation.
  * <p>
  * A singleton
  */
-public class Argon2 implements KeyDerivationFunction {
+public class Argon2d implements KeyDerivationFunction {
 
     /**
      * UUID indicating that Argon2d is being used as the KDF
-     * TODO: add support for Argon2id
      */
-    private static final UUID argon2_kdf = UUID.fromString("EF636DDF-8C29-444B-91F7-A9A403E30A0C");
+    private static final UUID argon2d_kdf = UUID.fromString("EF636DDF-8C29-444B-91F7-A9A403E30A0C");
 
     /**
      * hide constructor
      */
-    private Argon2() {
+    private Argon2d() {
     }
 
-    private static final Argon2 instance = new Argon2();
+    private static final Argon2d instance = new Argon2d();
 
-    public static Argon2 getInstance() {
+    public static Argon2d getInstance() {
         return instance;
     }
 
     private static VariantDictionary kdfParameters = new VariantDictionary((short) 1);
     static {
-        kdfParameters.putUuid("$UUID", argon2_kdf);
-        kdfParameters.putInt(paramVersion, 19); // hex representation of 13, which itself represents latest Argon version of 1.3
+        kdfParameters.putUuid("$UUID", argon2d_kdf);
+        kdfParameters.putInt(paramVersion, 19);
         kdfParameters.putLong(paramIterations, 2);
         kdfParameters.putLong(paramMemory, 67108864L); // this amount of bytes divided by 1024 is 65536 kibi bytes, which is equal to 64 MB
         kdfParameters.putInt(paramParallelism, 2);
         kdfParameters.putByteArray(paramSalt, SecureRandom.getSeed(32));
-        
     }
     
     /**
@@ -60,7 +58,7 @@ public class Argon2 implements KeyDerivationFunction {
 
     @Override
     public UUID getKdfUuid() {
-        return argon2_kdf;
+        return argon2d_kdf;
     }
     
     /**
