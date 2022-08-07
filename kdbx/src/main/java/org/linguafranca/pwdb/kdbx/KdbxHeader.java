@@ -76,10 +76,13 @@ public class KdbxHeader {
             }
             throw new IllegalArgumentException("Inner Random Stream Id " + innerRandomStreamId + "is not known");
         }
+        
+        public static int getAlgorithmValue(ProtectedStreamAlgorithm protectedStreamAlgorithm) {
+        	return protectedStreamAlgorithm.value;
+        }
     }
 
     private List<Integer> allowableVersions = new ArrayList<>(Arrays.asList(3, 4));
-
 
     /* version of the file */
     private int version;
@@ -104,13 +107,14 @@ public class KdbxHeader {
 
     /* dictionaries in V4 */
     private VariantDictionary kdfParameters;
+    
     // TODO implement V4 custom data
     @SuppressWarnings({"unused", "FieldCanBeLocal"})
     private VariantDictionary customData;
 
     /*
     * binaries in V4
-    * first byte, if set to 1 indicates "protected" remainder is the payload
+    * first byte, if set to 1 indicates "protected", remainder is the payload
     */
     List<byte[]> binaries = new ArrayList<>();
 
@@ -122,27 +126,51 @@ public class KdbxHeader {
     private byte[] headerBytes;
 
     /**
-     * Construct a default KDBX header
+     * Construct a default KDBX4 header
      */
     public KdbxHeader() {
-        this(3);
+        this(4);
     }
 
+    /*
+     * Construct a default KDBX header based on supplied version
+     * Can be customized using various setters
+     */
     public KdbxHeader(int version) {
         SecureRandom random = new SecureRandom();
 
         this.version = version;
-        cipherUuid = Aes.getInstance().getCipherUuid();
+        
+        if(version == 4) {
+        	cipherUuid = ChaCha.getInstance().getCipherUuid();
+        	encryptionIv = random.generateSeed(12);
+        }
+        else {
+        	cipherUuid = Aes.getInstance().getCipherUuid();
+        	encryptionIv = random.generateSeed(16);
+        }
+        
         compressionFlags = CompressionFlags.GZIP;
         masterSeed = random.generateSeed(32);
         transformSeed = random.generateSeed(32);
         transformRounds = 60000;
-        encryptionIv = random.generateSeed(16);
+        
+        if(version == 4) {
+        	protectedStreamAlgorithm = ProtectedStreamAlgorithm.CHA_CHA_20;
+        }
+        else {
+        	protectedStreamAlgorithm = ProtectedStreamAlgorithm.SALSA_20;
+        } 
+        
         innerRandomStreamKey = random.generateSeed(32);
-        streamStartBytes = new byte[32];
-        protectedStreamAlgorithm = ProtectedStreamAlgorithm.SALSA_20;
-
-        kdfParameters = Aes.createKdfParameters();
+        
+        if(version == 3) {
+        	streamStartBytes = new byte[32];
+        }
+        
+        if(version == 4) {
+        	kdfParameters = Aes.createKdfParameters();
+        }
     }
 
     /**
@@ -164,7 +192,7 @@ public class KdbxHeader {
     /**
      * Verify the header Hmac
      *
-     * @param key   the transformed Hmac Key for the header
+     * @param key the transformed Hmac Key for the header
      * @param bytes the bytes to compare to verify
      */
     public void verifyHeaderHmac(byte[] key, byte[] bytes) {
@@ -188,7 +216,7 @@ public class KdbxHeader {
      * Create a decrypted input stream using supplied digest and this header
      * apply decryption to the passed encrypted input stream
      *
-     * @param digest      the key digest
+     * @param digest the key digest
      * @param inputStream the encrypted input stream
      * @return a decrypted stream
      */
@@ -213,7 +241,7 @@ public class KdbxHeader {
      * @return the transformed digest
      */
     public byte[] getTransformedKeyDigest(byte[] digest) {
-        // v3 doesn't have a kdf therefore AES
+        // V3 can only use AES as its KDF and does not store KDF info in a VariantDictionary
         if (kdfParameters == null) {
             return Aes.getTransformedKey(digest, transformSeed, transformRounds);
         }
@@ -234,21 +262,43 @@ public class KdbxHeader {
         MessageDigest md = getSha256MessageDigestInstance();
         md.update(masterSeed);
         byte[] finalKeyDigest = md.digest(getTransformedKeyDigest(digest));
-        return Aes.getInstance().getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
+        if(cipherUuid == Aes.getInstance().getCipherUuid()) {
+        	return Aes.getInstance().getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
+        }
+        else {
+        	return ChaCha.getInstance().getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
+        }
+        
     }
 
     public byte[] getTransformSeed() {
         if (version < 4) {
             return transformSeed;
         }
-        return kdfParameters.mustGet(Aes.KdfKeys.ParamSeed).asByteArray();
+        else {
+        	//TODO: add support for argon2id
+        	if(kdfParameters.get("$UUID").asUuid().equals(Argon2.getInstance().getKdfUuid())) {
+        		return kdfParameters.mustGet(Argon2.KdfKeys.paramSalt).asByteArray();
+        	}
+        	else {
+        		return kdfParameters.mustGet(Aes.KdfKeys.ParamSeed).asByteArray();
+        	}
+        }
     }
 
     public long getTransformRounds() {
         if (version < 4) {
             return transformRounds;
         }
-        return kdfParameters.mustGet(Aes.KdfKeys.ParamRounds).asLong();
+        else {
+        	//TODO: add support for argon2id
+        	if(kdfParameters.get("$UUID").asUuid().equals(Argon2.getInstance().getKdfUuid())) {
+        		return kdfParameters.mustGet(Argon2.KdfKeys.paramIterations).asLong();
+        	}
+        	else {
+        		return kdfParameters.mustGet(Aes.KdfKeys.ParamRounds).asLong();
+        	}
+        }
     }
 
     public UUID getCipherUuid() {
@@ -304,6 +354,10 @@ public class KdbxHeader {
         }
         throw new IllegalStateException("Inner stream encoding unsupported");
     }
+    
+    public VariantDictionary getKdfParameters() {
+    	return kdfParameters;
+    }
 
     public void setCompressionFlags(int flags) {
         this.compressionFlags = CompressionFlags.values()[flags];
@@ -322,6 +376,16 @@ public class KdbxHeader {
     }
 
     public void setEncryptionIv(byte[] encryptionIv) {
+    	if(cipherUuid.equals(Aes.getInstance().getCipherUuid())) {
+    		if(encryptionIv.length != 16) {
+    			throw new IllegalArgumentException("AES cipher requires a 16-byte IV");
+    		}
+    	}
+    	else { // only other cipher option is ChaCha20
+    		if(encryptionIv.length != 12) {
+    			throw new IllegalArgumentException("ChaCha20 cipher requires a 12-byte IV");
+    		}
+    	}
         this.encryptionIv = encryptionIv;
     }
 
@@ -345,9 +409,16 @@ public class KdbxHeader {
         ByteBuffer b = ByteBuffer.wrap(uuid);
         UUID incoming = new UUID(b.getLong(), b.getLong(8));
         if (!incoming.equals(Aes.getInstance().getCipherUuid()) && !incoming.equals(ChaCha.getInstance().getCipherUuid())) {
-            throw new IllegalStateException("Unknown Cipher UUID " + incoming.toString());
+            throw new IllegalArgumentException("Unknown Cipher UUID " + incoming.toString());
         }
         this.cipherUuid = incoming;
+    }
+    
+    public void setCipherUuid(UUID uuid) {
+    	if(!uuid.equals(Aes.getInstance().getCipherUuid()) && !uuid.equals(ChaCha.getInstance().getCipherUuid())) {
+    		throw new IllegalArgumentException("Unknown Cipher UUID " + uuid.toString());
+    	}
+    	this.cipherUuid = uuid;
     }
 
     public void setVersion(int version) {
