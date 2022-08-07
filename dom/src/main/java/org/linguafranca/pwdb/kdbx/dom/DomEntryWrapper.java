@@ -31,7 +31,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
 
     private static Map<String, DomHelper.ValueCreator> mandatoryEntryElements = new HashMap<String, DomHelper.ValueCreator>() {{
         put(DomHelper.UUID_ELEMENT_NAME, new DomHelper.UuidValueCreator());
-        put(DomHelper.ICON_ELEMENT_NAME, new DomHelper.ConstantValueCreator("2"));
+        put(DomHelper.ICON_ELEMENT_NAME, new DomHelper.ConstantValueCreator("0"));
         put(DomHelper.TIMES_ELEMENT_NAME, new DomHelper.ConstantValueCreator(""));
         put(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, new DomHelper.DateValueCreator());
         put(DomHelper.CREATION_TIME_ELEMENT_NAME, new DomHelper.DateValueCreator());
@@ -49,7 +49,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
         this.element = element;
         this.database = database;
         if (newElement) {
-            DomHelper.ensureElements(element, mandatoryEntryElements);
+            DomHelper.ensureElements(element, mandatoryEntryElements, database.getDatabaseVersion());
             ensureProperty("Notes");
             ensureProperty("Title");
             ensureProperty("URL");
@@ -75,7 +75,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
             DomHelper.setElementContent("Key", property, name);
         }
         DomHelper.setElementContent(DomHelper.VALUE_ELEMENT_NAME, property, value);
-        DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element);
+        DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element, database.getDatabaseVersion());
         database.setDirty(true);
     }
 
@@ -114,7 +114,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
             DomHelper.setElementContent("Key", property, name);
         }
         DomHelper.setBinaryElementContent(DomHelper.VALUE_ELEMENT_NAME, property, value);
-        DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element);
+        DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element, database.getDatabaseVersion());
         database.setDirty(true);
 
     }
@@ -166,7 +166,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
     @Override
     public void setIcon(DomIconWrapper icon) {
         DomHelper.getElement(DomHelper.ICON_ELEMENT_NAME, element, true).setTextContent(String.valueOf(icon.getIndex()));
-        DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element);
+        DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element, database.getDatabaseVersion());
         database.setDirty(true);
     }
 
@@ -199,7 +199,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
     @Override
     public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
         if (expiryTime == null) throw new IllegalArgumentException("expiryTime may not be null");
-        String formatted = Helpers.fromDate(expiryTime);
+        String formatted = Helpers.fromDate(expiryTime, database.getDatabaseVersion());
         DomHelper.setElementContent(DomHelper.EXPIRY_TIME_ELEMENT_NAME, element, formatted);
     }
 
@@ -210,7 +210,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
 
     @Override
     protected void touch() {
-        DomHelper.setElementContent(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element, Helpers.fromDate(new Date()));
+        DomHelper.setElementContent(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element, Helpers.fromDate(new Date(), database.getDatabaseVersion()));
     }
 
     @Override
@@ -221,6 +221,5 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
         DomEntryWrapper that = (DomEntryWrapper) o;
 
         return element.equals(that.element) && database.equals(that.database);
-
     }
 }
