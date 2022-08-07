@@ -78,7 +78,6 @@ public class Argon2 implements KeyDerivationFunction {
         byte[] salt = argonParameterKeys.mustGet(paramSalt).asByteArray();
         int parallelism = argonParameterKeys.mustGet(paramParallelism).asInteger();
         int memoryCost = (int) argonParameterKeys.mustGet(paramMemory).asLong();
-        System.out.println("COST: " +  memoryCost);
         int timeCost = (int) argonParameterKeys.mustGet(paramIterations).asLong();
 
         // Configure the hasher
