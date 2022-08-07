@@ -95,7 +95,8 @@ public class Encryption {
      */
     public enum Kdf implements KeyDerivationFunction {
         AES(Aes.getInstance()),
-        ARGON2(Argon2.getInstance());
+        ARGON2D(Argon2d.getInstance()),
+    	ARGON2ID(Argon2id.getInstance());
 
         private final KeyDerivationFunction kdf;
 
