@@ -18,7 +18,6 @@ package org.linguafranca.pwdb.kdbx.dom;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.w3c.dom.Element;
@@ -27,7 +26,6 @@ import java.util.*;
 
 import static org.linguafranca.pwdb.kdbx.dom.DomHelper.*;
 
-
 /**
  * Class wraps Groups from a {@link DomSerializableDatabase} as {@link org.linguafranca.pwdb.Group}
  *
@@ -35,11 +33,19 @@ import static org.linguafranca.pwdb.kdbx.dom.DomHelper.*;
  */
 public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper> {
 
-    static Map<String, ValueCreator> mandatoryGroupElements = new HashMap<String, ValueCreator>() {{
+	private final Element element;
+    private final DomDatabaseWrapper database;
+	
+    /*
+     * this should be static but at the same time
+     * there needs to be a way to initialize so it matches with the database version
+     * 
+     */
+    private static Map<String, ValueCreator> mandatoryGroupElements = new HashMap<String, ValueCreator>() {{
         put(UUID_ELEMENT_NAME, new UuidValueCreator());
         put(NAME_ELEMENT_NAME, new ConstantValueCreator(""));
         put(NOTES_ELEMENT_NAME, new ConstantValueCreator(""));
-        put(ICON_ELEMENT_NAME, new ConstantValueCreator("0"));
+        put(ICON_ELEMENT_NAME, new ConstantValueCreator("48"));
         put(TIMES_ELEMENT_NAME, new ConstantValueCreator(""));
         put(LAST_MODIFICATION_TIME_ELEMENT_NAME, new DateValueCreator());
         put(CREATION_TIME_ELEMENT_NAME, new DateValueCreator());
@@ -50,15 +56,11 @@ public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupW
         put(LOCATION_CHANGED, new DateValueCreator());
     }};
 
-
-    private final Element element;
-    private final DomDatabaseWrapper database;
-
     public DomGroupWrapper(Element element, DomDatabaseWrapper database, boolean newGroup) {
         this.database = database;
         this.element = element;
         if (newGroup) {
-            ensureElements(this.element, mandatoryGroupElements);
+            ensureElements(this.element, mandatoryGroupElements, database.getDatabaseVersion());
         }
     }
 
@@ -123,7 +125,7 @@ public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupW
             group.getParent().removeGroup(group);
         }
         element.appendChild(group.element);
-        touchElement("Times/LocationChanged", group.element);
+        touchElement("Times/LocationChanged", group.element, database.getDatabaseVersion());
         touch();
         return group;
     }
@@ -209,11 +211,10 @@ public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupW
         DomGroupWrapper that = (DomGroupWrapper) o;
 
         return element.equals(that.element) && database.equals(that.database);
-
     }
 
     private void touch() {
-        touchElement(LAST_MODIFICATION_TIME_ELEMENT_NAME, this.element);
+        touchElement(LAST_MODIFICATION_TIME_ELEMENT_NAME, this.element, database.getDatabaseVersion());
         this.database.setDirty(true);
     }
 }
