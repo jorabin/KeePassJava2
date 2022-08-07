@@ -589,7 +589,7 @@ public class KdbxSerializer {
         		ledos.writeInt(entry.getValueLength());
         		
         		// write the bytes of Entry's value
-                // TODO: this needs reworked, not good
+                	// TODO: still doesn't account for booleans or Strings
         		if(entry.getType() == 0x42) { // byte array
         			ledos.write(entry.asByteArray());
         		}
@@ -600,20 +600,10 @@ public class KdbxSerializer {
         			ledos.writeLong(entry.asLong());
         		}
         		else if(entry.getType() == 0x4) {// unsigned 32-bit integer
-        			if(entry.getValueLength() == 4) { // if value is an integer
-        				ledos.writeLong(Integer.toUnsignedLong(entry.asInteger()));
-        			}
-        			else { //entry.getValueLength() == 8 (if value is a long)
-        				ledos.writeLong(entry.asLong() & 0xffffffffL);
-        			}
+        			ledos.writeInt(entry.asInteger());
         		}
-        		else if(entry.getType() == 0x5) {
-        			if(entry.getValueLength() == 4) { // if value is an integer
-        				ledos.writeLong(Integer.toUnsignedLong(entry.asInteger()));
-        			}
-        			else { //entry.getValueLength() == 8 (if value is a long)
-        				ledos.writeLong(entry.asLong());
-        			}
+        		else if(entry.getType() == 0x5) { // unsigned 64-bit integer
+        			ledos.writeLong(entry.asLong());
         		}
         	}
         	// write null terminator byte to signal end of VariantDictionary
