@@ -12,7 +12,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.linguafranca.pwdb.security.VariantDictionary.EntryType.ARRRAY;
+import static org.linguafranca.pwdb.security.VariantDictionary.EntryType.UINT32;
+import static org.linguafranca.pwdb.security.VariantDictionary.EntryType.ARRAY;
 import static org.linguafranca.pwdb.security.VariantDictionary.EntryType.UINT64;
 
 /**
@@ -41,7 +42,7 @@ public class VariantDictionary {
         INT32(0xC),
         INT64(0xD),
         STRING(0x18), // UTF-8, without BOM, without null terminator
-        ARRRAY(0x42);
+        ARRAY(0x42);
 
         private final byte value;
 
@@ -225,18 +226,18 @@ public class VariantDictionary {
         ByteBuffer bb = ByteBuffer.wrap(buf);
         bb.putLong(0, uuid.getMostSignificantBits());
         bb.putLong(8, uuid.getLeastSignificantBits());
-        entries.put(checkNotNull(key, knn), new Entry(ARRRAY, buf));
+        entries.put(checkNotNull(key, knn), new Entry(ARRAY, buf));
     }
 
     /**
      * Put a byte array under the key defined
      */
     public void putByteArray(@NotNull String key, @NotNull byte[] value) {
-        entries.put(checkNotNull(key, knn), new Entry(ARRRAY, value));
+        entries.put(checkNotNull(key, knn), new Entry(ARRAY, value));
     }
 
     /**
-     * Put a long as an unsigned64 under the key defined
+     * Put an unsigned/signed long (aka 64-bit int) under the key defined
      */
     public void putLong(@NotNull String key, long value) {
         byte[] buf = new byte[8];
@@ -244,4 +245,14 @@ public class VariantDictionary {
         bb.putLong(value);
         entries.put(checkNotNull(key, knn), new Entry(UINT64, buf));
     }
+
+    /**
+     * Put an unsigned/signed 32-bit int under the key defined
+     */
+	public void putInt(@NotNull String key, int value) {
+		byte[] buf = new byte[4];
+		ByteBuffer bb = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN);
+		bb.putInt(value);
+		entries.put(checkNotNull(key, knn), new Entry(UINT32, buf));
+	}
 }
