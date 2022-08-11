@@ -103,7 +103,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * @return a value or null if the property is not known, or if setting of arbitrary properties is not supported
      * @see Database#supportsNonStandardPropertyNames()
      */
-    char[] getProperty(String name);
+    String getProperty(String name);
 
     /**
      * Sets the value of a property.
@@ -200,7 +200,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * Get the username field of this entry
      * @return a username
      */
-    char[] getUsername();
+    String getUsername();
 
     /**
      * set the username
@@ -222,7 +222,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      *
      * @return a password
      */
-    char[] getPassword();
+    String getPassword();
 
     /**
      * Sets the plaintext password for this Entry.
@@ -240,7 +240,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      *
      * @return a string representation of a URL
      */
-    char[] getUrl();
+    String getUrl();
 
     /**
      * Sets the url for this Entry.
@@ -265,7 +265,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      *
      * @return a title
      */
-    char[] getTitle();
+    String getTitle();
 
     /**
      * Sets the title for this Entry.
@@ -290,7 +290,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      *
      * @return the notes field
      */
-    char[] getNotes();
+    String getNotes();
 
     /**
      * Sets the notes for this Entry.
