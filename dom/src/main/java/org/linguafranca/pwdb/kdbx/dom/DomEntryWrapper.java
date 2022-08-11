@@ -59,7 +59,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
     }
 
     @Override
-    public char[] getProperty(String name) {
+    public String getProperty(String name) {
         Element property = DomHelper.getElement(String.format(DomHelper.PROPERTY_ELEMENT_FORMAT, name), element, false);
         if (property == null) {
             return null;
@@ -221,5 +221,6 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
         DomEntryWrapper that = (DomEntryWrapper) o;
 
         return element.equals(that.element) && database.equals(that.database);
+
     }
 }
