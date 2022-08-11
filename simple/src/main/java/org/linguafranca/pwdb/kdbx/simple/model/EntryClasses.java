@@ -40,8 +40,8 @@ public abstract class EntryClasses {
         return null;
     }
 
-    public static char[] getStringContent(StringProperty property) {
-        return property == null || property.value == null? null:property.value.text.toCharArray();
+    public static String getStringContent(StringProperty property) {
+        return property == null || property.value == null? null:property.value.text;
     }
 
     public static BinaryProperty getBinaryProp(String name, List<BinaryProperty> binary) {
