@@ -19,7 +19,6 @@ package org.linguafranca.pwdb.kdb;
 import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Entry;
 
-import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractEntry;
 
 import java.util.ArrayList;
@@ -35,12 +34,12 @@ import java.util.UUID;
 public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, KdbIcon> {
     KdbGroup parent;
     private UUID uuid = UUID.randomUUID();
-    private char[] title;
-    private char[] url;
-    private char[] notes;
+    private String title;
+    private String url;
+    private String notes;
     private KdbIcon icon = new KdbIcon(0);
-    private char[] username;
-    private char[] password;
+    private String username;
+    private String password;
     private Date creationTime = new Date((System.currentTimeMillis()/1000L)*1000L); // to the next lower second
     private Date lastModificationTime = creationTime;
     private Date lastAccessTime = creationTime;
@@ -50,7 +49,7 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     private byte[] binaryData = new byte[0];
 
     @Override
-    public char[] getProperty(String name) {
+    public String getProperty(String name) {
         switch (name) {
             case STANDARD_PROPERTY_NAME_USER_NAME: return getUsername();
             case STANDARD_PROPERTY_NAME_PASSWORD: return getPassword();
@@ -103,53 +102,53 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     }
 
     @Override
-    public char[] getUsername() {
+    public String getUsername() {
         return username;
     }
 
     @Override
     public void setUsername(String username) {
-        this.username = username.toCharArray();
+        this.username = username;
     }
 
     @Override
-    public char[] getPassword() {
+    public String getPassword() {
         return password;
     }
 
     @Override
     public void setPassword(String pass) {
-        this.password = pass.toCharArray();
+        this.password = pass;
     }
 
     @Override
-    public char[] getUrl() {
+    public String getUrl() {
         return url;
     }
 
     @Override
     public void setUrl(String url) {
-        this.url = url.toCharArray();
+        this.url = url;
     }
 
     @Override
-    public char[] getTitle() {
+    public String getTitle() {
         return title;
     }
 
     @Override
     public void setTitle(String title) {
-        this.title = title.toCharArray();
+        this.title = title;
     }
 
     @Override
-    public char[] getNotes() {
+    public String getNotes() {
         return notes;
     }
 
     @Override
     public void setNotes(String notes) {
-        this.notes = notes.toCharArray();
+        this.notes = notes;
     }
 
     @Override
