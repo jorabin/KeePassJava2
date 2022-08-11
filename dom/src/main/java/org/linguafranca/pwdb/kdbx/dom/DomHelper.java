@@ -19,7 +19,6 @@ package org.linguafranca.pwdb.kdbx.dom;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -31,9 +30,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import static org.linguafranca.pwdb.kdbx.dom.DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME;
-
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -78,7 +74,9 @@ class DomHelper {
     	/*
     	 * Deprecated in favor of getFormattedValue,
     	 * which really only matters for DateValueCreator right now but could be useful in future scenarios
-    	 * where other XML elements may be formatted differently depending on the KDBX version
+    	 * where other XML elements may be formatted differently depending on the database version.
+    	 * Of course, this may be irrelevant for non-KDBX databases, in which case the more general
+         * getValue method is probably better.
     	 */
         //String getValue();
         
@@ -190,9 +188,9 @@ class DomHelper {
     }
 
     @Nullable
-    static char[] getElementContent(String elementPath, Element parentElement) {
+    static String getElementContent(String elementPath, Element parentElement) {
         Element result = getElement(elementPath, parentElement, false);
-        return (result == null) ? null : result.getTextContent().toCharArray();
+        return (result == null) ? null : result.getTextContent();
     }
 
     @NotNull
