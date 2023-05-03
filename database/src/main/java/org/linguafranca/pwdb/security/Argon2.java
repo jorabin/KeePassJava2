@@ -1,9 +1,12 @@
 package org.linguafranca.pwdb.security;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-import static com.kosprov.jargon2.api.Jargon2.*;
 import static org.linguafranca.pwdb.security.Argon2.VariantDictionaryKeys.*;
+
+import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
+import org.bouncycastle.crypto.params.Argon2Parameters;
 
 
 /**
@@ -53,24 +56,23 @@ public class Argon2 implements KeyDerivationFunction {
 
     @Override
     public byte[] getTransformedKey(byte[] digest, VariantDictionary argonParameterKeys) {
-        byte bVersion = argonParameterKeys.mustGet(paramVersion).asByteArray()[0];
-        Version version = bVersion == 0x13 ? Version.V13 : Version.V10;
+        int version = argonParameterKeys.mustGet(paramVersion).asInteger();
         byte[] salt = argonParameterKeys.mustGet(paramSalt).asByteArray();
         int parallelism = argonParameterKeys.mustGet(paramParallelism).asInteger();
         int memoryCost = (int) argonParameterKeys.mustGet(paramMemory).asLong();
         int timeCost = (int) argonParameterKeys.mustGet(paramIterations).asLong();
 
-        // Configure the hasher
-        Hasher hasher = jargon2Hasher()
-                .type(Type.ARGON2d)
-                .version(version)
-                .salt(salt)
-                .parallelism(parallelism)
-                .memoryCost(memoryCost / 1024) // block size 1024
-                .timeCost(timeCost)
-                .hashLength(32);
+        Argon2Parameters.Builder builder = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_d)
+                .withVersion(version)
+                .withIterations(timeCost)
+                .withMemoryAsKB(memoryCost/1024)
+                .withParallelism(parallelism)
+                .withSalt(salt);
 
-        // do the hash
-        return hasher.password(digest).rawHash();
+        Argon2BytesGenerator gen = new Argon2BytesGenerator();
+        gen.init(builder.build());
+        byte[] result = new byte[32];
+        gen.generateBytes(digest, result, 0, result.length);
+        return result;
     }
 }

@@ -9,7 +9,7 @@ import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import org.linguafranca.pwdb.keepasshttp.Crypto;
 import org.linguafranca.pwdb.keepasshttp.Processor;
 import org.linguafranca.pwdb.keepasshttp.Message;
-import org.spongycastle.crypto.paddings.PaddedBufferedBlockCipher;
+import org.bouncycastle.crypto.paddings.PaddedBufferedBlockCipher;
 
 import java.io.File;
 import java.io.FileNotFoundException;

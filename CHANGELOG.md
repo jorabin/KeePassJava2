@@ -4,10 +4,19 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 
 ##[2.2-Snapshot]
 
+### Changed
+
+- Minimum version supported is Java 8
+
 ### Added
 
-- Preliminary readonly support for V4 files
+- Readonly support for V4 files
 - updated documentation of various sorts
+- kdbx multithreaded fix
+- update dependencies
+  - spongy castle replaced by bouncy castle
+  - simplexml replaced by simple-xml-safe
+  - update versions throughout
 
 ## [2.1.4] 2018-02-03
 

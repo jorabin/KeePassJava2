@@ -16,6 +16,9 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import org.bouncycastle.crypto.digests.SHA256Digest;
+import org.bouncycastle.crypto.macs.HMac;
+import org.bouncycastle.crypto.params.KeyParameter;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.security.*;
 
@@ -174,15 +177,17 @@ public class KdbxHeader {
             throw new IllegalStateException("Header HMAC does not match");
         }
     }
-
-    // Alternative implementation of above using bouncy castle
-    /*
+/*
+        // Alternative implementation of above using bouncy castle
         HMac hmac = new HMac(new SHA256Digest());
-        hmac.init(new KeyParameter(hmacKey64));
-        hmac.update(kdbxHeader.getHeaderBytes(), 0, kdbxHeader.getHeaderBytes().length);
+        hmac.init(new KeyParameter(key));
+        hmac.update(bytes, 0, bytes.length);
         byte[] computedHmacSha256 = new byte[32];
         hmac.doFinal(computedHmacSha256, 0);
-     */
+        if (!Arrays.equals(computedHmacSha256, bytes)) {
+            throw new IllegalStateException("Header HMAC does not match");
+        }
+    }*/
 
     /**
      * Create a decrypted input stream using supplied digest and this header

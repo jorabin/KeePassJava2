@@ -19,7 +19,7 @@ package org.linguafranca.pwdb.kdb;
 import com.google.common.io.ByteStreams;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.security.Encryption;
-import org.spongycastle.util.encoders.Hex;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
 import java.io.InputStream;

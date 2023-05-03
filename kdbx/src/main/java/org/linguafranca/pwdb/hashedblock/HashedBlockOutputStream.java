@@ -16,14 +16,14 @@
 
 package org.linguafranca.pwdb.hashedblock;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Takes a stream of data and formats as Hashed Blocks to the underlying output stream.
@@ -60,6 +60,7 @@ public class HashedBlockOutputStream extends OutputStream {
 
     /**
      * Create a BigEndian Hash Block Output Stream
+     *
      * @param outputStream the output stream to receive the hash blocks
      */
     public HashedBlockOutputStream(OutputStream outputStream) {
@@ -68,19 +69,17 @@ public class HashedBlockOutputStream extends OutputStream {
 
     /**
      * Create a Hash Block Output Stream with choice of endian encoding
+     *
      * @param outputStream the output stream to receive the hash blocks
      * @param littleEndian true to encode in a little endian way
      */
     public HashedBlockOutputStream(OutputStream outputStream, boolean littleEndian) {
         this.outputStream = outputStream;
         this.littleEndian = littleEndian;
-        try
-        {
-            sha256 = MessageDigest.getInstance( "SHA-256" );
-        }
-        catch( NoSuchAlgorithmException e )
-        {
-            throw new IllegalStateException( e );
+        try {
+            sha256 = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
         }
     }
 
@@ -119,7 +118,8 @@ public class HashedBlockOutputStream extends OutputStream {
     /**
      * Writes to the internal buffer, and writes to the underlying output stream
      * as necessary as {@link #BLOCK_SIZE} blocks
-     * @param b the byte array to write
+     *
+     * @param b      the byte array to write
      * @param offset offset in the byte array
      * @param length number of bytes to write
      * @throws IOException
@@ -141,6 +141,7 @@ public class HashedBlockOutputStream extends OutputStream {
 
     /**
      * Saqve the internal buffer to the underlying stream as a hash block
+     *
      * @throws IOException
      */
     protected void save() throws IOException {
@@ -171,6 +172,7 @@ public class HashedBlockOutputStream extends OutputStream {
 
     /**
      * Write a 4 byte int value to the underlying stream in appropriate endian format
+     *
      * @param value the value to write
      * @throws IOException
      */
@@ -179,6 +181,7 @@ public class HashedBlockOutputStream extends OutputStream {
         if (littleEndian) {
             output = Integer.reverseBytes(value);
         }
-        outputStream.write(new byte[]{(byte) (output >> 24), (byte) (output >> 16), (byte) (output >> 8), (byte) output});
+        outputStream.write(new byte[]{(byte) (output >> 24), (byte) (output >> 16),
+                (byte) (output >> 8), (byte) output});
     }
 }

@@ -16,6 +16,8 @@
 
 package org.linguafranca.pwdb.hashedblock;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.io.IOException;
@@ -23,8 +25,6 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Takes an underlying input stream formatted as Hashed Blocks
@@ -61,6 +61,7 @@ public class HashedBlockInputStream extends InputStream {
 
     /**
      * Create a Big Endian Hash Block Input Stream
+     *
      * @param inputStream the input stream containing the hash blocks
      */
     public HashedBlockInputStream(InputStream inputStream) {
@@ -69,17 +70,17 @@ public class HashedBlockInputStream extends InputStream {
 
     /**
      * Create a Hash Block Input Stream with choice of endian encoding
-     * @param inputStream the input stream containing the hash blocks
+     *
+     * @param inputStream  the input stream containing the hash blocks
      * @param littleEndian true if the stream is little endian encoded
      */
     public HashedBlockInputStream(InputStream inputStream, boolean littleEndian) {
         this.inputStream = inputStream;
         this.littleEndian = littleEndian;
         try {
-            sha256 = MessageDigest.getInstance( "SHA-256" );
-        }
-        catch( NoSuchAlgorithmException e ) {
-            throw new IllegalStateException( e );
+            sha256 = MessageDigest.getInstance("SHA-256");
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException(e);
         }
     }
 
@@ -104,7 +105,8 @@ public class HashedBlockInputStream extends InputStream {
 
     /**
      * Gets bytes from the internal buffer and replenishes the buffer as necessary
-     * @param b a byte array to fill
+     *
+     * @param b      a byte array to fill
      * @param offset the offset to strat from
      * @param length the number of bytes to return
      * @return the number of bytes actually returned, , -1 if end of file
@@ -130,6 +132,7 @@ public class HashedBlockInputStream extends InputStream {
 
     /**
      * Reload the internal buffer from the underlying input stream
+     *
      * @throws IOException
      */
     protected void load() throws IOException {
@@ -173,6 +176,7 @@ public class HashedBlockInputStream extends InputStream {
 
     /**
      * Read an unsigned 4 byte int decoding from the endian format
+     *
      * @return a long holding the value read
      * @throws IOException
      */
@@ -187,6 +191,7 @@ public class HashedBlockInputStream extends InputStream {
 
     /**
      * Fill the buffer passed
+     *
      * @param buffer the buffer to fill
      * @throws IOException if the buffer could not be filled
      */

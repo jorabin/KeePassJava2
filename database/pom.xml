@@ -22,19 +22,9 @@
             <artifactId>guava</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.madgag.spongycastle</groupId>
-            <artifactId>core</artifactId>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcpkix-jdk15on</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.kosprov.jargon2</groupId>
-            <artifactId>jargon2-api</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.kosprov.jargon2</groupId>
-            <artifactId>jargon2-native-ri-backend</artifactId>
-            <version>1.1.0</version>
-            <scope>runtime</scope>
-        </dependency>
+
     </dependencies>
 </project>
