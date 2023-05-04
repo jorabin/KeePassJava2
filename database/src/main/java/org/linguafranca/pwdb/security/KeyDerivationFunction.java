@@ -15,8 +15,13 @@ public interface KeyDerivationFunction {
      * Transform a key using this key derivation faunction
      *
      * @param key             the key to transform
-     * @param transformParams the parameters defining the way the tranformation is to be carried out
+     * @param transformParams the parameters defining the way the transformation is to be carried out
      * @return a transformed key
      */
     byte[] getTransformedKey(byte[] key, VariantDictionary transformParams);
+
+    /**
+     * Create default KDF parameters
+     */
+    VariantDictionary createKdfParameters();
 }

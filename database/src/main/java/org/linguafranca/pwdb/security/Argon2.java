@@ -1,6 +1,7 @@
 package org.linguafranca.pwdb.security;
 
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
 import java.util.UUID;
 
 import static org.linguafranca.pwdb.security.Argon2.VariantDictionaryKeys.*;
@@ -74,5 +75,19 @@ public class Argon2 implements KeyDerivationFunction {
         byte[] result = new byte[32];
         gen.generateBytes(digest, result, 0, result.length);
         return result;
+    }
+
+    static final SecureRandom random = new SecureRandom();
+
+    @Override
+    public VariantDictionary createKdfParameters() {
+        VariantDictionary vd = new VariantDictionary((short) 1);
+        vd.putInt("P", 2);
+        vd.putInt("V", 19);
+        vd.putLong("I", 2);
+        vd.putLong("M", 64 * 1024 * 1024);
+        vd.putUuid("$UUID", Argon2.argon2_kdf);
+        vd.put("S", VariantDictionary.EntryType.ARRRAY, random.generateSeed(32));
+        return vd;
     }
 }

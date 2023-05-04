@@ -11,8 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.linguafranca.pwdb.security.VariantDictionary.EntryType.ARRRAY;
-import static org.linguafranca.pwdb.security.VariantDictionary.EntryType.UINT64;
+import static org.linguafranca.pwdb.security.VariantDictionary.EntryType.*;
 
 /**
  * Implementation of a storage for V4 KDBX Header field parameters
@@ -129,6 +128,13 @@ public class VariantDictionary {
     }
 
     /**
+     * get the entries in this dictionary
+     */
+    public Map<String, Entry> getEntries(){
+        return entries;
+    }
+
+    /**
      * Get the version number of this structure
      *
      * @return 1
@@ -191,12 +197,19 @@ public class VariantDictionary {
     }
 
     /**
-     * Put a long as an unsigned64 undewr the key defined
+     * Put a long as an signed64 under the key defined
      */
     public void putLong(@NotNull String key, long value) {
         byte[] buf = new byte[8];
         ByteBuffer bb = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN);
         bb.putLong(value);
-        entries.put(checkNotNull(key, knn), new Entry(UINT64, buf));
+        entries.put(checkNotNull(key, knn), new Entry(INT64, buf));
+    }
+
+    public void putInt(@NotNull String key, int value) {
+        byte[] buf = new byte[4];
+        ByteBuffer bb = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN);
+        bb.putInt(value);
+        entries.put(checkNotNull(key, knn), new Entry(INT32, buf));
     }
 }

@@ -8,3 +8,4 @@ gradlew.bat
 gradle
 *.versionsBackup
 */target
+/KeePass-2.53.1-Source/

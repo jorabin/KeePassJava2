@@ -55,7 +55,7 @@ public class Aes implements CipherAlgorithm, KeyDerivationFunction {
      * get a copy of the Aes Variant dictionary
      * @return a copy
      */
-    public static VariantDictionary createKdfParameters() {
+    public VariantDictionary createKdfParameters() {
         return kdfParameters.copy();
     }
 

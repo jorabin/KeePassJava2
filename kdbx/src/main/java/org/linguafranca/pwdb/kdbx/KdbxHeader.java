@@ -16,9 +16,6 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.bouncycastle.crypto.digests.SHA256Digest;
-import org.bouncycastle.crypto.macs.HMac;
-import org.bouncycastle.crypto.params.KeyParameter;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.security.*;
 
@@ -38,10 +35,13 @@ import static org.linguafranca.pwdb.security.Encryption.getSha256MessageDigestIn
 /**
  * This class represents the header portion of a KeePass KDBX file or stream. The header is received in
  * plain text and describes the encryption and compression of the remainder of the file.
- * <p>
- * <p>It is a factory for encryption and decryption streams. It provides for verification of its own serialization.
- * <p>
- * <p>While KDBX streams are Little-Endian, data is passed to and from this class in standard Java byte order.
+ * <p/>
+ * In V4 the header became Outer Header and Inner Header. The class stores the configuration
+ * contents of both and binary attachments.
+ * <p/>
+ * It is a factory for encryption and decryption streams. It provides for verification of its own serialization.
+ * <p/>
+ * While KDBX streams are Little-Endian, data is passed to and from this class in standard Java byte order.
  */
 @SuppressWarnings("WeakerAccess")
 public class KdbxHeader {
@@ -65,7 +65,7 @@ public class KdbxHeader {
     public enum ProtectedStreamAlgorithm {
         NONE(0), ARC_FOUR(1), SALSA_20(2), CHA_CHA_20(3);
 
-        private int value;
+        private final int value;
 
         ProtectedStreamAlgorithm(int value) {
             this.value = value;
@@ -81,10 +81,10 @@ public class KdbxHeader {
         }
     }
 
-    private List<Integer> allowableVersions = new ArrayList<>(Arrays.asList(3, 4));
+    private final List<Integer> allowableVersions = new ArrayList<>(Arrays.asList(3, 4));
 
 
-    /* version of the file */
+    /* version of the file - most significant 2 bytes i.e. 0x0302 is version 3 */
     private int version;
 
     protected UUID cipherUuid;
@@ -125,17 +125,78 @@ public class KdbxHeader {
     private byte[] headerBytes;
 
     /**
-     * Construct a default KDBX header
+     * Provides for choice of version number and crypto options for V3 and V4
      */
-    public KdbxHeader() {
-        this(3);
+    interface KdbxHeaderOptions {
+        int getVersion();
+        CipherAlgorithm getCipherAlgorithm();
+        KeyDerivationFunction getKeyDerivationFunction();
+        ProtectedStreamAlgorithm getProtectedStreamAlgorithm();
     }
 
+    /**
+     * Default values for crypto options
+     */
+    enum KdbxHeaderOpts implements KdbxHeaderOptions{
+        V3_AES_SALSA_20(3, Encryption.Cipher.AES, Encryption.Kdf.AES, ProtectedStreamAlgorithm.SALSA_20),
+        V4_AES_ARGON_CHA_CHA (4, Encryption.Cipher.AES, Encryption.Kdf.ARGON2, ProtectedStreamAlgorithm.CHA_CHA_20);
+
+        //<editor-fold desc="Fields, Getters and Setters for this class">
+        final int version;
+        final CipherAlgorithm algorithm;
+        final KeyDerivationFunction kdf;
+        final ProtectedStreamAlgorithm protectedStreamAlgorithm;
+
+
+        KdbxHeaderOpts(int version, Encryption.Cipher cipher, Encryption.Kdf kdf, ProtectedStreamAlgorithm protectedStreamAlgorithm) {
+            this.version = version;
+            this.algorithm = cipher;
+            this.kdf = kdf;
+            this.protectedStreamAlgorithm = protectedStreamAlgorithm;
+        }
+
+        @Override
+        public int getVersion() {
+            return version;
+        }
+
+        @Override
+        public CipherAlgorithm getCipherAlgorithm() {
+            return algorithm;
+        }
+
+        @Override
+        public KeyDerivationFunction getKeyDerivationFunction() {
+            return kdf;
+        }
+
+        @Override
+        public ProtectedStreamAlgorithm getProtectedStreamAlgorithm() {
+            return protectedStreamAlgorithm;
+        }
+        //</editor-fold>
+    }
+
+    /**
+     * Construct a default version 3 KDBX header
+     */
+    public KdbxHeader(){
+        this(KdbxHeaderOpts.V3_AES_SALSA_20);
+    }
+
+    /**
+     * Construct a default KDBX header with AES/AES/SALSA_20
+     */
     public KdbxHeader(int version) {
+        this(version ==3 ? KdbxHeaderOpts.V3_AES_SALSA_20 : KdbxHeaderOpts.V4_AES_ARGON_CHA_CHA);
+    }
+
+
+    public KdbxHeader(KdbxHeaderOptions opts) {
         SecureRandom random = new SecureRandom();
 
-        this.version = version;
-        cipherUuid = Aes.getInstance().getCipherUuid();
+        this.version = opts.getVersion();
+        cipherUuid = opts.getCipherAlgorithm().getCipherUuid();
         compressionFlags = CompressionFlags.GZIP;
         masterSeed = random.generateSeed(32);
         transformSeed = random.generateSeed(32);
@@ -143,9 +204,9 @@ public class KdbxHeader {
         encryptionIv = random.generateSeed(16);
         innerRandomStreamKey = random.generateSeed(32);
         streamStartBytes = new byte[32];
-        protectedStreamAlgorithm = ProtectedStreamAlgorithm.SALSA_20;
+        this.protectedStreamAlgorithm = opts.getProtectedStreamAlgorithm();
 
-        kdfParameters = Aes.createKdfParameters();
+        kdfParameters = opts.getKeyDerivationFunction().createKdfParameters();
     }
 
     /**
@@ -177,17 +238,6 @@ public class KdbxHeader {
             throw new IllegalStateException("Header HMAC does not match");
         }
     }
-/*
-        // Alternative implementation of above using bouncy castle
-        HMac hmac = new HMac(new SHA256Digest());
-        hmac.init(new KeyParameter(key));
-        hmac.update(bytes, 0, bytes.length);
-        byte[] computedHmacSha256 = new byte[32];
-        hmac.doFinal(computedHmacSha256, 0);
-        if (!Arrays.equals(computedHmacSha256, bytes)) {
-            throw new IllegalStateException("Header HMAC does not match");
-        }
-    }*/
 
     /**
      * Create a decrypted input stream using supplied digest and this header
@@ -227,7 +277,7 @@ public class KdbxHeader {
     }
 
     /**
-     * Create an unencrypted outputstream using the supplied digest and this header
+     * Create an unencrypted outputStream using the supplied digest and this header
      * and use the supplied output stream to write encrypted data.
      *
      * @param digest       the key digest
@@ -242,6 +292,7 @@ public class KdbxHeader {
         return Aes.getInstance().getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
     }
 
+    //<editor-fold desc="Getters/ Setters">
     public byte[] getTransformSeed() {
         if (version < 4) {
             return transformSeed;
@@ -290,6 +341,11 @@ public class KdbxHeader {
 
     public int getVersion() {
         return version;
+    }
+
+    // V4
+    public VariantDictionary getKdfParameters() {
+        return kdfParameters;
     }
 
     public StreamEncryptor getStreamEncryptor() {
@@ -350,14 +406,14 @@ public class KdbxHeader {
         ByteBuffer b = ByteBuffer.wrap(uuid);
         UUID incoming = new UUID(b.getLong(), b.getLong(8));
         if (!incoming.equals(Aes.getInstance().getCipherUuid()) && !incoming.equals(ChaCha.getInstance().getCipherUuid())) {
-            throw new IllegalStateException("Unknown Cipher UUID " + incoming.toString());
+            throw new IllegalStateException("Unknown Cipher UUID " + incoming);
         }
         this.cipherUuid = incoming;
     }
 
     public void setVersion(int version) {
         if (!allowableVersions.contains(version)) {
-            throw new IllegalStateException("File version must be in " + allowableVersions.toString());
+            throw new IllegalStateException("File version must be in " + allowableVersions);
         }
         this.version = version;
     }
@@ -402,4 +458,5 @@ public class KdbxHeader {
         System.arraycopy(headerBytes, 0, copy, 0, headerBytes.length);
         this.headerBytes = copy;
     }
+    //</editor-fold>
 }

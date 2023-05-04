@@ -99,7 +99,7 @@ public class HmacBlockInputStream extends FilterInputStream {
      * @param hmacSha256  the hmac to verify
      */
     private void verifyHmac(byte[] buffer, long blockNumber, byte[] hmacSha256) {
-        final byte[] transformedKey = transformHmacKey(this.key, toBytes(blockNumber, ByteOrder.LITTLE_ENDIAN));
+        final byte[] transformedKey = transformHmacKey(this.key, toBytes(blockNumber, byteOrder));
         final Mac mac = getHMacSha256Instance(transformedKey);
         mac.update(toBytes(blockNumber, byteOrder));
         mac.update(toBytes(buffer.length, byteOrder));

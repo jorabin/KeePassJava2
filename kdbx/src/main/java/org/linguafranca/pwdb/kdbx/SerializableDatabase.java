@@ -26,7 +26,7 @@ import java.io.OutputStream;
  * <p>Databases instantiate themselves from a stream and serialize to a stream,
  * and need to be able to encrypt and decrypt data (e.g. Protected fields in KDBX format).
  *
- * <p>KDBX databases contain a header hash (i.e. a hash of the contents of
+ * <p>KDBX V3 databases contain a header hash (i.e. a hash of the contents of
  * some portion of the {@link StreamFormat} they have been loaded from or saved to.
  * Which means that databases must support the setting of this value after the header
  * has been written on save, and reading the value after load to allow for integrity checking.

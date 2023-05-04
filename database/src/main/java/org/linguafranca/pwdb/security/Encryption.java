@@ -127,6 +127,11 @@ public class Encryption {
         public byte[] getTransformedKey(byte[] key, VariantDictionary transformParams) {
             return kdf.getTransformedKey(key, transformParams);
         }
+
+        @Override
+        public VariantDictionary createKdfParameters() {
+            return kdf.createKdfParameters();
+        }
     }
 
     /**

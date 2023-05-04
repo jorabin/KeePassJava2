@@ -140,7 +140,7 @@ public class HashedBlockOutputStream extends OutputStream {
     }
 
     /**
-     * Saqve the internal buffer to the underlying stream as a hash block
+     * Save the internal buffer to the underlying stream as a hash block
      *
      * @throws IOException
      */

@@ -23,7 +23,7 @@ public class CollectingInputStream extends FilterInputStream {
      *
      * @param in the input stream to forward/collect
      */
-    protected CollectingInputStream(InputStream in) {
+    public CollectingInputStream(InputStream in) {
         this(in, true);
     }
 

@@ -16,8 +16,10 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import org.bouncycastle.crypto.params.KDFParameters;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.security.VariantDictionary;
 
 import java.io.*;
 import java.util.Scanner;
@@ -48,6 +50,23 @@ public class KdbxSerializerTest {
         OutputStream testStream = new FileOutputStream(tempFile);
         Credentials credentials = new KdbxCreds("123".getBytes());
         OutputStream outputStream = KdbxSerializer.createEncryptedOutputStream(credentials, new KdbxHeader(), testStream);
+
+        outputStream.write("Hello World\n".getBytes());
+        outputStream.flush();
+        outputStream.close();
+
+        InputStream inputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), new FileInputStream(tempFile));
+        Scanner scanner = new Scanner(inputStream);
+        assertEquals("Hello World", scanner.nextLine());
+    }
+
+    @Test
+    public void testCypherTextOutputStream2() throws Exception {
+        File tempFile = File.createTempFile("test", "test");
+        OutputStream testStream = new FileOutputStream(tempFile);
+        Credentials credentials = new KdbxCreds("123".getBytes());
+        KdbxHeader kdbxHeader = new KdbxHeader(4);
+        OutputStream outputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, testStream);
 
         outputStream.write("Hello World\n".getBytes());
         outputStream.flush();
