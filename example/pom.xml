@@ -28,6 +28,10 @@
     <name>PWDB :: Example</name>
     <description>Examples of how to use PWDB</description>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>

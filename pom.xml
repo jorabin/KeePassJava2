@@ -32,7 +32,6 @@
         <module>jaxb</module>
         <module>all</module>
         <module>example</module>
-        <module>http</module>
     </modules>
     <packaging>pom</packaging>
 
