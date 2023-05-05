@@ -16,10 +16,8 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.bouncycastle.crypto.params.KDFParameters;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
-import org.linguafranca.pwdb.security.VariantDictionary;
 
 import java.io.*;
 import java.util.Scanner;
@@ -27,10 +25,13 @@ import java.util.Scanner;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author jo
+ * test operation of kdbx
  */
 public class KdbxSerializerTest {
 
+    /**
+     * Test that we can read a kdbx v3 file and list the XML to console
+     */
     @Test
     public void testGetPlainTextInputStream() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
@@ -44,6 +45,10 @@ public class KdbxSerializerTest {
         }
     }
 
+    /**
+     * Test that we can write a KDBX 3 file containing "Hello World"
+     * and then read it back to get the same content
+     */
     @Test
     public void testCypherTextOutputStream() throws Exception {
         File tempFile = File.createTempFile("test", "test");
@@ -60,6 +65,10 @@ public class KdbxSerializerTest {
         assertEquals("Hello World", scanner.nextLine());
     }
 
+    /**
+     * Test that we can write a KDBX 4 file containing "Hello World"
+     * and then read it back to get the same content
+     */
     @Test
     public void testCypherTextOutputStream2() throws Exception {
         File tempFile = File.createTempFile("test", "test");

@@ -23,7 +23,7 @@ import java.util.UUID;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author jo
+ * tests the operation of Hex conversion
  */
 public class HelperTest {
     @Test
@@ -34,12 +34,15 @@ public class HelperTest {
         String convertedString = Helpers.hexStringFromBase64("0tU8XFRUX2TCk5tmmrshuQ==");
         System.out.println("Converted string: " + convertedString);
         assertEquals(hexString, convertedString.toUpperCase());
+
         UUID uuid = Helpers.uuidFromBase64(inputString);
         System.out.println("UUID: " + uuid.toString());
         assertEquals("d2d53c5c-5454-5f64-c293-9b669abb21b9", uuid.toString());
+
         String uuidHex = Helpers.hexStringFromUuid(uuid);
         System.out.println("Hex from UUID: " + uuidHex);
         assertEquals(hexString, uuidHex.toUpperCase());
+
         String base64 = Helpers.base64FromUuid(uuid);
         System.out.println("Base 64: " + base64);
         assertEquals(inputString, base64);

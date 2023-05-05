@@ -25,6 +25,7 @@ import java.security.SecureRandom;
 import static org.junit.Assert.assertEquals;
 
 /**
+ * Verify that the inner random encryption works two-way
  * @author jo
  */
 public class StreamEncryptionTest {

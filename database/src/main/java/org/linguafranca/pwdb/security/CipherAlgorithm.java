@@ -14,7 +14,7 @@ public interface CipherAlgorithm {
     UUID getCipherUuid();
 
     /**
-     * Create a decrypted stream from the supplied encruypted one
+     * Create a decrypted stream from the supplied encrypted one
      *
      * @param encryptedInputStream an encryted stream
      * @param key                  the decryption key

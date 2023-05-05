@@ -96,36 +96,36 @@ public class KdbxSerializer {
      * @throws IOException on error
      */
     public static InputStream createUnencryptedInputStream(Credentials credentials, KdbxHeader kdbxHeader, InputStream inputStream) throws IOException {
-
+        // read plaintext outer header
         readOuterHeader(inputStream, kdbxHeader);
 
         InputStream plainTextStream;
 
         if (kdbxHeader.getVersion() >= 4) {
-
-            verifyOuterHeader(kdbxHeader, credentials, new DataInputStream(inputStream));
-
+            // verify the header hashes
+            readOuterHeaderVerification(kdbxHeader, credentials, new DataInputStream(inputStream));
+            // create an HMac Block input stream
             HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(kdbxHeader.getHmacKey(credentials), inputStream, true);
-
+            // decrypt the contents of the blocks
             plainTextStream = kdbxHeader.createDecryptedStream(credentials.getKey(), hmacBlockInputStream);
 
-        } else {
-
+        } else {// V3
+            // decrypt the input stream
             InputStream decryptedInputStream = kdbxHeader.createDecryptedStream(credentials.getKey(), inputStream);
-
+            // the unencrypted stream starts with a byte pattern
             checkStartBytes(kdbxHeader, decryptedInputStream);
-
+            // unencrypted stream consists of hashed blocks
             plainTextStream = new HashedBlockInputStream(decryptedInputStream, true);
         }
-
+        // need to decompress the stream
         if (kdbxHeader.getCompressionFlags().equals(KdbxHeader.CompressionFlags.GZIP)) {
             plainTextStream = new GZIPInputStream(plainTextStream);
         }
-
+        // read inner header in V4
         if (kdbxHeader.getVersion() >= 4) {
             readInnerHeader(kdbxHeader, plainTextStream);
         }
-
+        // stream is now positioned on payload (assumed to be Keepass XML)
         return plainTextStream;
     }
 
@@ -139,7 +139,7 @@ public class KdbxSerializer {
      * @throws IOException on error
      */
     public static OutputStream createEncryptedOutputStream(Credentials credentials, KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
-
+        // write plain text header
         writeKdbxHeader(kdbxHeader, outputStream);
 
         OutputStream result;
@@ -220,18 +220,6 @@ public class KdbxSerializer {
     }
 
     /**
-     * Read two lots of 4 bytes and verify that they satisfy the signature of a kdbx file;
-     * @param ledis an input stream
-     * @return true if it looks like this is a kdbx file
-     * @throws IOException on error
-     */
-    private static boolean verifyMagicNumber(LittleEndianDataInputStream ledis) throws IOException {
-        int sig1 = ledis.readInt();
-        int sig2 = ledis.readInt();
-        return sig1 == SIG1 && sig2 == SIG2;
-    }
-
-    /**
      * Create and populate a KdbxHeader from the input stream supplied
      * @param inputStream an input stream
      * @return the populated KdbxHeader
@@ -242,7 +230,9 @@ public class KdbxSerializer {
         // header is digested to verify correctness
         MessageDigest digest = Encryption.getSha256MessageDigestInstance();
         DigestInputStream shaDigestInputStream = new DigestInputStream(inputStream, digest);
-        // collect the bytes of the header, we'll need them later
+        // collect the bytes of the header, we'll need them later for the HMAC header calculation
+        // we can't use a similar technique to the digest stream above, since the
+        // HMac calculation depends on having collected a couple of the header fields
         CollectingInputStream collectingInputStream = new CollectingInputStream(shaDigestInputStream, true);
         // make values available from LittleEndian
         LittleEndianDataInputStream ledis = new LittleEndianDataInputStream(collectingInputStream);
@@ -256,10 +246,14 @@ public class KdbxSerializer {
         kdbxHeader.setVersion(fullVersion >> 16);
 
         // read header fields
-        getOuterHeaderFields(kdbxHeader, digest, ledis);
+        getOuterHeaderFields(kdbxHeader, ledis);
 
+        // stop digesting
+        shaDigestInputStream.on(false);
         // stop collecting the bytes of the header
         collectingInputStream.setCollecting(false);
+
+        kdbxHeader.setHeaderHash(digest.digest());
         kdbxHeader.setHeaderBytes(collectingInputStream.getCollectedBytes());
 
         return kdbxHeader;
@@ -272,25 +266,37 @@ public class KdbxSerializer {
      * @param input an input source
      * @throws IOException on error
      */
-    public static void verifyOuterHeader(KdbxHeader kdbxHeader, Credentials credentials, DataInput input) throws IOException {
+    public static void readOuterHeaderVerification(KdbxHeader kdbxHeader, Credentials credentials, DataInput input) throws IOException {
         // check the SHA
-        byte [] sha256 = getBytes(32, input);
-        if (!Arrays.equals(kdbxHeader.getHeaderHash(), sha256)) {
+        byte [] receivedSha256 = getBytes(32, input);
+        if (!Arrays.equals(kdbxHeader.getHeaderHash(), receivedSha256)) {
             throw new IllegalStateException("Header hash does not match");
         }
 
         byte[] hmacKey = kdbxHeader.getHmacKey(credentials);
-
         // get the key for the header Hmac (using sequence number -1)
         // KdbxFile.cs ComputeHeaderHmac
         byte [] hmacKey64 = Encryption.transformHmacKey(hmacKey, Helpers.toBytes(-1L, ByteOrder.LITTLE_ENDIAN));
-
-        kdbxHeader.verifyHeaderHmac(hmacKey64, getBytes(32, input));
+        Mac mac = Encryption.getHMacSha256Instance(hmacKey64);
+        byte [] computedHmacSha256 = mac.doFinal(kdbxHeader.getHeaderBytes());
+        byte [] receivedHmacSha256 = getBytes(32, input);
+        if (!Arrays.equals(computedHmacSha256, receivedHmacSha256)) {
+            throw new IllegalStateException("Header HMAC does not match");
+        }
     }
 
+    /**
+     * Write the hashes required after the header for V4
+     * @param kdbxHeader the header whose hashes need to be written
+     * @param credentials database credentials
+     * @param dataOutputStream somewhere to write to
+     */
+
     private static void writeOuterHeaderVerification(KdbxHeader kdbxHeader, Credentials credentials, DataOutputStream dataOutputStream) throws IOException {
+        // the SHA digest
         dataOutputStream.write(kdbxHeader.getHeaderHash());
 
+        // the HMac
         byte[] hmacKey = kdbxHeader.getHmacKey(credentials);
         byte[] hmacKey64 = Encryption.transformHmacKey(hmacKey, Helpers.toBytes(-1L, ByteOrder.LITTLE_ENDIAN));
         Mac mac = Encryption.getHMacSha256Instance(hmacKey64);
@@ -298,7 +304,7 @@ public class KdbxSerializer {
         dataOutputStream.write(hashedHeaderBytes);
     }
 
-    private static void getOuterHeaderFields(KdbxHeader kdbxHeader, MessageDigest digest, DataInput input) throws IOException {
+    private static void getOuterHeaderFields(KdbxHeader kdbxHeader, DataInput input) throws IOException {
         byte headerType;
         do {
             headerType = input.readByte();
@@ -352,142 +358,17 @@ public class KdbxSerializer {
                     break;
 
                 case HeaderType.KDF_PARAMETERS:
-                    kdbxHeader.setKdfParameters(makeVariantDictionary(length, input));
+                    kdbxHeader.setKdfParameters(readVariantDictionary(getBytes(length, input)));
                     break;
 
                 case HeaderType.CUSTOM_DATA:
-                    kdbxHeader.setCustomData(makeVariantDictionary(length, input));
+                    kdbxHeader.setCustomData(readVariantDictionary(getBytes(length, input)));
                     break;
 
                 default: throw new IllegalStateException("Unknown File Header");
             }
         } while (headerType != HeaderType.END);
-
-        kdbxHeader.setHeaderHash(digest.digest());
     }
-
-    /**
-     * Type fields for inner headers
-     * @see KdbxSerializer#readInnerHeader
-     */
-    private static class InnerHeaderType {
-        private static final byte END = 0;
-        private static final byte INNER_RANDOM_STREAM_ID = 1; // Supersedes KdbxHeaderFieldID.InnerRandomStreamID
-        private static final byte INNER_RANDOM_STREAM_KEY = 2; // Supersedes KdbxHeaderFieldID.InnerRandomStreamKey
-        private static final byte BINARY = 3;
-    }
-
-    /**
-     * From V4 the inner stream encryption parameters are contained in
-     * a set of headers immediately preceding the XML payload
-     * @param kdbxHeader the header whose values are to be read
-     * @param plainTextStream a stream to read them from
-     * @throws IOException on error
-     */
-    private static void readInnerHeader(KdbxHeader kdbxHeader, InputStream plainTextStream) throws IOException {
-        DataInput input = new LittleEndianDataInputStream(plainTextStream);
-
-        byte headerType;
-        do {
-            headerType = input.readByte();
-            int length = input.readInt();
-
-            switch (headerType) {
-                case InnerHeaderType.END: {
-                    getBytes(length, input);
-                    break;
-                }
-
-                case InnerHeaderType.INNER_RANDOM_STREAM_ID: {
-                    kdbxHeader.setInnerRandomStreamId(getInt(length, input));
-                    break;
-                }
-
-                case InnerHeaderType.INNER_RANDOM_STREAM_KEY: {
-                    kdbxHeader.setInnerRandomStreamKey(getBytes(length, input));
-                    break;
-                }
-
-                case InnerHeaderType.BINARY: {
-                    kdbxHeader.addBinary(getBytes(length, input));
-                    break;
-                }
-
-                default: throw new IllegalStateException("Invalid inner header field");
-            }
-        } while (headerType != HeaderType.END);
-    }
-
-    public static void writeInnerHeader(KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
-        DataOutput output = new LittleEndianDataOutputStream(outputStream);
-
-        output.writeByte(InnerHeaderType.INNER_RANDOM_STREAM_ID);
-        output.writeInt(4);
-        output.writeInt(kdbxHeader.getProtectedStreamAlgorithm().ordinal());
-
-        output.writeByte(InnerHeaderType.INNER_RANDOM_STREAM_KEY);
-        output.writeInt(kdbxHeader.getInnerRandomStreamKey().length);
-        output.write(kdbxHeader.getInnerRandomStreamKey());
-
-        output.writeByte(InnerHeaderType.END);
-        output.writeInt(0);
-    }
-
-    /**
-     * Read a VariantDictionary from the supplied input
-     * @param input source of data
-     * @return a VariantDictionary
-     * @throws IOException on error
-     */
-    private static VariantDictionary makeVariantDictionary(int length, DataInput input) throws IOException {
-        // read the buffer containing the dictionary, which starts with a 4 byte length
-        ByteBuffer buf = ByteBuffer.wrap(getBytes(length, input));
-        buf.order(ByteOrder.LITTLE_ENDIAN);
-        // version number must be 0x01??
-
-        VariantDictionary vd = new VariantDictionary((short) (buf.getShort() >> 8));
-
-        // sequence of entries followed by a byte 0
-        byte type = buf.get();
-        while (type != 0) {
-            // get key
-            int keyLength = buf.getInt();
-            byte [] key = new byte[keyLength];
-            buf.get(key);
-
-            // get value
-            int valueLength = buf.getInt();
-            byte [] value = new byte[valueLength];
-            buf.get(value);
-
-            // add entry
-            vd.put(new String(key, StandardCharsets.US_ASCII), VariantDictionary.EntryType.get(type), value);
-
-            type = buf.get();
-        }
-        return vd;
-    }
-
-    private static byte[] serializeVariantDictionary(VariantDictionary v) {
-        ByteBuffer buf = ByteBuffer.wrap(new byte[1024]);
-        buf.order(ByteOrder.LITTLE_ENDIAN);
-        buf.mark();
-        // version number must be 0x01??
-        buf.putShort((short) 0x100); //1
-        for (Map.Entry<String, VariantDictionary.Entry> e : v.getEntries().entrySet()){
-            buf.put(e.getValue().getType());
-            buf.putInt(e.getKey().length());
-            buf.put(e.getKey().getBytes(StandardCharsets.US_ASCII));
-            buf.putInt(e.getValue().asByteArray().length);
-            buf.put(e.getValue().asByteArray());
-        }
-        buf.put((byte) 0);
-        byte[] result = new byte[buf.position()];
-        buf.reset();
-        buf.get(result);
-        return result;
-    }
-
 
     /**
      * Write a KdbxHeader to the output stream supplied. The header is updated with the
@@ -580,6 +461,149 @@ public class KdbxSerializer {
         kdbxHeader.setHeaderBytes(collectingOutputStream.getCollectedBytes());
     }
 
+    /**
+     * Type fields for inner headers
+     * @see KdbxSerializer#readInnerHeader
+     */
+    private static class InnerHeaderType {
+        private static final byte END = 0;
+        private static final byte INNER_RANDOM_STREAM_ID = 1; // Supersedes KdbxHeaderFieldID.InnerRandomStreamID
+        private static final byte INNER_RANDOM_STREAM_KEY = 2; // Supersedes KdbxHeaderFieldID.InnerRandomStreamKey
+        private static final byte BINARY = 3;
+    }
+
+    /**
+     * From V4 the inner stream encryption parameters are contained in
+     * a set of headers immediately preceding the XML payload
+     * @param kdbxHeader the header whose values are to be read
+     * @param plainTextStream a stream to read them from
+     * @throws IOException on error
+     */
+    private static void readInnerHeader(KdbxHeader kdbxHeader, InputStream plainTextStream) throws IOException {
+        DataInput input = new LittleEndianDataInputStream(plainTextStream);
+
+        byte headerType;
+        do {
+            headerType = input.readByte();
+            int length = input.readInt();
+
+            switch (headerType) {
+                case InnerHeaderType.END: {
+                    getBytes(length, input);
+                    break;
+                }
+
+                case InnerHeaderType.INNER_RANDOM_STREAM_ID: {
+                    kdbxHeader.setInnerRandomStreamId(getInt(length, input));
+                    break;
+                }
+
+                case InnerHeaderType.INNER_RANDOM_STREAM_KEY: {
+                    kdbxHeader.setInnerRandomStreamKey(getBytes(length, input));
+                    break;
+                }
+
+                case InnerHeaderType.BINARY: {
+                    kdbxHeader.addBinary(getBytes(length, input));
+                    break;
+                }
+
+                default: throw new IllegalStateException("Invalid inner header field");
+            }
+        } while (headerType != HeaderType.END);
+    }
+
+    public static void writeInnerHeader(KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
+        DataOutput output = new LittleEndianDataOutputStream(outputStream);
+
+        output.writeByte(InnerHeaderType.INNER_RANDOM_STREAM_ID);
+        output.writeInt(4);
+        output.writeInt(kdbxHeader.getProtectedStreamAlgorithm().ordinal());
+
+        output.writeByte(InnerHeaderType.INNER_RANDOM_STREAM_KEY);
+        output.writeInt(kdbxHeader.getInnerRandomStreamKey().length);
+        output.write(kdbxHeader.getInnerRandomStreamKey());
+
+        for (byte [] binary: kdbxHeader.getBinaries()) {
+            output.writeByte(InnerHeaderType.BINARY);
+            output.writeInt(binary.length);
+            output.write(binary);
+        }
+
+        output.writeByte(InnerHeaderType.END);
+        output.writeInt(0);
+    }
+
+    /**
+     * Read a VariantDictionary from the supplied input according to KDBX rules
+     * @param source source of data
+     * @return a VariantDictionary
+     */
+    public static VariantDictionary readVariantDictionary(byte [] source) {
+        // read the buffer containing the dictionary, which starts with a 4 byte length
+        ByteBuffer buf = ByteBuffer.wrap(source);
+        buf.order(ByteOrder.LITTLE_ENDIAN);
+        // version number must be 0x01??
+
+        VariantDictionary vd = new VariantDictionary((short) (buf.getShort() >> 8));
+
+        // sequence of entries followed by a byte 0
+        byte type = buf.get();
+        while (type != 0) {
+            // get key
+            int keyLength = buf.getInt();
+            byte [] key = new byte[keyLength];
+            buf.get(key);
+
+            // get value
+            int valueLength = buf.getInt();
+            byte [] value = new byte[valueLength];
+            buf.get(value);
+
+            // add entry
+            vd.put(new String(key, StandardCharsets.US_ASCII), VariantDictionary.EntryType.get(type), value);
+
+            type = buf.get();
+        }
+        return vd;
+    }
+
+    /**
+     * Serialize a variant dictionary according to KDBX rules
+     * @param v the dictionary to serialize
+     * @return a byte array
+     */
+    public static byte[] serializeVariantDictionary(VariantDictionary v) {
+        ByteBuffer buf = ByteBuffer.wrap(new byte[1024]);
+        buf.order(ByteOrder.LITTLE_ENDIAN);
+        buf.mark();
+        // version number must be 0x01??
+        buf.putShort((short) 0x100); //1
+        for (Map.Entry<String, VariantDictionary.Entry> e : v.getEntries().entrySet()){
+            buf.put(e.getValue().getType());
+            buf.putInt(e.getKey().length());
+            buf.put(e.getKey().getBytes(StandardCharsets.US_ASCII));
+            buf.putInt(e.getValue().asByteArray().length);
+            buf.put(e.getValue().asByteArray());
+        }
+        buf.put((byte) 0);
+        byte[] result = new byte[buf.position()];
+        buf.reset();
+        buf.get(result);
+        return result;
+    }
+
+    /**
+     * Read two lots of 4 bytes and verify that they satisfy the signature of a kdbx file;
+     * @param ledis an input stream
+     * @return true if it looks like this is a kdbx file
+     * @throws IOException on error
+     */
+    private static boolean verifyMagicNumber(LittleEndianDataInputStream ledis) throws IOException {
+        int sig1 = ledis.readInt();
+        int sig2 = ledis.readInt();
+        return sig1 == SIG1 && sig2 == SIG2;
+    }
 
     private static int getInt(int length, DataInput input) throws IOException {
         if (length != 4) {

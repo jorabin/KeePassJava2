@@ -131,5 +131,4 @@ public interface StreamEncryptor {
             return output;
         }
     }
-
 }

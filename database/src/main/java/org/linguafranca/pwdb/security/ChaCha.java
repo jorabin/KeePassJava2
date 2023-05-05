@@ -22,7 +22,7 @@ public class ChaCha implements CipherAlgorithm {
 
     // hide constructor to enforce singleton
     private ChaCha(){}
-    private static ChaCha instance = new ChaCha();
+    private static final ChaCha instance = new ChaCha();
 
     public static ChaCha getInstance() {
         return instance;

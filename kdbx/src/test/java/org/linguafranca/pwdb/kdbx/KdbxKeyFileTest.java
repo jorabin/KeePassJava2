@@ -16,80 +16,74 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import com.google.common.io.CharStreams;
 import org.junit.Test;
-import org.linguafranca.pwdb.kdbx.KdbxSerializer;
 import org.linguafranca.pwdb.Credentials;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * @author jo
+ * tests reading of kdbx with various combinations of key file and password
  */
 public class KdbxKeyFileTest {
-
+    private static void toConsole(InputStream is) throws IOException {
+        System.out.println(CharStreams.toString(new InputStreamReader(is, StandardCharsets.UTF_8)));
+    }
+    /**
+     * Test that we can load a key file and get a 32 byte base64 encoded value back
+     */
     @Test
     public void testLoad() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("KeyFileDatabase.key");
         byte[] key = KdbxKeyFile.load(inputStream);
         assertNotNull(key);
-        assertEquals(32, key.length);
+        assertEquals(32, key.length);;
     }
 
-    /*
-    Test for empty password
+    /**
+     * Test that we can read a file with empty password
      */
     @Test
     public void testEmptyPasswordCreds() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("EmptyPassword.kdbx");
         Credentials credentials = new KdbxCreds(new byte[0]);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
-        byte[] buffer = new byte[1024];
-        while ( decryptedInputStream.available() > 0) {
-            int read = decryptedInputStream.read(buffer);
-            if (read == -1) break;
-            System.out.write(buffer, 0, read);
-        }
+        toConsole(decryptedInputStream);
     }
 
-
     /**
-     Test for empty password with key
+     Test for empty password with key file
      */
     @Test
     public void testEmptyPasswordKeyCreds() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("EmptyPasswordWithKey.kdbx");
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("EmptyPasswordWithKey.key");
+        assert inputStreamKeyFile != null;
         Credentials credentials = new KdbxCreds(new byte[0], inputStreamKeyFile);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
-        byte[] buffer = new byte[1024];
-        while ( decryptedInputStream.available() > 0) {
-            int read = decryptedInputStream.read(buffer);
-            if (read == -1) break;
-            System.out.write(buffer, 0, read);
-        }
+        toConsole(decryptedInputStream);
     }
 
     /**
-     Test for no master password
+     Test for no master password with key
      */
     @Test
     public void testNoPasswordKeyCreds() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("NoPasswordWithKey.kdbx");
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("NoPasswordWithKey.key");
+        assert inputStreamKeyFile != null;
         Credentials credentials = new KdbxCreds(inputStreamKeyFile);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
-        byte[] buffer = new byte[1024];
-        while ( decryptedInputStream.available() > 0) {
-            int read = decryptedInputStream.read(buffer);
-            if (read == -1) break;
-            System.out.write(buffer, 0, read);
-        }
+        toConsole(decryptedInputStream);
     }
 
-    /*
+    /**
     Test for empty password
      */
     @Test
@@ -97,11 +91,6 @@ public class KdbxKeyFileTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("EmptyPassword.kdbx");
         Credentials credentials = new KdbxCreds(new byte[0]);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
-        byte[] buffer = new byte[1024];
-        while ( decryptedInputStream.available() > 0) {
-            int read = decryptedInputStream.read(buffer);
-            if (read == -1) break;
-            System.out.write(buffer, 0, read);
-        }
+        toConsole(decryptedInputStream);
     }
 }

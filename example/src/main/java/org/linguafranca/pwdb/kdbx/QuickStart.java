@@ -130,14 +130,14 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
         database.visit(new Visitor.Print());
 
         // create a KDBX (database
-        D kdbxDatabse = getDatabase();
-        kdbxDatabse.setName("New Database");
-        kdbxDatabse.setDescription("Migration of KDB Database to KDBX Database");
+        D kdbxDatabase = getDatabase();
+        kdbxDatabase.setName("New Database");
+        kdbxDatabase.setDescription("Migration of KDB Database to KDBX Database");
         // deep copy from group (not including source group, KDB database has simulated root)
-        kdbxDatabse.getRootGroup().copy(database.getRootGroup());
+        kdbxDatabase.getRootGroup().copy(database.getRootGroup());
         // save it
         try (FileOutputStream f = new FileOutputStream("testOutput/migration.kdbx")) {
-            kdbxDatabse.save(new KdbxCreds("123".getBytes()), f);
+            kdbxDatabase.save(new KdbxCreds("123".getBytes()), f);
         }
     }
 }
