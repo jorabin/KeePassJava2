@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -39,21 +40,23 @@ public class KdbxKeyFile {
     /**
      * Load a key from an InputStream with a KDBX XML key file.
      * @param inputStream the input stream holding the key
-     * @return they key or null if there was a problem
+     * @return the key
      */
     public static byte[] load(InputStream inputStream) {
-        String base64;
         try {
             DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = documentBuilder.parse(inputStream);
-            base64 = (String) xpath.evaluate("//KeyFile/Key/Data/text()", doc, XPathConstants.STRING);
-            if (base64 == null) {
+            String version = (String) xpath.evaluate("//KeyFile/Meta/Version/text()", doc, XPathConstants.STRING);
+            String data = (String) xpath.evaluate("//KeyFile/Key/Data/text()", doc, XPathConstants.STRING);
+            if (data == null) {
                 return null;
             }
+            if (version.equals("2.0")) {
+                return Hex.decodeHex(data.replaceAll("\\s",""));
+            }
+            return Base64.decodeBase64(data.getBytes());
         } catch (Exception e) {
-            return null;
+            throw new RuntimeException("Key File input stream cannot be null");
         }
-        // android compatibility
-        return Base64.decodeBase64(base64.getBytes());
     }
 }
