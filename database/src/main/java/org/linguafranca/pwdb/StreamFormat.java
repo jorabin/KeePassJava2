@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx;
+package org.linguafranca.pwdb;
 
-import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.security.StreamEncryptor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,11 +27,11 @@ import java.io.OutputStream;
  *
  * @author jo
  */
-public interface StreamFormat {
+public interface StreamFormat <C extends StreamConfiguration>{
     /**
      * Class allows for serializing a database directly to or from a stream with no encryption etc
      */
-    class None implements StreamFormat {
+    class None implements StreamFormat<StreamConfiguration.None> {
 
         @Override
         public void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream inputStream) throws IOException {
@@ -47,9 +47,23 @@ public interface StreamFormat {
             outputStream.flush();
             outputStream.close();
         }
+
+        @Override
+        public StreamConfiguration.None getStreamConfiguration() {
+            return new StreamConfiguration.None();
+        }
+
+        @Override
+        public void setStreamConfiguration(StreamConfiguration.None configuration) {
+
+        }
     }
 
     void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream encryptedInputStream) throws IOException;
 
     void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream encryptedOutputStream) throws IOException;
+
+    C getStreamConfiguration();
+
+    void setStreamConfiguration(C configuration);
 }

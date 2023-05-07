@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx;
 
 import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.StreamConfiguration;
 import org.linguafranca.pwdb.security.*;
 
 import javax.crypto.Mac;
@@ -44,41 +45,13 @@ import static org.linguafranca.pwdb.security.Encryption.getSha256MessageDigestIn
  * While KDBX streams are Little-Endian, data is passed to and from this class in standard Java byte order.
  */
 @SuppressWarnings("WeakerAccess")
-public class KdbxHeader {
-
+public class KdbxHeader implements StreamConfiguration {
     /**
      * The ordinal 0 represents uncompressed and 1 GZip compressed
      */
     @SuppressWarnings("WeakerAccess")
     public enum CompressionFlags {
         NONE, GZIP
-    }
-
-    /**
-     * The ordinals represent various types of encryption that may
-     * be applied to fields within the unencrypted data
-     *
-     * @see StreamFormat
-     * @see KdbxStreamFormat
-     */
-    @SuppressWarnings("WeakerAccess, unused")
-    public enum ProtectedStreamAlgorithm {
-        NONE(0), ARC_FOUR(1), SALSA_20(2), CHA_CHA_20(3);
-
-        private final int value;
-
-        ProtectedStreamAlgorithm(int value) {
-            this.value = value;
-        }
-
-        public static ProtectedStreamAlgorithm getAlgorithm(int innerRandomStreamId) {
-            for (ProtectedStreamAlgorithm pse: values()) {
-                if (pse.value == innerRandomStreamId) {
-                    return pse;
-                }
-            }
-            throw new IllegalArgumentException("Inner Random Stream Id " + innerRandomStreamId + "is not known");
-        }
     }
 
     private final List<Integer> allowableVersions = new ArrayList<>(Arrays.asList(3, 4));
@@ -100,7 +73,9 @@ public class KdbxHeader {
 
     /* header (V3) inner header (v4) */
     private byte[] innerRandomStreamKey;
-    private ProtectedStreamAlgorithm protectedStreamAlgorithm;
+    private Encryption.ProtectedStreamAlgorithm protectedStreamAlgorithm;
+    private CipherAlgorithm cipherAlgorithm;
+    private KeyDerivationFunction keyDerivationFunction;
 
     /* these bytes appear in cipher text immediately following the header (V3) */
     private byte[] streamStartBytes;
@@ -124,6 +99,7 @@ public class KdbxHeader {
     /* the bytes that compose the outer header, required for V4 to calculate the HMac */
     private byte[] headerBytes;
 
+    final SecureRandom random;
     /**
      * Provides for choice of version number and crypto options for V3 and V4
      */
@@ -131,24 +107,24 @@ public class KdbxHeader {
         int getVersion();
         CipherAlgorithm getCipherAlgorithm();
         KeyDerivationFunction getKeyDerivationFunction();
-        ProtectedStreamAlgorithm getProtectedStreamAlgorithm();
+        Encryption.ProtectedStreamAlgorithm getProtectedStreamAlgorithm();
     }
 
     /**
      * Default values for crypto options
      */
     enum KdbxHeaderOpts implements KdbxHeaderOptions{
-        V3_AES_SALSA_20(3, Encryption.Cipher.AES, Encryption.Kdf.AES, ProtectedStreamAlgorithm.SALSA_20),
-        V4_AES_ARGON_CHA_CHA (4, Encryption.Cipher.AES, Encryption.Kdf.ARGON2, ProtectedStreamAlgorithm.CHA_CHA_20);
+        V3_AES_SALSA_20(3, Encryption.Cipher.AES, Encryption.Kdf.AES, Encryption.ProtectedStreamAlgorithm.SALSA_20),
+        V4_AES_ARGON_CHA_CHA (4, Encryption.Cipher.AES, Encryption.Kdf.ARGON2, Encryption.ProtectedStreamAlgorithm.CHA_CHA_20);
 
         //<editor-fold desc="Fields, Getters and Setters for this class">
         final int version;
         final CipherAlgorithm algorithm;
         final KeyDerivationFunction kdf;
-        final ProtectedStreamAlgorithm protectedStreamAlgorithm;
+        final Encryption.ProtectedStreamAlgorithm protectedStreamAlgorithm;
 
 
-        KdbxHeaderOpts(int version, Encryption.Cipher cipher, Encryption.Kdf kdf, ProtectedStreamAlgorithm protectedStreamAlgorithm) {
+        KdbxHeaderOpts(int version, Encryption.Cipher cipher, Encryption.Kdf kdf, Encryption.ProtectedStreamAlgorithm protectedStreamAlgorithm) {
             this.version = version;
             this.algorithm = cipher;
             this.kdf = kdf;
@@ -171,7 +147,7 @@ public class KdbxHeader {
         }
 
         @Override
-        public ProtectedStreamAlgorithm getProtectedStreamAlgorithm() {
+        public Encryption.ProtectedStreamAlgorithm getProtectedStreamAlgorithm() {
             return protectedStreamAlgorithm;
         }
         //</editor-fold>
@@ -193,10 +169,14 @@ public class KdbxHeader {
 
 
     public KdbxHeader(KdbxHeaderOptions opts) {
-        SecureRandom random = new SecureRandom();
+        random = new SecureRandom();
 
         this.version = opts.getVersion();
+        setCipherAlgorithm(opts.getCipherAlgorithm());
+        setKeyDerivationFunction(opts.getKeyDerivationFunction());
+        setProtectedStreamAlgorithm(opts.getProtectedStreamAlgorithm());
         cipherUuid = opts.getCipherAlgorithm().getCipherUuid();
+
         compressionFlags = CompressionFlags.GZIP;
         masterSeed = random.generateSeed(32);
         transformSeed = random.generateSeed(32);
@@ -204,21 +184,16 @@ public class KdbxHeader {
         encryptionIv = random.generateSeed(16);
         innerRandomStreamKey = random.generateSeed(32);
         streamStartBytes = new byte[32];
-        this.protectedStreamAlgorithm = opts.getProtectedStreamAlgorithm();
-
-        kdfParameters = opts.getKeyDerivationFunction().createKdfParameters();
     }
 
     /**
      * Compute the Hmac Key Digest
-     * KdbxFile.cs Computekeys
+     * from "KdbxFile.cs Computekeys"
      *
      * @param credentials the credentials
      * @return the digest
      */
     public byte[] getHmacKey(Credentials credentials) {
-        // Compute the Hmac Key Digest
-        // KdbxFile.cs Computekeys
         MessageDigest md = Encryption.getSha512MessageDigestInstance();
         md.update(getMasterSeed());
         md.update(getTransformedKeyDigest(credentials.getKey()));
@@ -289,7 +264,7 @@ public class KdbxHeader {
         MessageDigest md = getSha256MessageDigestInstance();
         md.update(masterSeed);
         byte[] finalKeyDigest = md.digest(getTransformedKeyDigest(digest));
-        return Aes.getInstance().getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
+        return cipherAlgorithm.getEncryptedOutputStream(outputStream, finalKeyDigest, getEncryptionIv());
     }
 
     //<editor-fold desc="Getters/ Setters">
@@ -331,7 +306,15 @@ public class KdbxHeader {
         return streamStartBytes;
     }
 
-    public ProtectedStreamAlgorithm getProtectedStreamAlgorithm() {
+    public CipherAlgorithm getCipherAlgorithm() {
+        return cipherAlgorithm;
+    }
+
+    public KeyDerivationFunction getKeyDerivationFunction() {
+        return keyDerivationFunction;
+    }
+
+    public Encryption.ProtectedStreamAlgorithm getProtectedStreamAlgorithm() {
         return protectedStreamAlgorithm;
     }
 
@@ -349,21 +332,7 @@ public class KdbxHeader {
     }
 
     public StreamEncryptor getStreamEncryptor() {
-        switch (getProtectedStreamAlgorithm()) {
-            case NONE: {
-                throw new IllegalStateException("Inner stream encoding of NONE");
-            }
-            case ARC_FOUR: {
-                throw new UnsupportedOperationException("Arc Four inner stream not supported");
-            }
-            case SALSA_20: {
-                return new StreamEncryptor.Salsa20(this.innerRandomStreamKey);
-            }
-            case CHA_CHA_20: {
-                return new StreamEncryptor.ChaCha20(this.innerRandomStreamKey);
-            }
-        }
-        throw new IllegalStateException("Inner stream encoding unsupported");
+        return Encryption.ProtectedStreamAlgorithm.getStreamEncryptor(getProtectedStreamAlgorithm(), this.innerRandomStreamKey);
     }
 
     public void setCompressionFlags(int flags) {
@@ -395,20 +364,43 @@ public class KdbxHeader {
     }
 
     public void setInnerRandomStreamId(int innerRandomStreamId) {
-        this.protectedStreamAlgorithm = ProtectedStreamAlgorithm.getAlgorithm(innerRandomStreamId);
+        this.protectedStreamAlgorithm = Encryption.ProtectedStreamAlgorithm.getAlgorithm(innerRandomStreamId);
+    }
+
+    public void setProtectedStreamAlgorithm(Encryption.ProtectedStreamAlgorithm protectedStreamAlgorithm) {
+        this.protectedStreamAlgorithm = protectedStreamAlgorithm;
+    }
+
+    public void setKeyDerivationFunction(KeyDerivationFunction keyDerivationFunction) {
+        this.keyDerivationFunction = keyDerivationFunction;
+        if (version > 3) {
+            kdfParameters = this.keyDerivationFunction.createKdfParameters();
+        }
+    }
+
+    public void setCipherAlgorithm(CipherAlgorithm cipherAlgorithm) {
+        this.cipherAlgorithm = cipherAlgorithm;
+        setCipherUuid(this.cipherAlgorithm.getCipherUuid());
+        if (cipherAlgorithm.getName().equals("CHA_CHA_20")){
+            encryptionIv = random.generateSeed(12);
+        }
+    }
+    public void setCipherUuid(byte[] uuid) {
+        ByteBuffer b = ByteBuffer.wrap(uuid);
+        UUID incoming = new UUID(b.getLong(), b.getLong(8));
+        setCipherUuid(incoming);
+        this.cipherAlgorithm = Encryption.Cipher.getCipherAlgorithm(incoming);
+    }
+
+    public void setCipherUuid(UUID uuid) {
+        if (!uuid.equals(Aes.getInstance().getCipherUuid()) && !uuid.equals(ChaCha.getInstance().getCipherUuid())) {
+            throw new IllegalStateException("Unknown Cipher UUID " + uuid);
+        }
+        this.cipherUuid = uuid;
     }
 
     public void setHeaderHash(byte[] headerHash) {
         this.headerHash = headerHash;
-    }
-
-    public void setCipherUuid(byte[] uuid) {
-        ByteBuffer b = ByteBuffer.wrap(uuid);
-        UUID incoming = new UUID(b.getLong(), b.getLong(8));
-        if (!incoming.equals(Aes.getInstance().getCipherUuid()) && !incoming.equals(ChaCha.getInstance().getCipherUuid())) {
-            throw new IllegalStateException("Unknown Cipher UUID " + incoming);
-        }
-        this.cipherUuid = incoming;
     }
 
     public void setVersion(int version) {
@@ -423,6 +415,7 @@ public class KdbxHeader {
      */
     public void setKdfParameters(VariantDictionary kdfParameters) {
         this.kdfParameters = kdfParameters;
+        this.keyDerivationFunction = Encryption.Kdf.getKdf(kdfParameters.get("$UUID").asUuid());
     }
 
     /**

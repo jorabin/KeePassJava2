@@ -14,9 +14,14 @@ public interface CipherAlgorithm {
     UUID getCipherUuid();
 
     /**
+     * Return the name of this algorithm
+     */
+    String getName();
+
+    /**
      * Create a decrypted stream from the supplied encrypted one
      *
-     * @param encryptedInputStream an encryted stream
+     * @param encryptedInputStream an encrypted stream
      * @param key                  the decryption key
      * @param iv                   the iv
      * @return an unencrypted stream

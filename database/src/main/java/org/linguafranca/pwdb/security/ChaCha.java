@@ -18,7 +18,9 @@ import java.util.UUID;
  */
 public class ChaCha implements CipherAlgorithm {
 
-    private static final UUID CHACHA_CIPHER = UUID.fromString("d6038a2b-8b6f-4cb5-a524-339a31dbb59a");
+    private static final UUID CHA_CHA_20_CIPHER = UUID.fromString("d6038a2b-8b6f-4cb5-a524-339a31dbb59a");
+
+    private  static final String name = "CHA_CHA_20";
 
     // hide constructor to enforce singleton
     private ChaCha(){}
@@ -30,7 +32,12 @@ public class ChaCha implements CipherAlgorithm {
 
     @Override
     public UUID getCipherUuid() {
-        return CHACHA_CIPHER;
+        return CHA_CHA_20_CIPHER;
+    }
+
+    @Override
+    public String getName(){
+        return name;
     }
 
     @Override

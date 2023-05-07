@@ -14,6 +14,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
+<!--suppress XmlDefaultAttributeValue -->
 <xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified"
            xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xs:annotation>
@@ -78,10 +79,12 @@
                                     <xs:documentation>When the XML database is loaded into memory, sensitive
                                         fields will be encrypted in that stream. This element specifies which of the
                                         standardFields are encrypted in that stream, which is decrypted using Salsa20
-                                        and the InnerRandomStream encryption header.
+                                        for KDBX3 (or ChaCha20 by default for V4) and the InnerRandomStream encryption header.
 
-                                        /./Entry/String/Value/@Protected signifies that the value of a stringField is
+                                        ./Entry/String/Value/@Protected signifies that the value of a stringField is
                                         so encrypted and applies also to customFields.
+
+                                        Attachments are optionally memory protected in V4.
                                     </xs:documentation>
                                 </xs:annotation>
                                 <xs:complexType>
@@ -107,7 +110,7 @@
                             <xs:element name="Binaries" type="binaries" minOccurs="0">
                                 <xs:annotation>
                                     <xs:documentation>Used to store binary values in version 3.1 - in version 4
-                                        such values are now stored as part of the KDBX inner headers.
+                                        such values are now transferred as part of the KDBX inner headers.
                                     </xs:documentation>
                                 </xs:annotation>
                             </xs:element>
@@ -306,7 +309,7 @@
 
     <xs:simpleType name="commaSeparatedList">
         <xs:annotation>
-            <xs:documentation>XSD doesn't do comma separated lists so we can't model this handily.
+            <xs:documentation>XSD doesn't do comma separated lists, so we can't model this handily.
 
                 Assume that the format is something like [{token}{, token}*]+ where white space is ignored except
                 as part of the name of the token.
@@ -319,9 +322,9 @@
     <xs:complexType name="stringField">
         <xs:annotation>
             <xs:documentation>This is where the values of the database are actually stored. You can have String valued
-                fields and you can have Binary valued fields. There are "Default" String fields (username and so on) and
+                fields, and you can have Binary valued fields. There are "Default" String fields (username and so on) and
                 there are custom string fields (custom only in that their names are not the names of default string
-                fields. Not really clear whether the keys are case sensitive.
+                fields). Not really clear whether the keys are case-sensitive.
             </xs:documentation>
         </xs:annotation>
         <xs:sequence>

@@ -19,6 +19,10 @@ package org.linguafranca.pwdb.example;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.QuickStart;
+import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
+import org.linguafranca.pwdb.kdbx.dom.DomEntryWrapper;
+import org.linguafranca.pwdb.kdbx.dom.DomGroupWrapper;
+import org.linguafranca.pwdb.kdbx.dom.DomIconWrapper;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import org.linguafranca.pwdb.kdbx.simple.SimpleEntry;
 import org.linguafranca.pwdb.kdbx.simple.SimpleGroup;
@@ -33,18 +37,18 @@ import java.io.InputStream;
  * 
  * @author jo
  */
-public class SimpleQuickStartTest extends QuickStart<SimpleDatabase, SimpleGroup, SimpleEntry, SimpleIcon> {
+public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper> {
 
 
     @Override
-    public SimpleDatabase getDatabase() {
-        return new SimpleDatabase();
+    public DomDatabaseWrapper getDatabase() {
+        return new DomDatabaseWrapper();
     }
 
     @Override
-    public SimpleDatabase loadDatabase(Credentials credentials, InputStream inputStream){
+    public DomDatabaseWrapper loadDatabase(Credentials credentials, InputStream inputStream){
         try {
-            return SimpleDatabase.load(credentials, inputStream);
+            return DomDatabaseWrapper.load(credentials, inputStream);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -65,5 +69,13 @@ public class SimpleQuickStartTest extends QuickStart<SimpleDatabase, SimpleGroup
         super.loadKdb();
     }
 
+    @Test
+    public void loadSaveLoadSave() throws IOException {
+        loadKdbx3SaveKdbx4();
+    }
+    @Test
+    public void listKdbxParamsTest() throws IOException {
+        listKdbxHeaderParams();
+    }
 
 }

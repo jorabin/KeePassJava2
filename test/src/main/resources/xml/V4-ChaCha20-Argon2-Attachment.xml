@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<KeePassFile>
+    <Meta>
+        <Generator>KeePass</Generator>
+        <SettingsChanged>BoES0g4AAAA=</SettingsChanged>
+        <DatabaseName />
+        <DatabaseNameChanged>qZ1Tzw4AAAA=</DatabaseNameChanged>
+        <DatabaseDescription />
+        <DatabaseDescriptionChanged>qZ1Tzw4AAAA=</DatabaseDescriptionChanged>
+        <DefaultUserName />
+        <DefaultUserNameChanged>qZ1Tzw4AAAA=</DefaultUserNameChanged>
+        <MaintenanceHistoryDays>365</MaintenanceHistoryDays>
+        <Color />
+        <MasterKeyChanged>tp1Tzw4AAAA=</MasterKeyChanged>
+        <MasterKeyChangeRec>-1</MasterKeyChangeRec>
+        <MasterKeyChangeForce>-1</MasterKeyChangeForce>
+        <MemoryProtection>
+            <ProtectTitle>False</ProtectTitle>
+            <ProtectUserName>False</ProtectUserName>
+            <ProtectPassword>True</ProtectPassword>
+            <ProtectURL>False</ProtectURL>
+            <ProtectNotes>False</ProtectNotes>
+        </MemoryProtection>
+        <RecycleBinEnabled>True</RecycleBinEnabled>
+        <RecycleBinUUID>AAAAAAAAAAAAAAAAAAAAAA==</RecycleBinUUID>
+        <RecycleBinChanged>qZ1Tzw4AAAA=</RecycleBinChanged>
+        <EntryTemplatesGroup>AAAAAAAAAAAAAAAAAAAAAA==</EntryTemplatesGroup>
+        <EntryTemplatesGroupChanged>qZ1Tzw4AAAA=</EntryTemplatesGroupChanged>
+        <HistoryMaxItems>10</HistoryMaxItems>
+        <HistoryMaxSize>6291456</HistoryMaxSize>
+        <LastSelectedGroup>TOEWAvT9GlIjOkSMv9F+aw==</LastSelectedGroup>
+        <LastTopVisibleGroup>TOEWAvT9GlIjOkSMv9F+aw==</LastTopVisibleGroup>
+        <CustomData />
+    </Meta>
+    <Root>
+        <Group>
+            <UUID>TOEWAvT9GlIjOkSMv9F+aw==</UUID>
+            <Name>Root</Name>
+            <Notes />
+            <IconID>48</IconID>
+            <Times>
+                <CreationTime>qZ1Tzw4AAAA=</CreationTime>
+                <LastModificationTime>qZ1Tzw4AAAA=</LastModificationTime>
+                <LastAccessTime>qZ1Tzw4AAAA=</LastAccessTime>
+                <ExpiryTime>qZ1Tzw4AAAA=</ExpiryTime>
+                <Expires>False</Expires>
+                <UsageCount>0</UsageCount>
+                <LocationChanged>qZ1Tzw4AAAA=</LocationChanged>
+            </Times>
+            <IsExpanded>True</IsExpanded>
+            <DefaultAutoTypeSequence />
+            <EnableAutoType>null</EnableAutoType>
+            <EnableSearching>null</EnableSearching>
+            <LastTopVisibleEntry>GPv+n0B4upj0sZd+nuuiBQ==</LastTopVisibleEntry>
+            <Entry>
+                <UUID>GPv+n0B4upj0sZd+nuuiBQ==</UUID>
+                <IconID>0</IconID>
+                <ForegroundColor />
+                <BackgroundColor />
+                <OverrideURL />
+                <Tags />
+                <Times>
+                    <CreationTime>wZ1Tzw4AAAA=</CreationTime>
+                    <LastModificationTime>J55Tzw4AAAA=</LastModificationTime>
+                    <LastAccessTime>J55Tzw4AAAA=</LastAccessTime>
+                    <ExpiryTime>wZ1Tzw4AAAA=</ExpiryTime>
+                    <Expires>False</Expires>
+                    <UsageCount>0</UsageCount>
+                    <LocationChanged>J55Tzw4AAAA=</LocationChanged>
+                </Times>
+                <String>
+                    <Key>Notes</Key>
+                    <Value />
+                </String>
+                <String>
+                    <Key>Password</Key>
+                    <Value Protected="True" />
+                </String>
+                <String>
+                    <Key>Title</Key>
+                    <Value>Test attachment</Value>
+                </String>
+                <String>
+                    <Key>URL</Key>
+                    <Value />
+                </String>
+                <String>
+                    <Key>UserName</Key>
+                    <Value />
+                </String>
+                <Binary>
+                    <Key>letter J.jpeg</Key>
+                    <Value Ref="0" />
+                </Binary>
+                <AutoType>
+                    <Enabled>True</Enabled>
+                    <DataTransferObfuscation>0</DataTransferObfuscation>
+                </AutoType>
+                <History />
+            </Entry>
+            <Entry>
+                <UUID>mwq3nFNpPrvjXlsWy/6FTQ==</UUID>
+                <IconID>0</IconID>
+                <ForegroundColor />
+                <BackgroundColor />
+                <OverrideURL />
+                <Tags />
+                <Times>
+                    <CreationTime>2KJTzw4AAAA=</CreationTime>
+                    <LastModificationTime>DKNTzw4AAAA=</LastModificationTime>
+                    <LastAccessTime>DKNTzw4AAAA=</LastAccessTime>
+                    <ExpiryTime>2KJTzw4AAAA=</ExpiryTime>
+                    <Expires>False</Expires>
+                    <UsageCount>0</UsageCount>
+                    <LocationChanged>DKNTzw4AAAA=</LocationChanged>
+                </Times>
+                <String>
+                    <Key>Notes</Key>
+                    <Value />
+                </String>
+                <String>
+                    <Key>Password</Key>
+                    <Value Protected="True" />
+                </String>
+                <String>
+                    <Key>Title</Key>
+                    <Value>Test 2 Attachments</Value>
+                </String>
+                <String>
+                    <Key>URL</Key>
+                    <Value />
+                </String>
+                <String>
+                    <Key>UserName</Key>
+                    <Value />
+                </String>
+                <Binary>
+                    <Key>letter J.jpeg</Key>
+                    <Value Ref="0" />
+                </Binary>
+                <Binary>
+                    <Key>letter L.jpeg</Key>
+                    <Value Ref="1" />
+                </Binary>
+                <AutoType>
+                    <Enabled>True</Enabled>
+                    <DataTransferObfuscation>0</DataTransferObfuscation>
+                </AutoType>
+                <History />
+            </Entry>
+        </Group>
+        <DeletedObjects />
+    </Root>
+</KeePassFile>

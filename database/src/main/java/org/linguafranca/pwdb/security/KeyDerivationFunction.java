@@ -12,7 +12,7 @@ public interface KeyDerivationFunction {
     UUID getKdfUuid();
 
     /**
-     * Transform a key using this key derivation faunction
+     * Transform a key using this key derivation function
      *
      * @param key             the key to transform
      * @param transformParams the parameters defining the way the transformation is to be carried out
@@ -24,4 +24,9 @@ public interface KeyDerivationFunction {
      * Create default KDF parameters
      */
     VariantDictionary createKdfParameters();
+
+    /**
+     * Get a name
+     */
+    String getName();
 }

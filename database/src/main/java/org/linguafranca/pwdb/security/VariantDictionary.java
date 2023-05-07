@@ -39,7 +39,7 @@ public class VariantDictionary {
         INT32(0xC),
         INT64(0xD),
         STRING(0x18), // UTF-8, without BOM, without null terminator
-        ARRRAY(0x42);
+        ARRAY(0x42);
 
         private final byte value;
 
@@ -62,14 +62,14 @@ public class VariantDictionary {
     @Immutable
     public static class Entry {
         private final byte type;
-        private final @NotNull byte[] value;
+        private final byte @NotNull [] value;
         private final ByteOrder byteOrder;
 
-        public Entry(EntryType entryType, @NotNull byte[] value) {
+        public Entry(EntryType entryType, byte @NotNull [] value) {
             this(entryType, value, ByteOrder.LITTLE_ENDIAN);
         }
 
-        public Entry(EntryType entryType, @NotNull byte[] value, ByteOrder byteOrder) {
+        public Entry(EntryType entryType, byte @NotNull [] value, ByteOrder byteOrder) {
             this.type = entryType.value;
             this.value = checkNotNull(value, vnn);
             this.byteOrder = byteOrder;
@@ -101,7 +101,7 @@ public class VariantDictionary {
             return ByteBuffer.wrap(value).order(byteOrder).getInt();
         }
 
-        public @NotNull byte[] asByteArray() {
+        public byte @NotNull [] asByteArray() {
             return value;
         }
     }
@@ -121,10 +121,8 @@ public class VariantDictionary {
      */
     public VariantDictionary copy() {
         VariantDictionary vd = new VariantDictionary(this.version);
-        for (Map.Entry<String, VariantDictionary.Entry> e : this.entries.entrySet()) {
-            vd.entries.put(e.getKey(), e.getValue());
-        }
-        return null;
+        vd.entries.putAll(this.entries);
+        return vd;
     }
 
     /**
@@ -174,7 +172,7 @@ public class VariantDictionary {
      * @param type  the data type of the entry
      * @param value a buffer containing an appropriate entry
      */
-    public void put(@NotNull String key, EntryType type, @NotNull byte[] value) {
+    public void put(@NotNull String key, EntryType type, byte @NotNull [] value) {
         entries.put(checkNotNull(key), new Entry(type, checkNotNull(value)));
     }
 
@@ -186,18 +184,18 @@ public class VariantDictionary {
         ByteBuffer bb = ByteBuffer.wrap(buf);
         bb.putLong(0, uuid.getMostSignificantBits());
         bb.putLong(8, uuid.getLeastSignificantBits());
-        entries.put(checkNotNull(key, knn), new Entry(ARRRAY, buf));
+        entries.put(checkNotNull(key, knn), new Entry(ARRAY, buf));
     }
 
     /**
      * Put a byte array under the key defined
      */
-    public void putByteArray(@NotNull String key, @NotNull byte[] value) {
-        entries.put(checkNotNull(key, knn), new Entry(ARRRAY, value));
+    public void putByteArray(@NotNull String key, byte @NotNull [] value) {
+        entries.put(checkNotNull(key, knn), new Entry(ARRAY, value));
     }
 
     /**
-     * Put a long as an signed64 under the key defined
+     * Put a long as a signed64 under the key defined
      */
     public void putLong(@NotNull String key, long value) {
         byte[] buf = new byte[8];

@@ -17,10 +17,11 @@
 package org.linguafranca.pwdb.kdbx.dom;
 
 import org.jetbrains.annotations.NotNull;
+import org.linguafranca.pwdb.StreamConfiguration;
 import org.linguafranca.pwdb.base.AbstractDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
-import org.linguafranca.pwdb.kdbx.StreamFormat;
+import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.Credentials;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -47,14 +48,14 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
     private Element dbRootGroup;
     Element dbMeta;
 
-    private DomSerializableDatabase domDatabase = DomSerializableDatabase.createEmptyDatabase();
+    private final DomSerializableDatabase domDatabase = DomSerializableDatabase.createEmptyDatabase();
 
 
-    public DomDatabaseWrapper () throws IOException {
+    public DomDatabaseWrapper ()  {
         init();
     }
 
-    public DomDatabaseWrapper (StreamFormat streamFormat, Credentials credentials, InputStream inputStream) throws IOException {
+    public <C extends StreamConfiguration> DomDatabaseWrapper (StreamFormat<C> streamFormat, Credentials credentials, InputStream inputStream) throws IOException {
         streamFormat.load(domDatabase, credentials, inputStream);
         init();
     }
@@ -65,7 +66,12 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
                 checkNotNull(inputStream, "InputStream must not be null"));
     }
 
-    private void init() {
+    public static <C extends StreamConfiguration> DomDatabaseWrapper load (StreamFormat<C> streamFormat, @NotNull Credentials credentials, @NotNull InputStream inputStream) throws IOException {
+        return new DomDatabaseWrapper(streamFormat, credentials, inputStream);
+    }
+
+
+        private void init() {
         document = domDatabase.getDoc();
         try {
             dbRootGroup = ((Element) DomHelper.xpath.evaluate("/KeePassFile/Root/Group", document, XPathConstants.NODE));
@@ -81,7 +87,7 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
         setDirty(false);
     }
 
-    public void save(StreamFormat streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
+    public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
         streamFormat.save(domDatabase, credentials, outputStream);
         setDirty(false);
     }
@@ -91,7 +97,7 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
         if (protectionElement == null) {
             return false;
         }
-        return Boolean.valueOf(protectionElement.getTextContent());
+        return Boolean.parseBoolean(protectionElement.getTextContent());
     }
 
     @Override
@@ -123,9 +129,9 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
 
     @Override
     public DomGroupWrapper getRecycleBin() {
-        String UUIDcontent = getElementContent(RECYCLE_BIN_UUID_ELEMENT_NAME, dbMeta);
-        if (UUIDcontent != null){
-            final UUID uuid = Helpers.uuidFromBase64(UUIDcontent);
+        String UuidContent = getElementContent(RECYCLE_BIN_UUID_ELEMENT_NAME, dbMeta);
+        if (UuidContent != null){
+            final UUID uuid = Helpers.uuidFromBase64(UuidContent);
             if (uuid.getLeastSignificantBits() != 0 && uuid.getMostSignificantBits() != 0) {
                 for (DomGroupWrapper g: getRootGroup().getGroups()) {
                     if (g.getUuid().equals(uuid)) {
@@ -151,7 +157,7 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
 
     @Override
     public boolean isRecycleBinEnabled() {
-        return Boolean.valueOf(getElementContent(RECYCLE_BIN_ENABLED_ELEMENT_NAME, dbMeta));
+        return Boolean.parseBoolean(getElementContent(RECYCLE_BIN_ENABLED_ELEMENT_NAME, dbMeta));
     }
 
     @Override

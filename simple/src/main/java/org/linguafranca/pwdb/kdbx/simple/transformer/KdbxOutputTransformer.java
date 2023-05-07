@@ -17,7 +17,7 @@
 package org.linguafranca.pwdb.kdbx.simple.transformer;
 
 import org.linguafranca.pwdb.kdbx.Helpers;
-import org.linguafranca.pwdb.kdbx.StreamEncryptor;
+import org.linguafranca.pwdb.security.StreamEncryptor;
 import org.linguafranca.xml.XmlEventTransformer;
 
 import javax.xml.namespace.QName;

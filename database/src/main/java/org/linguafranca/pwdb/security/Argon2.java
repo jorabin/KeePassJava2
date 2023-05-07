@@ -1,13 +1,12 @@
 package org.linguafranca.pwdb.security;
 
-import java.nio.charset.StandardCharsets;
+import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
+import org.bouncycastle.crypto.params.Argon2Parameters;
+
 import java.security.SecureRandom;
 import java.util.UUID;
 
 import static org.linguafranca.pwdb.security.Argon2.VariantDictionaryKeys.*;
-
-import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
-import org.bouncycastle.crypto.params.Argon2Parameters;
 
 
 /**
@@ -21,6 +20,8 @@ public class Argon2 implements KeyDerivationFunction {
      * UUID indicating that Argon is being used as the KDF
      */
     private static final UUID argon2_kdf = UUID.fromString("EF636DDF-8C29-444B-91F7-A9A403E30A0C");
+
+    private static final String name = "Argon2";
 
     /**
      * hide constructor
@@ -56,6 +57,11 @@ public class Argon2 implements KeyDerivationFunction {
     }
 
     @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
     public byte[] getTransformedKey(byte[] digest, VariantDictionary argonParameterKeys) {
         int version = argonParameterKeys.mustGet(paramVersion).asInteger();
         byte[] salt = argonParameterKeys.mustGet(paramSalt).asByteArray();
@@ -87,7 +93,7 @@ public class Argon2 implements KeyDerivationFunction {
         vd.putLong("I", 2);
         vd.putLong("M", 64 * 1024 * 1024);
         vd.putUuid("$UUID", Argon2.argon2_kdf);
-        vd.put("S", VariantDictionary.EntryType.ARRRAY, random.generateSeed(32));
+        vd.put("S", VariantDictionary.EntryType.ARRAY, random.generateSeed(32));
         return vd;
     }
 }

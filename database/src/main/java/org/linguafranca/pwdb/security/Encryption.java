@@ -16,6 +16,8 @@
 
 package org.linguafranca.pwdb.security;
 
+import org.linguafranca.pwdb.StreamFormat;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.InputStream;
@@ -28,7 +30,7 @@ import java.util.UUID;
 /**
  * Contains the key transform functions and cipher algorithms used in other modules.
  * <p>
- * Also some convenience utilities that hide the checked exceptions that would otherwise need to be checked for
+ * Also, some convenience utilities that hide the checked exceptions that would otherwise need to be checked for
  * when using digests.
  */
 public class Encryption {
@@ -132,6 +134,11 @@ public class Encryption {
         public VariantDictionary createKdfParameters() {
             return kdf.createKdfParameters();
         }
+
+        @Override
+        public String getName(){
+            return kdf.getName();
+        }
     }
 
     /**
@@ -139,7 +146,7 @@ public class Encryption {
      * Enum constants forward to underlying implementation.
      */
     public enum Cipher implements CipherAlgorithm {
-        CHACHA(ChaCha.getInstance()),
+        CHA_CHA_20(ChaCha.getInstance()),
         AES(Aes.getInstance());
 
         private final CipherAlgorithm ef;
@@ -170,6 +177,11 @@ public class Encryption {
         }
 
         @Override
+        public String getName(){
+            return this.ef.getName();
+        }
+
+        @Override
         public InputStream getDecryptedInputStream(InputStream encryptedInputStream, byte[] key, byte[] iv) {
             return ef.getDecryptedInputStream(encryptedInputStream, key, iv);
         }
@@ -178,5 +190,51 @@ public class Encryption {
         public OutputStream getEncryptedOutputStream(OutputStream decryptedOutputStream, byte[] key, byte[] iv) {
             return ef.getEncryptedOutputStream(decryptedOutputStream, key, iv);
         }
+    }
+
+    /**
+     * The ordinals represent various types of encryption that may
+     * be applied to fields within the unencrypted data
+     *
+     * @see StreamFormat
+     */
+    @SuppressWarnings("WeakerAccess, unused")
+    public enum ProtectedStreamAlgorithm {
+        NONE(0), ARC_FOUR(1), SALSA_20(2), CHA_CHA_20(3);
+
+        private final int value;
+
+        ProtectedStreamAlgorithm(int value) {
+            this.value = value;
+        }
+
+        public static ProtectedStreamAlgorithm getAlgorithm(int innerRandomStreamId) {
+            for (ProtectedStreamAlgorithm pse: values()) {
+                if (pse.value == innerRandomStreamId) {
+                    return pse;
+                }
+            }
+            throw new IllegalArgumentException("Inner Random Stream Id " + innerRandomStreamId + "is not known");
+        }
+
+        public static StreamEncryptor getStreamEncryptor(ProtectedStreamAlgorithm psa, byte [] key) {
+
+            switch (psa) {
+                case NONE: {
+                    throw new IllegalStateException("Inner stream encoding of NONE");
+                }
+                case ARC_FOUR: {
+                    throw new UnsupportedOperationException("Arc Four inner stream not supported");
+                }
+                case SALSA_20: {
+                    return new StreamEncryptor.Salsa20(key);
+                }
+                case CHA_CHA_20: {
+                    return new StreamEncryptor.ChaCha20(key);
+                }
+            }
+            throw new IllegalStateException("Inner stream encoding unsupported");
+        }
+
     }
 }

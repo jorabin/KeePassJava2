@@ -31,7 +31,7 @@ import java.io.OutputStream;
 public class DomBinaryPropertyV4Test extends BinaryPropertyChecks {
 
     public DomBinaryPropertyV4Test() throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment-ChaCha20-Argon2.kdbx");
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-ChaCha20-Argon2-Attachment.kdbx");
         database = DomDatabaseWrapper.load(new KdbxCreds("123".getBytes()), inputStream);
     }
 

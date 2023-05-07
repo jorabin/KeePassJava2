@@ -1,0 +1,1 @@
+This was rasied as Issue 38 - Keyfile is version 2, which was not supported.

@@ -27,7 +27,8 @@ public class Aes implements CipherAlgorithm, KeyDerivationFunction {
 
     /** UUID specifying that AES is to be used as the Key Derivation Function in KDBX */
     private static final UUID KDF = UUID.fromString("C9D9F39A-628A-4460-BF74-0D08C18A4FEA");
-    private static VariantDictionary kdfParameters = new VariantDictionary((short) 1);
+    private static final String name = "AES";
+    private static final VariantDictionary kdfParameters = new VariantDictionary((short) 1);
     static {
         kdfParameters.putUuid("$UUID", KDF);
         kdfParameters.putLong(ParamRounds, 6000L);
@@ -63,6 +64,10 @@ public class Aes implements CipherAlgorithm, KeyDerivationFunction {
     @Override
     public UUID getCipherUuid() {
         return CIPHER;
+    }
+
+    public String getName(){
+        return name;
     }
 
     @Override

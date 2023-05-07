@@ -16,10 +16,12 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import com.google.common.io.CharStreams;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import static org.junit.Assert.assertEquals;
@@ -37,13 +39,20 @@ public class KdbxSerializerTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
         Credentials credentials = new KdbxCreds("123".getBytes());
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
-        byte[] buffer = new byte[1024];
-        while ( decryptedInputStream.available() > 0) {
-            int read = decryptedInputStream.read(buffer);
-            if (read == -1) break;
-            System.out.write(buffer, 0, read);
-        }
+        System.out.println(CharStreams.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
     }
+
+    /**
+     * Test that we can read a kdbx v4 file and list the XML to console
+     */
+    @Test
+    public void testGetPlainTextInputStream2() throws Exception {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-ChaCha20-AES.kdbx");
+        Credentials credentials = new KdbxCreds("123".getBytes());
+        InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
+        System.out.println(CharStreams.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
+    }
+
 
     /**
      * Test that we can write a KDBX 3 file containing "Hello World"
@@ -81,8 +90,11 @@ public class KdbxSerializerTest {
         outputStream.flush();
         outputStream.close();
 
-        InputStream inputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), new FileInputStream(tempFile));
-        Scanner scanner = new Scanner(inputStream);
-        assertEquals("Hello World", scanner.nextLine());
+        KdbxHeader kdbxHeader1 = new KdbxHeader();
+        try (InputStream inputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader1, new FileInputStream(tempFile))){
+            assertEquals(4, kdbxHeader1.getVersion());
+            Scanner scanner = new Scanner(inputStream);
+            assertEquals("Hello World", scanner.nextLine());
+        }
     }
 }

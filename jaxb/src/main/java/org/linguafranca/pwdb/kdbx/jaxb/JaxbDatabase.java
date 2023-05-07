@@ -18,11 +18,10 @@ package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.StreamConfiguration;
+import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.base.AbstractDatabase;
-import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
-import org.linguafranca.pwdb.kdbx.StreamFormat;
-import org.linguafranca.pwdb.kdbx.jaxb.binding.Binaries;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.ObjectFactory;
 
@@ -40,9 +39,9 @@ import java.util.UUID;
 
 public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, JaxbEntry, JaxbIcon> {
 
-    private KeePassFile keePassFile;
-    private ObjectFactory objectFactory = new ObjectFactory();
-    private JaxbGroup root;
+    private final KeePassFile keePassFile;
+    private final ObjectFactory objectFactory = new ObjectFactory();
+    private final JaxbGroup root;
 
     public JaxbDatabase() {
         this(createEmptyDatabase().getKeePassFile());
@@ -61,12 +60,11 @@ public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, Jaxb
     }
 
     public static JaxbDatabase load(Credentials creds, InputStream inputStream) {
-        StreamFormat format = new KdbxStreamFormat();
-        return load(format, creds, inputStream);
+        return load(new KdbxStreamFormat(), creds, inputStream);
     }
 
     @NotNull
-    public static JaxbDatabase load(StreamFormat format, Credentials creds, InputStream inputStream) {
+    public static <C extends StreamConfiguration> JaxbDatabase load(StreamFormat<C> format, Credentials creds, InputStream inputStream) {
         JaxbSerializableDatabase db = new JaxbSerializableDatabase();
         try {
             format.load(db, creds, inputStream);
@@ -81,7 +79,7 @@ public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, Jaxb
         save(new KdbxStreamFormat(), creds, outputStream);
     }
 
-    public void save(StreamFormat format, Credentials creds, OutputStream outputStream) throws IOException {
+    public <C extends StreamConfiguration> void save(StreamFormat<C> format, Credentials creds, OutputStream outputStream) throws IOException {
         JaxbSerializableDatabase jsd = new JaxbSerializableDatabase();
         jsd.setKeePassFile(this.keePassFile);
         format.save(jsd, creds, outputStream);

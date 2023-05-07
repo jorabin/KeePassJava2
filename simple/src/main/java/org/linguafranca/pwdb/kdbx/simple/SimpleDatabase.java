@@ -16,9 +16,11 @@
 
 package org.linguafranca.pwdb.kdbx.simple;
 
+import org.linguafranca.pwdb.StreamConfiguration;
+import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.base.AbstractDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
-import org.linguafranca.pwdb.kdbx.StreamEncryptor;
+import org.linguafranca.pwdb.security.StreamEncryptor;
 import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxInputTransformer;
 import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxOutputTransformer;
 import org.linguafranca.pwdb.kdbx.KdbxHeader;
@@ -269,6 +271,12 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
+                                                     OutputStream outputStream) throws IOException{
+        throw new UnsupportedOperationException();
     }
 
     @Override

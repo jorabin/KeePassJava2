@@ -16,12 +16,8 @@
 
 package org.linguafranca.pwdb.kdb;
 
-import org.linguafranca.pwdb.Group;
-import org.linguafranca.pwdb.Icon;
-import org.linguafranca.pwdb.Visitor;
+import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.base.AbstractDatabase;
-import org.linguafranca.pwdb.Credentials;
-import org.linguafranca.pwdb.Entry;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +32,7 @@ import java.util.UUID;
  */
 public class KdbDatabase extends AbstractDatabase<KdbDatabase, KdbGroup, KdbEntry, KdbIcon> {
     private String description;
-    private KdbGroup rootGroup;
+    private final KdbGroup rootGroup;
 
     static SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -103,8 +99,14 @@ public class KdbDatabase extends AbstractDatabase<KdbDatabase, KdbGroup, KdbEntr
     }
 
     @Override
-    public void save(Credentials credentials, OutputStream outputStream) throws IOException {
+    public void save(Credentials credentials, OutputStream outputStream) {
         throw new UnsupportedOperationException("Cannot save KDB files in this implementation");
+    }
+
+    @Override
+    public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
+                                                     OutputStream outputStream) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

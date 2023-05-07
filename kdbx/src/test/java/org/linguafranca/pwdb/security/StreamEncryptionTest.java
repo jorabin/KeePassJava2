@@ -17,8 +17,7 @@
 package org.linguafranca.pwdb.security;
 
 import org.junit.Test;
-import org.linguafranca.pwdb.kdbx.StreamEncryptor;
-import org.linguafranca.pwdb.kdbx.StreamEncryptor.*;
+import org.linguafranca.pwdb.security.StreamEncryptor.*;
 
 import java.security.SecureRandom;
 

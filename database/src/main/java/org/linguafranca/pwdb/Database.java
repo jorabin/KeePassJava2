@@ -32,7 +32,7 @@ import java.util.UUID;
  * to one database cannot in general be added to another database, they need to be
  * imported using {@link #newGroup(Group)} and {@link #newEntry(Entry)}, or implicitly
  * imported using {@link Group#addGroup(Group)}  which automatically create Groups and
- * Entries (as well as importing sub groups and their entries). {@link Group#addEntry(Entry)}
+ * Entries (as well as importing subgroups and their entries). {@link Group#addEntry(Entry)}
  * allows arbitrary importing from other databases.
  *
  * <p>Databases may be navigated directly from the root {@link #getRootGroup()},
@@ -77,7 +77,7 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
      * @param group the group to copy
      * @return the group created
      */
-    G newGroup(Group group);
+    G newGroup(Group<?,?,?,?> group);
 
     /**
      * Create a new Entry
@@ -157,8 +157,8 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
     void enableRecycleBin(boolean enable);
 
     /**
-     * If the recycle bin is enabled or it's disabled but there is a pre-existing
-     * recycle bin, then return the recycle bin, creating one if necessary.
+     * If the recycle bin is enabled (or it's disabled but there is a pre-existing
+     * recycle bin), then return the recycle bin, creating one if necessary.
      * If the recycle bin is disabled and there is no pre-existing recycle bin
      * or if recycle bin is not supported then return null.
      * @see #supportsRecycleBin()
@@ -232,9 +232,14 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
     boolean isDirty();
 
     /**
-     * Save the database to a stream
+     * Save the database to a stream using default format
      */
     void save(Credentials credentials, OutputStream outputStream) throws IOException;
+
+    /**
+     * Save the database to a stream
+     */
+    <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) throws IOException;
 
     /**
      * Properties to encrypt

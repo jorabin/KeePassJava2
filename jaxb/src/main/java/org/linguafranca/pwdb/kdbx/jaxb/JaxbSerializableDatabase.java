@@ -17,10 +17,10 @@
 package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.apache.commons.codec.binary.Base64;
+import org.linguafranca.pwdb.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
-import org.linguafranca.pwdb.kdbx.SerializableDatabase;
-import org.linguafranca.pwdb.kdbx.StreamEncryptor;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
+import org.linguafranca.pwdb.security.StreamEncryptor;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -29,7 +29,7 @@ import javax.xml.bind.Unmarshaller;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
 
     protected KeePassFile keePassFile;
     private StreamEncryptor encryption;
-    private ObjectFactory objectFactory = new ObjectFactory();
+    private final ObjectFactory objectFactory = new ObjectFactory();
 
 
     @Override
@@ -52,24 +52,20 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
             u.setListener(new Unmarshaller.Listener() {
                 @Override
                 public void afterUnmarshal(Object target, Object parent) {
-                    try {
-                        if (target instanceof StringField.Value) {
-                            StringField.Value value = (StringField.Value) target;
-                            if (value.getProtected() !=null && value.getProtected()) {
-                                byte[] encrypted = Base64.decodeBase64(value.getValue().getBytes());
-                                String decrypted = new String(encryption.decrypt(encrypted), "UTF-8");
-                                value.setValue(decrypted);
-                                value.setProtected(false);
-                            }
+                    if (target instanceof StringField.Value) {
+                        StringField.Value value = (StringField.Value) target;
+                        if (value.getProtected() !=null && value.getProtected()) {
+                            byte[] encrypted = Base64.decodeBase64(value.getValue().getBytes());
+                            String decrypted = new String(encryption.decrypt(encrypted), StandardCharsets.UTF_8);
+                            value.setValue(decrypted);
+                            value.setProtected(false);
                         }
-                        if (target instanceof JaxbGroupBinding && (parent instanceof JaxbGroupBinding)) {
-                            ((JaxbGroupBinding) target).parent = ((JaxbGroupBinding) parent);
-                        }
-                        if (target instanceof JaxbEntryBinding && (parent instanceof JaxbGroupBinding)) {
-                            ((JaxbEntryBinding) target).parent = ((JaxbGroupBinding) parent);
-                        }
-                    } catch (UnsupportedEncodingException e) {
-                        throw new IllegalStateException();
+                    }
+                    if (target instanceof JaxbGroupBinding && (parent instanceof JaxbGroupBinding)) {
+                        ((JaxbGroupBinding) target).parent = ((JaxbGroupBinding) parent);
+                    }
+                    if (target instanceof JaxbEntryBinding && (parent instanceof JaxbGroupBinding)) {
+                        ((JaxbEntryBinding) target).parent = ((JaxbGroupBinding) parent);
                     }
                 }
             });
@@ -105,18 +101,14 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
             u.setListener(new Marshaller.Listener() {
                 @Override
                 public void beforeMarshal(Object source) {
-                    try {
-                        if (source instanceof StringField) {
-                            StringField field = (StringField) source;
-                            if (toEncrypt.contains(field.getKey())) {
-                                byte[] encrypted = encryption.encrypt(field.getValue().getValue().getBytes());
-                                String b64 = new String(Base64.encodeBase64(encrypted), "UTF-8");
-                                field.getValue().setValue(b64);
-                                field.getValue().setProtected(true);
-                            }
+                    if (source instanceof StringField) {
+                        StringField field = (StringField) source;
+                        if (toEncrypt.contains(field.getKey())) {
+                            byte[] encrypted = encryption.encrypt(field.getValue().getValue().getBytes());
+                            String b64 = new String(Base64.encodeBase64(encrypted), StandardCharsets.UTF_8);
+                            field.getValue().setValue(b64);
+                            field.getValue().setProtected(true);
                         }
-                    } catch (UnsupportedEncodingException e) {
-                        throw new IllegalStateException();
                     }
                 }
             });
@@ -151,6 +143,16 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
         addBinary(keePassFile, objectFactory, index, value);
     }
 
+    @Override
+    public byte[] getBinary(int index) {
+        return keePassFile.getMeta().getBinaries().getBinary().get(index).getValue();
+    }
+
+    @Override
+    public int getBinaryCount() {
+        return keePassFile.getMeta().getBinaries().getBinary().size();
+    }
+
     public static void addBinary(KeePassFile keePassFile, ObjectFactory objectFactory, int index, byte[] value) {
         // create a new binary to put in the store
         Binaries.Binary newBin = objectFactory.createBinariesBinary();
@@ -162,6 +164,8 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
         }
         keePassFile.getMeta().getBinaries().getBinary().add(newBin);
     }
+
+
 
     public KeePassFile getKeePassFile() {
         return keePassFile;

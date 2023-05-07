@@ -23,13 +23,10 @@ import org.linguafranca.pwdb.kdbx.Helpers;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-//import javax.xml.bind.DatatypeConverter;
-
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -40,8 +37,6 @@ import java.util.*;
 class DomHelper {
 
     static XPath xpath = XPathFactory.newInstance().newXPath();
-
-//    static SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
 
     static final String GROUP_ELEMENT_NAME = "Group";
     static final String ENTRY_ELEMENT_NAME = "Entry";
@@ -231,6 +226,27 @@ class DomHelper {
         binary.setTextContent(b64);
         binary.setAttribute("Compressed", "True");
         binary.setAttribute("ID", index.toString());
+    }
+
+    public static String getBinary(Element documentElement, Integer index) {
+        Element binaries = getElement("Meta/Binaries", documentElement,false);
+        if (Objects.isNull(binaries)){
+            throw new IllegalArgumentException("No binaries found");
+        }
+        for (int i = 0; i < binaries.getChildNodes().getLength(); i++){
+            if (((Element) binaries.getChildNodes().item(i)).getAttribute("ID").equals(index.toString())) {
+                return ((Element) binaries.getChildNodes().item(i)).getTextContent();
+            }
+        }
+        throw new IllegalArgumentException("No binary with that index found");
+    }
+
+    public static int getBinaryCount(Element documentElement) {
+        Element binaries = getElement("Meta/Binaries", documentElement,false);
+        if (Objects.isNull(binaries)) {
+            return 0;
+        }
+        return binaries.getChildNodes().getLength();
     }
 
     @NotNull

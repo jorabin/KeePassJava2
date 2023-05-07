@@ -19,7 +19,6 @@ package org.linguafranca.pwdb.kdbx.dom;
 import org.linguafranca.pwdb.checks.SaveAndReloadChecks;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.StreamFormat;
 import org.linguafranca.pwdb.Credentials;
 
 import java.io.IOException;
@@ -33,11 +32,7 @@ public class DomSaveAndReloadTest extends SaveAndReloadChecks {
 
     @Override
     public Database getDatabase() {
-        try {
-            return new DomDatabaseWrapper();
-        } catch (IOException e) {
-            throw new IllegalStateException();
-        }
+        return new DomDatabaseWrapper();
     }
     @Override
     public Database getDatabase(String name, Credentials credentials) throws IOException {

@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx;
 
 import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.security.StreamEncryptor;
 import org.xml.sax.*;
 
 import javax.xml.parsers.ParserConfigurationException;

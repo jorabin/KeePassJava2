@@ -33,7 +33,7 @@ import java.io.OutputStream;
 public class JaxbBinaryPropertyV4Test extends BinaryPropertyChecks {
 
     public JaxbBinaryPropertyV4Test() throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment-ChaCha20-Argon2.kdbx");
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-ChaCha20-Argon2-Attachment.kdbx");
         database = JaxbDatabase.load(new KdbxCreds("123".getBytes()), inputStream);
     }
 

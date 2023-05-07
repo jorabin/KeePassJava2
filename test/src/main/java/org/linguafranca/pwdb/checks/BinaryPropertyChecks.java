@@ -46,7 +46,7 @@ import static org.junit.Assert.*;
  * When used as a test suite for a concrete implementation, subclass and name the class *Test etc to conform
  * with Junit rules
  * <p>
- * Subclasses should test both V3 KDBX files (Attachment.kdbx) and V4 (Attachment-ChaCha20-Argon2.kdbx) since
+ * Subclasses should test both V3 KDBX files (Attachment.kdbx) and V4 (V4-ChaCha20-Argon2-Attachment.kdbx) since
  * attachments are handled differently in the two versions.
  *
  * @author jo
@@ -135,7 +135,7 @@ public abstract class BinaryPropertyChecks {
         assertTrue(entry.removeBinaryProperty("test"));
         // false that same property was removed
         assertFalse(entry.removeBinaryProperty("test"));
-        // false that non existent was removed
+        // false that non-existent was removed
         assertFalse(entry.removeBinaryProperty("test-test"));
         // same number of properties as we started with
         assertEquals(1, entry.getBinaryPropertyNames().size());

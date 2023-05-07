@@ -18,8 +18,8 @@ package org.linguafranca.pwdb.kdbx.dom;
 
 
 import org.linguafranca.pwdb.kdbx.Helpers;
-import org.linguafranca.pwdb.kdbx.SerializableDatabase;
-import org.linguafranca.pwdb.kdbx.StreamEncryptor;
+import org.linguafranca.pwdb.SerializableDatabase;
+import org.linguafranca.pwdb.security.StreamEncryptor;
 import org.apache.commons.codec.binary.Base64;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -38,9 +38,7 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.SecureRandom;
-import java.text.ParseException;
-import java.util.Date;
+import java.nio.charset.StandardCharsets;
 
 /**
  * This class is an XML DOM implementation of a KDBX database. The data is maintained as a DOM,
@@ -59,19 +57,15 @@ public class DomSerializableDatabase implements SerializableDatabase {
 
     private DomSerializableDatabase() {}
 
-    public static DomSerializableDatabase createEmptyDatabase() throws IOException {
+    public static DomSerializableDatabase createEmptyDatabase() {
         DomSerializableDatabase result = new DomSerializableDatabase();
         // read in the template KeePass XML database
-        result.load(result.getClass().getClassLoader().getResourceAsStream("base.kdbx.xml"));
         try {
-            // replace all placeholder dates with now (this is now already done in the loader)
-/*
-            String now = DomHelper.dateFormatter.format(new Date());
-            NodeList list = (NodeList) DomHelper.xpath.evaluate("//*[contains(text(),'${creationDate}')]", result.doc.getDocumentElement(), XPathConstants.NODESET);
-            for (int i = 0; i < list.getLength(); i++) {
-                list.item(i).setTextContent(now);
-            }
-*/
+            result.load(result.getClass().getClassLoader().getResourceAsStream("base.kdbx.xml"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
             // set the root group UUID
             Node uuid = (Node) DomHelper.xpath.evaluate("//"+ DomHelper.UUID_ELEMENT_NAME, result.doc.getDocumentElement(), XPathConstants.NODE);
             uuid.setTextContent(DomHelper.base64RandomUuid());
@@ -96,7 +90,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
                 String base64 = DomHelper.getElementContent(".", element);
                 // Android compatibility
                 byte[] encrypted = Base64.decodeBase64(base64.getBytes());
-                String decrypted = new String(encryption.decrypt(encrypted), "UTF-8");
+                String decrypted = new String(encryption.decrypt(encrypted), StandardCharsets.UTF_8);
                 DomHelper.setElementContent(".", element, decrypted);
                 element.removeAttribute("Protected");
             }
@@ -112,38 +106,21 @@ public class DomSerializableDatabase implements SerializableDatabase {
         }
     }
 
-/*
-    public void dateConvert() {
-        try {
-            // finding all elements name ending Changed and Time
-            NodeList dateContent = (NodeList) DomHelper.xpath.evaluate("//*[substring(local-name(), string-length(local-name()) -3) = 'Time']", doc, XPathConstants.NODESET);
-            processDates(dateContent);
-
-            dateContent = (NodeList) DomHelper.xpath.evaluate("//*[substring(local-name(), string-length(local-name()) -6) = 'Changed']", doc, XPathConstants.NODESET);
-            processDates(dateContent);
-        } catch (XPathExpressionException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-*/
-
     @Override
     public void addBinary(int index, byte[] payload) {
         DomHelper.addBinary(doc.getDocumentElement(), Helpers.encodeBase64Content(payload, true),index);
     }
 
-/*
-    private void processDates(NodeList dateContent) {
-        Date now = new Date();
-        for (int i = 0; i < dateContent.getLength(); i++){
-            Element element = ((Element) dateContent.item(i));
-            String content = DomHelper.getElementContent(".", element);
-            Date d = content == null || content.equals("${creationDate}") ? now :Helpers.toDate(content);
-            DomHelper.setElementContent(".", element, DomHelper.dateFormatter.format(d));
-        }
+    @Override
+    public byte[] getBinary(int index) {
+        return Helpers.decodeBase64Content(DomHelper.getBinary(doc.getDocumentElement(), index).getBytes(StandardCharsets.UTF_8), true);
     }
 
-*/
+    @Override
+    public int getBinaryCount() {
+        return DomHelper.getBinaryCount(doc.getDocumentElement());
+    }
+
     @Override
     public void save(OutputStream outputStream) {
         Document copyDoc = (Document) doc.cloneNode(true);
@@ -180,6 +157,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
             //factory.setAttribute("indent-number", "4");
             Transformer transformer = factory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            //noinspection HttpUrlsUsage
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
             transformer.transform(xmlSource, outputTarget);
         } catch (TransformerException e) {
@@ -192,7 +170,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
     private void prepareProtection(Document doc, String protect) throws XPathExpressionException {
         // does this require encryption
         String query = String.format(protectQuery, protect);
-        if (!((String) DomHelper.xpath.evaluate(query, doc, XPathConstants.STRING)).toLowerCase().equals("true")) {
+        if (!((String) DomHelper.xpath.evaluate(query, doc, XPathConstants.STRING)).equalsIgnoreCase("true")) {
             return;
         }
         // mark the field as Protected but don't actually encrypt yet, that comes later
