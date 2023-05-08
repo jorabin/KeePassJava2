@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -99,7 +100,18 @@ public class KdbxHeader implements StreamConfiguration {
     /* the bytes that compose the outer header, required for V4 to calculate the HMac */
     private byte[] headerBytes;
 
-    final SecureRandom random;
+    // Make static and try to use SHA1PRNG per
+    // https://stackoverflow.com/questions/137212/how-to-deal-with-a-slow-securerandom-generator
+    // and comment on issue #12. If you don't like this then you can of course set this
+    // to something else
+    public static SecureRandom random;
+    static {
+        try {
+            random = SecureRandom.getInstance("SHA1PRNG");
+        } catch (NoSuchAlgorithmException e) {
+            random = new SecureRandom();
+        }
+    }
     /**
      * Provides for choice of version number and crypto options for V3 and V4
      */
@@ -169,8 +181,6 @@ public class KdbxHeader implements StreamConfiguration {
 
 
     public KdbxHeader(KdbxHeaderOptions opts) {
-        random = new SecureRandom();
-
         this.version = opts.getVersion();
         setCipherAlgorithm(opts.getCipherAlgorithm());
         setKeyDerivationFunction(opts.getKeyDerivationFunction());
