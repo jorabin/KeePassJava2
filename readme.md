@@ -3,7 +3,9 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent) 
 
 A Java 8 API for databases compatible with the renowned [KeePass](http://keepass.info) password
-safe for Windows.
+safe for Windows. This is a "headless" implementation - if you want something with a UI
+then [KeePassXC](https://keepassxc.org/) and [KeePassDX](https://www.keepassdx.com/) could
+be just the things for you.
 
 Features to date:
 
@@ -160,6 +162,10 @@ The Simple XML implementation additionally depends on:
 
 - [Simple XML Serialisation Framework](http://simple.sourceforge.net/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
 - [Faster XML Aalto](https://github.com/FasterXML/aalto-xml) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0.txt)).
+
+On Java 11 and later Jaxb implementation depends on:
+
+- [JAXB](https://javaee.github.io/jaxb-v2/)
 
 It also depends on SLF4J and Junit for tests.
 
