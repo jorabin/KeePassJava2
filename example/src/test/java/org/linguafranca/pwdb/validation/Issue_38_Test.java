@@ -1,7 +1,9 @@
-package org.linguafranca.pwdb.kdbx.dom;
+package org.linguafranca.pwdb.validation;
 
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
+import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
+import org.linguafranca.pwdb.kdbx.dom.DomEntryWrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,12 +12,12 @@ import java.util.List;
 /**
  * Bug report on GitHub, the Keyfile is Version 2 (Hex)
  */
-public class Issue38Test {
+public class Issue_38_Test {
 
     @Test
     public void testV2Keyfile() throws IOException {
-        InputStream databaseStream = Issue38Test.class.getClassLoader().getResourceAsStream("issue-38/Database/Database.kdbx");
-        InputStream keyStream = Issue38Test.class.getClassLoader().getResourceAsStream("issue-38/Database/Database.keyx");
+        InputStream databaseStream = Issue_38_Test.class.getClassLoader().getResourceAsStream("issue-38/Database/Database.kdbx");
+        InputStream keyStream = Issue_38_Test.class.getClassLoader().getResourceAsStream("issue-38/Database/Database.keyx");
         assert keyStream != null;
         KdbxCreds creds = new KdbxCreds("MyPassword".getBytes(), keyStream);
         assert databaseStream != null;
