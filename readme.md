@@ -34,7 +34,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
 After a number of years of neglect, the project is (May 2023) back in development.
 
-The current code is version 3.2-SNAPSHOT. This is on the main branch. It has 
+The current code is version 2.2-SNAPSHOT. This is on the main branch. It has 
 not yet been distributed to Maven. See [Build from Source](#build-from-source)
 
 Key updates:
@@ -46,7 +46,7 @@ See the [changelog](CHANGELOG.md) for more details.
 
 ## Maven Coordinates
 
-The composite POM for the last release (3.1), Java 7 compatible, is
+The composite POM for the last release (2.1), Java 7 compatible, is
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
@@ -61,7 +61,7 @@ The composite POM for the last release (3.1), Java 7 compatible, is
 
 ## Java Version
 
-From release 3.2 it requires Java 1.8. Earlier versions require Java 1.7.
+From release 2.2 it requires Java 1.8. Earlier versions require Java 1.7.
 
 ## Quick Start
 
@@ -138,7 +138,11 @@ exactly.
 KeePass is in effect defined by the code that Dominik writes to create and maintain the project.
 Hence, there is not much by way of definitive specification of KeePass files other than that code. There 
 is a discussion of the [differences between KDBX version 3.1 and version 4](https://keepass.info/help/kb/kdbx_4.html).
-There is also a discussion of the [enhancements in KDBX 4.1](https://keepass.info/help/kb/kdbx_4.1.html).
+There is also a discussion of the [enhancements in KDBX 4.1](https://keepass.info/help/kb/kdbx_4.1.html), as well
+as a discussion of [Key Files](https://keepass.info/help/base/keys.html#keyfiles).
+
+Massive credit also to the folks over at [KeePassXC](https://keepassxc.org/) who wrote some 
+[documentation](https://github.com/keepassxreboot/keepassxc-specs) about their understanding of various format things.
 
 For the sake of
 clarification and my own satisfaction I have written about my understanding of 
@@ -151,12 +155,11 @@ KeePass formats in the following locations:
 
 ## Dependencies
 
-Aside from the JRE the API depends on:
+Aside from the JRE, at release 3.2, the API depends on:
 
 - [Google Guava](https://github.com/google/guava/wiki) ([Apache 2 license](https://github.com/google/guava/blob/master/COPYING)).
 - [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
-- [Spongy Castle](https://rtyley.github.io/spongycastle/) ([License](https://github.com/rtyley/spongycastle/blob/spongy-master/LICENSE.html)) which is a repackaging for Android of [Bouncy Castle](https://www.bouncycastle.org/java.html) ([License](https://www.bouncycastle.org/licence.html)).
-- [Jargon2](https://github.com/kosprov/jargon2-api) for KDBX format version 4 Argon2 Key Derivation Function (Apache2 license)
+- [Bouncy Castle](https://github.com/bcgit/bc-java/blob/master/LICENSE.html) ([MIT License](https://github.com/bcgit/bc-java/blob/master/LICENSE.html)).
 
 The Simple XML implementation additionally depends on:
 
