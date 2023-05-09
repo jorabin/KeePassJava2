@@ -165,8 +165,8 @@ class DomHelper {
         Element result = getElement(elementPath, parentElement, false);
         if (result == null) {
             result = createHierarchically(elementPath, parentElement);
-            result.setTextContent(value);
         }
+        result.setTextContent(value);
         return result.getTextContent();
     }
 

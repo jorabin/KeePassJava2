@@ -43,4 +43,19 @@ public class SimpleBinaryPropertyV3Test extends BinaryPropertyChecks {
     public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
         database.save(credentials, outputStream);
     }
+
+
+    @Override
+    public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
+        try {
+            return SimpleDatabase.load(credentials, inputStream);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Credentials getCreds(byte[] creds) {
+        return new KdbxCreds(creds);
+    }
 }

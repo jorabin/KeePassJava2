@@ -26,9 +26,10 @@ import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
 
 import static org.junit.Assert.*;
 
@@ -57,6 +58,8 @@ public abstract class BinaryPropertyChecks {
 
     @SuppressWarnings("unused")
     public abstract void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException;
+    public abstract Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException;
+    public abstract Credentials getCreds(byte[] creds);
 
     /**
      * Retrieve and verify attachment "letter J"
@@ -144,9 +147,18 @@ public abstract class BinaryPropertyChecks {
     /**
      * Checks that a database with binary properties saves and reloads correctly
      */
-    @Test @Ignore
-    public void saveAndReloadCheck() {
-        // TODO
+    @Test
+    public void saveAndReloadCheck() throws IOException {
+        Path file = Files.createTempFile("keepass", "tmp");
+        saveDatabase(database, getCreds("123".getBytes()), Files.newOutputStream(file));
+
+        Database db = loadDatabase(getCreds("123".getBytes()),Files.newInputStream(file));
+        Entry entry = (Entry) db.findEntries("Test attachment").get(0);
+        assertArrayEquals(new String[] {"letter J.jpeg"}, entry.getBinaryPropertyNames().toArray());
+
+        entry = (Entry) db.findEntries("Test 2 attachment").get(0);
+        assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
+
     }
 
 

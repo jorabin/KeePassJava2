@@ -39,4 +39,14 @@ public class DomBinaryPropertyV3Test extends BinaryPropertyChecks {
     public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
         database.save(credentials, outputStream);
     }
+
+    @Override
+    public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
+        return DomDatabaseWrapper.load(credentials, inputStream);
+    }
+
+    @Override
+    public Credentials getCreds(byte[] creds) {
+        return new KdbxCreds(creds);
+    }
 }

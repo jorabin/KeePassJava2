@@ -197,11 +197,8 @@ public class DomSerializableDatabase implements SerializableDatabase {
     public void setHeaderHash(byte[] hash) {
         // Android compatibility
         String base64String = new String(Base64.encodeBase64(hash));
-        try {
-            ((Element) DomHelper.xpath.evaluate("//HeaderHash", doc, XPathConstants.NODE)).setTextContent(base64String);
-        } catch (XPathExpressionException e) {
-            throw new IllegalStateException("Can't set header hash", e);
-        }
+        DomHelper.ensureElementContent("Meta/HeaderHash", doc.getDocumentElement(), base64String);
+        //((Element) DomHelper.xpath.evaluate("//HeaderHash", doc, XPathConstants.NODE)).setTextContent(base64String);
     }
 
 

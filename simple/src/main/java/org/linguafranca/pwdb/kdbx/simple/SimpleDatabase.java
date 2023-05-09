@@ -202,7 +202,7 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
         if (kdbxHeader.getVersion() == 4) {
             int index = 0;
             for (byte[] binary : kdbxHeader.getBinaries()) {
-                addBinary(result, binary, index);
+                addBinary(result, Arrays.copyOfRange(binary, 1, binary.length), index);
                 index++;
             }
         }
@@ -252,8 +252,14 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
             KdbxHeader kdbxHeader = new KdbxHeader();
             OutputStream kdbxInnerStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, outputStream);
 
-            // the database contains the hash of the headers
-            keePassFile.meta.headerHash.setContent(kdbxHeader.getHeaderHash());
+            if (kdbxHeader.getVersion() == 3) {
+                // the database contains the hash of the headers
+                if (Objects.isNull(keePassFile.meta.headerHash)){
+                    keePassFile.meta.headerHash = new KeePassFile.ByteArray(kdbxHeader.getHeaderHash());
+                } else {
+                    keePassFile.meta.headerHash.setContent(kdbxHeader.getHeaderHash());
+                }
+            }
 
             // encrypt the fields in the XML inner stream
             XmlOutputStreamFilter plainTextOutputStream = new XmlOutputStreamFilter(kdbxInnerStream,

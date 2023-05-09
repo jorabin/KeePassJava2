@@ -18,8 +18,11 @@ package org.linguafranca.pwdb.kdbx.dom;
 
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
+import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.checks.BinaryPropertyChecks;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
+import org.linguafranca.pwdb.kdbx.KdbxHeader;
+import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +40,19 @@ public class DomBinaryPropertyV4Test extends BinaryPropertyChecks {
 
     @Override
     public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
-        database.save(credentials, outputStream);
+        StreamFormat<KdbxHeader> sf = new KdbxStreamFormat(new KdbxHeader(4));
+        database.save(sf, credentials, outputStream);
     }
+
+
+    @Override
+    public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
+        return DomDatabaseWrapper.load(credentials, inputStream);
+    }
+
+    @Override
+    public Credentials getCreds(byte[] creds) {
+        return new KdbxCreds(creds);
+    }
+
 }
