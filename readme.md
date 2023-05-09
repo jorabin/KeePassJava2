@@ -151,11 +151,13 @@ KeePass formats in the following locations:
 1. The Javadoc header to [KdbxSerializer](http://javadoc.io/page/org.linguafranca.pwdb/KeePassJava2-kdbx/latest/org/linguafranca/pwdb/kdbx/stream_3_1/KdbxSerializer.html) describes KDBX stream formatting.
 2. The XSD Schema [KDBX.4.xsd](KDBX.4.xsd) documents my understanding of the Keepass XML, and also my lack of understanding, in parts.
 3. The following graphic illustrates KDBX 3.1 and 4 file formats:
+
+
 [![KDBX Formats](KdbxDiagram.svg "KDBX Formats")](KdbxDiagram.svg)
 
 ## Dependencies
 
-Aside from the JRE, at release 3.2, the API depends on:
+Aside from the JRE, at release 2.2, the API depends on:
 
 - [Google Guava](https://github.com/google/guava/wiki) ([Apache 2 license](https://github.com/google/guava/blob/master/COPYING)).
 - [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
@@ -166,7 +168,7 @@ The Simple XML implementation additionally depends on:
 - [Simple XML Serialisation Framework](http://simple.sourceforge.net/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
 - [Faster XML Aalto](https://github.com/FasterXML/aalto-xml) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0.txt)).
 
-On Java 11 and later Jaxb implementation depends on:
+For Java 11 and later Jaxb implementation depends on explicit inclusion [no longer provided by JDK](https://docs.oracle.com/en/java/javase/11/migrate/index.html#JSMIG-GUID-F640FA9D-FB66-4D85-AD2B-D931174C09A3) of:
 
 - [JAXB](https://javaee.github.io/jaxb-v2/)
 
