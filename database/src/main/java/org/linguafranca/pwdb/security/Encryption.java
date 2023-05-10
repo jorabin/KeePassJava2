@@ -95,13 +95,13 @@ public class Encryption {
      * A list of functions that we can use to transform keys
      * Enum constants forward to underlying implementation.
      */
-    public enum Kdf implements KeyDerivationFunction {
+    public enum KeyDerivationFunction implements org.linguafranca.pwdb.security.KeyDerivationFunction {
         AES(Aes.getInstance()),
         ARGON2(Argon2.getInstance());
 
-        private final KeyDerivationFunction kdf;
+        private final org.linguafranca.pwdb.security.KeyDerivationFunction kdf;
 
-        Kdf(KeyDerivationFunction kdf) {
+        KeyDerivationFunction(org.linguafranca.pwdb.security.KeyDerivationFunction kdf) {
             this.kdf = kdf;
         }
 
@@ -111,8 +111,8 @@ public class Encryption {
          * @param kdfUuid the Uuid to match
          * @throws IllegalArgumentException if the Uuid is not known
          */
-        public static KeyDerivationFunction getKdf(UUID kdfUuid) {
-            for (KeyDerivationFunction kdf : values()) {
+        public static org.linguafranca.pwdb.security.KeyDerivationFunction getKdf(UUID kdfUuid) {
+            for (org.linguafranca.pwdb.security.KeyDerivationFunction kdf : values()) {
                 if (kdf.getKdfUuid().equals(kdfUuid)) {
                     return kdf;
                 }

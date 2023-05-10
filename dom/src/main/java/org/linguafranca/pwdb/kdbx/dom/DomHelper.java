@@ -198,6 +198,9 @@ class DomHelper {
 
             //Find the highest numbered existing content
             String max = xpath.evaluate("//Binaries/Binary/@ID[not(. < ../../Binary/@ID)][1]", parentElement.getOwnerDocument().getDocumentElement());
+            if (max.trim().isEmpty()){
+                max = "-1";
+            }
             Integer newIndex = Integer.valueOf(max) + 1;
 
             addBinary(parentElement.getOwnerDocument().getDocumentElement(), b64, newIndex);
