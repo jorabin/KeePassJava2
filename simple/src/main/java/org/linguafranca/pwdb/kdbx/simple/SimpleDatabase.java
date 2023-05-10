@@ -16,32 +16,24 @@
 
 package org.linguafranca.pwdb.kdbx.simple;
 
+import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.StreamConfiguration;
 import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.base.AbstractDatabase;
-import org.linguafranca.pwdb.kdbx.Helpers;
-import org.linguafranca.pwdb.security.StreamEncryptor;
-import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxInputTransformer;
-import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxOutputTransformer;
 import org.linguafranca.pwdb.kdbx.KdbxHeader;
-import org.linguafranca.pwdb.kdbx.KdbxSerializer;
-import org.linguafranca.pwdb.kdbx.simple.converter.*;
-import org.linguafranca.pwdb.kdbx.simple.model.EntryClasses;
+import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.simple.model.KeePassFile;
-import org.linguafranca.pwdb.Credentials;
-import org.linguafranca.xml.XmlInputStreamFilter;
-import org.linguafranca.xml.XmlOutputStreamFilter;
-import org.simpleframework.xml.*;
-import org.simpleframework.xml.convert.AnnotationStrategy;
-import org.simpleframework.xml.convert.Registry;
-import org.simpleframework.xml.convert.RegistryStrategy;
-import org.simpleframework.xml.core.Persister;
-import org.simpleframework.xml.strategy.Strategy;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+
+import static org.linguafranca.pwdb.kdbx.simple.SimpleSerializableDatabase.createEmptyDatabase;
+import static org.linguafranca.pwdb.kdbx.simple.SimpleSerializableDatabase.getSerializer;
 
 /**
  * Implementation of {@link org.linguafranca.pwdb.Database} using the Simple XML framework.
@@ -52,28 +44,98 @@ import java.util.*;
 public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup, SimpleEntry, SimpleIcon>{
 
     KeePassFile keePassFile;
+    StreamFormat<?> streamFormat;
+    private SimpleSerializableDatabase serializableDatabase;
 
     /**
      * Create a new empty database
      */
     public SimpleDatabase() {
+        this(createEmptyDatabase());
+    }
+
+    public SimpleDatabase(KeePassFile file) {
         try {
-            keePassFile = createEmptyDatabase();
+            keePassFile = file;
             keePassFile.root.group.database = this;
+            this.serializableDatabase = new SimpleSerializableDatabase();
+            this.serializableDatabase.setKeePassFile(this.keePassFile);
+            SimpleSerializableDatabase.fixUp(keePassFile.root.group);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
     }
+    /**
+     * Load plaintext XML
+     *
+     * @param inputStream contains the XML
+     * @return a new Database
+     * @throws Exception on load failure
+     */
+    public static SimpleDatabase loadXml(InputStream inputStream) throws Exception {
+        KeePassFile result =  getSerializer().read(KeePassFile.class, inputStream);
+        result.root.group.uuid = UUID.randomUUID();
+        return new SimpleDatabase(result);
+    }
 
     /**
-     * Create a database instance from a keepass file
-     * @param keePassFile the instance to initialise from
+     * Load kdbx file
+     *
+     * @param credentials the credentials to use
+     * @param inputStream the encrypted input stream
+     * @return a new database
      */
-    protected SimpleDatabase (KeePassFile keePassFile) {
-        this.keePassFile = keePassFile;
-        this.keePassFile.root.group.database = this;
-        fixUp(this.keePassFile.root.group);
+    public static SimpleDatabase load(Credentials credentials, InputStream inputStream) throws IOException {
+        // doesn't matter how streamFormat is initialised
+        return load(new KdbxStreamFormat(), credentials, inputStream);
     }
+
+    /**
+     * Load file with a choice of StreamFormat
+     * @param streamFormat which contains format information about the file after load
+     * @param credentials credentials to use
+     * @param inputStream where to load from
+     * @return a new database
+     * @param <C> config for the streamFormat
+     */
+    public static <C extends StreamConfiguration> SimpleDatabase load(StreamFormat<C> streamFormat,
+                                                                      Credentials credentials,
+                                                                      InputStream inputStream) throws IOException {
+        SimpleSerializableDatabase simpleSerializableDatabase = new SimpleSerializableDatabase();
+        streamFormat.load(simpleSerializableDatabase, credentials, inputStream);
+        SimpleDatabase db = new SimpleDatabase(simpleSerializableDatabase.getKeePassFile());
+        db.serializableDatabase = simpleSerializableDatabase;
+        db.streamFormat = streamFormat;
+        return db;
+    }
+
+    /**
+     * Save the database with the same stream format that it was loaded with, or V4 default if none
+     * @param credentials credentials to use
+     * @param outputStream where to write to
+     */
+    @Override
+    public void save(Credentials credentials, OutputStream outputStream) throws IOException {
+        // save with the stream format used to load if it exists, otherwise save V4
+        if (Objects.isNull(streamFormat)) {
+            streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
+        }
+        save(streamFormat, credentials, outputStream);
+    }
+
+    /**
+     * Save the database with a choice of stream format
+     * @param streamFormat the format to use
+     * @param credentials credentials to use
+     * @param outputStream where to write to
+     */
+    @Override
+    public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
+                                                     OutputStream outputStream) throws IOException{
+        streamFormat.save(this.serializableDatabase, credentials, outputStream);
+        setDirty(false);
+    }
+
 
     @Override
     public SimpleGroup getRootGroup() {
@@ -149,142 +211,6 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
         setDirty(true);
     }
 
-    /**
-     * Create an empty underlying KeePassFile instance
-     *
-     * @return a new database
-     * @throws Exception on failure
-     */
-    private static KeePassFile createEmptyDatabase() throws Exception {
-        InputStream inputStream = SimpleDatabase.class.getClassLoader().getResourceAsStream("base.kdbx.xml");
-        return getSerializer().read(KeePassFile.class, inputStream);
-    }
-
-    /**
-     * Load plaintext XML
-     *
-     * @param inputStream contains the XML
-     * @return a new Database
-     * @throws Exception on load failure
-     */
-    public static SimpleDatabase loadXml(InputStream inputStream) throws Exception {
-        KeePassFile result =  getSerializer().read(KeePassFile.class, inputStream);
-        result.root.group.uuid = UUID.randomUUID();
-        return new SimpleDatabase(result);
-    }
-
-    /**
-     * Load kdbx file
-     *
-     * @param credentials the credentials to use
-     * @param inputStream the encrypted input stream
-     * @return a new database
-     * @throws Exception on load failure
-     */
-    public static SimpleDatabase load(Credentials credentials, InputStream inputStream) throws Exception {
-
-        // load the KDBX header and get the inner Kdbx stream
-        KdbxHeader kdbxHeader = new KdbxHeader();
-        InputStream kdbxInnerStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, inputStream);
-
-        StreamEncryptor streamEncyptor = kdbxHeader.getInnerStreamEncryptor();
-
-        // decrypt the encrypted fields in the inner XML stream
-        InputStream plainTextXmlStream = new XmlInputStreamFilter(kdbxInnerStream, new KdbxInputTransformer(streamEncyptor));
-
-        // read the now entirely decrypted stream into database
-        KeePassFile result = getSerializer().read(KeePassFile.class, plainTextXmlStream);
-
-        if (kdbxHeader.getVersion() == 3 && !Arrays.equals(result.meta.headerHash.getContent(), kdbxHeader.getHeaderHash())) {
-            throw new IllegalStateException("Header Hash Mismatch");
-        }
-
-        if (kdbxHeader.getVersion() == 4) {
-            int index = 0;
-            for (byte[] binary : kdbxHeader.getBinaries()) {
-                addBinary(result, Arrays.copyOfRange(binary, 1, binary.length), index);
-                index++;
-            }
-        }
-
-        return new SimpleDatabase(result);
-    }
-
-    public void addBinary(byte[] bytes, Integer index) {
-        addBinary(keePassFile, bytes, index);
-    }
-
-    public static void addBinary(KeePassFile keePassFile, byte[] bytes, Integer index) {
-        // create a new binary to put in the store
-        KeePassFile.Binary newBin = new KeePassFile.Binary();
-        newBin.setId(index);
-        newBin.setValue(Helpers.encodeBase64Content(bytes, true));
-        newBin.setCompressed(true);
-        if (keePassFile.getBinaries() == null) {
-            keePassFile.createBinaries();
-        }
-        keePassFile.getBinaries().add(newBin);
-    }
-
-
-    /**
-     * Save as plaintext XML
-     *
-     * @param outputStream the destination to save to
-     */
-    public void save(OutputStream outputStream) {
-        try {
-            prepareForSave(keePassFile.root.group);
-
-            // and save the database out
-            getSerializer().write(this.keePassFile, outputStream);
-
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-
-    }
-
-    @Override
-    public void save(Credentials credentials, OutputStream outputStream) throws IOException {
-        try {
-            // create the stream to accept unencrypted data and output to encrypted
-            KdbxHeader kdbxHeader = new KdbxHeader();
-            OutputStream kdbxInnerStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, outputStream);
-
-            if (kdbxHeader.getVersion() == 3) {
-                // the database contains the hash of the headers
-                if (Objects.isNull(keePassFile.meta.headerHash)){
-                    keePassFile.meta.headerHash = new KeePassFile.ByteArray(kdbxHeader.getHeaderHash());
-                } else {
-                    keePassFile.meta.headerHash.setContent(kdbxHeader.getHeaderHash());
-                }
-            }
-
-            // encrypt the fields in the XML inner stream
-            XmlOutputStreamFilter plainTextOutputStream = new XmlOutputStreamFilter(kdbxInnerStream,
-                    new KdbxOutputTransformer(new StreamEncryptor.Salsa20(kdbxHeader.getInnerRandomStreamKey())));
-
-            // set up the "protected" attributes of fields that need inner stream encryption
-            prepareForSave(keePassFile.root.group);
-
-            // and save the database out
-            getSerializer().write(this.keePassFile, plainTextOutputStream);
-            plainTextOutputStream.close();
-            plainTextOutputStream.await();
-            this.setDirty(false);
-
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
-    @Override
-    public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
-                                                     OutputStream outputStream) throws IOException{
-        throw new UnsupportedOperationException();
-    }
-
     @Override
     public boolean shouldProtect(String s) {
         return keePassFile.meta.memoryProtection.shouldProtect(s);
@@ -295,50 +221,7 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
         return keePassFile.getBinaries();
     }
 
-    /**
-     * Utility to get a simple framework persister
-     * @return a persister
-     * @throws Exception when things get tough
-     */
-    private static Serializer getSerializer() throws Exception {
-        Registry registry = new Registry();
-        registry.bind(String.class, EmptyStringConverter.class);
-        Strategy strategy = new AnnotationStrategy(new RegistryStrategy(registry));
-        return new Persister(strategy);
-
-    }
-
-    /**
-     * Utility to add in back links to parent group and database
-     *
-     * @param parent the group to start from
-     */
-    private static void fixUp(SimpleGroup parent){
-        for (SimpleGroup group: parent.group) {
-            group.parent = parent;
-            group.database = parent.database;
-            fixUp(group);
-        }
-        for (SimpleEntry entry: parent.entry) {
-            entry.database = parent.database;
-            entry.parent = parent;
-        }
-    }
-
-    /**
-     * Utility to mark fields that need to be encrypted and vice versa
-     *
-     * @param parent the group to start from
-     */
-    private static void prepareForSave(SimpleGroup parent){
-        for (SimpleGroup group: parent.group) {
-            prepareForSave(group);
-        }
-        for (SimpleEntry entry: parent.entry) {
-            for (EntryClasses.StringProperty property : entry.string) {
-                boolean shouldProtect = parent.database.shouldProtect(property.getKey());
-                property.getValue().setProtected(shouldProtect);
-            }
-        }
+    public void addBinary(byte [] bytes, int index) {
+        SimpleSerializableDatabase.addBinary(this.keePassFile, index, bytes);
     }
 }

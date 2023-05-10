@@ -45,21 +45,21 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
 
     @Test
     public void testEmptyDatabase() {
-        Assert.assertTrue (database.getRootGroup().getName().equals("Root"));
-        Assert.assertTrue (database.getRootGroup().getEntries().size() == 0);
-        Assert.assertTrue (database.getRootGroup().getGroups().size() == 0);
+        assertEquals("Root", database.getRootGroup().getName());
+        assertEquals(0, database.getRootGroup().getEntries().size());
+        assertEquals(0, database.getRootGroup().getGroups().size());
     }
 
     @Test
     public void testAddGroup() {
-        Group g1 = database.getRootGroup().addGroup(database.newGroup("group1"));
-        Assert.assertTrue (database.getRootGroup().getGroups().size() == 1);
-        Assert.assertTrue (g1.getName().equals("group1"));
-        Assert.assertTrue (g1.getGroups().size() == 0);
-        Assert.assertTrue (g1.getEntries().size() == 0);
-        Assert.assertTrue("root is not the parent of its child", g1.getParent().equals(database.getRootGroup()));
+        G g1 = database.getRootGroup().addGroup(database.newGroup("group1"));
+        assertEquals(1, database.getRootGroup().getGroups().size());
+        assertEquals("group1", g1.getName());
+        assertEquals(0, g1.getGroups().size());
+        assertEquals(0, g1.getEntries().size());
+        assertEquals("root is not the parent of its child", g1.getParent(), database.getRootGroup());
 
-        Group g2 = database.newGroup();
+        G g2 = database.newGroup();
         assertEquals("", g2.getName());
         Assert.assertNotNull(g2.getUuid());
         assertEquals(0, g2.getIcon().getIndex());
@@ -68,22 +68,22 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
 
         // show that the list of groups is a copy
         database.getRootGroup().getGroups().clear();
-        Assert.assertTrue(database.getRootGroup().getGroups().size() == 1);
-        Assert.assertTrue (g1.getEntries().size() == 0);
+        assertEquals(1, database.getRootGroup().getGroups().size());
+        assertEquals(0, g1.getEntries().size());
     }
 
     @Test
     public void testDeleteGroup () {
         Group<D,G,E,I> g1 = database.getRootGroup().addGroup(database.newGroup("group1"));
         List<? extends G> l1 = database.getRootGroup().findGroups("group1");
-        Assert.assertTrue(l1.size() == 1);
+        assertEquals(1, l1.size());
         G g2 = l1.get(0);
-        Assert.assertTrue (g2.equals(g1));
-        Group g3 = database.getRootGroup().removeGroup(g2);
-        Assert.assertTrue (g3.equals(g1));
-        Assert.assertTrue(g1.getParent() == null);
-        Assert.assertTrue(database.getRootGroup().getGroups().size() == 0);
-        Assert.assertTrue(database.getRootGroup().findGroups("group1").size() == 0);
+        assertEquals(g2, g1);
+        G g3 = database.getRootGroup().removeGroup(g2);
+        assertEquals(g3, g1);
+        assertNull(g1.getParent());
+        assertEquals(0, database.getRootGroup().getGroups().size());
+        assertEquals(0, database.getRootGroup().findGroups("group1").size());
     }
 
     @Test
@@ -91,38 +91,38 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
         E e1 = database.getRootGroup().addEntry(database.newEntry());
         e1.setTitle("entry1");
         List<? extends E> l1 = database.findEntries("entry1");
-        Assert.assertTrue(l1.size() == 1);
+        assertEquals(1, l1.size());
 
         E e12 = database.getRootGroup().addEntry(database.newEntry("entry12"));
         List<? extends E> l2 = database.findEntries("entry1");
-        Assert.assertTrue(l2.size() == 2);
+        assertEquals(2, l2.size());
 
         // show that the entries are different
-        Assert.assertFalse(l2.get(0).equals(l2.get(1)));
+        assertNotEquals(l2.get(0), l2.get(1));
 
         // show that the list is a copy
         l2.clear();
-        Assert.assertTrue(database.findEntries("entry1").size() == 2);
+        assertEquals(2, database.findEntries("entry1").size());
 
         // show that we get an equivalent entry when we remove to when we inserted
-        Entry e12b = database.getRootGroup().removeEntry(e12);
-        Assert.assertTrue(e12b.equals(e12));
+        E e12b = database.getRootGroup().removeEntry(e12);
+        assertEquals(e12b, e12);
         // has been unhooked from parent
-        Assert.assertTrue(e12.getParent() == null);
-        Assert.assertTrue(database.findEntries("entry1").size() == 1);
+        assertNull(e12.getParent());
+        assertEquals(1, database.findEntries("entry1").size());
     }
 
     @Test
     public void testSetFields () {
         E e1 = database.newEntry("Entry 1");
         e1.setNotes("this looks a little like Entry 2");
-        Assert.assertTrue(e1.getNotes().equals("this looks a little like Entry 2"));
+        assertEquals("this looks a little like Entry 2", e1.getNotes());
         e1.setUsername("jake@window.com");
-        Assert.assertTrue(e1.getUsername().equals("jake@window.com"));
+        assertEquals("jake@window.com", e1.getUsername());
         e1.setPassword("supercalifragelisticexpialidocious");
-        Assert.assertTrue(e1.getPassword().equals("supercalifragelisticexpialidocious"));
-        e1.setUrl("http://window.com");
-        Assert.assertTrue(e1.getUrl().equals("http://window.com"));
+        assertEquals("supercalifragelisticexpialidocious", e1.getPassword());
+        e1.setUrl("https://window.com");
+        assertEquals("https://window.com", e1.getUrl());
 
 
         Assert.assertTrue(e1.match("2"));
@@ -131,7 +131,7 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
 
         I ic1 = database.newIcon(27);
         e1.setIcon(ic1);
-        Assert.assertTrue(e1.getIcon().equals(ic1));
+        assertEquals(e1.getIcon(), ic1);
 
         // databases have to support setting of standard properties
         e1.setProperty(Entry.STANDARD_PROPERTY_NAME_TITLE, "A title");
@@ -155,7 +155,7 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
             Assert.assertEquals(0, properties.size());
         } catch (UnsupportedOperationException e) {
             // databases don't have to support arbitrary properties
-            assertTrue(!database.supportsNonStandardPropertyNames());
+            assertFalse(database.supportsNonStandardPropertyNames());
             assertArrayEquals(e1.getPropertyNames().toArray(), Entry.STANDARD_PROPERTY_NAMES.toArray());
         }
 
@@ -237,7 +237,7 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
         entry1.setTitle("Entry");
         entry1.setUsername("Username");
         entry1.setPassword("Password");
-        entry1.setUrl("http://dont.follow.me");
+        entry1.setUrl("https://dont.follow.me");
         entry1.setNotes("Notes");
         entry1.setIcon(database.newIcon(2));
 

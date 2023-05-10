@@ -77,7 +77,7 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
     }
 
     @Override
-    public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream encryptedOutputStream) throws IOException {
+    public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream outputStream) throws IOException {
         if (kdbxHeader.getVersion() == 4) {
             // TODO this assumes that the indexes start from 0 and are in sequence ...
             for (int a = 0; a < serializableDatabase.getBinaryCount(); a++) {
@@ -89,13 +89,13 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
             }
         }
 
-        try (OutputStream unencrytedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, encryptedOutputStream)) {
+        try (OutputStream encryptedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, outputStream)) {
             if (kdbxHeader.getVersion() == 3) {
                 serializableDatabase.setHeaderHash(kdbxHeader.getHeaderHash());
             }
             serializableDatabase.setEncryption(kdbxHeader.getStreamEncryptor());
-            serializableDatabase.save(unencrytedOutputStream);
-            unencrytedOutputStream.flush();
+            serializableDatabase.save(encryptedOutputStream);
+            encryptedOutputStream.flush();
         }
     }
 

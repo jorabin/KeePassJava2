@@ -23,7 +23,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * This interface allows for serialization and deserialization of databases.
+ * This interface allows for serialization and deserialization of databases, which is
+ * theoretically decoupled from the actual format they use for serialization.
  * <p/>
  * Databases instantiate themselves from a stream and serialize to a stream,
  * and need to be able to encrypt and decrypt data (e.g. Protected fields in KDBX format).

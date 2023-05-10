@@ -18,18 +18,14 @@ package org.linguafranca.pwdb.checks;
 
 import com.google.common.io.ByteStreams;
 import org.junit.Assert;
-
-import org.junit.Ignore;
 import org.junit.Test;
-import org.linguafranca.pwdb.Credentials;
-import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.Entry;
+import org.linguafranca.pwdb.*;
 
-
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.FileAttribute;
 
 import static org.junit.Assert.*;
 
@@ -44,7 +40,7 @@ import static org.junit.Assert.*;
  *     <dd>Contains an attachment "Letter L" which is also present in the resources directory</dd>
  * </dl>
  *
- * When used as a test suite for a concrete implementation, subclass and name the class *Test etc to conform
+ * When used as a test suite for a concrete implementation, subclass and name the class *Test etc. to conform
  * with Junit rules
  * <p>
  * Subclasses should test both V3 KDBX files (Attachment.kdbx) and V4 (V4-ChaCha20-Argon2-Attachment.kdbx) since
@@ -52,14 +48,14 @@ import static org.junit.Assert.*;
  *
  * @author jo
  */
-public abstract class BinaryPropertyChecks {
+public abstract class BinaryPropertyChecks  <D extends Database<D,G,E,I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon> {
 
-    public Database<?,?,?,?> database;
+    public D database;
 
     @SuppressWarnings("unused")
-    public abstract void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException;
-    public abstract Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException;
-    public abstract Database newDatabase();
+    public abstract void saveDatabase(D database, Credentials credentials, OutputStream outputStream) throws IOException;
+    public abstract D loadDatabase(Credentials credentials, InputStream inputStream) throws IOException;
+    public abstract D newDatabase();
     public abstract Credentials getCreds(byte[] creds);
 
     /**
@@ -67,10 +63,11 @@ public abstract class BinaryPropertyChecks {
      */
     @Test
     public void getBinaryProperty() throws Exception {
-        Entry entry = database.findEntries("Test attachment").get(0);
+        E entry = database.findEntries("Test attachment").get(0);
         byte [] letterJ = entry.getBinaryProperty("letter J.jpeg");
-        InputStream testfile = getClass().getClassLoader().getResourceAsStream("letter J.jpeg");
-        byte [] original = ByteStreams.toByteArray(testfile);
+        InputStream testFile = getClass().getClassLoader().getResourceAsStream("letter J.jpeg");
+        assert testFile != null;
+        byte [] original = ByteStreams.toByteArray(testFile);
         Assert.assertArrayEquals(original, letterJ);
     }
 
@@ -79,10 +76,11 @@ public abstract class BinaryPropertyChecks {
      */
     @Test
     public void getAnotherBinaryProperty() throws Exception {
-        Entry entry = database.findEntries("Test 2 attachment").get(0);
+        E entry = database.findEntries("Test 2 attachment").get(0);
         byte [] letterL = entry.getBinaryProperty("letter L.jpeg");
-        InputStream testfile = getClass().getClassLoader().getResourceAsStream("letter L.jpeg");
-        byte [] original = ByteStreams.toByteArray(testfile);
+        InputStream testFile = getClass().getClassLoader().getResourceAsStream("letter L.jpeg");
+        assert testFile != null;
+        byte [] original = ByteStreams.toByteArray(testFile);
         Assert.assertArrayEquals(original, letterL);
     }
 
@@ -91,9 +89,10 @@ public abstract class BinaryPropertyChecks {
      */
     @Test
     public void setBinaryProperty() throws Exception {
-        InputStream testfile = getClass().getClassLoader().getResourceAsStream("letter L.jpeg");
-        byte [] original = ByteStreams.toByteArray(testfile);
-        Entry entry = database.findEntries("Test attachment").get(0);
+        InputStream testFile = getClass().getClassLoader().getResourceAsStream("letter L.jpeg");
+        assert testFile != null;
+        byte [] original = ByteStreams.toByteArray(testFile);
+        E entry = database.findEntries("Test attachment").get(0);
         entry.setBinaryProperty("letter L.jpeg", original);
         byte [] letterL = entry.getBinaryProperty("letter L.jpeg");
         Assert.assertArrayEquals(original, letterL);
@@ -106,7 +105,7 @@ public abstract class BinaryPropertyChecks {
      */
     @Test
     public void getBinaryPropertyNames() {
-        Entry entry = database.findEntries("Test attachment").get(0);
+        E entry = database.findEntries("Test attachment").get(0);
         assertArrayEquals(new String[] {"letter J.jpeg"}, entry.getBinaryPropertyNames().toArray());
 
         entry = database.findEntries("Test 2 attachment").get(0);
@@ -129,7 +128,7 @@ public abstract class BinaryPropertyChecks {
     public void checkAddChangeRemoveBinaryProperty() {
         byte[] test = new byte[] {0, 1, 2 ,3};
         byte[] test2 = new byte[] {3, 2, 1, 0};
-        Entry entry = database.findEntries("Test attachment").get(0);
+        E entry = database.findEntries("Test attachment").get(0);
         assertEquals(1, entry.getBinaryPropertyNames().size());
         entry.setBinaryProperty("test", test);
         assertArrayEquals(test, entry.getBinaryProperty("test"));
@@ -153,12 +152,17 @@ public abstract class BinaryPropertyChecks {
         Path file = Files.createTempFile("keepass", "tmp");
         saveDatabase(database, getCreds("123".getBytes()), Files.newOutputStream(file));
 
-        Database db = loadDatabase(getCreds("123".getBytes()),Files.newInputStream(file));
-        Entry entry = (Entry) db.findEntries("Test attachment").get(0);
-        assertArrayEquals(new String[] {"letter J.jpeg"}, entry.getBinaryPropertyNames().toArray());
+        D db = loadDatabase(getCreds("123".getBytes()),Files.newInputStream(file));
+        E newEntry = db.findEntries("Test attachment").get(0);
+        assertArrayEquals(new String[] {"letter J.jpeg"}, newEntry.getBinaryPropertyNames().toArray());
+        E oldEntry = database.findEntries("Test attachment").get(0);
+        assertArrayEquals(oldEntry.getBinaryProperty("letter J.jpeg"), newEntry.getBinaryProperty("letter J.jpeg"));
 
-        entry = (Entry) db.findEntries("Test 2 attachment").get(0);
-        assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
+        newEntry = db.findEntries("Test 2 attachment").get(0);
+        assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, newEntry.getBinaryPropertyNames().toArray());
+        oldEntry = database.findEntries("Test 2 attachment").get(0);
+        assertArrayEquals(oldEntry.getBinaryProperty("letter J.jpeg"), newEntry.getBinaryProperty("letter J.jpeg"));
+        assertArrayEquals(oldEntry.getBinaryProperty("letter L.jpeg"), newEntry.getBinaryProperty("letter L.jpeg"));
 
     }
 
@@ -168,16 +172,17 @@ public abstract class BinaryPropertyChecks {
     @Test
     public void createAndSaveCheck() throws IOException {
         Path file = Files.createTempFile("keepass", "tmp");
-        Database database1 = newDatabase();
-        Entry entry = database1.newEntry("Test attachment");
+        D database1 = newDatabase();
+        E entry = database1.newEntry("Test attachment");
         database1.getRootGroup().addEntry(entry);
-        InputStream testfile = getClass().getClassLoader().getResourceAsStream("letter J.jpeg");
-        byte [] letterJ = ByteStreams.toByteArray(testfile);
+        InputStream testFile = getClass().getClassLoader().getResourceAsStream("letter J.jpeg");
+        assert testFile != null;
+        byte [] letterJ = ByteStreams.toByteArray(testFile);
         entry.setBinaryProperty("letter J.jpeg", letterJ);
         saveDatabase(database1, getCreds("123".getBytes()), Files.newOutputStream(file));
 
-        Database db = loadDatabase(getCreds("123".getBytes()),Files.newInputStream(file));
-        Entry entry1 = (Entry) db.findEntries("Test attachment").get(0);
+        D db = loadDatabase(getCreds("123".getBytes()),Files.newInputStream(file));
+        E entry1 = db.findEntries("Test attachment").get(0);
         // just one property
         assertArrayEquals(new String[] {"letter J.jpeg"}, entry1.getBinaryPropertyNames().toArray());
         // content is correct
