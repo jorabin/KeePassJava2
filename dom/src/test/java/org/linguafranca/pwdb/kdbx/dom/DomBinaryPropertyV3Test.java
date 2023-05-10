@@ -46,6 +46,11 @@ public class DomBinaryPropertyV3Test extends BinaryPropertyChecks {
     }
 
     @Override
+    public Database newDatabase() {
+        return new DomDatabaseWrapper();
+    }
+
+    @Override
     public Credentials getCreds(byte[] creds) {
         return new KdbxCreds(creds);
     }

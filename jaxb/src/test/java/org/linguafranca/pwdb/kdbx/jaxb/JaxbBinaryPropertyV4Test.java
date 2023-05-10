@@ -52,6 +52,11 @@ public class JaxbBinaryPropertyV4Test extends BinaryPropertyChecks {
     }
 
     @Override
+    public Database newDatabase() {
+        return new JaxbDatabase();
+    }
+
+    @Override
     public Credentials getCreds(byte[] creds) {
         return new KdbxCreds(creds);
     }

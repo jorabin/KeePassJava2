@@ -1,4 +1,4 @@
-package org.linguafranca.pwdb.validation;
+package org.linguafranca.pwdb.kdbx.validation;
 
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;

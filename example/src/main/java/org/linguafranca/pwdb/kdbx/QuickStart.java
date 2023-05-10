@@ -21,9 +21,7 @@ import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.kdb.KdbCredentials;
 import org.linguafranca.pwdb.kdb.KdbDatabase;
 import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
-import org.linguafranca.pwdb.security.Aes;
 import org.linguafranca.pwdb.security.Encryption;
-import org.linguafranca.pwdb.security.KeyDerivationFunction;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -144,99 +142,61 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
     }
 
     /**
-     * Load KDBX V3 save as KDBX V4 - then load again and save with different configuration
+     * Load KDBX V3 save as KDBX V4
      */
-    public void loadKdbx3SaveKdbx4() throws IOException {
+    public void loadKdbx3SaveKdbx4(String resourceName, byte[] password, OutputStream v4OutputStream) throws IOException {
         DomDatabaseWrapper database;
         // password credentials
-        KdbxCreds credentials = new KdbxCreds("123".getBytes());
-
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx")) {
+        KdbxCreds credentials = new KdbxCreds(password);
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
             // load KdbDatabase
             database = DomDatabaseWrapper.load(credentials, inputStream);
         }
-        // visit all groups and entries and list them to console
-        database.visit(new Visitor.Print());
 
         // create a KDBX (database
         D kdbxDatabase = getDatabase();
         kdbxDatabase.setName("New Database");
-        kdbxDatabase.setDescription("Migration of KDB Database to KDBX Database");
+        kdbxDatabase.setDescription("Migration of KDBX 3 Database to KDBX 4 Database");
         // deep copy from group (not including source group, KDB database has simulated root)
         kdbxDatabase.getRootGroup().copy(database.getRootGroup());
 
         // choose a stream format - V4 Kdbx and choose some algorithms
-        KdbxStreamFormat formatV4 = new KdbxStreamFormat(new KdbxHeader(KdbxHeader.KdbxHeaderOpts.V4_AES_ARGON_CHA_CHA));
-        KdbxHeader kdbxHeader = formatV4.getStreamConfiguration();
-        // change algos from those originally selected
+        KdbxHeader kdbxHeader = new KdbxHeader(KdbxHeader.KdbxHeaderOpts.V4_AES_ARGON_CHA_CHA);
+        KdbxStreamFormat formatV4 = new KdbxStreamFormat(kdbxHeader);
+        // change algorithm from those originally selected
         kdbxHeader.setCipherAlgorithm(Encryption.Cipher.CHA_CHA_20);
-        kdbxHeader.setKeyDerivationFunction(Encryption.Kdf.AES);
+        kdbxHeader.setKeyDerivationFunction(Encryption.KeyDerivationFunction.ARGON2);
         kdbxHeader.setProtectedStreamAlgorithm(Encryption.ProtectedStreamAlgorithm.CHA_CHA_20);
 
         // save it with format options
-        try (FileOutputStream f = new FileOutputStream("testOutput/CHACHA-AES-CHACHA.kdbx")) {
-            kdbxDatabase.save(formatV4, credentials, f);
-        }
-
-        // doesn't matter what we create it will be overwritten
-        KdbxStreamFormat kdbxStreamFormat = new KdbxStreamFormat();
-        // load it again
-        try (FileInputStream f = new FileInputStream("testOutput/CHACHA-AES-CHACHA.kdbx")) {
-            DomDatabaseWrapper.load(kdbxStreamFormat, credentials, f);
-        }
-
-        assertEquals("CHA_CHA_20", kdbxStreamFormat.getStreamConfiguration().getCipherAlgorithm().getName());
-        assertEquals("AES", kdbxStreamFormat.getStreamConfiguration().getKeyDerivationFunction().getName());
-        assertEquals("CHA_CHA_20", kdbxStreamFormat.getStreamConfiguration().getProtectedStreamAlgorithm().name());
-
-        try (FileOutputStream f = new FileOutputStream("testOutput/CHACHA-AES-CHACHA-2.kdbx")) {
-            kdbxDatabase.save(kdbxStreamFormat, credentials, f);
-        }
-
-        // doesn't matter what we create it will be overwritten
-        KdbxStreamFormat kdbxStreamFormat2 = new KdbxStreamFormat();
-        // load it again
-        try (FileInputStream f = new FileInputStream("testOutput/CHACHA-AES-CHACHA-2.kdbx")) {
-            DomDatabaseWrapper.load(kdbxStreamFormat2, credentials, f);
-        }
-        // still CHA-CHA_20 etc.
-        assertEquals("CHA_CHA_20", kdbxStreamFormat2.getStreamConfiguration().getCipherAlgorithm().getName());
-        assertEquals("AES", kdbxStreamFormat.getStreamConfiguration().getKeyDerivationFunction().getName());
-        assertEquals("CHA_CHA_20", kdbxStreamFormat.getStreamConfiguration().getProtectedStreamAlgorithm().name());
+        kdbxDatabase.save(formatV4, credentials, v4OutputStream);
     }
 
 
-    public KdbxHeader loadKdbxHeader(String filename) throws IOException {
-        KdbxHeader kdbxHeader = new KdbxHeader();
-        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(filename)) {
-            try {
-                // load KdbDatabase with no credentials, in V4 this will fail as HMac256 won't be correct
-                // but the header will still be populated
-                KdbxSerializer.createUnencryptedInputStream(new Credentials.None(), kdbxHeader, inputStream);
-            } catch (IllegalStateException ignored) {
-            }
-            return kdbxHeader;
-        }
-    }
-
-    public void listKdbxHeaderProperties(KdbxHeader kdbxHeader, PrintWriter printWriter) {
-        printWriter.format("Version: %d\n", kdbxHeader.getVersion());
-        printWriter.format("Cipher Algorithm: %s\n", kdbxHeader.getCipherAlgorithm().getName());
-        // AES is the only KDF in V3
-        KeyDerivationFunction kdf = kdbxHeader.getVersion() == 3 ? Aes.getInstance() : kdbxHeader.getKeyDerivationFunction();
-        printWriter.format("Key Derivation Function: %s\n", kdf.getName());
-        printWriter.format("Inner Stream Algorithm: %s\n", kdbxHeader.getProtectedStreamAlgorithm().name());
-        printWriter.flush();
-    }
     /**
-     * List Database Encryption Characteristics
+     * Load KDBX V3 save as KDBX V4
      */
-    public void listKdbxHeaderParams () throws IOException {
-        PrintWriter writer = new PrintWriter(System.out);
-        listKdbxHeaderProperties(loadKdbxHeader("V4-AES-AES.kdbx"), writer);
-        listKdbxHeaderProperties(loadKdbxHeader("V4-AES-Argon2.kdbx"), writer);
-        listKdbxHeaderProperties(loadKdbxHeader("V4-ChaCha20-AES.kdbx"), writer);
-        listKdbxHeaderProperties(loadKdbxHeader("V4-ChaCha20-Argon2-Attachment.kdbx"), writer);
-    }
+    public void loadKdbx4SaveKdbx3(String resourceName, byte[] password, OutputStream v3OutputStream) throws IOException {
+        DomDatabaseWrapper database;
+        // password credentials
+        KdbxCreds credentials = new KdbxCreds(password);
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
+            // load KdbDatabase
+            database = DomDatabaseWrapper.load(credentials, inputStream);
+        }
 
+        // create a KDBX (database
+        D kdbxDatabase = getDatabase();
+        kdbxDatabase.setName("New Database");
+        kdbxDatabase.setDescription("Migration of KDBX 4 Database to KDBX 3 Database");
+        // deep copy from group (not including source group, KDB database has simulated root)
+        kdbxDatabase.getRootGroup().copy(database.getRootGroup());
+
+        // choose a stream format - V4 Kdbx and choose some algorithms
+        KdbxHeader kdbxHeader = new KdbxHeader(KdbxHeader.KdbxHeaderOpts.V3_AES_SALSA_20);
+        KdbxStreamFormat formatV3 = new KdbxStreamFormat(kdbxHeader);
+
+        // save it with format options
+        kdbxDatabase.save(formatV3, credentials, v3OutputStream);
+    }
 }

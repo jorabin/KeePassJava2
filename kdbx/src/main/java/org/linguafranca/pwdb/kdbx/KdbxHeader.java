@@ -126,8 +126,8 @@ public class KdbxHeader implements StreamConfiguration {
      * Default values for crypto options
      */
     enum KdbxHeaderOpts implements KdbxHeaderOptions{
-        V3_AES_SALSA_20(3, Encryption.Cipher.AES, Encryption.Kdf.AES, Encryption.ProtectedStreamAlgorithm.SALSA_20),
-        V4_AES_ARGON_CHA_CHA (4, Encryption.Cipher.AES, Encryption.Kdf.ARGON2, Encryption.ProtectedStreamAlgorithm.CHA_CHA_20);
+        V3_AES_SALSA_20(3, Encryption.Cipher.AES, Encryption.KeyDerivationFunction.AES, Encryption.ProtectedStreamAlgorithm.SALSA_20),
+        V4_AES_ARGON_CHA_CHA (4, Encryption.Cipher.AES, Encryption.KeyDerivationFunction.ARGON2, Encryption.ProtectedStreamAlgorithm.CHA_CHA_20);
 
         //<editor-fold desc="Fields, Getters and Setters for this class">
         final int version;
@@ -136,7 +136,7 @@ public class KdbxHeader implements StreamConfiguration {
         final Encryption.ProtectedStreamAlgorithm protectedStreamAlgorithm;
 
 
-        KdbxHeaderOpts(int version, Encryption.Cipher cipher, Encryption.Kdf kdf, Encryption.ProtectedStreamAlgorithm protectedStreamAlgorithm) {
+        KdbxHeaderOpts(int version, Encryption.Cipher cipher, Encryption.KeyDerivationFunction kdf, Encryption.ProtectedStreamAlgorithm protectedStreamAlgorithm) {
             this.version = version;
             this.algorithm = cipher;
             this.kdf = kdf;
@@ -242,9 +242,7 @@ public class KdbxHeader implements StreamConfiguration {
     }
 
     public StreamEncryptor getInnerStreamEncryptor() {
-        return getVersion() == 4 ?
-                new StreamEncryptor.ChaCha20(getInnerRandomStreamKey()) :
-                new StreamEncryptor.Salsa20(getInnerRandomStreamKey());
+        return Encryption.ProtectedStreamAlgorithm.getStreamEncryptor(getProtectedStreamAlgorithm(), getInnerRandomStreamKey());
     }
 
     /**
@@ -257,7 +255,7 @@ public class KdbxHeader implements StreamConfiguration {
         if (kdfParameters == null) {
             return Aes.getTransformedKey(digest, transformSeed, transformRounds);
         }
-        KeyDerivationFunction kdf = Encryption.Kdf.getKdf(kdfParameters.mustGet("$UUID").asUuid());
+        KeyDerivationFunction kdf = Encryption.KeyDerivationFunction.getKdf(kdfParameters.mustGet("$UUID").asUuid());
         return kdf.getTransformedKey(digest, kdfParameters);
     }
 
@@ -425,7 +423,7 @@ public class KdbxHeader implements StreamConfiguration {
      */
     public void setKdfParameters(VariantDictionary kdfParameters) {
         this.kdfParameters = kdfParameters;
-        this.keyDerivationFunction = Encryption.Kdf.getKdf(kdfParameters.get("$UUID").asUuid());
+        this.keyDerivationFunction = Encryption.KeyDerivationFunction.getKdf(kdfParameters.get("$UUID").asUuid());
     }
 
     /**

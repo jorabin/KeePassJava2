@@ -79,6 +79,7 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
     @Override
     public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream encryptedOutputStream) throws IOException {
         if (kdbxHeader.getVersion() == 4) {
+            // TODO this assumes that the indexes start from 0 and are in sequence ...
             for (int a = 0; a < serializableDatabase.getBinaryCount(); a++) {
                 int attachmentLength = serializableDatabase.getBinary(a).length;
                 byte[] binary = new byte[attachmentLength + 1];

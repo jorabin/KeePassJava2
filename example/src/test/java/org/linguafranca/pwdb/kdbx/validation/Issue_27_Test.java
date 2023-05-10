@@ -1,4 +1,4 @@
-package org.linguafranca.pwdb.validation;
+package org.linguafranca.pwdb.kdbx.validation;
 
 import com.google.common.io.CharStreams;
 import org.junit.Ignore;

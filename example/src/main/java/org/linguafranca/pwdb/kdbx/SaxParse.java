@@ -31,15 +31,15 @@ import java.io.InputStream;
  */
 public class SaxParse {
     /**
-     * SAX Parsing
+     * SAX Parsing - shows also how to decrypt values that are stored encrypted in XML (Inner Stream Encryption)
      */
-    public void exampleSaxparsing() throws IOException, SAXException, ParserConfigurationException {
-        InputStream encryptedInputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
+    public void exampleSaxparsing(String resourceName) throws IOException, SAXException, ParserConfigurationException {
+        InputStream encryptedInputStream = getClass().getClassLoader().getResourceAsStream(resourceName);
         Credentials credentials = new KdbxCreds("123".getBytes());
         KdbxHeader kdbxHeader = new KdbxHeader();
         try (InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, encryptedInputStream)) {
             // use this to decrypt the encrypted fields
-            final StreamEncryptor memoryProtection = new StreamEncryptor.Salsa20(kdbxHeader.getInnerRandomStreamKey());
+            final StreamEncryptor valueEncryptor = kdbxHeader.getInnerStreamEncryptor();
             SAXParserFactory spfactory = SAXParserFactory.newInstance();
             SAXParser saxParser = spfactory.newSAXParser();
             XMLReader xmlReader = saxParser.getXMLReader();
@@ -87,7 +87,7 @@ public class SaxParse {
                 public void characters(char[] ch, int start, int length) throws SAXException {
                     String content = new String(ch, start, length);
                     if (protectedContent) {
-                        content = new String(memoryProtection.decrypt(Helpers.decodeBase64Content(content.getBytes(), false)));
+                        content = new String(valueEncryptor.decrypt(Helpers.decodeBase64Content(content.getBytes(), false)));
                     }
                     System.out.print(content);
                     protectedContent = false;

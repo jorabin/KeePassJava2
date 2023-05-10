@@ -52,6 +52,11 @@ public class SimpleBinaryPropertyV4Test extends BinaryPropertyChecks {
     }
 
     @Override
+    public Database newDatabase() {
+        return new SimpleDatabase();
+    }
+
+    @Override
     public Credentials getCreds(byte[] creds) {
         return new KdbxCreds(creds);
     }

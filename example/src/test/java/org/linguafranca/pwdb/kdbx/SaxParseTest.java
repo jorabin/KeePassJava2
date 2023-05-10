@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.example;
+package org.linguafranca.pwdb.kdbx;
 
 import org.junit.Test;
-import org.linguafranca.pwdb.kdbx.SaxParse;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,8 +28,12 @@ import java.io.IOException;
 public class SaxParseTest extends SaxParse {
 
     @Test
-    public void exampleSaxparsing () throws IOException, SAXException, ParserConfigurationException {
-        super.exampleSaxparsing();
+    public void exampleSaxparsingV3 () throws IOException, SAXException, ParserConfigurationException {
+        super.exampleSaxparsing("test123.kdbx");
+    }
+    @Test
+    public void exampleSaxparsingV4 () throws IOException, SAXException, ParserConfigurationException {
+        super.exampleSaxparsing("V4-AES-Argon2-CustomIcon.kdbx");
     }
 
 }
