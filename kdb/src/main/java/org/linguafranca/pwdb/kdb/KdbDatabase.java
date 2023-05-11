@@ -174,4 +174,9 @@ public class KdbDatabase extends AbstractDatabase<KdbDatabase, KdbGroup, KdbEntr
     public boolean supportsRecycleBin() {
         return false;
     }
+
+    @Override
+    public <C extends StreamConfiguration> StreamFormat<C> getStreamFormat(){
+        return null;
+    }
 }

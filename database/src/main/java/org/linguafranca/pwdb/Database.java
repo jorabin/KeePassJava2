@@ -242,6 +242,11 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
     <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) throws IOException;
 
     /**
+     * Get the format the database was loaded from
+     */
+    <C extends StreamConfiguration> StreamFormat<C> getStreamFormat();
+
+    /**
      * Properties to encrypt
      * @param propertyName the property of interest
      * @return true if it should be encrypted

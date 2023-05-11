@@ -47,6 +47,13 @@ public class SimpleSerializableDatabase implements SerializableDatabase {
     public KeePassFile keePassFile;
     private StreamEncryptor encryption;
 
+    public  SimpleSerializableDatabase(){
+
+    }
+    public SimpleSerializableDatabase(KeePassFile keePassFile) {
+        this.keePassFile = keePassFile;
+    }
+
 
     /**
      * Create an empty underlying KeePassFile instance

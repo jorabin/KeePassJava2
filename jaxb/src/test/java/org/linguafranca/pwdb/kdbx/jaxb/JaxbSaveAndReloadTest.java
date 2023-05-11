@@ -16,10 +16,11 @@
 
 package org.linguafranca.pwdb.kdbx.jaxb;
 
-import org.linguafranca.pwdb.Database;
+import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.checks.SaveAndReloadChecks;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.kdbx.KdbxHeader;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,29 +29,40 @@ import java.io.OutputStream;
 /**
  * @author jo
  */
-public class JaxbSaveAndReloadTest extends SaveAndReloadChecks {
+public class JaxbSaveAndReloadTest extends SaveAndReloadChecks<JaxbDatabase, JaxbGroup, JaxbEntry, JaxbIcon> {
     @Override
-    public Database getDatabase() {
+    public JaxbDatabase getDatabase() {
         return new JaxbDatabase();
     }
     @Override
-    public Database getDatabase(String name, Credentials credentials) {
+    public JaxbDatabase getDatabase(String name, Credentials credentials) throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream(name);
         return JaxbDatabase.load(credentials, inputStream);
     }
 
     @Override
-    public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
+    public void saveDatabase(JaxbDatabase database, Credentials credentials, OutputStream outputStream) throws IOException {
         database.save(credentials, outputStream);
     }
 
     @Override
-    public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
+    public JaxbDatabase loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
         return JaxbDatabase.load(credentials, inputStream);
     }
 
     @Override
     public Credentials getCreds(byte[] creds) {
         return new KdbxCreds(creds);
+    }
+
+
+    @Override
+    public boolean verifyStreamFormat(StreamFormat s1, StreamFormat s2) {
+        KdbxHeader h1 = (KdbxHeader) s1.getStreamConfiguration();
+        KdbxHeader h2 = (KdbxHeader) s1.getStreamConfiguration();
+        return (h1.getVersion() == h2.getVersion() &&
+                h1.getProtectedStreamAlgorithm().equals(h2.getProtectedStreamAlgorithm()) &&
+                h1.getKeyDerivationFunction().equals(h2.getKeyDerivationFunction()) &&
+                h1.getCipherAlgorithm().equals(h2.getCipherAlgorithm()));
     }
 }

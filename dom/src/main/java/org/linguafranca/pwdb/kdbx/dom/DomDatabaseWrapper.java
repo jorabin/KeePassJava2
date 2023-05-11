@@ -17,12 +17,13 @@
 package org.linguafranca.pwdb.kdbx.dom;
 
 import org.jetbrains.annotations.NotNull;
+import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.StreamConfiguration;
+import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.base.AbstractDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
+import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
-import org.linguafranca.pwdb.StreamFormat;
-import org.linguafranca.pwdb.Credentials;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -31,6 +32,7 @@ import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -42,36 +44,48 @@ import static org.linguafranca.pwdb.kdbx.dom.DomHelper.*;
  *
  * @author jo
  */
-public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper> {
-
-    private Document document;
-    private Element dbRootGroup;
-    Element dbMeta;
+public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper,
+        DomIconWrapper> {
 
     private final DomSerializableDatabase domDatabase = DomSerializableDatabase.createEmptyDatabase();
+    Element dbMeta;
+    private Document document;
+    private Element dbRootGroup;
 
 
-    public DomDatabaseWrapper ()  {
+    private StreamFormat<?> streamFormat;
+
+
+    public DomDatabaseWrapper() {
         init();
     }
 
-    public <C extends StreamConfiguration> DomDatabaseWrapper (StreamFormat<C> streamFormat, Credentials credentials, InputStream inputStream) throws IOException {
+    /**
+     * load a database
+     * @param credentials credentials to use
+     * @param inputStream where to read from
+     * @return a database
+     */
+    public DomDatabaseWrapper(Credentials credentials, InputStream inputStream) throws IOException {
+        this.streamFormat = new KdbxStreamFormat();
         streamFormat.load(domDatabase, credentials, inputStream);
         init();
     }
 
-    public static DomDatabaseWrapper load (@NotNull Credentials credentials, @NotNull InputStream inputStream) throws IOException {
-        return new DomDatabaseWrapper(new KdbxStreamFormat(),
+    /**
+     * load a database
+     * @param credentials credentials to use
+     * @param inputStream where to read from
+     * @return a database
+     */
+    public static DomDatabaseWrapper load(@NotNull Credentials credentials,
+                                          @NotNull InputStream inputStream) throws IOException {
+        return new DomDatabaseWrapper(
                 checkNotNull(credentials, "Credentials must not be null"),
                 checkNotNull(inputStream, "InputStream must not be null"));
     }
 
-    public static <C extends StreamConfiguration> DomDatabaseWrapper load (StreamFormat<C> streamFormat, @NotNull Credentials credentials, @NotNull InputStream inputStream) throws IOException {
-        return new DomDatabaseWrapper(streamFormat, credentials, inputStream);
-    }
-
-
-        private void init() {
+    private void init() {
         document = domDatabase.getDoc();
         try {
             dbRootGroup = ((Element) DomHelper.xpath.evaluate("/KeePassFile/Root/Group", document, XPathConstants.NODE));
@@ -81,13 +95,29 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
         }
     }
 
+    /**
+     * Save database with same format/encryption settings as it was loaded with or V4 defaults if was not loaded
+     * @param credentials credentials to use
+     * @param outputStream where to write
+     */
     @Override
-    public void save(Credentials credentials, OutputStream outputStream) throws IOException {
-        new KdbxStreamFormat().save(domDatabase, credentials, outputStream);
-        setDirty(false);
+    public void save(Credentials credentials,
+                     OutputStream outputStream) throws IOException {
+        if (Objects.isNull(streamFormat)){
+            streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
+        }
+        save(streamFormat, credentials, outputStream);
     }
 
-    public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
+    /**
+     * Save database with same format/encryption settings as it was loaded with
+     * @param streamFormat format/config to use for saving
+     * @param credentials credentials to use
+     * @param outputStream where to write
+     */
+    public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat,
+                                                     Credentials credentials,
+                                                     OutputStream outputStream) throws IOException {
         streamFormat.save(domDatabase, credentials, outputStream);
         setDirty(false);
     }
@@ -122,7 +152,7 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
 
     @Override
     public DomIconWrapper newIcon(Integer i) {
-        DomIconWrapper icon =  newIcon();
+        DomIconWrapper icon = newIcon();
         icon.setIndex(i);
         return icon;
     }
@@ -130,10 +160,10 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
     @Override
     public DomGroupWrapper getRecycleBin() {
         String UuidContent = getElementContent(RECYCLE_BIN_UUID_ELEMENT_NAME, dbMeta);
-        if (UuidContent != null){
+        if (UuidContent != null) {
             final UUID uuid = Helpers.uuidFromBase64(UuidContent);
             if (uuid.getLeastSignificantBits() != 0 && uuid.getMostSignificantBits() != 0) {
-                for (DomGroupWrapper g: getRootGroup().getGroups()) {
+                for (DomGroupWrapper g : getRootGroup().getGroups()) {
                     if (g.getUuid().equals(uuid)) {
                         return g;
                     }
@@ -186,6 +216,7 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
         DomHelper.touchElement("DatabaseDescriptionChanged", dbMeta);
         setDirty(true);
     }
-
-
+    public StreamFormat<?> getStreamFormat() {
+        return streamFormat;
+    }
 }

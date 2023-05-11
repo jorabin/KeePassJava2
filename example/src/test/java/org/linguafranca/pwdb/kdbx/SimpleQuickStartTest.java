@@ -76,8 +76,8 @@ public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGrou
         loadKdbx3SaveKdbx4("test123.kdbx","123".getBytes(), Files.newOutputStream(path));
 
         // load newly created V4 database
-        KdbxStreamFormat streamFormat = new KdbxStreamFormat();
-        DomDatabaseWrapper.load(streamFormat, new KdbxCreds("123".getBytes()), Files.newInputStream(path));
+        DomDatabaseWrapper db = DomDatabaseWrapper.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
+        KdbxStreamFormat streamFormat = (KdbxStreamFormat) db.getStreamFormat();
         assertEquals(4, streamFormat.getStreamConfiguration().getVersion());
         assertEquals(Encryption.Cipher.CHA_CHA_20, streamFormat.getStreamConfiguration().getCipherAlgorithm());
         assertEquals(Encryption.KeyDerivationFunction.ARGON2, streamFormat.getStreamConfiguration().getKeyDerivationFunction());
@@ -90,8 +90,8 @@ public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGrou
         loadKdbx4SaveKdbx3("V4-ChaCha20-Argon2-Attachment.kdbx","123".getBytes(), Files.newOutputStream(path));
 
         // load newly created V4 database
-        KdbxStreamFormat streamFormat = new KdbxStreamFormat();
-        DomDatabaseWrapper.load(streamFormat, new KdbxCreds("123".getBytes()), Files.newInputStream(path));
+        DomDatabaseWrapper db = DomDatabaseWrapper.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
+        KdbxStreamFormat streamFormat = (KdbxStreamFormat) db.getStreamFormat();
         assertEquals(3, streamFormat.getStreamConfiguration().getVersion());
         assertEquals(Encryption.Cipher.AES, streamFormat.getStreamConfiguration().getCipherAlgorithm());
         assertEquals(Encryption.KeyDerivationFunction.AES, streamFormat.getStreamConfiguration().getKeyDerivationFunction());

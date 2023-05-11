@@ -21,6 +21,7 @@ import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.StreamConfiguration;
 import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.base.AbstractDatabase;
+import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.ObjectFactory;
@@ -29,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -42,46 +44,46 @@ public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, Jaxb
     private final KeePassFile keePassFile;
     private final ObjectFactory objectFactory = new ObjectFactory();
     private final JaxbGroup root;
+    private StreamFormat<?> streamFormat;
 
     public JaxbDatabase() {
-        this(createEmptyDatabase().getKeePassFile());
+        this(createEmptyDatabase().getKeePassFile(), null);
     }
 
-    private JaxbDatabase(KeePassFile keePassFile) {
+    private JaxbDatabase(KeePassFile keePassFile, StreamFormat<?> streamFormat) {
         this.keePassFile = keePassFile;
         this.root = new JaxbGroup(this, keePassFile.getRoot().getGroup());
+        this.streamFormat = streamFormat;
     }
 
     public static JaxbDatabase createEmptyDatabase() {
         InputStream inputStream = JaxbDatabase.class.getClassLoader().getResourceAsStream("base.kdbx.xml");
         KeePassFile keePassFile = new JaxbSerializableDatabase().load(inputStream).keePassFile;
         keePassFile.getRoot().getGroup().setUUID(UUID.randomUUID());
-        return new JaxbDatabase(keePassFile);
+        return new JaxbDatabase(keePassFile, null);
     }
 
-    public static JaxbDatabase load(Credentials creds, InputStream inputStream) {
+    public static JaxbDatabase load(Credentials creds, InputStream inputStream) throws IOException {
         return load(new KdbxStreamFormat(), creds, inputStream);
     }
 
     @NotNull
-    public static <C extends StreamConfiguration> JaxbDatabase load(StreamFormat<C> format, Credentials creds, InputStream inputStream) {
+    public static <C extends StreamConfiguration> JaxbDatabase load(StreamFormat<C> format, Credentials creds, InputStream inputStream) throws IOException {
         JaxbSerializableDatabase db = new JaxbSerializableDatabase();
-        try {
-            format.load(db, creds, inputStream);
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
-        }
-        return new JaxbDatabase(db.getKeePassFile());
+        format.load(db, creds, inputStream);
+        return new JaxbDatabase(db.getKeePassFile(), format);
     }
 
     @Override
     public void save(Credentials creds, OutputStream outputStream) throws IOException {
-        save(new KdbxStreamFormat(), creds, outputStream);
+        if (Objects.isNull(this.streamFormat)){
+            this.streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
+        }
+        save(this.streamFormat, creds, outputStream);
     }
 
     public <C extends StreamConfiguration> void save(StreamFormat<C> format, Credentials creds, OutputStream outputStream) throws IOException {
-        JaxbSerializableDatabase jsd = new JaxbSerializableDatabase();
-        jsd.setKeePassFile(this.keePassFile);
+        JaxbSerializableDatabase jsd = new JaxbSerializableDatabase(this.keePassFile);
         format.save(jsd, creds, outputStream);
         setDirty(false);
     }
@@ -186,5 +188,11 @@ public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, Jaxb
 
     public void createBinary(byte[] value, Integer index) {
         JaxbSerializableDatabase.addBinary(getKeePassFile(), getObjectFactory(), index, value);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public StreamFormat<?> getStreamFormat(){
+        return streamFormat;
     }
 }

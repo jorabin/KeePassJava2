@@ -45,21 +45,19 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
 
     KeePassFile keePassFile;
     StreamFormat<?> streamFormat;
-    private SimpleSerializableDatabase serializableDatabase;
 
     /**
      * Create a new empty database
      */
     public SimpleDatabase() {
-        this(createEmptyDatabase());
+        this(createEmptyDatabase(), null);
     }
 
-    public SimpleDatabase(KeePassFile file) {
+    public SimpleDatabase(KeePassFile file, StreamFormat<?> streamFormat) {
         try {
             keePassFile = file;
             keePassFile.root.group.database = this;
-            this.serializableDatabase = new SimpleSerializableDatabase();
-            this.serializableDatabase.setKeePassFile(this.keePassFile);
+            this.streamFormat = streamFormat;
             SimpleSerializableDatabase.fixUp(keePassFile.root.group);
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -75,38 +73,21 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
     public static SimpleDatabase loadXml(InputStream inputStream) throws Exception {
         KeePassFile result =  getSerializer().read(KeePassFile.class, inputStream);
         result.root.group.uuid = UUID.randomUUID();
-        return new SimpleDatabase(result);
+        return new SimpleDatabase(result, null);
     }
 
     /**
      * Load kdbx file
      *
-     * @param credentials the credentials to use
-     * @param inputStream the encrypted input stream
-     * @return a new database
-     */
-    public static SimpleDatabase load(Credentials credentials, InputStream inputStream) throws IOException {
-        // doesn't matter how streamFormat is initialised
-        return load(new KdbxStreamFormat(), credentials, inputStream);
-    }
-
-    /**
-     * Load file with a choice of StreamFormat
-     * @param streamFormat which contains format information about the file after load
      * @param credentials credentials to use
      * @param inputStream where to load from
      * @return a new database
-     * @param <C> config for the streamFormat
      */
-    public static <C extends StreamConfiguration> SimpleDatabase load(StreamFormat<C> streamFormat,
-                                                                      Credentials credentials,
-                                                                      InputStream inputStream) throws IOException {
+    public static SimpleDatabase load(Credentials credentials, InputStream inputStream) throws IOException {
         SimpleSerializableDatabase simpleSerializableDatabase = new SimpleSerializableDatabase();
+        StreamFormat<?> streamFormat = new KdbxStreamFormat();
         streamFormat.load(simpleSerializableDatabase, credentials, inputStream);
-        SimpleDatabase db = new SimpleDatabase(simpleSerializableDatabase.getKeePassFile());
-        db.serializableDatabase = simpleSerializableDatabase;
-        db.streamFormat = streamFormat;
-        return db;
+        return new SimpleDatabase(simpleSerializableDatabase.getKeePassFile(), streamFormat);
     }
 
     /**
@@ -132,7 +113,8 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
     @Override
     public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
                                                      OutputStream outputStream) throws IOException{
-        streamFormat.save(this.serializableDatabase, credentials, outputStream);
+        SimpleSerializableDatabase simpleSerializableDatabase = new SimpleSerializableDatabase(this.keePassFile);
+        streamFormat.save(simpleSerializableDatabase, credentials, outputStream);
         setDirty(false);
     }
 
@@ -223,5 +205,9 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
 
     public void addBinary(byte [] bytes, int index) {
         SimpleSerializableDatabase.addBinary(this.keePassFile, index, bytes);
+    }
+
+    public StreamFormat<?> getStreamFormat() {
+        return streamFormat;
     }
 }

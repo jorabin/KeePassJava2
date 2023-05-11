@@ -38,7 +38,7 @@ public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
     @Test
     public void inspectPasswordDatabase() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
-        DomDatabaseWrapper database = new DomDatabaseWrapper(new KdbxStreamFormat(), new KdbxCreds("123".getBytes()), inputStream);
+        DomDatabaseWrapper database = new DomDatabaseWrapper(new KdbxCreds("123".getBytes()), inputStream);
 
         database.save(new StreamFormat.None(), new Credentials.None(), System.out);
     }
@@ -48,7 +48,7 @@ public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
         InputStream keyFileInputStream = getClass().getClassLoader().getResourceAsStream("KeyFileDatabase.key");
         Credentials credentials = new KdbxCreds("123".getBytes(), keyFileInputStream);
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("KeyFileDatabase.kdbx");
-        DomDatabaseWrapper database = new DomDatabaseWrapper(new KdbxStreamFormat(), credentials, inputStream);
+        DomDatabaseWrapper database = new DomDatabaseWrapper(credentials, inputStream);
 
         database.save(new StreamFormat.None(), new Credentials.None(), System.out);
     }

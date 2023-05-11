@@ -64,7 +64,7 @@ public class VisitorTest {
     public void testLoadDB() {
         try {
             InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
-            DomDatabaseWrapper db = new DomDatabaseWrapper(new KdbxStreamFormat(), new KdbxCreds("123".getBytes()), inputStream);
+            DomDatabaseWrapper db = new DomDatabaseWrapper(new KdbxCreds("123".getBytes()), inputStream);
             db.visit(visitor);
 
             //noinspection unchecked

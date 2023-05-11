@@ -123,6 +123,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
 
     @Override
     public void save(OutputStream outputStream) {
+        // make a copy so we can mess with content
         Document copyDoc = (Document) doc.cloneNode(true);
         try {
             // check whether protection is required and if so mark the element with @Protected='True'

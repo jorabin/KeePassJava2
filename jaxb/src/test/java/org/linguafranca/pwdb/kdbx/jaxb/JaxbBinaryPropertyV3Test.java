@@ -30,7 +30,7 @@ import java.io.OutputStream;
  */
 public class JaxbBinaryPropertyV3Test extends BinaryPropertyChecks {
 
-    public JaxbBinaryPropertyV3Test() {
+    public JaxbBinaryPropertyV3Test() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
         database = JaxbDatabase.load(new KdbxCreds("123".getBytes()),inputStream);
     }

@@ -32,6 +32,7 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author jo
@@ -39,10 +40,29 @@ import java.util.List;
 @SuppressWarnings("WeakerAccess")
 public class JaxbSerializableDatabase implements SerializableDatabase {
 
+    private final ObjectFactory objectFactory = new ObjectFactory();
     protected KeePassFile keePassFile;
     private StreamEncryptor encryption;
-    private final ObjectFactory objectFactory = new ObjectFactory();
 
+    public JaxbSerializableDatabase() {
+
+    }
+
+    public JaxbSerializableDatabase(KeePassFile keePassFile) {
+        this.keePassFile = keePassFile;
+    }
+
+    public static void addBinary(KeePassFile keePassFile, ObjectFactory objectFactory, int index, byte[] value) {
+        // create a new binary to put in the store
+        Binaries.Binary newBin = objectFactory.createBinariesBinary();
+        newBin.setID(index);
+        newBin.setValue(Helpers.zipBinaryContent(value));
+        newBin.setCompressed(true);
+        if (keePassFile.getMeta().getBinaries() == null) {
+            keePassFile.getMeta().setBinaries(objectFactory.createBinaries());
+        }
+        keePassFile.getMeta().getBinaries().getBinary().add(newBin);
+    }
 
     @Override
     public JaxbSerializableDatabase load(InputStream inputStream) {
@@ -54,7 +74,7 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
                 public void afterUnmarshal(Object target, Object parent) {
                     if (target instanceof StringField.Value) {
                         StringField.Value value = (StringField.Value) target;
-                        if (value.getProtected() !=null && value.getProtected()) {
+                        if (value.getProtected() != null && value.getProtected()) {
                             byte[] encrypted = Base64.decodeBase64(value.getValue().getBytes());
                             String decrypted = new String(encryption.decrypt(encrypted), StandardCharsets.UTF_8);
                             value.setValue(decrypted);
@@ -98,16 +118,41 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
             JAXBContext jc = JAXBContext.newInstance(KeePassFile.class);
             Marshaller u = jc.createMarshaller();
             u.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+            // we encrypt values on marshal and then reset them afterwards
+            // this may seem a bit clunky, but seems like it's actually less fiddly than other things
             u.setListener(new Marshaller.Listener() {
+                String savedValue = "";
+
+                /**
+                 * Change protected fields on marshal
+                 * @param source instance of JAXB mapped class prior to marshalling from it.
+                 */
                 @Override
                 public void beforeMarshal(Object source) {
                     if (source instanceof StringField) {
                         StringField field = (StringField) source;
                         if (toEncrypt.contains(field.getKey())) {
+                            this.savedValue = field.getValue().getValue();
                             byte[] encrypted = encryption.encrypt(field.getValue().getValue().getBytes());
                             String b64 = new String(Base64.encodeBase64(encrypted), StandardCharsets.UTF_8);
                             field.getValue().setValue(b64);
                             field.getValue().setProtected(true);
+                        }
+                    }
+                }
+
+                /**
+                 * Restore protected fields after marshal
+                 * @param source instance of JAXB mapped class after marshalling it.
+                 */
+                @Override
+                public void afterMarshal(Object source) {
+                    if (source instanceof StringField) {
+                        StringField field = (StringField) source;
+                        if (Objects.nonNull(field.getValue().getProtected()) && field.getValue().getProtected()) {
+                            field.getValue().setValue(savedValue );
+                            field.getValue().setProtected(false);
+                            savedValue = "";
                         }
                     }
                 }
@@ -150,22 +195,11 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
 
     @Override
     public int getBinaryCount() {
+        if (Objects.isNull(keePassFile.getMeta().getBinaries())) {
+            return 0;
+        }
         return keePassFile.getMeta().getBinaries().getBinary().size();
     }
-
-    public static void addBinary(KeePassFile keePassFile, ObjectFactory objectFactory, int index, byte[] value) {
-        // create a new binary to put in the store
-        Binaries.Binary newBin = objectFactory.createBinariesBinary();
-        newBin.setID(index);
-        newBin.setValue(Helpers.zipBinaryContent(value));
-        newBin.setCompressed(true);
-        if (keePassFile.getMeta().getBinaries() == null) {
-            keePassFile.getMeta().setBinaries(objectFactory.createBinaries());
-        }
-        keePassFile.getMeta().getBinaries().getBinary().add(newBin);
-    }
-
-
 
     public KeePassFile getKeePassFile() {
         return keePassFile;

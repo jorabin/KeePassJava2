@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx.simple;
 
 import org.junit.Test;
+import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.checks.SaveAndReloadChecks;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
@@ -59,6 +60,17 @@ public class SimpleSaveAndReloadTest extends SaveAndReloadChecks {
         } catch (Exception e) {
             throw new IOException(e);
         }
+    }
+
+
+    @Override
+    public boolean verifyStreamFormat(StreamFormat s1, StreamFormat s2) {
+        KdbxHeader h1 = (KdbxHeader) s1.getStreamConfiguration();
+        KdbxHeader h2 = (KdbxHeader) s1.getStreamConfiguration();
+        return (h1.getVersion() == h2.getVersion() &&
+                h1.getProtectedStreamAlgorithm().equals(h2.getProtectedStreamAlgorithm()) &&
+                h1.getKeyDerivationFunction().equals(h2.getKeyDerivationFunction()) &&
+                h1.getCipherAlgorithm().equals(h2.getCipherAlgorithm()));
     }
 
 

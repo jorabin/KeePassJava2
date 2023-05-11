@@ -16,10 +16,13 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
+import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.checks.SaveAndReloadChecks;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.kdbx.KdbxHeader;
+import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,5 +56,15 @@ public class DomSaveAndReloadTest extends SaveAndReloadChecks {
     @Override
     public Credentials getCreds(byte[] creds) {
         return new KdbxCreds("123".getBytes());
+    }
+
+    @Override
+    public boolean verifyStreamFormat(StreamFormat s1, StreamFormat s2) {
+        KdbxHeader h1 = (KdbxHeader) s1.getStreamConfiguration();
+        KdbxHeader h2 = (KdbxHeader) s1.getStreamConfiguration();
+        return (h1.getVersion() == h2.getVersion() &&
+                h1.getProtectedStreamAlgorithm().equals(h2.getProtectedStreamAlgorithm()) &&
+                h1.getKeyDerivationFunction().equals(h2.getKeyDerivationFunction()) &&
+                h1.getCipherAlgorithm().equals(h2.getCipherAlgorithm()));
     }
 }

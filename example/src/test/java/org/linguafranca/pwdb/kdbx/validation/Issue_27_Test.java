@@ -23,7 +23,7 @@ public class Issue_27_Test {
      * Check load of problem file
      */
     @Test
-    public void testIssue27() {
+    public void testIssue27() throws IOException {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx");
         KdbxCreds creds = new KdbxCreds("passwordless".getBytes());
         JaxbDatabase db = JaxbDatabase.load(creds, is);
@@ -39,7 +39,7 @@ public class Issue_27_Test {
      * Verify that V4 dates are still processed correctly
      */
     @Test
-    public void testV4Date() {
+    public void testV4Date() throws IOException {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("V4-AES-AES.kdbx");
         KdbxCreds creds = new KdbxCreds("123".getBytes());
         JaxbDatabase db = JaxbDatabase.load(creds, is);
