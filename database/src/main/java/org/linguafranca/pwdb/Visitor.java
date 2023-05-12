@@ -16,29 +16,31 @@
 
 package org.linguafranca.pwdb;
 
+import java.io.PrintStream;
+
 /**
  * Interface for implementing a visitor for Groups, their sub-Groups and their Entries.
  *
  * @author jo
  */
-public interface Visitor {
+public interface Visitor <D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon> {
     /**
      * Called on entry to a group visit
      * @param group the group being visited
      */
-    void startVisit(Group group);
+    void startVisit(G group);
 
     /**
      * Called on exit from a group visit
      * @param group the group being exited
      */
-    void endVisit(Group group);
+    void endVisit(G group);
 
     /**
      * Called on visit to an entry
      * @param entry the entry being visited
      */
-    void visit(Entry entry);
+    void visit(E entry);
 
     /**
      * called to determine whether to visit entries before subgroups, or not
@@ -49,16 +51,17 @@ public interface Visitor {
     /**
      * Empty implementation of Visitor
      */
-    abstract class Default implements Visitor {
+    abstract class Default <D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon>
+            implements Visitor <D, G, E, I>{
 
         @Override
-        public void startVisit(Group group) {}
+        public void startVisit(G group) {}
 
         @Override
-        public void endVisit(Group group) {}
+        public void endVisit(G group) {}
 
         @Override
-        public void visit(Entry entry) {}
+        public void visit(E entry) {}
 
         @Override
         public boolean isEntriesFirst() {
@@ -69,15 +72,29 @@ public interface Visitor {
     /**
      * Visitor prints the Groups and Entries it visits to console
      */
-    class Print extends Default {
-        @Override
-        public void startVisit(Group group) {
-            System.out.println(group.toString());
+    class Print <D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon>
+            extends Default<D, G, E, I> {
+
+        private final PrintStream printStream;
+
+        public Print() {
+            this(System.out);
+        }
+
+        public Print(PrintStream out) {
+            this.printStream = out;
         }
 
         @Override
-        public void visit(Entry entry) {
-            System.out.println(entry.toString());
+        public void startVisit(G group) {
+            printStream.println(group.toString());
         }
+
+        @Override
+        @Deprecated
+        public void visit(E entry) {
+            printStream.println(entry.toString());
+        }
+
     }
 }

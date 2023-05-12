@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * Examples for QuickStart
@@ -37,6 +38,9 @@ import static org.junit.Assert.assertEquals;
  */
 @SuppressWarnings("WeakerAccess")
 public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D, G, E, I>, I extends Icon> {
+
+    static PrintStream printStream = getTestPrintStream();
+
 
     public abstract D getDatabase();
     public abstract D loadDatabase(Credentials creds, InputStream inputStream);
@@ -57,7 +61,7 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
             // Jaxb implementation seems a lot faster than the DOM implementation
             D database = loadDatabase(credentials, inputStream);
             // visit all groups and entries and list them to console
-            database.visit(new Visitor.Print());
+            database.visit(new Visitor.Print(printStream));
         }
     }
 

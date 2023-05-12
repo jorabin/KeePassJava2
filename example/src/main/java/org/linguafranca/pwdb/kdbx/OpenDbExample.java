@@ -7,6 +7,9 @@ import org.linguafranca.pwdb.kdbx.jaxb.JaxbDatabase;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 
 import java.io.InputStream;
+import java.io.PrintStream;
+
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * Example and naive speed test for various implementations.
@@ -14,6 +17,8 @@ import java.io.InputStream;
  * @author jo
  */
 public class OpenDbExample {
+
+    static PrintStream printStream = getTestPrintStream();
 
     private interface DbLoader {
         Database load(KdbxCreds creds, InputStream inputStream) throws Exception;
@@ -52,17 +57,17 @@ public class OpenDbExample {
                 }
             }
         }
-        System.out.printf("%s %d loads %d iterations %d millis%n", label, loads, iterations, System.currentTimeMillis()-start);
+        printStream.printf("%s %d loads %d iterations %d millis%n", label, loads, iterations, System.currentTimeMillis()-start);
     }
 
 
     public static void main(String[] args) throws Exception {
-        System.out.println("Warming up JVM");
+        printStream.println("Warming up JVM");
         testDb(new SimpleDbLoader(), "Simple", 5, 20);
         testDb(new JaxbDbLoader(), "Jaxb", 5, 20);
         testDb(new DomDbLoader(), "Dom", 5, 20);
 
-        System.out.println("Sleeping");
+        printStream.println("Sleeping");
         System.gc();
         Thread.sleep(2000);
 
@@ -70,7 +75,7 @@ public class OpenDbExample {
         testDb(new JaxbDbLoader(), "Jaxb", 5, 20);
         testDb(new DomDbLoader(), "Dom", 5, 20);
 
-        System.out.println("Sleeping");
+        printStream.println("Sleeping");
         System.gc();
         Thread.sleep(2000);
 
@@ -78,7 +83,7 @@ public class OpenDbExample {
         testDb(new JaxbDbLoader(), "Jaxb", 10, 1);
         testDb(new DomDbLoader(), "Dom", 10, 1);
 
-        System.out.println("Sleeping");
+        printStream.println("Sleeping");
         System.gc();
         Thread.sleep(2000);
 

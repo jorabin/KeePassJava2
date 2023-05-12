@@ -25,21 +25,26 @@ import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertTrue;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author Jo
  */
 public class VisitorTest {
+
+    static PrintStream printStream = getTestPrintStream();
+
     private List<Entry> visitorList = new ArrayList<>();
     private Visitor visitor = new Visitor() {
         StringBuffer indentation = new StringBuffer();
         @Override
         public void startVisit(Group group) {
-            System.out.println(indentation.toString() + group.getName());
+            printStream.println(indentation.toString() + group.getName());
             indentation.append("   ");
         }
 
@@ -55,7 +60,7 @@ public class VisitorTest {
 
         @Override
         public void visit(Entry entry) {
-            System.out.println(indentation.toString() + "= " + entry.getTitle());
+            printStream.println(indentation.toString() + "= " + entry.getTitle());
             visitorList.add(entry);
         }
     };

@@ -19,19 +19,24 @@ package org.linguafranca.pwdb.kdbx.dom;
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.Helpers;
 
+import java.io.PrintStream;
+
 import static org.junit.Assert.assertEquals;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
 public class DomHelperTest {
 
+    static PrintStream printStream = getTestPrintStream();
+
     @Test
     public void testBase64RandomUuid() throws Exception {
         // just check that it can do something
         String uuid1 =  DomHelper.base64RandomUuid();
-        System.out.println(Helpers.uuidFromBase64(uuid1));
+        printStream.println(Helpers.uuidFromBase64(uuid1));
         String uuid2 = DomHelper.base64RandomUuid();
-        System.out.println(Helpers.uuidFromBase64(uuid2));
+        printStream.println(Helpers.uuidFromBase64(uuid2));
     }
 }

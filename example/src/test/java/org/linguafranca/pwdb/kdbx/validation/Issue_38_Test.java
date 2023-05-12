@@ -7,13 +7,17 @@ import org.linguafranca.pwdb.kdbx.dom.DomEntryWrapper;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.List;
+
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * Bug report on GitHub, the Keyfile is Version 2 (Hex)
  */
 public class Issue_38_Test {
 
+    static PrintStream printStream = getTestPrintStream();
     @Test
     public void testV2Keyfile() throws IOException {
         InputStream databaseStream = Issue_38_Test.class.getClassLoader().getResourceAsStream("issue-38/Database/Database.kdbx");
@@ -24,6 +28,6 @@ public class Issue_38_Test {
         DomDatabaseWrapper database = DomDatabaseWrapper.load(creds, databaseStream);
         List<? extends DomEntryWrapper> entries = database.findEntries("Sample Entry");
         DomEntryWrapper entry = entries.get(0);
-        System.out.println(entry.getTitle());
+        printStream.println(entry.getTitle());
     }
 }

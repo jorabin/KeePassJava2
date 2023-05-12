@@ -13,12 +13,15 @@ import org.linguafranca.pwdb.kdbx.jaxb.JaxbEntry;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 public class Issue_27_Test {
+    static PrintStream printStream = getTestPrintStream();
     /**
      * Check load of problem file
      */
@@ -30,7 +33,7 @@ public class Issue_27_Test {
         List<? extends JaxbEntry> entries = db.findEntries("testtitle");
 
         for (JaxbEntry entry: entries) {
-            System.out.println(Helpers.fromDate(entry.getCreationTime()));
+            printStream.println(Helpers.fromDate(entry.getCreationTime()));
             assertEquals("2021-01-11T09:18:56Z", Helpers.fromDate(entry.getCreationTime()));
         }
     }
@@ -46,7 +49,7 @@ public class Issue_27_Test {
         List<? extends JaxbEntry> entries = db.findEntries("Sample Entry #2 - Copy");
 
         for (JaxbEntry entry: entries) {
-            System.out.println(Helpers.fromDate(entry.getCreationTime()));
+            printStream.println(Helpers.fromDate(entry.getCreationTime()));
             assertEquals("2018-01-26T13:20:58Z", Helpers.fromDate(entry.getCreationTime()));
         }
     }
@@ -57,6 +60,6 @@ public class Issue_27_Test {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx");
         KdbxCreds creds = new KdbxCreds("passwordless".getBytes());
         InputStream plainText = KdbxSerializer.createUnencryptedInputStream(creds,new KdbxHeader(), is);
-        System.out.println(CharStreams.toString(new InputStreamReader(plainText, StandardCharsets.UTF_8)));
+        printStream.println(CharStreams.toString(new InputStreamReader(plainText, StandardCharsets.UTF_8)));
     }
 }

@@ -28,11 +28,15 @@ import org.linguafranca.pwdb.kdbx.KdbxSerializer;
 import java.io.*;
 
 import static org.junit.Assert.assertTrue;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
 public class SimpleSaveAndReloadTest extends SaveAndReloadChecks {
+
+    static PrintStream printStream = getTestPrintStream();
+
     @Override
     public Database getDatabase() {
         return new SimpleDatabase();
@@ -95,7 +99,7 @@ public class SimpleSaveAndReloadTest extends SaveAndReloadChecks {
                 assertTrue(string.contains("True"));
                 foundValue = true;
             }
-            System.out.println(string);
+            printStream.println(string);
         }
         assertTrue(foundValue);
     }

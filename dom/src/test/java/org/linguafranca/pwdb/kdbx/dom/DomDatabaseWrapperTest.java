@@ -26,11 +26,16 @@ import org.linguafranca.pwdb.Credentials;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
+
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
 public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
+
+    static PrintStream printStream = getTestPrintStream();
 
     public DomDatabaseWrapperTest() throws IOException {
     }
@@ -40,7 +45,7 @@ public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
         DomDatabaseWrapper database = new DomDatabaseWrapper(new KdbxCreds("123".getBytes()), inputStream);
 
-        database.save(new StreamFormat.None(), new Credentials.None(), System.out);
+        database.save(new StreamFormat.None(), new Credentials.None(), printStream);
     }
 
     @Test
@@ -50,7 +55,7 @@ public class DomDatabaseWrapperTest extends BasicDatabaseChecks {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("KeyFileDatabase.kdbx");
         DomDatabaseWrapper database = new DomDatabaseWrapper(credentials, inputStream);
 
-        database.save(new StreamFormat.None(), new Credentials.None(), System.out);
+        database.save(new StreamFormat.None(), new Credentials.None(), printStream);
     }
 
     @Override

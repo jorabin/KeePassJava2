@@ -19,12 +19,14 @@ package org.linguafranca.pwdb.kdbx;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 import org.xml.sax.*;
+import org.xml.sax.helpers.DefaultHandler;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 
 /**
  * @author jo
@@ -32,11 +34,12 @@ import java.io.InputStream;
 public class SaxParse {
     /**
      * SAX Parsing - shows also how to decrypt values that are stored encrypted in XML (Inner Stream Encryption)
+     * though it doesn't decode other values, like dates etc.
      */
-    public void exampleSaxparsing(String resourceName) throws IOException, SAXException, ParserConfigurationException {
+    public void exampleSaxParsing(String resourceName, Credentials credentials, PrintWriter writer) throws IOException, SAXException, ParserConfigurationException {
         InputStream encryptedInputStream = getClass().getClassLoader().getResourceAsStream(resourceName);
-        Credentials credentials = new KdbxCreds("123".getBytes());
         KdbxHeader kdbxHeader = new KdbxHeader();
+
         try (InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, encryptedInputStream)) {
             // use this to decrypt the encrypted fields
             final StreamEncryptor valueEncryptor = kdbxHeader.getInnerStreamEncryptor();
@@ -44,68 +47,42 @@ public class SaxParse {
             SAXParser saxParser = spfactory.newSAXParser();
             XMLReader xmlReader = saxParser.getXMLReader();
 
-            xmlReader.setContentHandler(new ContentHandler() {
+            xmlReader.setContentHandler(new DefaultHandler() {
                 boolean protectedContent = false;
 
                 @Override
-                public void setDocumentLocator(Locator locator) {
-
-                }
-
-                @Override
-                public void startDocument() throws SAXException {
-                    System.out.println("Starting document");
-                }
-
-                @Override
-                public void endDocument() throws SAXException {
-                    System.out.println("Ending document");
-                }
-
-                @Override
-                public void startPrefixMapping(String prefix, String uri) throws SAXException {
-
-                }
-
-                @Override
-                public void endPrefixMapping(String prefix) throws SAXException {
-
-                }
-
-                @Override
-                public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException {
+                public void startElement(String uri, String localName, String qName, Attributes atts) {
                     protectedContent = atts.getIndex("Protected") >= 0;
-                    System.out.print("<" + qName + ">");
+                    writer.append("<")
+                                    .append(qName);
+                    for (int i = 0; i < atts.getLength(); i++){
+                        if (!atts.getLocalName(i).equals("Protected")) {
+                            // we wil decrypt protected values
+                            writer.append(" ")
+                                    .append(atts.getLocalName(i))
+                                    .append(" = \"")
+                                    .append(atts.getValue(i))
+                                    .append("\"");
+                        }
+                    }
+                    writer.append(">");
                 }
 
                 @Override
-                public void endElement(String uri, String localName, String qName) throws SAXException {
-                    System.out.print("</" + qName + ">");
+                public void endElement(String uri, String localName, String qName) {
+                    writer.append("</")
+                            .append(qName)
+                            .append(">");
                 }
 
                 @Override
-                public void characters(char[] ch, int start, int length) throws SAXException {
+                public void characters(char[] ch, int start, int length) {
                     String content = new String(ch, start, length);
                     if (protectedContent) {
                         content = new String(valueEncryptor.decrypt(Helpers.decodeBase64Content(content.getBytes(), false)));
                     }
-                    System.out.print(content);
+                    writer.append(content);
                     protectedContent = false;
-                }
-
-                @Override
-                public void ignorableWhitespace(char[] ch, int start, int length) throws SAXException {
-
-                }
-
-                @Override
-                public void processingInstruction(String target, String data) throws SAXException {
-
-                }
-
-                @Override
-                public void skippedEntity(String name) throws SAXException {
-
                 }
             });
 

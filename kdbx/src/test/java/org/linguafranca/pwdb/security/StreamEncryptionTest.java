@@ -19,15 +19,19 @@ package org.linguafranca.pwdb.security;
 import org.junit.Test;
 import org.linguafranca.pwdb.security.StreamEncryptor.*;
 
+import java.io.PrintStream;
 import java.security.SecureRandom;
 
 import static org.junit.Assert.assertEquals;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * Verify that the inner random encryption works two-way
  * @author jo
  */
 public class StreamEncryptionTest {
+
+    static PrintStream printStream = getTestPrintStream();
 
     @Test
     public void salsa20() {
@@ -59,8 +63,8 @@ public class StreamEncryptionTest {
         assertEquals("new secret", s1);
         assertEquals("secret 2", t1);
 
-        System.out.println(s1);
-        System.out.println(t1);
+        printStream.println(s1);
+        printStream.println(t1);
     }
 
 }

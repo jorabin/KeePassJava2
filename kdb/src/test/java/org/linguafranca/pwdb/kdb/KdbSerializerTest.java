@@ -21,16 +21,22 @@ import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Visitor;
 
 import java.io.InputStream;
+import java.io.PrintStream;
+
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
 public class KdbSerializerTest {
 
+    static PrintStream printStream = getTestPrintStream();
+
+
     @Test
     public void testCreateKdbDatabase() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdb");
         Database database = KdbDatabase.load(new KdbCredentials.Password("123".getBytes()), inputStream);
-        database.visit(new Visitor.Print());
+        database.visit(new Visitor.Print(printStream));
     }
 }

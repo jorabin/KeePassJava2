@@ -21,11 +21,15 @@ import org.linguafranca.pwdb.kdbx.jaxb.binding.KeePassFile;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.StringField;
 
 import javax.xml.bind.*;
+import java.io.PrintStream;
+
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
 public class JaxbTest {
+    static PrintStream printStream = getTestPrintStream();
 
     @Test
     public void unmarshal() throws JAXBException {
@@ -34,7 +38,7 @@ public class JaxbTest {
         u.setEventHandler(new ValidationEventHandler() {
             @Override
             public boolean handleEvent(ValidationEvent event) {
-                System.out.println(event.getLocator().getLineNumber() +": "+ event.getMessage());
+                printStream.println(event.getLocator().getLineNumber() +": "+ event.getMessage());
                 return true;
             }
         });
@@ -43,13 +47,13 @@ public class JaxbTest {
             public void afterUnmarshal(Object target, Object parent) {
                 if (target instanceof StringField.Value) {
                     StringField.Value value = (StringField.Value) target;
-                    System.out.println(value.getValue());
+                    printStream.println(value.getValue());
                 }
                 super.afterUnmarshal(target, parent);
             }
         });
         KeePassFile kpf = (KeePassFile) u.unmarshal(getClass().getClassLoader().getResourceAsStream("ExampleDatabase.xml"));
-        System.out.println(kpf.getMeta().getDatabaseDescription());
+        printStream.println(kpf.getMeta().getDatabaseDescription());
 
     }
 }

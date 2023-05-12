@@ -1,0 +1,21 @@
+<!--
+This is the logback configuration file that is picked up by the entire project
+when compiled/run the root maven POM
+-->
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoders are assigned the type
+             ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+        <encoder>
+            <pattern>-%highlight(%-5level) %d{HH:mm:ss.SSS} [%thread] %logger{36} - %cyan(%marker) %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="STDOUT" />
+    </root>
+
+    <shutdownHook class="ch.qos.logback.core.hook.DefaultShutdownHook">
+        <delay>100</delay>
+    </shutdownHook>
+</configuration>

@@ -22,11 +22,13 @@ import java.io.*;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
 public class HashBlockTest {
+    static PrintStream printStream = getTestPrintStream();
 
     @Test
     public void testSmallBuf () throws IOException {
@@ -108,7 +110,7 @@ public class HashBlockTest {
         os.write(buf);
         os.flush();
         os.close();
-        System.out.println("File size is " + test.length() + " test buffer is " + length);
+        printStream.println("File size is " + test.length() + " test buffer is " + length);
     }
 
 }

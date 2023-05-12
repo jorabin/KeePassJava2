@@ -24,12 +24,16 @@ import org.linguafranca.xml.XmlInputStreamFilter;
 import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.util.Scanner;
+
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
 public class KdbxInnerInputStreamTest {
+    static PrintStream printStream = getTestPrintStream();
 
     // TODO what does this test, exactly?
     @Test
@@ -38,7 +42,7 @@ public class KdbxInnerInputStreamTest {
         XmlInputStreamFilter sxd = new XmlInputStreamFilter(is, new KdbxInputTransformer(new StreamEncryptor.None()));
         Scanner s = new Scanner(is);
         while (s.hasNext()) {
-            System.out.println(s.nextLine());
+            printStream.println(s.nextLine());
         }
         s.close();
    }

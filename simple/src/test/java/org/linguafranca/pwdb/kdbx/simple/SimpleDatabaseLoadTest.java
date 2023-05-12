@@ -23,34 +23,39 @@ import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 
 import java.io.InputStream;
+import java.io.PrintStream;
+
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
 public class SimpleDatabaseLoadTest {
 
+    static PrintStream printStream = getTestPrintStream();
+
     @Test
     public void loadXml() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("ExampleDatabase.xml");
         SimpleDatabase database = SimpleDatabase.loadXml(inputStream);
-        database.visit(new Visitor.Print());
+        database.visit(new Visitor.Print(printStream));
     }
     @Test
     public void loadKdbx() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
         SimpleDatabase database = SimpleDatabase.load(new KdbxCreds("123".getBytes()), inputStream);
-        database.visit(new Visitor.Print());
+        database.visit(new Visitor.Print(printStream));
     }
     @Test
     public void loadKdbxV4() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx");
         SimpleDatabase database = SimpleDatabase.load(new KdbxCreds("123".getBytes()), inputStream);
-        database.visit(new Visitor.Print());
+        database.visit(new Visitor.Print(printStream));
         // test what happens to dates in V4
         database.visit(new Visitor.Default(){
             @Override
             public void visit(Entry entry) {
-                System.out.println(entry.getCreationTime());
+                printStream.println(entry.getCreationTime());
             }
         });
     }
@@ -58,14 +63,14 @@ public class SimpleDatabaseLoadTest {
     @Test
     public void emptyDb() throws Exception {
         SimpleDatabase database = new SimpleDatabase();
-        System.out.println(database.getDescription());
+        printStream.println(database.getDescription());
     }
 
     @Test
     public void dbWithDeleted() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("testDeleted.kdbx");
         SimpleDatabase database = SimpleDatabase.load(new KdbxCreds("123".getBytes()), inputStream);
-        database.visit(new Visitor.Print());
+        database.visit(new Visitor.Print(printStream));
     }
 
 }

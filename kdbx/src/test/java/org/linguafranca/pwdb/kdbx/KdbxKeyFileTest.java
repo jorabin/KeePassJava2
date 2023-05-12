@@ -23,17 +23,22 @@ import org.linguafranca.pwdb.Credentials;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * tests reading of kdbx with various combinations of key file and password
  */
 public class KdbxKeyFileTest {
+
+    static PrintStream printStream = getTestPrintStream();
+
     private static void toConsole(InputStream is) throws IOException {
-        System.out.println(CharStreams.toString(new InputStreamReader(is, StandardCharsets.UTF_8)));
+        printStream.println(CharStreams.toString(new InputStreamReader(is, StandardCharsets.UTF_8)));
     }
     /**
      * Test that we can load a key file and get a 32 byte base64 encoded value back

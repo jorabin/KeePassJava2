@@ -21,21 +21,27 @@ import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 
 import java.io.InputStream;
+import java.io.PrintStream;
+
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
 public class JaxbSerializableDatabaseTest {
+
+    static PrintStream printStream = getTestPrintStream();
+
     @Test
     public void createEmptyDatabase() throws Exception {
         JaxbDatabase db = JaxbDatabase.createEmptyDatabase();
-        db.save(new KdbxCreds.None(), System.out);
+        db.save(new KdbxCreds.None(), printStream);
     }
     @Test
     public void loadXml() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
         JaxbDatabase database = JaxbDatabase.load(new KdbxCreds("123".getBytes()), inputStream);
-        database.visit(new Visitor.Print());
+        database.visit(new Visitor.Print(printStream));
     }
 
 }

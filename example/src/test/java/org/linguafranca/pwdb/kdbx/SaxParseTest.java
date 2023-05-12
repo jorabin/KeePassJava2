@@ -21,19 +21,25 @@ import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
+
 public class SaxParseTest extends SaxParse {
 
+    OutputStream outputStream = getTestPrintStream();
     @Test
-    public void exampleSaxparsingV3 () throws IOException, SAXException, ParserConfigurationException {
-        super.exampleSaxparsing("test123.kdbx");
+    public void exampleSaxParsingV3 () throws IOException, SAXException, ParserConfigurationException {
+        super.exampleSaxParsing("test123.kdbx", new KdbxCreds("123".getBytes()), new PrintWriter(outputStream));
     }
     @Test
-    public void exampleSaxparsingV4 () throws IOException, SAXException, ParserConfigurationException {
-        super.exampleSaxparsing("V4-AES-Argon2-CustomIcon.kdbx");
+    public void exampleSaxParsingV4 () throws IOException, SAXException, ParserConfigurationException {
+        super.exampleSaxParsing("V4-AES-AES.kdbx", new KdbxCreds("123".getBytes()), new PrintWriter(outputStream));
     }
 
 }

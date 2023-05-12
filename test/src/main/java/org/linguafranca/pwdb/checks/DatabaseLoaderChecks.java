@@ -20,17 +20,22 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.linguafranca.pwdb.*;
 
+import java.io.PrintStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
 public abstract class DatabaseLoaderChecks <D extends Database<D,G,E,I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon>{
+
+    static PrintStream printStream = getTestPrintStream();
+
     protected Database<D,G,E,I> database;
     protected boolean skipDateCheck = false;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX");
@@ -41,7 +46,7 @@ public abstract class DatabaseLoaderChecks <D extends Database<D,G,E,I>, G exten
     public void test123File() throws ParseException {
 
         // visit all groups and entries and list them to console
-        database.visit(new Visitor.Print());
+        database.visit(new Visitor.Print(printStream));
 
         // find all entries in the database
         // the kdb version has three additional system related entries
@@ -51,7 +56,7 @@ public abstract class DatabaseLoaderChecks <D extends Database<D,G,E,I>, G exten
         // find all entries in the database that have the string "test" in them
         List<? extends E> tests = database.findEntries("test");
         for (Entry tes: tests) {
-            System.out.println(tes.getTitle());
+            printStream.println(tes.getTitle());
         }
         Assert.assertEquals(4, tests.size());
         if (tests.size() > 0) {
@@ -60,7 +65,7 @@ public abstract class DatabaseLoaderChecks <D extends Database<D,G,E,I>, G exten
 /*
             StringSelection selection = new StringSelection(pass);
             Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
-            System.out.println(pass + " copied to clip board");
+            printStream.println(pass + " copied to clip board");
 */
             // all the relevant entries should have the password 123
             String pass2 = tests.get(0).getPassword();
@@ -72,7 +77,7 @@ public abstract class DatabaseLoaderChecks <D extends Database<D,G,E,I>, G exten
         Assert.assertEquals(4, passwords.size());
         for (Entry passwordEntry : passwords) {
             assertEquals(passwordEntry.getTitle(), passwordEntry.getPassword());
-            System.out.println(passwordEntry.getTitle());
+            printStream.println(passwordEntry.getTitle());
         }
 
         List<? extends E> entries = database.findEntries(new Entry.Matcher() {

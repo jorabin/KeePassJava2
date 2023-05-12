@@ -1,11 +1,11 @@
 package org.linguafranca.pwdb.kdbx;
 
 import com.google.common.io.CharStreams;
+import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.StreamFormat;
+import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 
 public class Util {
@@ -25,7 +25,16 @@ public class Util {
     }
 
     /**
-     * Example shows how to list the XML of a database
+     * Example shows how to list XML with decoded field values (but not decrypted passwords)
+     */
+    public static void listDatabase(String resourceName, Credentials creds, OutputStream outputStream) throws IOException {
+        DomDatabaseWrapper database = DomDatabaseWrapper.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
+        database.save(new StreamFormat.None(), new KdbxCreds.None(), outputStream);
+    }
+
+
+    /**
+     * Example shows how to list the XML of a database in a raw form
      * @param resourceName the name of a resource to find on the classpath
      * @param password the password for the resource
      * @param printWriter a PrintWriter to list the contents

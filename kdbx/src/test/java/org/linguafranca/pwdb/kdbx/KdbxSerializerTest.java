@@ -25,11 +25,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 import static org.junit.Assert.assertEquals;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * test operation of kdbx
  */
 public class KdbxSerializerTest {
+
+    static PrintStream printStream = getTestPrintStream();
 
     /**
      * Test that we can read a kdbx v3 file and list the XML to console
@@ -39,7 +42,7 @@ public class KdbxSerializerTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
         Credentials credentials = new KdbxCreds("123".getBytes());
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
-        System.out.println(CharStreams.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
+        printStream.println(CharStreams.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
     }
 
     /**
@@ -50,7 +53,7 @@ public class KdbxSerializerTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-ChaCha20-AES.kdbx");
         Credentials credentials = new KdbxCreds("123".getBytes());
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
-        System.out.println(CharStreams.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
+        printStream.println(CharStreams.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
     }
 
 

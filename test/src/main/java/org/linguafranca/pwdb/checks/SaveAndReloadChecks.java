@@ -28,11 +28,14 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
 public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon>{
+
+    static PrintStream printStream = getTestPrintStream();
 
     public abstract D getDatabase();
     public abstract D getDatabase(String name, Credentials credentials) throws IOException;
@@ -59,7 +62,7 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         // create database with known content
         D output = createNewDatabase();
         verifyContents(output);
-        //output.save(new StreamFormat.None(), new Credentials.None(), System.out);
+        //output.save(new StreamFormat.None(), new Credentials.None(), printStream);
 
         FileOutputStream fos = new FileOutputStream("testOutput/test1.kdbx");
         saveDatabase(output, getCreds("123".getBytes()), fos);
@@ -68,14 +71,14 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         fos.close();
         // make sure that saving didn't mess up content
         verifyContents(output);
-        //output.save(new StreamFormat.None(), new Credentials.None(), System.out);
+        //output.save(new StreamFormat.None(), new Credentials.None(), printStream);
 
 
         FileInputStream fis = new FileInputStream("testOutput/test1.kdbx");
         D input = loadDatabase(getCreds("123".getBytes()), fis);
         verifyContents(input);
-        //saveDatabase(input, new StreamFormat.None(), new Credentials.None(), System.out);
-        System.out.format("Test took %d millis", System.currentTimeMillis() - now);
+        //saveDatabase(input, new StreamFormat.None(), new Credentials.None(), printStream);
+        printStream.format("Test took %d millis", System.currentTimeMillis() - now);
     }
 
     /**
@@ -106,7 +109,7 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         entry = input.findEntries("Test attachment").get(0);
         assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
 
-        //saveDatabase(input, new StreamFormat.None(), new Credentials.None(), System.out);
+        //saveDatabase(input, new StreamFormat.None(), new Credentials.None(), printStream);
     }
 
     String [] testFiles = {"V4-AES-AES.kdbx",
@@ -195,7 +198,7 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
     public void inspectNewDatabase () throws IOException {
         D database = createNewDatabase();
 
-        database.visit(new Visitor.Print());
+        database.visit(new Visitor.Print(printStream));
     }
 
     // create a new database for messing around with
