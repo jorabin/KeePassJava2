@@ -1,0 +1,27 @@
+version: 2.1
+jobs:
+  java8:
+    docker:
+      - image: cimg/openjdk:8.0
+    working_directory: ~/workspace
+    steps:
+      - checkout
+      - run:
+          name: Clean and Test JDK 8
+          command: mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean test
+  java11:
+    docker:
+      - image: cimg/openjdk:11.0
+    working_directory: ~/workspace
+    steps:
+      - checkout
+      - run:
+          name: Clean and Test JDK 11
+          command: mvn -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn clean test
+workflows:
+  maven_test:
+    jobs:
+      - ubuntu-jdk8
+      - ubuntu-jdk11
+      - java8
+      - java11
