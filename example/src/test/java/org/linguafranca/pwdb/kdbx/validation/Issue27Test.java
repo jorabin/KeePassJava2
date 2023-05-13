@@ -20,7 +20,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
-public class Issue_27_Test {
+public class Issue27Test {
     static PrintStream printStream = getTestPrintStream();
     /**
      * Check load of problem file

@@ -15,13 +15,13 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
 /**
  * Bug report on GitHub, the Keyfile is Version 2 (Hex)
  */
-public class Issue_38_Test {
+public class Issue38Test {
 
     static PrintStream printStream = getTestPrintStream();
     @Test
     public void testV2Keyfile() throws IOException {
-        InputStream databaseStream = Issue_38_Test.class.getClassLoader().getResourceAsStream("issue-38/Database/Database.kdbx");
-        InputStream keyStream = Issue_38_Test.class.getClassLoader().getResourceAsStream("issue-38/Database/Database.keyx");
+        InputStream databaseStream = Issue38Test.class.getClassLoader().getResourceAsStream("issue-38/Database/Database.kdbx");
+        InputStream keyStream = Issue38Test.class.getClassLoader().getResourceAsStream("issue-38/Database/Database.keyx");
         assert keyStream != null;
         KdbxCreds creds = new KdbxCreds("MyPassword".getBytes(), keyStream);
         assert databaseStream != null;
