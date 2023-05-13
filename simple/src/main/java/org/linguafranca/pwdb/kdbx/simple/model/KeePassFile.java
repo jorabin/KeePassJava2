@@ -215,6 +215,11 @@ public class KeePassFile {
         @Element(name = "UUID", type=UUID.class)
         @Convert(UuidConverter.class)
         protected UUID uuid;
+        @Element(name = "Name")
+        protected String name;
+        @Element(name = "LastModificationTime", type=Date.class)
+        @Convert(TimeConverter.class)
+        protected Date lastModificationTime;
         @Element(name = "Data")
         @Convert(Base64ByteArrayConverter.class)
         protected ByteArray data;
