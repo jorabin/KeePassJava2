@@ -10,14 +10,13 @@ import java.nio.charset.StandardCharsets;
 
 public class Util {
 
-    public static InputStream getDecryptedInputStream (String resourceName, byte [] password) throws IOException {
-        return getDecryptedInputStream(resourceName, password, new KdbxHeader());
+    public static InputStream getDecryptedInputStream (String resourceName, Credentials credentials) throws IOException {
+        return getDecryptedInputStream(resourceName, credentials, new KdbxHeader());
     }
 
-    public static InputStream getDecryptedInputStream (String resourceName, byte [] password, KdbxHeader header) throws IOException {
+    public static InputStream getDecryptedInputStream (String resourceName, Credentials credentials, KdbxHeader header) throws IOException {
         InputStream is = Util.class.getClassLoader().getResourceAsStream(resourceName);
-        KdbxCreds creds = new KdbxCreds(password);
-        return KdbxSerializer.createUnencryptedInputStream(creds, header, is);
+        return KdbxSerializer.createUnencryptedInputStream(credentials, header, is);
     }
 
     public static String streamToString(InputStream inputStream) throws IOException {
@@ -36,12 +35,12 @@ public class Util {
     /**
      * Example shows how to list the XML of a database in a raw form
      * @param resourceName the name of a resource to find on the classpath
-     * @param password the password for the resource
+     * @param credentials the credentials for the resource
      * @param printWriter a PrintWriter to list the contents
      */
-    public static void listXml(String resourceName, byte [] password, PrintWriter printWriter) throws IOException {
+    public static void listXml(String resourceName, Credentials credentials, PrintWriter printWriter) throws IOException {
         printWriter.format(resourceName + "\n");
-        printWriter.println(streamToString(getDecryptedInputStream(resourceName, password)));
+        printWriter.println(streamToString(getDecryptedInputStream(resourceName, credentials)));
         printWriter.println();
         printWriter.flush();
     }

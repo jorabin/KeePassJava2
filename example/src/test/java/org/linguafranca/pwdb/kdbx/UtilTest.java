@@ -19,7 +19,7 @@ public class UtilTest {
     @Test
     public void listXmlTest() throws IOException {
         PrintWriter writer = new PrintWriter(outputStream);
-        listXml("V4-AES-AES.kdbx", "123".getBytes(), writer);
+        listXml("V4-AES-AES.kdbx", new KdbxCreds("123".getBytes()), writer);
         writer.flush();
     }
 
@@ -41,7 +41,7 @@ public class UtilTest {
     public void listHeaderPropertiesAndXml() throws IOException {
         PrintWriter writer = new PrintWriter(outputStream);
         listKdbxHeaderProperties("V4-AES-Argon2-CustomIcon.kdbx", writer);
-        listXml("V4-AES-Argon2-CustomIcon.kdbx", "123".getBytes(), writer);
+        listXml("V4-AES-Argon2-CustomIcon.kdbx", new KdbxCreds("123".getBytes()), writer);
         writer.flush();
     }
 }
