@@ -1,6 +1,13 @@
 # KeePassJava2
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent) 
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent)
+[![javadoc](https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2/javadoc.svg)](https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2)
+
+![alt text](https://badgen.net/badge/Build/2.2-SNAPSHOT/red?icon=github)
+master [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
+develop [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
+
+
 
 A Java 8 API for databases compatible with the renowned [KeePass](http://keepass.info) password
 safe for Windows. This is a "headless" implementation - if you want something with a UI
@@ -32,7 +39,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-After a number of years of neglect, the project is (May 2023) back in development.
+After a a period of neglect, the project is (May 2023) back in development.
 
 The current code is version 2.2-SNAPSHOT. This is on the main branch. It has 
 not yet been distributed to Maven. See [Build from Source](#build-from-source)
