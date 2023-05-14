@@ -93,6 +93,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
                 String decrypted = new String(encryption.decrypt(encrypted), StandardCharsets.UTF_8);
                 DomHelper.setElementContent(".", element, decrypted);
                 element.removeAttribute("Protected");
+                element.setAttribute("kpj2-ProtectOnOutput", "True");
             }
 
             return this;
@@ -126,12 +127,20 @@ public class DomSerializableDatabase implements SerializableDatabase {
         // make a copy so we can mess with content
         Document copyDoc = (Document) doc.cloneNode(true);
         try {
-            // check whether protection is required and if so mark the element with @Protected='True'
+            // check whether protection is required by default and if so mark the element with @Protected='True'
             prepareProtection(copyDoc, "Title");
             prepareProtection(copyDoc, "UserName");
             prepareProtection(copyDoc, "Password");
             prepareProtection(copyDoc, "Notes");
             prepareProtection(copyDoc, "URL");
+
+            // look for elements that were protected on input and mark them as protected again
+            NodeList shouldProtectedContent = (NodeList) DomHelper.xpath.evaluate("//*[@kpj-ProtectOnOutput='True']", doc, XPathConstants.NODESET);
+            for (int i = 0; i < shouldProtectedContent.getLength(); i++) {
+                Element element = (Element) shouldProtectedContent.item(i);
+                element.removeAttribute("kpj-ProtectOnOutput");
+                element.setAttribute("Protected", "True");
+            }
 
             // encrypt and base64 every element marked as protected
             NodeList protectedContent = (NodeList) DomHelper.xpath.evaluate("//*[@Protected='True']", copyDoc, XPathConstants.NODESET);
@@ -152,7 +161,6 @@ public class DomSerializableDatabase implements SerializableDatabase {
         }
 
         Source xmlSource = new DOMSource(copyDoc);
-        Result outputTarget = new StreamResult(outputStream);
         try {
             TransformerFactory factory = TransformerFactory.newInstance();
             //factory.setAttribute("indent-number", "4");
@@ -160,7 +168,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             //noinspection HttpUrlsUsage
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-            transformer.transform(xmlSource, outputTarget);
+            transformer.transform(xmlSource, new StreamResult(outputStream));
         } catch (TransformerException e) {
             throw new IllegalStateException(e);
         }

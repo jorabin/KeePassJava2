@@ -72,11 +72,14 @@ public class Helpers {
     }
 
     public static Boolean toBoolean(String value) {
-        return value.toLowerCase().equals("true") || value.toLowerCase().equals("Yes") || value.equals("1");
+        if (value.equalsIgnoreCase("null")) {
+            return null;
+        }
+        return value.equalsIgnoreCase("true") || value.equalsIgnoreCase("yes") || value.equals("1");
     }
 
     public static String fromBoolean(Boolean value) {
-        return value == null ? "False" : (value ? "True" : "False");
+        return value == null ? "null" : (value ? "True" : "False");
     }
 
     public static final SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
