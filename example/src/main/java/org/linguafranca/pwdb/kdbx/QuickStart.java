@@ -114,7 +114,7 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
         G newParent = database.newGroup("Found entries");
         // iterate over the found entries
         for (E entry : entries) {
-            // copy the entry using DB factory so it remains where it was found as well as being in new group
+            // copy the entry using DB factory so that it remains where it was found as well as being in new group
             E copy = database.newEntry(entry);
             // add new entry to new group
             newParent.addEntry(copy);

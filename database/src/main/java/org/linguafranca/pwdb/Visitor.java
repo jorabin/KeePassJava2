@@ -91,7 +91,6 @@ public interface Visitor <D extends Database<D, G, E, I>, G extends Group<D, G, 
         }
 
         @Override
-        @Deprecated
         public void visit(E entry) {
             printStream.println(entry.toString());
         }

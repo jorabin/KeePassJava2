@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 /**
  * This class is an XML DOM implementation of a KDBX database. The data is maintained as a DOM,
@@ -127,25 +128,21 @@ public class DomSerializableDatabase implements SerializableDatabase {
         // make a copy so we can mess with content
         Document copyDoc = (Document) doc.cloneNode(true);
         try {
-            // check whether protection is required by default and if so mark the element with @Protected='True'
+            // check whether protection is required by default and if so mark the element with @@kpj2-ProtectOnOutput='True'
             prepareProtection(copyDoc, "Title");
             prepareProtection(copyDoc, "UserName");
             prepareProtection(copyDoc, "Password");
             prepareProtection(copyDoc, "Notes");
             prepareProtection(copyDoc, "URL");
 
-            // look for elements that were protected on input and mark them as protected again
-            NodeList shouldProtectedContent = (NodeList) DomHelper.xpath.evaluate("//*[@kpj-ProtectOnOutput='True']", doc, XPathConstants.NODESET);
-            for (int i = 0; i < shouldProtectedContent.getLength(); i++) {
-                Element element = (Element) shouldProtectedContent.item(i);
-                element.removeAttribute("kpj-ProtectOnOutput");
-                element.setAttribute("Protected", "True");
-            }
-
             // encrypt and base64 every element marked as protected
-            NodeList protectedContent = (NodeList) DomHelper.xpath.evaluate("//*[@Protected='True']", copyDoc, XPathConstants.NODESET);
+            NodeList protectedContent = (NodeList) DomHelper.xpath.evaluate("//*[@kpj2-ProtectOnOutput='True']", copyDoc, XPathConstants.NODESET);
             for (int i = 0; i < protectedContent.getLength(); i++){
                 Element element = ((Element) protectedContent.item(i));
+
+                element.removeAttribute("kpj2-ProtectOnOutput");
+                element.setAttribute("Protected", "True");
+
                 String decrypted = DomHelper.getElementContent(".", element);
                 if (decrypted == null) {
                     decrypted = "";
@@ -154,6 +151,23 @@ public class DomSerializableDatabase implements SerializableDatabase {
                 // Android compatibility
                 String base64 = new String(Base64.encodeBase64(encrypted));
                 DomHelper.setElementContent(".", element, base64);
+            }
+
+            // we need to serialise dates according to the format, and
+            // we are going to say that anything that is a date is called *Changed or *Time
+            // because that does work in the schema, but won't work for custom values
+            NodeList timeBasedContent = (NodeList) DomHelper.xpath.evaluate(
+                    //"//*[ends-with(name(), 'Changed')] | //*[ends-with(name(), 'Time')]",
+                    // dealing with XPath1
+                    "//*[substring(name(),string-length(name())-6) = 'Changed'] | //*[substring(name(),string-length(name())-3) = 'Time']",
+                    copyDoc,
+                    XPathConstants.NODESET);
+            for (int i = 0; i < timeBasedContent.getLength(); i++){
+                Element element = ((Element) timeBasedContent.item(i));
+                String time = DomHelper.getElementContent(".", element);
+                Date date = Helpers.toDate(time);
+                String encoded = Helpers.fromDate(date);
+                DomHelper.setElementContent(".", element, encoded);
             }
 
         } catch (XPathExpressionException e) {
@@ -187,7 +201,7 @@ public class DomSerializableDatabase implements SerializableDatabase {
         NodeList nodelist = (NodeList) DomHelper.xpath.evaluate(path, doc, XPathConstants.NODESET);
         for (int i = 0; i < nodelist.getLength(); i++) {
             Element element = (Element) nodelist.item(i);
-            element.setAttribute("Protected", "True");
+            element.setAttribute("kpj2-ProtectOnOutput", "True");
         }
     }
 

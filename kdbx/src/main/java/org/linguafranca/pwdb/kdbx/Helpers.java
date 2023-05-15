@@ -25,9 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -37,9 +35,15 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * @author jo
+ * The class provides helpers to marshal and unmarshal values of KDBX files
  */
 public class Helpers {
+    /**
+     *  Oftentimes we have no way of communicating which version we are using, say in an adapter that
+     *  is buried deep in the internals of JAXB marshalling
+     */
+    public static ThreadLocal<Boolean> isV4 = ThreadLocal.withInitial(() -> true);
+
     public static String base64FromUuid(UUID uuid) {
         byte[] buffer = new byte[16];
         ByteBuffer b = ByteBuffer.wrap(buffer);
@@ -71,6 +75,9 @@ public class Helpers {
         return new UUID(b.getLong(), b.getLong(8));
     }
 
+    /* --- Boolean ---
+        Booleans are deliberately tri-valued true, false and null
+     */
     public static Boolean toBoolean(String value) {
         if (value.equalsIgnoreCase("null")) {
             return null;
@@ -82,7 +89,14 @@ public class Helpers {
         return value == null ? "null" : (value ? "True" : "False");
     }
 
-    public static final SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+    /* --- Dates
+    V3 dates are serialised as ISO8601 using Zulu (Z) TZD - but will deserialize more leniently
+    V4 dates are base64 encoded seconds since midnight 0001-01-01
+    --- */
+
+    // we use this for formatting a Date which doesn't have a time zone, and we are assuming
+    // that date is in fact GMT
+    public static final SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
     public static final Date baseDate = Date.from(ZonedDateTime.parse("0001-01-01T00:00:00Z").toInstant());
 
@@ -102,9 +116,27 @@ public class Helpers {
         return new Date(secondsSinceBaseDate * 1000 + baseDate.getTime());
     }
 
+    /**
+     * Formats the value according to the value of {@link Helpers#isV4}
+     * @param value a date
+     * @return a formatted date
+     */
     public static String fromDate(Date value) {
+        return isV4.get() ? fromDateV4(value) : fromDateV3(value);
+    }
+    public static String fromDateV3(Date value) {
         return inFormat.format(value);
     }
+    public static String fromDateV4(Date value) {
+        long keepassInstant = value.getTime() - baseDate.getTime();
+        long secondsSinceBaseDate = keepassInstant / 1000;
+        byte []  asBytes = toBytes(secondsSinceBaseDate, ByteOrder.LITTLE_ENDIAN);
+        return encodeBase64Content(asBytes);
+    }
+
+
+
+    /* --- Base64 --- */
 
     public static byte[] decodeBase64Content(byte[] content) {
         return decodeBase64Content(content, false);
