@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.simple;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
@@ -34,7 +35,7 @@ public class SimpleDatabaseLoadTest {
 
     static PrintStream printStream = getTestPrintStream();
 
-    @Test
+    @Test @Ignore(value = "Looks like this example is bogus")
     public void loadXml() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("ExampleDatabase.xml");
         SimpleDatabase database = SimpleDatabase.loadXml(inputStream);

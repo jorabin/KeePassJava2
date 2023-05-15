@@ -18,13 +18,12 @@ package org.linguafranca.pwdb.kdbx.simple.model;
 
 import org.linguafranca.pwdb.kdbx.simple.SimpleEntry;
 import org.linguafranca.pwdb.kdbx.simple.converter.KeePassBooleanConverter;
-import org.simpleframework.xml.Attribute;
-import org.simpleframework.xml.Element;
-import org.simpleframework.xml.Root;
-import org.simpleframework.xml.Text;
+import org.simpleframework.xml.*;
 import org.simpleframework.xml.convert.Convert;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author jo
@@ -131,11 +130,18 @@ public abstract class EntryClasses {
             @Convert(KeePassBooleanConverter.class)
             // NB converters don't work on attributes -see KdbxOutputTransformer
             Boolean _protected;
+            @Attribute(name = "kpj2-ProtectOnOutput", required = false)
+            @Convert(KeePassBooleanConverter.class)
+            Boolean protectOnOutput;
             @Text
             String text;
 
-            public void setProtected(boolean aProtected) {
-                this._protected = aProtected;
+            public void setProtectOnOutput(boolean aProtected) {
+                this.protectOnOutput = aProtected;
+            }
+
+            public boolean getProtectOnOutput() {
+                return Objects.nonNull(this.protectOnOutput) && this.protectOnOutput;
             }
         }
     }
@@ -177,9 +183,16 @@ public abstract class EntryClasses {
         }
     }
 
-    @Root(name = "History")
     public static class History {
-        @Element(name = "SimpleEntry", required = false)
-        protected SimpleEntry entry;
+
+        @ElementList(entry = "SimpleEntry", inline = true)
+        private List<SimpleEntry> list;
+
+        public History(){
+            list = new ArrayList<>();
+        }
+        public List<SimpleEntry> getHistory(){
+            return list;
+        }
     }
 }

@@ -129,7 +129,15 @@ public class SimpleSerializableDatabase implements SerializableDatabase {
         for (SimpleEntry entry: parent.entry) {
             for (EntryClasses.StringProperty property : entry.string) {
                 boolean shouldProtect = parent.database.shouldProtect(property.getKey());
-                property.getValue().setProtected(shouldProtect);
+                property.getValue().setProtectOnOutput(shouldProtect || property.getValue().getProtectOnOutput());
+            }
+            if (Objects.nonNull(entry.history)) {
+                for (SimpleEntry entry2 : entry.history) {
+                    for (EntryClasses.StringProperty property : entry2.string) {
+                        boolean shouldProtect = parent.database.shouldProtect(property.getKey());
+                        property.getValue().setProtectOnOutput(shouldProtect || property.getValue().getProtectOnOutput());
+                    }
+                }
             }
         }
     }

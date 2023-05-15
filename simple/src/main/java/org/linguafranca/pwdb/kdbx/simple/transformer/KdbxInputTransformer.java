@@ -20,10 +20,14 @@ import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 import org.linguafranca.xml.XmlEventTransformer;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static javax.xml.stream.XMLStreamConstants.CHARACTERS;
 import static javax.xml.stream.XMLStreamConstants.END_ELEMENT;
@@ -43,13 +47,35 @@ public class KdbxInputTransformer implements XmlEventTransformer {
     public KdbxInputTransformer (StreamEncryptor streamEncryptor) {
         this.streamEncryptor = streamEncryptor;
     }
+    XMLEventFactory eventFactory = com.fasterxml.aalto.stax.EventFactoryImpl.newInstance();
 
     public XMLEvent transform (XMLEvent event) {
         switch (event.getEventType()) {
             case START_ELEMENT: {
-                Attribute attribute = event.asStartElement().getAttributeByName(new QName("Protected"));
+                StartElement startElement = event.asStartElement();
+                Iterable<Attribute> attributeIterable = startElement::getAttributes;
+                List<Attribute> attributes = StreamSupport
+                        .stream(attributeIterable.spliterator(), false)
+                        .collect(Collectors.toList());
+
+                // find any element that is marked for protection
+                Attribute attribute = attributes
+                        .stream()
+                        .filter(a -> a.getName().getLocalPart().equalsIgnoreCase("Protected"))
+                        .findFirst()
+                        .orElse(null);
+
+                // set flag so it gets encrypted and remove attribute, set attribute for output
                 if (attribute != null) {
-                    decryptContent = Helpers.toBoolean(attribute.getValue());
+                    if (attribute.getValue().equalsIgnoreCase("true")) {
+                        decryptContent = true;
+                        attributes.add(eventFactory.createAttribute("kpj2-ProtectOnOutput", "True"));
+                    }
+                    attributes.remove(attribute);
+                    event = eventFactory.createStartElement(
+                            event.asStartElement().getName(),
+                            attributes.iterator(),
+                            null);
                 }
                 break;
             }
