@@ -27,6 +27,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -83,7 +84,7 @@ class DomHelper {
     static class DateValueCreator implements ValueCreator {
         @Override
         public String getValue() {
-            return Helpers.fromDate(new Date());
+            return Helpers.fromDate(Date.from(Instant.now()));
         }
     }
 

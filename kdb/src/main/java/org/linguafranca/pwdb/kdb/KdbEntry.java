@@ -41,7 +41,7 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     private KdbIcon icon = new KdbIcon(0);
     private String username = "";
     private String password = "";
-    private Date creationTime = new Date((System.currentTimeMillis()/1000L)*1000L); // to the next lower second
+    private Date creationTime = new Date((System.currentTimeMillis())); // to the next lower second
     private Date lastModificationTime = creationTime;
     private Date lastAccessTime = creationTime;
     private boolean expires = false;

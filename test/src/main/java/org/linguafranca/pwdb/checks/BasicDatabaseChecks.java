@@ -24,6 +24,7 @@ import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -168,20 +169,21 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
 
     @Test
     public void testTimes() {
-        long before = (new Date().getTime() / 1000L) * 1000L; // round to next lower second
+        long beforeSecond = Instant.now().toEpochMilli()/1000;
         E entry = database.newEntry();
-        long after = (new Date().getTime()/ 1000L) * 1000L; // round to next lower second
-        long created = entry.getCreationTime().getTime();
-        assertTrue(created >= before && created <= after);
+        long afterSecond = Instant.now().toEpochMilli()/1000;
+        long createdSecond = entry.getCreationTime().getTime()/1000;
+
+        assertTrue(createdSecond >= beforeSecond && createdSecond <= afterSecond);
         assertFalse(entry.getExpires());
-        assertTrue(entry.getLastAccessTime().getTime() <= created);
-        assertTrue(entry.getLastModificationTime().getTime() <= created);
+        assertTrue(entry.getLastAccessTime().getTime()/1000 <= createdSecond);
+        assertTrue(entry.getLastModificationTime().getTime()/1000 <= createdSecond);
 
         entry.setExpires(true);
-        entry.setExpiryTime(new Date(created));
+        entry.setExpiryTime(new Date(createdSecond*1000));
 
         assertTrue(entry.getExpires());
-        assertEquals(created, entry.getExpiryTime().getTime());
+        assertEquals(createdSecond, entry.getExpiryTime().getTime()/1000);
 
 
     }

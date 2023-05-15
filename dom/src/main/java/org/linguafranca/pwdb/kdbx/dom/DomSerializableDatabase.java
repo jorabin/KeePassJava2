@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -165,7 +166,12 @@ public class DomSerializableDatabase implements SerializableDatabase {
             for (int i = 0; i < timeBasedContent.getLength(); i++){
                 Element element = ((Element) timeBasedContent.item(i));
                 String time = DomHelper.getElementContent(".", element);
-                Date date = Helpers.toDate(time);
+                Date date;
+                if (time.equals("${creationDate}")) {
+                    date = Date.from(Instant.now());
+                } else {
+                    date = Helpers.toDate(time);
+                }
                 String encoded = Helpers.fromDate(date);
                 DomHelper.setElementContent(".", element, encoded);
             }

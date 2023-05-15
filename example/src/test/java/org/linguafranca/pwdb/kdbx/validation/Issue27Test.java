@@ -33,8 +33,8 @@ public class Issue27Test {
         List<? extends JaxbEntry> entries = db.findEntries("testtitle");
 
         for (JaxbEntry entry: entries) {
-            printStream.println(Helpers.fromDate(entry.getCreationTime()));
-            assertEquals("2021-01-11T09:18:56Z", Helpers.fromDate(entry.getCreationTime()));
+            printStream.println(Helpers.fromDateV3(entry.getCreationTime()));
+            assertEquals("2021-01-11T09:18:56Z", Helpers.fromDateV3(entry.getCreationTime()));
         }
     }
 
@@ -50,7 +50,7 @@ public class Issue27Test {
 
         for (JaxbEntry entry: entries) {
             printStream.println(Helpers.fromDate(entry.getCreationTime()));
-            assertEquals("2018-01-26T13:20:58Z", Helpers.fromDate(entry.getCreationTime()));
+            assertEquals("2018-01-26T13:20:58Z", Helpers.fromDateV3(entry.getCreationTime()));
         }
     }
 

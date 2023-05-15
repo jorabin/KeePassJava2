@@ -6,6 +6,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.StreamFormat;
+import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.Util;
 import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
@@ -33,6 +34,7 @@ public class Issue33Test {
     public static void listXml() throws IOException {
         Files.createDirectories(Paths.get(TEST_OUTPUT_DIR));
         Util.listXml(TEST_RESOURCE, CREDENTIALS, new PrintWriter(TEST_XML_FILE));
+        Helpers.isV4.set(true);
     }
 
     @Before

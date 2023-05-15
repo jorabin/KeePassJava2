@@ -26,10 +26,11 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -42,7 +43,7 @@ public class Helpers {
      *  Oftentimes we have no way of communicating which version we are using, say in an adapter that
      *  is buried deep in the internals of JAXB marshalling
      */
-    public static ThreadLocal<Boolean> isV4 = ThreadLocal.withInitial(() -> true);
+    public static ThreadLocal<Boolean> isV4 = ThreadLocal.withInitial(() -> false);
 
     public static String base64FromUuid(UUID uuid) {
         byte[] buffer = new byte[16];
@@ -96,24 +97,24 @@ public class Helpers {
 
     // we use this for formatting a Date which doesn't have a time zone, and we are assuming
     // that date is in fact GMT
-    public static final SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-    public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
-    public static final Date baseDate = Date.from(ZonedDateTime.parse("0001-01-01T00:00:00Z").toInstant());
+    //public static final SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+    public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssz");
+    public static final Date baseDate = Date.from(ZonedDateTime.parse("0001-01-01T00:00:00Z", dateTimeFormatter).toInstant());
 
     // in V3 this is just a date, in V4 it's a base64 encoded serial number of seconds after the base date above
     public static Date toDate(String value) {
         try {
-            return Date.from(ZonedDateTime.parse(value).toInstant());
+            ZonedDateTime zdt = ZonedDateTime.parse(value);
+            Instant instant = zdt.toInstant();
+            return Date.from(instant);
         } catch (DateTimeParseException e) {
-            // check if it may be a base64 encoded value ending in =
-            if (!value.endsWith("=")) {
-                throw new IllegalArgumentException(value + " is not a valid date");
-            }
+               // let's see if it is a V4 date
         }
         // V4 dates are base 64 encoded seconds since baseDate
         byte [] b = decodeBase64Content(value.getBytes());
         long secondsSinceBaseDate = ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getLong();
-        return new Date(secondsSinceBaseDate * 1000 + baseDate.getTime());
+        Instant instant = Instant.ofEpochSecond(secondsSinceBaseDate + baseDate.getTime()/1000);
+        return Date.from(instant);
     }
 
     /**
@@ -125,10 +126,10 @@ public class Helpers {
         return isV4.get() ? fromDateV4(value) : fromDateV3(value);
     }
     public static String fromDateV3(Date value) {
-        return inFormat.format(value);
+        return dateTimeFormatter.format(value.toInstant().atZone(ZoneId.of("Z")));
     }
     public static String fromDateV4(Date value) {
-        long keepassInstant = value.getTime() - baseDate.getTime();
+        long keepassInstant = value.toInstant().toEpochMilli() - baseDate.getTime();
         long secondsSinceBaseDate = keepassInstant / 1000;
         byte []  asBytes = toBytes(secondsSinceBaseDate, ByteOrder.LITTLE_ENDIAN);
         return encodeBase64Content(asBytes);
