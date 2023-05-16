@@ -10,17 +10,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
+/**
+ * Utility to allow browsing of database files and listing content to console
+ */
 public class ChooseFile {
 
     OutputStream outputStream = getTestPrintStream();
 
-    public static void main(String[] args) throws URISyntaxException, IOException {
+    public static void main(String[] args) throws IOException {
         ChooseFile cf = new ChooseFile();
         cf.choose();
     }
@@ -32,10 +34,11 @@ public class ChooseFile {
     }
     public void choose() throws IOException {
         final JFileChooser fc = new JFileChooser();
+        // get a file in the test resource directory
         URL resources = this.getClass().getClassLoader().getResource("kdb.key");
         try {
             fc.setCurrentDirectory(Paths.get(resources.toURI()).toFile());
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         fc.setFileFilter(new FileFilter() {

@@ -143,17 +143,24 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
             marshaller.marshal(keePassFile, document);
 
             // encrypt and base64 every element marked as protected
-            NodeList protectedContent = (NodeList) DomHelper.xpath.evaluate("//*[@Protected='true']", document, XPathConstants.NODESET);
+            NodeList protectedContent = (NodeList) DomHelper.xpath.evaluate("//Value", document, XPathConstants.NODESET);
             for (int i = 0; i < protectedContent.getLength(); i++){
                 Element element = ((Element) protectedContent.item(i));
-                String decrypted = DomHelper.getElementContent(".", element);
-                if (decrypted == null) {
-                    decrypted = "";
+                boolean protect = element.getAttribute("ProtectInMemory").equalsIgnoreCase("true");
+                if (protect) {
+                    String decrypted = DomHelper.getElementContent(".", element);
+                    if (decrypted == null) {
+                        decrypted = "";
+                    }
+                    byte[] encrypted = encryption.encrypt(decrypted.getBytes());
+                    // Android compatibility
+                    String base64 = new String(Base64.encodeBase64(encrypted));
+                    DomHelper.setElementContent(".", element, base64);
+                    element.setAttribute("Protected", "True");
+                } else {
+                    element.removeAttribute("Protected");
                 }
-                byte[] encrypted = encryption.encrypt(decrypted.getBytes());
-                // Android compatibility
-                String base64 = new String(Base64.encodeBase64(encrypted));
-                DomHelper.setElementContent(".", element, base64);
+                element.removeAttribute("ProtectInMemory");
             }
 
             try {
