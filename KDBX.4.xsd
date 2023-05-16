@@ -163,6 +163,7 @@
                         <xs:element name="Name" type="xs:string"/>
                         <xs:element name="Notes" type="xs:string"/>
                         <xs:element name="IconID" type="iconId"/>
+                        <xs:element name="CustomIconUUID" type="customIconUuidRef" minOccurs="0"/>
                         <xs:element ref="Times"/>
                         <!-- not sure what the flwg are for -->
                         <xs:element name="IsExpanded" type="keepassBoolean"/>
@@ -319,6 +320,12 @@
         <xs:restriction base="xs:string"/>
     </xs:simpleType>
 
+    <xs:complexType name="ValueExtender" abstract="true">
+        <xs:simpleContent>
+            <xs:extension base="xs:string"/>
+        </xs:simpleContent>
+    </xs:complexType>
+
     <xs:complexType name="stringField">
         <xs:annotation>
             <xs:documentation>This is where the values of the database are actually stored. You can have String valued
@@ -332,9 +339,9 @@
             <xs:element name="Value">
                 <xs:complexType>
                     <xs:simpleContent>
-                        <xs:extension base="xs:string">
-                            <xs:attribute type="keepassBoolean" name="Protected"/>
-                            <xs:attribute type="keepassBoolean" name="ProtectInMemory"/>
+                        <xs:extension base="ValueExtender">
+                            <xs:attribute type="keepassBoolean" name="Protected" default="False"/>
+                            <xs:attribute type="keepassBoolean" name="ProtectInMemory" default="False"/>
                         </xs:extension>
                     </xs:simpleContent>
                 </xs:complexType>

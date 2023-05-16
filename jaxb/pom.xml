@@ -75,6 +75,7 @@
     <profiles>
         <profile>
             <id>generateSources</id>
+            <!-- generate JAXB class files -->
             <build>
                 <plugins>
                     <plugin>
@@ -90,9 +91,9 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <!-- xjc -d src/generated/java -p org.linguafranca.pwdb.kdbx.jaxb.binding KDBX.3.1.xsd -->
+                            <!--  xjc -d src/generated/java -p org.linguafranca.pwdb.kdbx.jaxb.binding -b bindings.xml ../KDBX.4.xsd -->
                             <sources>
-                                <source>../KDBX.3.1.xsd</source>
+                                <source>../KDBX.4.xsd</source>
                             </sources>
                             <xjbSources>
                                 <source>bindings.xml</source>

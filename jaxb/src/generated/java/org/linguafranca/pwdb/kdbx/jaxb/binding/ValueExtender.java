@@ -10,62 +10,61 @@ package org.linguafranca.pwdb.kdbx.jaxb.binding;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 
 
 /**
- * <p>Java class for anonymous complex type.
+ * <p>Java class for ValueExtender complex type.
  * 
  * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
- * &lt;complexType>
- *   &lt;complexContent>
- *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;sequence>
- *         &lt;element ref="{}Entry"/>
- *       &lt;/sequence>
- *     &lt;/restriction>
- *   &lt;/complexContent>
+ * &lt;complexType name="ValueExtender">
+ *   &lt;simpleContent>
+ *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>string">
+ *     &lt;/extension>
+ *   &lt;/simpleContent>
  * &lt;/complexType>
  * </pre>
  * 
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "entry"
+@XmlType(name = "ValueExtender", propOrder = {
+    "value"
 })
-@XmlRootElement(name = "History")
-public class History {
+@XmlSeeAlso({
+    org.linguafranca.pwdb.kdbx.jaxb.binding.StringField.Value.class
+})
+public abstract class ValueExtender {
 
-    @XmlElement(name = "Entry", required = true)
-    protected JaxbEntryBinding entry;
+    @XmlValue
+    protected String value;
 
     /**
-     * Gets the value of the entry property.
+     * Gets the value of the value property.
      * 
      * @return
      *     possible object is
-     *     {@link JaxbEntryBinding }
+     *     {@link String }
      *     
      */
-    public JaxbEntryBinding getEntry() {
-        return entry;
+    public String getValue() {
+        return value;
     }
 
     /**
-     * Sets the value of the entry property.
+     * Sets the value of the value property.
      * 
      * @param value
      *     allowed object is
-     *     {@link JaxbEntryBinding }
+     *     {@link String }
      *     
      */
-    public void setEntry(JaxbEntryBinding value) {
-        this.entry = value;
+    public void setValue(String value) {
+        this.value = value;
     }
 
 }

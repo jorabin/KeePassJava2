@@ -21,6 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.linguafranca.pwdb.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
+import org.linguafranca.pwdb.kdbx.jaxb.base.ValueBinding;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
 import org.linguafranca.pwdb.kdbx.dom.DomHelper;
 import org.linguafranca.pwdb.security.StreamEncryptor;
@@ -84,7 +85,7 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
     @Override
     public JaxbSerializableDatabase load(InputStream inputStream) {
         try {
-            JAXBContext jc = JAXBContext.newInstance(KeePassFile.class);
+            JAXBContext jc = JAXBContext.newInstance(KeePassFile.class, ValueBinding.class);
             Unmarshaller u = jc.createUnmarshaller();
             u.setListener(new Unmarshaller.Listener() {
                 @Override
