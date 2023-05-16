@@ -13,13 +13,13 @@ public class UtilTest {
 
     OutputStream outputStream = getTestPrintStream();
     @Test public void listDatabaseTest() throws IOException {
-        listDatabase("V4-AES-AES.kdbx", new KdbxCreds("123".getBytes()), outputStream);
+        listDatabase("V3-CustomIcon.kdbx", new KdbxCreds("123".getBytes()), outputStream);
     }
 
     @Test
     public void listXmlTest() throws IOException {
         PrintWriter writer = new PrintWriter(outputStream);
-        listXml("V4-AES-AES.kdbx", new KdbxCreds("123".getBytes()), writer);
+        listXml("V3-CustomIcon.kdbx", new KdbxCreds("123".getBytes()), writer);
         writer.flush();
     }
 
