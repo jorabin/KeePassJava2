@@ -17,15 +17,32 @@
 package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.apache.commons.codec.binary.Base64;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.linguafranca.pwdb.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
+import org.linguafranca.pwdb.kdbx.dom.DomHelper;
 import org.linguafranca.pwdb.security.StreamEncryptor;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -78,7 +95,8 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
                             byte[] encrypted = Base64.decodeBase64(value.getValue().getBytes());
                             String decrypted = new String(encryption.decrypt(encrypted), StandardCharsets.UTF_8);
                             value.setValue(decrypted);
-                            value.setProtected(false);
+                            value.setProtected(null);
+                            value.setProtectInMemory(true);
                         }
                     }
                     if (target instanceof JaxbGroupBinding && (parent instanceof JaxbGroupBinding)) {
@@ -115,51 +133,41 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
             toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_NOTES);
         }
         try {
+            // Create the Document
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document document = db.newDocument();
+
             JAXBContext jc = JAXBContext.newInstance(KeePassFile.class);
-            Marshaller u = jc.createMarshaller();
-            u.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            // we encrypt values on marshal and then reset them afterwards
-            // this may seem a bit clunky, but seems like it's actually less fiddly than other things
-            u.setListener(new Marshaller.Listener() {
-                String savedValue = "";
+            Marshaller marshaller = jc.createMarshaller();
+            marshaller.marshal(keePassFile, document);
 
-                /**
-                 * Change protected fields on marshal
-                 * @param source instance of JAXB mapped class prior to marshalling from it.
-                 */
-                @Override
-                public void beforeMarshal(Object source) {
-                    if (source instanceof StringField) {
-                        StringField field = (StringField) source;
-                        if (toEncrypt.contains(field.getKey())) {
-                            this.savedValue = field.getValue().getValue();
-                            byte[] encrypted = encryption.encrypt(field.getValue().getValue().getBytes());
-                            String b64 = new String(Base64.encodeBase64(encrypted), StandardCharsets.UTF_8);
-                            field.getValue().setValue(b64);
-                            field.getValue().setProtected(true);
-                        }
-                    }
+            // encrypt and base64 every element marked as protected
+            NodeList protectedContent = (NodeList) DomHelper.xpath.evaluate("//*[@Protected='true']", document, XPathConstants.NODESET);
+            for (int i = 0; i < protectedContent.getLength(); i++){
+                Element element = ((Element) protectedContent.item(i));
+                String decrypted = DomHelper.getElementContent(".", element);
+                if (decrypted == null) {
+                    decrypted = "";
                 }
+                byte[] encrypted = encryption.encrypt(decrypted.getBytes());
+                // Android compatibility
+                String base64 = new String(Base64.encodeBase64(encrypted));
+                DomHelper.setElementContent(".", element, base64);
+            }
 
-                /**
-                 * Restore protected fields after marshal
-                 * @param source instance of JAXB mapped class after marshalling it.
-                 */
-                @Override
-                public void afterMarshal(Object source) {
-                    if (source instanceof StringField) {
-                        StringField field = (StringField) source;
-                        if (Objects.nonNull(field.getValue().getProtected()) && field.getValue().getProtected()) {
-                            field.getValue().setValue(savedValue );
-                            field.getValue().setProtected(false);
-                            savedValue = "";
-                        }
-                    }
-                }
-            });
-            u.marshal(keePassFile, outputStream);
-        } catch (JAXBException e) {
+            try {
+                Transformer transformer = TransformerFactory.newInstance().newTransformer();
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
+                transformer.transform(new DOMSource(document), new StreamResult(outputStream));
+            } catch (Exception e) {
+                throw new IllegalStateException(e);
+            }
+        } catch (JAXBException | XPathExpressionException e) {
             throw new IllegalStateException(e);
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
         }
     }
 

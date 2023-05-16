@@ -35,9 +35,9 @@ import java.util.*;
  *
  * @author jo
  */
-class DomHelper {
+public class DomHelper {
 
-    static XPath xpath = XPathFactory.newInstance().newXPath();
+    public static XPath xpath = XPathFactory.newInstance().newXPath();
 
     static final String GROUP_ELEMENT_NAME = "Group";
     static final String ENTRY_ELEMENT_NAME = "Entry";
@@ -156,13 +156,13 @@ class DomHelper {
     }
 
     @Nullable
-    static String getElementContent(String elementPath, Element parentElement) {
+    public static String getElementContent(String elementPath, Element parentElement) {
         Element result = getElement(elementPath, parentElement, false);
         return (result == null) ? null : result.getTextContent();
     }
 
     @NotNull
-    static String ensureElementContent(String elementPath, Element parentElement, @NotNull String value) {
+    public static String ensureElementContent(String elementPath, Element parentElement, @NotNull String value) {
         Element result = getElement(elementPath, parentElement, false);
         if (result == null) {
             result = createHierarchically(elementPath, parentElement);
@@ -172,7 +172,7 @@ class DomHelper {
     }
 
     @NotNull
-    static Element setElementContent(String elementPath, Element parentElement, String value) {
+    public static Element setElementContent(String elementPath, Element parentElement, String value) {
         Element result = getElement(elementPath, parentElement, true);
         result.setTextContent(value);
         return result;
