@@ -321,6 +321,12 @@
     </xs:simpleType>
 
     <xs:complexType name="ValueExtender" abstract="true">
+        <xs:annotation>
+            <xs:documentation>Abstract parent for StringField/Value so that
+                to allow creation of a custom mapping that contains extra
+                non-serialised (transient) fields.
+            </xs:documentation>
+        </xs:annotation>
         <xs:simpleContent>
             <xs:extension base="xs:string"/>
         </xs:simpleContent>
@@ -409,6 +415,8 @@
                 <xs:complexType>
                     <xs:sequence>
                         <xs:element name="UUID" type="uuid"/>
+                        <xs:element name="Name" type="xs:string"/>
+                        <xs:element name="LastModificationTime" type="keepassDateTime" />
                         <xs:element name="Data" type="xs:base64Binary"/>
                     </xs:sequence>
                 </xs:complexType>

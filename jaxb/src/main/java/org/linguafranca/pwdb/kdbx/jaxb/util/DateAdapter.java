@@ -30,6 +30,7 @@ public class DateAdapter {
     }
 
     public static Date fromString(String string) {
+        // this is found in the base template
         if (string.equals("${creationDate}")) {
             return new Date();
         }

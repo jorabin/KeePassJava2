@@ -39,7 +39,6 @@
             />
         </bindings>
 
-
         <bindings node = "//xs:complexType[@name='ValueExtender']">
             <class implClass="org.linguafranca.pwdb.kdbx.jaxb.base.ValueBinding"/>
         </bindings>
