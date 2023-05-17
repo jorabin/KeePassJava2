@@ -16,35 +16,21 @@
 
 package org.linguafranca.pwdb.kdbx.jaxb;
 
+import com.sun.xml.txw2.output.IndentingXMLStreamWriter;
 import org.apache.commons.codec.binary.Base64;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.linguafranca.pwdb.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jaxb.base.ValueBinding;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.*;
-import org.linguafranca.pwdb.kdbx.dom.DomHelper;
 import org.linguafranca.pwdb.security.StreamEncryptor;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpressionException;
-import java.io.IOException;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
@@ -97,7 +83,7 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
                             String decrypted = new String(encryption.decrypt(encrypted), StandardCharsets.UTF_8);
                             value.setValue(decrypted);
                             value.setProtected(null);
-                            value.setProtectInMemory(true);
+                            value.protectOnOutput=true;
                         }
                     }
                     if (target instanceof JaxbGroupBinding && (parent instanceof JaxbGroupBinding)) {
@@ -116,7 +102,7 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
     }
 
     @Override
-    public void save(OutputStream outputStream) throws IOException {
+    public void save(OutputStream outputStream) {
         final List<String> toEncrypt = new ArrayList<>();
         if (keePassFile.getMeta().getMemoryProtection().getProtectTitle()) {
             toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_TITLE);
@@ -133,51 +119,80 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
         if (keePassFile.getMeta().getMemoryProtection().getProtectNotes()) {
             toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_NOTES);
         }
-        try {
-            // Create the Document
-            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-            DocumentBuilder db = dbf.newDocumentBuilder();
-            Document document = db.newDocument();
 
+        try {
             JAXBContext jc = JAXBContext.newInstance(KeePassFile.class);
             Marshaller marshaller = jc.createMarshaller();
-            marshaller.marshal(keePassFile, document);
+            marshaller.setListener(new Marshaller.Listener() {
+                String savedValue="";
 
-            // encrypt and base64 every element marked as protected
-            NodeList protectedContent = (NodeList) DomHelper.xpath.evaluate("//Value", document, XPathConstants.NODESET);
-            for (int i = 0; i < protectedContent.getLength(); i++){
-                Element element = ((Element) protectedContent.item(i));
-                boolean protect = element.getAttribute("ProtectInMemory").equalsIgnoreCase("true");
-                if (protect) {
-                    String decrypted = DomHelper.getElementContent(".", element);
-                    if (decrypted == null) {
-                        decrypted = "";
+                // this changes the content on save, so we need to change it back again, see comment below
+                @Override
+                public void beforeMarshal(Object source) {
+                    if (source instanceof StringField) {
+                        StringField field = (StringField) source;
+                        if (toEncrypt.contains(field.getKey()) || field.getValue().protectOnOutput) {
+                            savedValue = field.getValue().getValue();
+                            byte [] encrypted = encryption.encrypt(field.getValue().getValue().getBytes(StandardCharsets.UTF_8));
+                            byte [] base64Encoded = Base64.encodeBase64(encrypted);
+                            field.getValue().setValue(new String(base64Encoded));
+                            field.getValue().setProtected(true);
+                        } else {
+                            field.getValue().setProtected(false);
+                        }
+                        field.getValue().setProtectInMemory(false);
                     }
-                    byte[] encrypted = encryption.encrypt(decrypted.getBytes());
-                    // Android compatibility
-                    String base64 = new String(Base64.encodeBase64(encrypted));
-                    DomHelper.setElementContent(".", element, base64);
-                    element.setAttribute("Protected", "True");
-                } else {
-                    element.removeAttribute("Protected");
                 }
-                element.removeAttribute("ProtectInMemory");
-            }
 
-            try {
-                Transformer transformer = TransformerFactory.newInstance().newTransformer();
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
-                transformer.transform(new DOMSource(document), new StreamResult(outputStream));
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-        } catch (JAXBException | XPathExpressionException e) {
+                // turns out that undoing the content change we made in beforeMarshal is the easiest way of doing this
+                // after a couple of days of looking at it. Making a clone before serialization
+                // is not practical and creating an adapter is not practical either, believe me, I tried.
+                // That said, if you are a JAXB whizz, and you know better ...
+                @Override
+                public void afterMarshal(Object source) {
+                    if (source instanceof StringField) {
+                        StringField field = (StringField) source;
+                        if (field.getValue().getProtected()) {
+                            field.getValue().setValue(savedValue);
+                            field.getValue().setProtected(false);
+                        }
+                    }
+                }
+            });
+
+            XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
+            XMLStreamWriter xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(outputStream);
+
+            // this tidies up output of boolean ="False" attributes and indentation, which is incorrect
+            // in marshaller and also uses tabs rather than spaces, which is more economical
+            IndentingXMLStreamWriter writer = new IndentingXMLStreamWriter(xmlStreamWriter){
+
+                @Override
+                public void writeStartDocument() throws XMLStreamException {
+                    setIndentStep("\t");
+                    super.writeStartDocument();
+                }
+
+                @Override
+                public void writeAttribute(String localName, String value) throws XMLStreamException {
+                    if (localName.equals("ProtectInMemory")) {
+                        return;
+                    }
+                    if (localName.equals("Protected")) {
+                        if (!value.equalsIgnoreCase("true")){
+                            return;
+                        }
+                    }
+                    super.writeAttribute(localName, value);
+                }
+            };
+            marshaller.marshal(keePassFile, writer);
+
+        } catch (Exception e) {
             throw new IllegalStateException(e);
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
         }
     }
+
 
     @Override
     public StreamEncryptor getEncryption() {
