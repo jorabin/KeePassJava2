@@ -124,11 +124,8 @@ public abstract class EntryClasses {
 
             @Attribute(name = "ProtectInMemory", required = false)
             @Convert(KeePassBooleanConverter.class)
-            // NB converters don't work on attributes -see KdbxOutputTransformer
             protected Boolean protectInMemory;
             @Attribute(name = "Protected", required = false)
-            @Convert(KeePassBooleanConverter.class)
-            // NB converters don't work on attributes -see KdbxOutputTransformer
             Boolean _protected;
             @Attribute(name = "kpj2-ProtectOnOutput", required = false)
             @Convert(KeePassBooleanConverter.class)
@@ -136,12 +133,29 @@ public abstract class EntryClasses {
             @Text
             String text;
 
+            public String getText() {
+                return text;
+            }
+
+            public void setText(String text) {
+                this.text = text;
+            }
+
             public void setProtectOnOutput(boolean aProtected) {
                 this.protectOnOutput = aProtected;
             }
 
             public boolean getProtectOnOutput() {
                 return Objects.nonNull(this.protectOnOutput) && this.protectOnOutput;
+            }
+
+
+            public Boolean getProtected() {
+                return _protected;
+            }
+
+            public void setProtected(Boolean _protected) {
+                this._protected = _protected;
             }
         }
     }

@@ -77,7 +77,7 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         FileInputStream fis = new FileInputStream("testOutput/test1.kdbx");
         D input = loadDatabase(getCreds("123".getBytes()), fis);
         verifyContents(input);
-        //saveDatabase(input, new StreamFormat.None(), new Credentials.None(), printStream);
+        //input.save(new StreamFormat.None(),  new Credentials.None(), printStream);
         printStream.format("Test took %d millis", System.currentTimeMillis() - now);
     }
 

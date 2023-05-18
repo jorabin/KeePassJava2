@@ -19,13 +19,10 @@ package org.linguafranca.pwdb.kdbx.simple;
 import org.linguafranca.pwdb.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.simple.converter.EmptyStringConverter;
+import org.linguafranca.pwdb.kdbx.simple.converter.ValueConverter;
 import org.linguafranca.pwdb.kdbx.simple.model.EntryClasses;
 import org.linguafranca.pwdb.kdbx.simple.model.KeePassFile;
-import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxInputTransformer;
-import org.linguafranca.pwdb.kdbx.simple.transformer.KdbxOutputTransformer;
 import org.linguafranca.pwdb.security.StreamEncryptor;
-import org.linguafranca.xml.XmlInputStreamFilter;
-import org.linguafranca.xml.XmlOutputStreamFilter;
 import org.simpleframework.xml.Serializer;
 import org.simpleframework.xml.convert.AnnotationStrategy;
 import org.simpleframework.xml.convert.Registry;
@@ -63,7 +60,7 @@ public class SimpleSerializableDatabase implements SerializableDatabase {
     static KeePassFile createEmptyDatabase() {
         InputStream inputStream = SimpleDatabase.class.getClassLoader().getResourceAsStream("base.kdbx.xml");
         try {
-            return getSerializer().read(KeePassFile.class, inputStream);
+            return getSerializer(new StreamEncryptor.None()).read(KeePassFile.class, inputStream);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -73,9 +70,9 @@ public class SimpleSerializableDatabase implements SerializableDatabase {
     public SimpleSerializableDatabase load(InputStream inputStream) {
         try {
             // decrypt the encrypted fields in the inner XML stream
-            InputStream plainTextXmlStream = new XmlInputStreamFilter(inputStream, new KdbxInputTransformer(encryption));
+            // InputStream plainTextXmlStream = new XmlInputStreamFilter(inputStream, new KdbxInputTransformer(encryption));
             // read the now entirely decrypted stream into database
-            keePassFile = getSerializer().read(KeePassFile.class, plainTextXmlStream);
+            keePassFile = getSerializer(encryption).read(KeePassFile.class, inputStream);
             // ensure that parent fields are set
             fixUp(keePassFile.root.group);
             return this;
@@ -87,29 +84,28 @@ public class SimpleSerializableDatabase implements SerializableDatabase {
     @Override
     public void save(OutputStream outputStream) throws IOException {
         // encrypt the fields in the XML inner stream
-        XmlOutputStreamFilter plainTextOutputStream = new XmlOutputStreamFilter(outputStream, new KdbxOutputTransformer(encryption));
+        // XmlOutputStreamFilter plainTextOutputStream = new XmlOutputStreamFilter(outputStream, new KdbxOutputTransformer(encryption));
 
         // set up the "protected" attributes of fields that need inner stream encryption
         prepareForSave(keePassFile.root.group);
 
         // and save the database out
         try {
-            getSerializer().write(this.keePassFile, plainTextOutputStream);
+            getSerializer(encryption).write(this.keePassFile, outputStream);
         } catch (Exception e) {
             throw new IOException(e);
         }
-        plainTextOutputStream.close();
-        plainTextOutputStream.await();
     }
 
     /**
      * Utility to get a simple framework persister
      * @return a persister
      */
-     static Serializer getSerializer() {
+     public static Serializer getSerializer(StreamEncryptor encryption) {
         Registry registry = new Registry();
         try {
             registry.bind(String.class, EmptyStringConverter.class);
+            registry.bind(EntryClasses.StringProperty.Value.class, new ValueConverter(encryption));
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }

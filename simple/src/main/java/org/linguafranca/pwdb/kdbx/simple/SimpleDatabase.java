@@ -23,6 +23,8 @@ import org.linguafranca.pwdb.base.AbstractDatabase;
 import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.simple.model.KeePassFile;
+import org.linguafranca.pwdb.security.Encryption;
+import org.linguafranca.pwdb.security.StreamEncryptor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,7 +73,7 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
      * @throws Exception on load failure
      */
     public static SimpleDatabase loadXml(InputStream inputStream) throws Exception {
-        KeePassFile result =  getSerializer().read(KeePassFile.class, inputStream);
+        KeePassFile result =  getSerializer(new StreamEncryptor.None()).read(KeePassFile.class, inputStream);
         result.root.group.uuid = UUID.randomUUID();
         return new SimpleDatabase(result, null);
     }
