@@ -41,8 +41,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
 After a a period of neglect, the project is (May 2023) back in development.
 
-The current code is version 2.2-SNAPSHOT. This is on the main branch. It has 
-not yet been distributed to Maven. See [Build from Source](#build-from-source)
+The current code is version 2.2-SNAPSHOT. This is on the main branch. See [Build from Source](#build-from-source)
 
 Key updates:
 - Java 8 (dependencies no longer support Java 7)
@@ -53,18 +52,41 @@ See the [changelog](CHANGELOG.md) for more details.
 
 ## Maven Coordinates
 
+### Release
+
 The composite POM for the last release (2.1), Java 7 compatible, is
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
         <version>2.1.4</version>
-        
- at Maven Central. Note that the artifactId has become Camel Case from release 2.1.x onwards.
+
+at Maven Central. Note that the artifactId has become Camel Case from release 2.1.x onwards.
+
+### Snapshot
+
+Snapshot build at [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/org/linguafranca/pwdb/):
+
+        <groupId>org.linguafranca.pwdb</groupId>
+        <artifactId>KeePassJava2</artifactId>
+        <version>2.2-SNAPSHOT</version>
+ 
+with appropriate `<repositories>` entry, like:
+
+      <repositories>
+         <repository>
+           <id>oss.sonatype.org-snapshot</id>
+           <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+           <releases>
+             <enabled>false</enabled>
+           </releases>
+           <snapshots>
+             <enabled>true</enabled>
+           </snapshots>
+         </repository>
+       </repositories>
  
  There are also separate POMs for the various modules. The module structure is illustrated below
  under [Build from Source](#build-from-source).
-  
- <!-- Snapshot builds at [Sonatype OSS](https://oss.sonatype.org/content/groups/public/). -->
 
 ## Java Version
 
