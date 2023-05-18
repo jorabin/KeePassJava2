@@ -115,6 +115,7 @@ public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup
     @Override
     public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
                                                      OutputStream outputStream) throws IOException{
+        keePassFile.meta.generator = "KeePassJava2-Simple";
         SimpleSerializableDatabase simpleSerializableDatabase = new SimpleSerializableDatabase(this.keePassFile);
         streamFormat.save(simpleSerializableDatabase, credentials, outputStream);
         setDirty(false);

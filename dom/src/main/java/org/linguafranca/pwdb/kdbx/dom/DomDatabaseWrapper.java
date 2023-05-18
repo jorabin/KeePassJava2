@@ -118,6 +118,7 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
     public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat,
                                                      Credentials credentials,
                                                      OutputStream outputStream) throws IOException {
+        DomHelper.getElement("//Generator", domDatabase.getDoc().getDocumentElement(), false).setTextContent("KeePassJava2-DOM");
         streamFormat.save(domDatabase, credentials, outputStream);
         setDirty(false);
     }

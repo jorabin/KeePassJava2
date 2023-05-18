@@ -7,16 +7,20 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 ### Added
 
 - support for V4 files
+  - numerous updates to accommodate this
 
 ### Changed
 
 - Minimum version supported is Java 8
 - updated documentation of various sorts
 - kdbx multithreaded fix
+- fixes for a number of issues
+- tidy up in various places
 - update dependencies
   - spongy castle replaced by bouncy castle
   - simplexml replaced by simple-xml-safe
   - update versions throughout
+  - list JAXB as external dependency for Java 11
 - remove http module
 - don't deploy examples to Maven
 

@@ -64,7 +64,7 @@ public class KeePassFile {
     @SuppressWarnings("unused")
     public static class Meta {
         @Element(name = "Generator")
-        protected String generator;
+        public String generator;
         @Element(name = "HeaderHash", required = false)
         @Convert(Base64ByteArrayConverter.class)
         public KeePassFile.ByteArray headerHash;

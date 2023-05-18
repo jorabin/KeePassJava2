@@ -83,6 +83,7 @@ public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, Jaxb
     }
 
     public <C extends StreamConfiguration> void save(StreamFormat<C> format, Credentials creds, OutputStream outputStream) throws IOException {
+        keePassFile.getMeta().setGenerator("KeePassJava2-JAXB");
         JaxbSerializableDatabase jsd = new JaxbSerializableDatabase(this.keePassFile);
         format.save(jsd, creds, outputStream);
         setDirty(false);
