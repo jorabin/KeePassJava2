@@ -18,6 +18,7 @@ package org.linguafranca.pwdb.kdbx.jaxb;
 
 import com.sun.xml.txw2.output.IndentingXMLStreamWriter;
 import org.apache.commons.codec.binary.Base64;
+import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jaxb.base.ValueBinding;
@@ -103,62 +104,11 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
 
     @Override
     public void save(OutputStream outputStream) {
-        final List<String> toEncrypt = new ArrayList<>();
-        if (keePassFile.getMeta().getMemoryProtection().getProtectTitle()) {
-            toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_TITLE);
-        }
-        if (keePassFile.getMeta().getMemoryProtection().getProtectURL()) {
-            toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_URL);
-        }
-        if (keePassFile.getMeta().getMemoryProtection().getProtectUserName()) {
-            toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_USER_NAME);
-        }
-        if (keePassFile.getMeta().getMemoryProtection().getProtectPassword()) {
-            toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_PASSWORD);
-        }
-        if (keePassFile.getMeta().getMemoryProtection().getProtectNotes()) {
-            toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_NOTES);
-        }
 
         try {
             JAXBContext jc = JAXBContext.newInstance(KeePassFile.class);
             Marshaller marshaller = jc.createMarshaller();
-            marshaller.setListener(new Marshaller.Listener() {
-                String savedValue="";
-
-                // this changes the content on save, so we need to change it back again, see comment below
-                @Override
-                public void beforeMarshal(Object source) {
-                    if (source instanceof StringField) {
-                        StringField field = (StringField) source;
-                        if (toEncrypt.contains(field.getKey()) || field.getValue().protectOnOutput) {
-                            savedValue = field.getValue().getValue();
-                            byte [] encrypted = encryption.encrypt(field.getValue().getValue().getBytes(StandardCharsets.UTF_8));
-                            byte [] base64Encoded = Base64.encodeBase64(encrypted);
-                            field.getValue().setValue(new String(base64Encoded));
-                            field.getValue().setProtected(true);
-                        } else {
-                            field.getValue().setProtected(false);
-                        }
-                        field.getValue().setProtectInMemory(false);
-                    }
-                }
-
-                // turns out that undoing the content change we made in beforeMarshal is the easiest way of doing this
-                // after a couple of days of looking at it. Making a clone before serialization
-                // is not practical and creating an adapter is not practical either, believe me, I tried.
-                // That said, if you are a JAXB whizz, and you know better ...
-                @Override
-                public void afterMarshal(Object source) {
-                    if (source instanceof StringField) {
-                        StringField field = (StringField) source;
-                        if (field.getValue().getProtected()) {
-                            field.getValue().setValue(savedValue);
-                            field.getValue().setProtected(false);
-                        }
-                    }
-                }
-            });
+            marshaller.setListener(createMarshallerListener(getToEncrypt()));
 
             XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newInstance();
             XMLStreamWriter xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(outputStream);
@@ -191,6 +141,72 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    /**
+     * Creates a listener for marshalling that will rewrite fields that need encryption
+     */
+    private Marshaller.Listener createMarshallerListener(List<String> toEncrypt) {
+        return new Marshaller.Listener() {
+            String savedValue="";
+
+            // this changes the content on save, so we need to change it back again, see comment below
+            @Override
+            public void beforeMarshal(Object source) {
+                if (source instanceof StringField) {
+                    StringField field = (StringField) source;
+                    if (toEncrypt.contains(field.getKey()) || field.getValue().protectOnOutput) {
+                        savedValue = field.getValue().getValue();
+                        byte [] encrypted = encryption.encrypt(field.getValue().getValue().getBytes(StandardCharsets.UTF_8));
+                        byte [] base64Encoded = Base64.encodeBase64(encrypted);
+                        field.getValue().setValue(new String(base64Encoded));
+                        field.getValue().setProtected(true);
+                    } else {
+                        field.getValue().setProtected(false);
+                    }
+                    field.getValue().setProtectInMemory(false);
+                }
+            }
+
+            // turns out that undoing the content change we made in beforeMarshal is the easiest way of doing this
+            // after a couple of days of looking at it. Making a clone before serialization
+            // is not practical and creating an adapter is not practical either, believe me, I tried.
+            // That said, if you are a JAXB whizz, and you know better ...
+            @Override
+            public void afterMarshal(Object source) {
+                if (source instanceof StringField) {
+                    StringField field = (StringField) source;
+                    if (field.getValue().getProtected()) {
+                        field.getValue().setValue(savedValue);
+                        field.getValue().setProtected(false);
+                    }
+                }
+            }
+        };
+    }
+
+    /**
+     * Create a list of names of peroperties that should be encrypted by default
+     */
+    @NotNull
+    private List<String> getToEncrypt() {
+        final List<String> toEncrypt = new ArrayList<>();
+        if (keePassFile.getMeta().getMemoryProtection().getProtectTitle()) {
+            toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_TITLE);
+        }
+        if (keePassFile.getMeta().getMemoryProtection().getProtectURL()) {
+            toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_URL);
+        }
+        if (keePassFile.getMeta().getMemoryProtection().getProtectUserName()) {
+            toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_USER_NAME);
+        }
+        if (keePassFile.getMeta().getMemoryProtection().getProtectPassword()) {
+            toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_PASSWORD);
+        }
+        if (keePassFile.getMeta().getMemoryProtection().getProtectNotes()) {
+            toEncrypt.add(org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_NOTES);
+        }
+        return toEncrypt;
     }
 
 
