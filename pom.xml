@@ -93,6 +93,7 @@
                     <configuration>
                         <useSystemClassLoader>false</useSystemClassLoader>
                         <systemPropertyVariables>
+                            <!-- set Java system property to maven property, set in eponymous profile, below -->
                             <inhibitConsoleOutput>${inhibitConsoleOutput}</inhibitConsoleOutput>
                             <!-- this tells all tests run via surefire to pick their logback config up from the root -->
                             <!-- fwiw does not affect those run via main() which need to find their config by other means -->
@@ -100,6 +101,7 @@
                             <logback.configurationFile>${maven.multiModuleProjectDirectory}/logback.xml</logback.configurationFile>
                         </systemPropertyVariables>
                         <properties>
+                            <!-- this gives us more detailed logging during build -->
                             <property>
                                 <name>listener</name>
                                 <value>org.linguafranca.util.MavenRunListener</value>
@@ -189,6 +191,8 @@
                 <artifactId>slf4j-api</artifactId>
                 <version>2.0.5</version>
             </dependency>
+            <!-- if you want to use logback versions from 1.2 on you need to use
+                SLF4J > 2.0, this was kind of hard to find out. -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
@@ -203,6 +207,7 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.13.2</version>
+                <!-- needs to be a "compile" dependency as we have shared tests -->
             </dependency>
         </dependencies>
     </dependencyManagement>

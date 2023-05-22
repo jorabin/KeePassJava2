@@ -34,6 +34,7 @@
             <artifactId>KeePassJava2-kdbx</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- this is the last version of JAXB that supports Java 8, I think -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
@@ -71,10 +72,12 @@
             </plugin>
         </plugins>
     </build>
+
     <profiles>
         <profile>
-            <id>generateSources</id>
-            <!-- generate JAXB class files -->
+            <id>generateJaxbSources</id>
+            <!-- Use the xjc compiler, as follows, in the JAXB directory -->
+            <!--  xjc -d src/generated/java -p org.linguafranca.pwdb.kdbx.jaxb.binding -b bindings.xml ../KDBX.4.xsd -->
             <build>
                 <plugins>
                     <plugin>
@@ -90,7 +93,6 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <!--  xjc -d src/generated/java -p org.linguafranca.pwdb.kdbx.jaxb.binding -b bindings.xml ../KDBX.4.xsd -->
                             <sources>
                                 <source>../KDBX.4.xsd</source>
                             </sources>

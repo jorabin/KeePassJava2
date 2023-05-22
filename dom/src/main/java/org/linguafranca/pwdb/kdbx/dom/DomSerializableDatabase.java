@@ -85,7 +85,6 @@ public class DomSerializableDatabase implements SerializableDatabase {
             doc = dBuilder.parse(inputStream);
 
             // we need to decrypt all protected fields
-            // TODO we assume they are all strings, which is wrong
             NodeList protectedContent = (NodeList) DomHelper.xpath.evaluate("//*[@Protected='True']", doc, XPathConstants.NODESET);
             for (int i = 0; i < protectedContent.getLength(); i++){
                 Element element = ((Element) protectedContent.item(i));
@@ -97,7 +96,6 @@ public class DomSerializableDatabase implements SerializableDatabase {
                 element.removeAttribute("Protected");
                 element.setAttribute("kpj2-ProtectOnOutput", "True");
             }
-
             return this;
 
         } catch (ParserConfigurationException e) {
