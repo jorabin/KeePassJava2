@@ -203,11 +203,26 @@ public class VariantDictionary {
         bb.putLong(value);
         entries.put(checkNotNull(key, knn), new Entry(INT64, buf));
     }
+    /**
+     * Put a long as an unsigned64 under the key defined
+     */
+    public void putULong(@NotNull String key, long value) {
+        byte[] buf = new byte[8];
+        ByteBuffer bb = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN);
+        bb.putLong(value);
+        entries.put(checkNotNull(key, knn), new Entry(UINT64, buf));
+    }
 
     public void putInt(@NotNull String key, int value) {
         byte[] buf = new byte[4];
         ByteBuffer bb = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(value);
         entries.put(checkNotNull(key, knn), new Entry(INT32, buf));
+    }
+    public void putUInt(@NotNull String key, int value) {
+        byte[] buf = new byte[4];
+        ByteBuffer bb = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN);
+        bb.putInt(value);
+        entries.put(checkNotNull(key, knn), new Entry(UINT32, buf));
     }
 }

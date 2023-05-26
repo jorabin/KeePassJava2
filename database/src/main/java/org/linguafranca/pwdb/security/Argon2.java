@@ -88,10 +88,10 @@ public class Argon2 implements KeyDerivationFunction {
     @Override
     public VariantDictionary createKdfParameters() {
         VariantDictionary vd = new VariantDictionary((short) 1);
-        vd.putInt("P", 2);
-        vd.putInt("V", 19);
-        vd.putLong("I", 2);
-        vd.putLong("M", 64 * 1024 * 1024);
+        vd.putUInt("P", 2);
+        vd.putUInt("V", 19);
+        vd.putULong("I", 2);
+        vd.putULong("M", 64 * 1024 * 1024);
         vd.putUuid("$UUID", Argon2.argon2_kdf);
         vd.put("S", VariantDictionary.EntryType.ARRAY, random.generateSeed(32));
         return vd;

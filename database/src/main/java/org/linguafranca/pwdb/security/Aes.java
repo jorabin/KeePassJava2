@@ -31,7 +31,7 @@ public class Aes implements CipherAlgorithm, KeyDerivationFunction {
     private static final VariantDictionary kdfParameters = new VariantDictionary((short) 1);
     static {
         kdfParameters.putUuid("$UUID", KDF);
-        kdfParameters.putLong(ParamRounds, 6000L);
+        kdfParameters.putULong(ParamRounds, 6000L);
         kdfParameters.putByteArray(ParamSeed, SecureRandom.getSeed(32));
     }
 

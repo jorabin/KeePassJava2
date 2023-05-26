@@ -432,17 +432,19 @@ public class KdbxSerializer {
         lengthWriter.accept(kdbxHeader.getEncryptionIv().length);
         ledos.write(kdbxHeader.getEncryptionIv());
 
-        ledos.writeByte(HeaderType.INNER_RANDOM_STREAM_KEY);
-        lengthWriter.accept(kdbxHeader.getInnerRandomStreamKey().length);
-        ledos.write(kdbxHeader.getInnerRandomStreamKey());
+        if (kdbxHeader.getVersion() < 4) {
+            ledos.writeByte(HeaderType.INNER_RANDOM_STREAM_KEY);
+            lengthWriter.accept(kdbxHeader.getInnerRandomStreamKey().length);
+            ledos.write(kdbxHeader.getInnerRandomStreamKey());
 
-        ledos.writeByte(HeaderType.STREAM_START_BYTES);
-        lengthWriter.accept(kdbxHeader.getStreamStartBytes().length);
-        ledos.write(kdbxHeader.getStreamStartBytes());
+            ledos.writeByte(HeaderType.STREAM_START_BYTES);
+            lengthWriter.accept(kdbxHeader.getStreamStartBytes().length);
+            ledos.write(kdbxHeader.getStreamStartBytes());
 
-        ledos.writeByte(HeaderType.INNER_RANDOM_STREAM_ID);
-        lengthWriter.accept(4);
-        ledos.writeInt(kdbxHeader.getProtectedStreamAlgorithm().ordinal());
+            ledos.writeByte(HeaderType.INNER_RANDOM_STREAM_ID);
+            lengthWriter.accept(4);
+            ledos.writeInt(kdbxHeader.getProtectedStreamAlgorithm().ordinal());
+        }
 
         if (kdbxHeader.getVersion() > 3) {
             ledos.writeByte(HeaderType.KDF_PARAMETERS);
