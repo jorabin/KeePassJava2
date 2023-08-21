@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
-// @JacksonXmlRootElement(localName = "Times")
 public class Times {
     @JacksonXmlProperty(localName = "LastModificationTime")
     @JsonDeserialize(converter = StringToDateConverter.class)

@@ -57,7 +57,6 @@ public abstract class EntryClasses {
         return property == null || property.value == null ? null : property.value.ref;
     }
 
-    //@JacksonXmlRootElement(localName = "AutoType")
     public static class AutoType {
         @JacksonXmlProperty(localName = "Enabled")
         @JsonDeserialize(converter = StringToBooleanConverter.class)
@@ -84,7 +83,6 @@ public abstract class EntryClasses {
         }
     }
 
-    //@JacksonXmlRootElement(localName = "String")
     public static class StringProperty {
 
         public StringProperty() {
@@ -117,7 +115,7 @@ public abstract class EntryClasses {
         public void setValue(Value value) {
             this.value = value;
         }
-       // @JsonSerialize(using = ValueBooleanSerializer.class)
+
         public static class Value {
 
             public Value() {
@@ -134,19 +132,13 @@ public abstract class EntryClasses {
             }
 
             @JacksonXmlProperty(localName = "ProtectInMemory", isAttribute = true)
-            //@JsonDeserialize(converter = StringToBooleanConverter.class)
-            //@JsonSerialize(converter = BooleanToStringConverter.class)
             protected Boolean protectInMemory;
 
-             @JacksonXmlProperty(localName = "Protected", isAttribute = true)
-            //@JsonDeserialize(converter = StringToBooleanConverter.class)
-            //@JsonSerialize(converter = BooleanToStringConverter.class)
+            @JacksonXmlProperty(localName = "Protected", isAttribute = true)
             Boolean _protected;
 
 
             @JacksonXmlProperty(localName = "kpj2-ProtectOnOutput", isAttribute = true)
-            //@JsonDeserialize(converter = StringToBooleanConverter.class)
-            //@JsonSerialize(converter = BooleanToStringConverter.class)
             Boolean protectOnOutput;
 
             @JacksonXmlText
@@ -188,7 +180,6 @@ public abstract class EntryClasses {
         }
     }
 
-    // @JacksonXmlRootElement(localName = "Binary")
     public static class BinaryProperty {
 
         @JacksonXmlProperty(localName = "Key")
@@ -223,7 +214,6 @@ public abstract class EntryClasses {
 
         @JacksonXmlProperty(localName = "Entry") /** Workaround jackson **/
         @JacksonXmlElementWrapper(useWrapping = false)
-        //@JacksonXmlElementWrapper(localName = "JacksonEntry", useWrapping = false)
         private List<JacksonEntry> list;
 
         public History() {

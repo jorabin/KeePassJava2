@@ -1,5 +1,6 @@
 testOutput
 build
+.vscode/*
 *.versionsBackup
 */target
 #settings.gradle

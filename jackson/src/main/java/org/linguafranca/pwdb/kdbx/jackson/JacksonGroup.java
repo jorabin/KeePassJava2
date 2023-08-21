@@ -36,7 +36,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
-// @JacksonXmlRootElement(localName = "Group")
 @JsonPropertyOrder({
 "uuid",
 "name",
@@ -51,7 +50,6 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 "lastTopVisibleEntry",
 "entry",
 "group",
-//"customData"
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JacksonGroup

@@ -59,7 +59,6 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
     "binary",
     "autoType",
     "history",
-    //"customData"
 })
 
 

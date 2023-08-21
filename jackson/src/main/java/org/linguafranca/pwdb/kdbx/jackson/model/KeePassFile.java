@@ -52,7 +52,6 @@ public class KeePassFile {
         meta.binaries = new ArrayList<>();
     }
 
-    // @JacksonXmlRootElement(localName = "Root")
     @JsonPropertyOrder({
         "group",
         "deletedObject"
@@ -70,7 +69,6 @@ public class KeePassFile {
 
     }
 
-    // @JacksonXmlRootElement(localName = "Meta")
     @JsonPropertyOrder({
         "generator",
         "headerHash",
@@ -97,7 +95,6 @@ public class KeePassFile {
         "historyMaxItems",
         "historyMaxSize",
         "binaries",
-        //"customData"
     })
     public static class Meta {
 
@@ -272,7 +269,6 @@ public class KeePassFile {
         }
     }
 
-    // @JacksonXmlRootElement(localName = "Binary")
     public static class Binary {
 
         public Binary() {
@@ -314,7 +310,6 @@ public class KeePassFile {
         }
     }
 
-    // @JacksonXmlRootElement(localName = "Icon")
     public static class Icon {
         public Icon() {
         }
@@ -342,7 +337,6 @@ public class KeePassFile {
         }
     }
 
-    // @JacksonXmlRootElement(localName = "CustomData")
     public static class CustomData {
 
         public CustomData() {

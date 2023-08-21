@@ -99,14 +99,6 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
             sw.writeEndDocument();
             sw.close();
 
-            //sw.writeStartElement("root");
-            
-            
-            //sw.writeComment("Some insightful commentary here");
-            //sw.writeEndElement();
-         //   sw.writeEndDocument();
-
-
         } catch(Exception e) {
             throw new IllegalStateException(e);
         }
