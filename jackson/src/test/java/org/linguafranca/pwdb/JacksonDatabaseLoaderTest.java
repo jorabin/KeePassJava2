@@ -15,21 +15,20 @@
  */
 package org.linguafranca.pwdb;
 
-import java.io.IOException;
+import java.io.InputStream;
 
-import org.linguafranca.pwdb.checks.BasicDatabaseChecks;
+import org.linguafranca.pwdb.checks.DatabaseLoaderChecks;
+import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
 
-public class JacksonDatabaseTest extends BasicDatabaseChecks {
-
-    public JacksonDatabaseTest() throws IOException {
-
-    }
-
-
-    @Override
-    public Database createDatabase() throws IOException {
-        return new JacksonDatabase();
-    }
+public class JacksonDatabaseLoaderTest extends DatabaseLoaderChecks{
     
+     
+    public JacksonDatabaseLoaderTest() throws Exception{
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
+        // file has password credentials
+        Credentials credentials = new KdbxCreds("123".getBytes());
+        super.database = JacksonDatabase.load(credentials, inputStream);
+    }
+
 }

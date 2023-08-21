@@ -13,23 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.linguafranca.pwdb;
 
-import java.io.IOException;
+package org.linguafranca.pwdb.kdbx.jackson.converter;
 
-import org.linguafranca.pwdb.checks.BasicDatabaseChecks;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
+import java.util.Date;
 
-public class JacksonDatabaseTest extends BasicDatabaseChecks {
+import org.linguafranca.pwdb.kdbx.Helpers;
 
-    public JacksonDatabaseTest() throws IOException {
+import com.fasterxml.jackson.databind.util.StdConverter;
 
-    }
-
+public class DateToStringConverter extends StdConverter<Date, String> {
 
     @Override
-    public Database createDatabase() throws IOException {
-        return new JacksonDatabase();
+    public String convert(Date date) {
+       return Helpers.fromDate(date);
     }
     
 }

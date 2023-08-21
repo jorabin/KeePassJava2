@@ -15,15 +15,27 @@
  */
 package org.linguafranca.pwdb.kdbx.jackson.converter;
 
-import java.util.Base64;
+import java.util.Date;
+
+import org.linguafranca.pwdb.kdbx.Helpers;
 
 import com.fasterxml.jackson.databind.util.StdConverter;
 
-public class ByteToBase64Converter extends StdConverter<byte[], String> {
+public class StringToDateConverter extends StdConverter<String, Date> {
 
     @Override
-    public String convert(byte[] value) {
-        return new String(Base64.getEncoder().encode(value));
+    public Date convert(String value) {
+        Date result = null;
+        if(value != null) {
+            if(value.equals("${creationDate}")) {
+                result = new Date();
+            }
+            try {
+                result =  Helpers.toDate(value);
+            } catch(Exception e) {
+                result = new Date();
+            }
+        }
+        return result;
     }
-
 }

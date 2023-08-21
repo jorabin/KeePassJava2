@@ -35,7 +35,7 @@ public class JacksonIcon implements Icon {
 
     @Override
     public int getIndex() {
-       return this.index;
+        return this.index;
     }
 
     @Override
@@ -45,8 +45,10 @@ public class JacksonIcon implements Icon {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
 
         JacksonIcon that = (JacksonIcon) o;
 
@@ -58,5 +60,5 @@ public class JacksonIcon implements Icon {
     public int hashCode() {
         return index;
     }
-    
+
 }

@@ -15,21 +15,17 @@
  */
 package org.linguafranca.pwdb;
 
-import java.io.IOException;
-
-import org.linguafranca.pwdb.checks.BasicDatabaseChecks;
+import org.linguafranca.pwdb.checks.RecycleBinChecks;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
 
-public class JacksonDatabaseTest extends BasicDatabaseChecks {
+public class JacksonRecycleBinTest extends RecycleBinChecks {
 
-    public JacksonDatabaseTest() throws IOException {
-
-    }
-
-
-    @Override
-    public Database createDatabase() throws IOException {
-        return new JacksonDatabase();
-    }
-    
+    public JacksonRecycleBinTest() {
+        try {
+            database = new JacksonDatabase();
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+         
+     }
 }

@@ -22,54 +22,92 @@ import java.util.List;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
+import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
 
+import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
+import org.linguafranca.pwdb.kdbx.jackson.model.Times;
+import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses.AutoType;
+import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses.BinaryProperty;
+import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses.StringProperty;
 
 import static org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses.*;
-import org.linguafranca.pwdb.kdbx.jackson.model.Times;
-
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
-@JacksonXmlRootElement(localName = "Entry")
+
+
+@JsonPropertyOrder({
+    "uuid",
+    "iconID",
+    "customIconUUID",
+    "foregroundColor",
+    "backgroundColor",
+    "overrideURL",
+    "tags",
+    "times",
+    "string",
+    "binary",
+    "autoType",
+    "history",
+    //"customData"
+})
+
+
+@JsonIgnoreProperties({"path", "username", "title", "notes", "url", "password"})
 public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
 
+
     @JacksonXmlProperty(localName = "UUID")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
     protected UUID uuid;
+
     @JacksonXmlProperty(localName = "IconID")
     protected int iconID;
+    
     @JacksonXmlProperty(localName = "CustomIconUUID")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
     protected UUID customIconUUID;
+   
     @JacksonXmlProperty(localName = "ForegroundColor")
     protected String foregroundColor;
+    
     @JacksonXmlProperty(localName = "BackgroundColor")
     protected String backgroundColor;
+   
     @JacksonXmlProperty(localName = "OverrideURL")
     protected String overrideURL;
+    
     @JacksonXmlProperty(localName = "Tags")
     protected String tags;
+   
     @JacksonXmlProperty(localName = "Times")
     protected Times times;
 
-    @JacksonXmlProperty(localName = "String") /** Workaround jackson  **/
+    @JacksonXmlProperty(localName = "String") /** Workaround jackson **/
     @JacksonXmlElementWrapper(useWrapping = false)
     protected List<StringProperty> string;
 
-    @JacksonXmlProperty(localName = "Binary") /** Workaround jackson  **/
+    @JacksonXmlProperty(localName = "Binary") /** Workaround jackson **/
     @JacksonXmlElementWrapper(useWrapping = false)
     protected List<BinaryProperty> binary;
 
     @JacksonXmlProperty(localName = "AutoType")
     protected AutoType autoType;
 
-    @JacksonXmlProperty(localName = "History") /** Workaround jackson  **/
-    @JacksonXmlElementWrapper(useWrapping = false)
-    protected List<JacksonHistory> history;
+    @JacksonXmlProperty(localName = "History") /** Workaround jackson **/
+    protected JacksonHistory history;
 
     @JsonIgnore
     JacksonDatabase database;
@@ -85,24 +123,25 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
         iconID = 0;
     }
 
-
     public static JacksonEntry createEntry(JacksonDatabase database) {
         JacksonEntry result = new JacksonEntry();
         result.database = database;
         result.parent = null;
         // avoiding setProperty as it does a touch();
-        for (String p: STANDARD_PROPERTY_NAMES) {
+        for (String p : STANDARD_PROPERTY_NAMES) {
             result.string.add(new StringProperty(p, new StringProperty.Value("")));
         }
         return result;
     }
 
     @Override
+    @JsonIgnore
     public String getProperty(String s) {
         return getStringContent(getStringProperty(s, string));
     }
 
     @Override
+    @JsonIgnore
     public void setProperty(String s, String s1) {
         StringProperty sp;
         if ((sp = getStringProperty(s, string)) != null) {
@@ -113,8 +152,10 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
+    @JsonIgnore
     public boolean removeProperty(String name) throws IllegalArgumentException {
-        if (STANDARD_PROPERTY_NAMES.contains(name)) throw new IllegalArgumentException("may not remove property: " + name);
+        if (STANDARD_PROPERTY_NAMES.contains(name))
+            throw new IllegalArgumentException("may not remove property: " + name);
 
         StringProperty sp = getStringProperty(name, string);
         if (sp == null) {
@@ -127,9 +168,10 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
+    @JsonIgnore
     public List<String> getPropertyNames() {
         List<String> result = new ArrayList<>();
-        for (StringProperty property: this.string) {
+        for (StringProperty property : this.string) {
             result.add(property.getKey());
         }
         return result;
@@ -158,13 +200,13 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
     public void setBinaryProperty(String s, byte[] bytes) {
         // remove old binary property with same name
         BinaryProperty bp = getBinaryProp(s, binary);
-        if (bp != null){
+        if (bp != null) {
             binary.remove(bp);
         }
 
         // what is the next free index in the binary store?
         Integer max = -1;
-        for (KeePassFile.Binary binary: database.getBinaries()){
+        for (KeePassFile.Binary binary : database.getBinaries()) {
             if (binary.getId() > max) {
                 max = binary.getId();
             }
@@ -184,6 +226,7 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
+    @JsonIgnore
     public boolean removeBinaryProperty(String name) throws UnsupportedOperationException {
         BinaryProperty bp = getBinaryProp(name, binary);
         if (bp != null) {
@@ -195,9 +238,10 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
+    @JsonIgnore
     public List<String> getBinaryPropertyNames() {
         List<String> result = new ArrayList<>();
-        for (BinaryProperty property: this.binary) {
+        for (BinaryProperty property : this.binary) {
             result.add(property.getKey());
         }
         return result;
@@ -224,46 +268,53 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
+    @JsonIgnore
     public Date getLastAccessTime() {
         return times.getLastAccessTime();
     }
 
     @Override
+    @JsonIgnore
     public Date getCreationTime() {
         return times.getCreationTime();
     }
 
     @Override
+    @JsonIgnore
     public boolean getExpires() {
         return times.getExpires();
     }
 
     @Override
+    @JsonIgnore
     public void setExpires(boolean expires) {
         times.setExpires(expires);
     }
 
     @Override
+    @JsonIgnore
     public Date getExpiryTime() {
         return times.getExpiryTime();
     }
 
     @Override
+    @JsonIgnore
     public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
-        if (expiryTime == null) throw new IllegalArgumentException("expiryTime may not be null");
+        if (expiryTime == null)
+            throw new IllegalArgumentException("expiryTime may not be null");
         times.setExpiryTime(expiryTime);
     }
 
     @Override
+    @JsonIgnore
     public Date getLastModificationTime() {
         return times.getLastModificationTime();
     }
 
     @Override
+    @JsonIgnore
     protected void touch() {
         this.times.setLastModificationTime(new Date());
         this.database.setDirty(true);
     }
-
-    
 }

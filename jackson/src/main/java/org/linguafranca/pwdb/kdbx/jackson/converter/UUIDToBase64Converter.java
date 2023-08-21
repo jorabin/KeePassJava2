@@ -13,23 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.linguafranca.pwdb;
+package org.linguafranca.pwdb.kdbx.jackson.converter;
 
-import java.io.IOException;
+import java.util.UUID;
 
-import org.linguafranca.pwdb.checks.BasicDatabaseChecks;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
+import org.linguafranca.pwdb.kdbx.Helpers;
 
-public class JacksonDatabaseTest extends BasicDatabaseChecks {
+import com.fasterxml.jackson.databind.util.StdConverter;
 
-    public JacksonDatabaseTest() throws IOException {
-
-    }
-
+public class UUIDToBase64Converter extends StdConverter<UUID, String> {
 
     @Override
-    public Database createDatabase() throws IOException {
-        return new JacksonDatabase();
+    public String convert(UUID value) {
+       
+        if(value != null) {
+            return Helpers.base64FromUuid(value);
+        }
+        return new String();
     }
     
 }

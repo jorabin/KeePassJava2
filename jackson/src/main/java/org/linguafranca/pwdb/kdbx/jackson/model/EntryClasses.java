@@ -16,18 +16,19 @@
 
 package org.linguafranca.pwdb.kdbx.jackson.model;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import org.linguafranca.pwdb.kdbx.jackson.JacksonEntry;
+import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
-
 
 public abstract class EntryClasses {
     public static StringProperty getStringProperty(String name, List<StringProperty> string) {
@@ -40,7 +41,7 @@ public abstract class EntryClasses {
     }
 
     public static String getStringContent(StringProperty property) {
-        return property == null || property.value == null? null:property.value.text;
+        return property == null || property.value == null ? null : property.value.text;
     }
 
     public static BinaryProperty getBinaryProp(String name, List<BinaryProperty> binary) {
@@ -53,12 +54,14 @@ public abstract class EntryClasses {
     }
 
     public static String getBinaryContent(BinaryProperty property) {
-        return property == null || property.value == null ? null :  property.value.ref;
+        return property == null || property.value == null ? null : property.value.ref;
     }
 
-    @JacksonXmlRootElement(localName = "AutoType")
+    //@JacksonXmlRootElement(localName = "AutoType")
     public static class AutoType {
         @JacksonXmlProperty(localName = "Enabled")
+        @JsonDeserialize(converter = StringToBooleanConverter.class)
+        @JsonSerialize(converter = BooleanToStringConverter.class)
         protected Boolean enabled;
 
         @JacksonXmlProperty(localName = "DataTransferObfuscation")
@@ -81,12 +84,13 @@ public abstract class EntryClasses {
         }
     }
 
-    @JacksonXmlRootElement(localName = "String")
-    public static class StringProperty  {
+    //@JacksonXmlRootElement(localName = "String")
+    public static class StringProperty {
 
         public StringProperty() {
-            this("",new Value());
+            
         }
+
         public StringProperty(String key, Value value) {
             this.key = key;
             this.value = value;
@@ -98,10 +102,6 @@ public abstract class EntryClasses {
         @JacksonXmlProperty(localName = "Value")
         Value value;
 
-        public String getName() {
-            return key;
-        }
-
         public String getKey() {
             return key;
         }
@@ -110,11 +110,19 @@ public abstract class EntryClasses {
             return value;
         }
 
-        @JacksonXmlRootElement(localName = "Value")
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public void setValue(Value value) {
+            this.value = value;
+        }
+       // @JsonSerialize(using = ValueBooleanSerializer.class)
         public static class Value {
-            public Value(){
-                this("");
+
+            public Value() {
             }
+
             public Value(String text) {
                 this.text = text;
                 this._protected = false;
@@ -126,12 +134,19 @@ public abstract class EntryClasses {
             }
 
             @JacksonXmlProperty(localName = "ProtectInMemory", isAttribute = true)
+            //@JsonDeserialize(converter = StringToBooleanConverter.class)
+            //@JsonSerialize(converter = BooleanToStringConverter.class)
             protected Boolean protectInMemory;
 
-            @JacksonXmlProperty(localName = "Protected", isAttribute = true)
+             @JacksonXmlProperty(localName = "Protected", isAttribute = true)
+            //@JsonDeserialize(converter = StringToBooleanConverter.class)
+            //@JsonSerialize(converter = BooleanToStringConverter.class)
             Boolean _protected;
-            
+
+
             @JacksonXmlProperty(localName = "kpj2-ProtectOnOutput", isAttribute = true)
+            //@JsonDeserialize(converter = StringToBooleanConverter.class)
+            //@JsonSerialize(converter = BooleanToStringConverter.class)
             Boolean protectOnOutput;
 
             @JacksonXmlText
@@ -153,7 +168,6 @@ public abstract class EntryClasses {
                 return Objects.nonNull(this.protectOnOutput) && this.protectOnOutput;
             }
 
-
             public Boolean getProtected() {
                 return _protected;
             }
@@ -161,11 +175,21 @@ public abstract class EntryClasses {
             public void setProtected(Boolean _protected) {
                 this._protected = _protected;
             }
+
+
+            public Boolean getProtectInMemory() {
+                return protectInMemory;
+            }
+
+ 
+            public void setProtectInMemory(Boolean protectInMemory) {
+                this.protectInMemory = protectInMemory;
+            }
         }
     }
 
-    @JacksonXmlRootElement(localName = "Binary")
-    public static class BinaryProperty  {
+    // @JacksonXmlRootElement(localName = "Binary")
+    public static class BinaryProperty {
 
         @JacksonXmlProperty(localName = "Key")
         String key;
@@ -177,10 +201,6 @@ public abstract class EntryClasses {
             return key;
         }
 
-        public String getName() {
-            return key;
-        }
-
         public void setKey(String key) {
             this.key = key;
         }
@@ -189,7 +209,6 @@ public abstract class EntryClasses {
             this.value = value;
         }
 
-        @JacksonXmlRootElement(localName = "Value")
         public static class Value {
             @JacksonXmlProperty(localName = "Ref", isAttribute = true)
             String ref;
@@ -202,13 +221,16 @@ public abstract class EntryClasses {
 
     public static class History {
 
-        @JacksonXmlElementWrapper(localName = "JacksonEntry", useWrapping = false)
+        @JacksonXmlProperty(localName = "Entry") /** Workaround jackson **/
+        @JacksonXmlElementWrapper(useWrapping = false)
+        //@JacksonXmlElementWrapper(localName = "JacksonEntry", useWrapping = false)
         private List<JacksonEntry> list;
 
-        public History(){
+        public History() {
             list = new ArrayList<>();
         }
-        public List<JacksonEntry> getHistory(){
+
+        public List<JacksonEntry> getHistory() {
             return list;
         }
     }

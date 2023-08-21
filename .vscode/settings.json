@@ -1,4 +1,4 @@
 {
     "java.compile.nullAnalysis.mode": "automatic",
-    "maven.view": "hierarchical"
+    "maven.view": "flat"
 }

@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.linguafranca.pwdb;
 
-import java.io.IOException;
+package org.linguafranca.pwdb.kdbx.jackson.converter;
 
-import org.linguafranca.pwdb.checks.BasicDatabaseChecks;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
+import org.linguafranca.pwdb.kdbx.Helpers;
 
-public class JacksonDatabaseTest extends BasicDatabaseChecks {
+import com.fasterxml.jackson.databind.util.StdConverter;
 
-    public JacksonDatabaseTest() throws IOException {
-
-    }
-
+public class BooleanToStringConverter extends StdConverter<Boolean, String> {
 
     @Override
-    public Database createDatabase() throws IOException {
-        return new JacksonDatabase();
+    public String convert(Boolean value) {
+       return Helpers.fromBoolean(value);
     }
     
 }

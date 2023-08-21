@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package org.linguafranca.pwdb.kdbx.jackson;
 
 import java.util.ArrayList;
@@ -23,57 +22,104 @@ import java.util.List;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
+import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
 import org.linguafranca.pwdb.kdbx.jackson.model.Times;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
-
-@JacksonXmlRootElement(localName = "Group")
-public class JacksonGroup extends org.linguafranca.pwdb.base.AbstractGroup<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
+// @JacksonXmlRootElement(localName = "Group")
+@JsonPropertyOrder({
+"uuid",
+"name",
+"notes",
+"iconID",
+"customIconUUID",
+"times",
+"isExpanded",
+"defaultAutoTypeSequence",
+"enableAutoType",
+"enableSearching",
+"lastTopVisibleEntry",
+"entry",
+"group",
+//"customData"
+})
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class JacksonGroup
+        extends org.linguafranca.pwdb.base.AbstractGroup<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
 
     @JacksonXmlProperty(localName = "UUID")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
     protected UUID uuid;
-    
+
     @JacksonXmlProperty(localName = "Name")
     protected String name;
+    
     @JacksonXmlProperty(localName = "Notes")
     protected String notes;
+    
     @JacksonXmlProperty(localName = "IconID")
     protected int iconID;
+    
     @JacksonXmlProperty(localName = "CustomIconUUID")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
     protected UUID customIconUuid;
+    
     @JacksonXmlProperty(localName = "Times")
     protected Times times;
+    
     @JacksonXmlProperty(localName = "IsExpanded")
+    @JsonDeserialize(converter = StringToBooleanConverter.class)
+    @JsonSerialize(converter = BooleanToStringConverter.class)
     protected Boolean isExpanded;
+    
     @JacksonXmlProperty(localName = "DefaultAutoTypeSequence")
     protected String defaultAutoTypeSequence;
+    
     @JacksonXmlProperty(localName = "EnableAutoType")
+    @JsonDeserialize(converter = StringToBooleanConverter.class)
+    @JsonSerialize(converter = BooleanToStringConverter.class)
     protected Boolean enableAutoType;
+    
     @JacksonXmlProperty(localName = "EnableSearching")
+    @JsonDeserialize(converter = StringToBooleanConverter.class)
+    @JsonSerialize(converter = BooleanToStringConverter.class)
     protected Boolean enableSearching;
+
     @JacksonXmlProperty(localName = "LastTopVisibleEntry")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
     protected UUID lastTopVisibleEntry;
 
-    @JacksonXmlProperty(localName = "Entry") /** Workaround jackson  **/
+    @JacksonXmlProperty(localName = "Entry") /** Workaround jackson **/
     @JacksonXmlElementWrapper(useWrapping = false)
-    protected List<JacksonEntry> entry;
+    protected List<JacksonEntry> entries;
 
-    @JacksonXmlProperty(localName = "Group") /** Workaround jackson  **/
+
+    @JacksonXmlProperty(localName = "Group") /** Workaround jackson **/
     @JacksonXmlElementWrapper(useWrapping = false)
-    protected List<JacksonGroup> group;
+    protected List<JacksonGroup> groups;
 
     @JsonIgnore
     protected JacksonDatabase database;
+    
     @JsonIgnore
     protected JacksonGroup parent;
 
     protected JacksonGroup() {
-        entry = new ArrayList<>();
-        group = new ArrayList<>();
+        entries = new ArrayList<>();
+        groups = new ArrayList<>();
         times = new Times();
     }
 
@@ -121,15 +167,16 @@ public class JacksonGroup extends org.linguafranca.pwdb.base.AbstractGroup<Jacks
     @Override
     public List<JacksonGroup> getGroups() {
         List<JacksonGroup> result = new ArrayList<>();
-        for (JacksonGroup aGroup : group) {
+        for (JacksonGroup aGroup : groups) {
             result.add(aGroup);
         }
         return result;
     }
 
     @Override
+    @JsonIgnore
     public int getGroupsCount() {
-        return group.size();
+        return groups.size();
     }
 
     @Override
@@ -144,7 +191,7 @@ public class JacksonGroup extends org.linguafranca.pwdb.base.AbstractGroup<Jacks
             group.getParent().removeGroup(group);
         }
         group.parent = this;
-        this.group.add(group);
+        this.groups.add(group);
         touch();
         return group;
     }
@@ -154,7 +201,7 @@ public class JacksonGroup extends org.linguafranca.pwdb.base.AbstractGroup<Jacks
         if (this.database != group.database) {
             throw new IllegalStateException("Must be from same database");
         }
-        this.group.remove(group);
+        this.groups.remove(group);
         group.parent = null;
         touch();
         return group;
@@ -163,15 +210,16 @@ public class JacksonGroup extends org.linguafranca.pwdb.base.AbstractGroup<Jacks
     @Override
     public List<JacksonEntry> getEntries() {
         List<JacksonEntry> result = new ArrayList<>();
-        for (JacksonEntry entry: this.entry){
+        for (JacksonEntry entry : this.entries) {
             result.add(entry);
         }
         return result;
     }
 
     @Override
+    @JsonIgnore
     public int getEntriesCount() {
-        return this.entry.size();
+        return this.entries.size();
     }
 
     @Override
@@ -182,8 +230,8 @@ public class JacksonGroup extends org.linguafranca.pwdb.base.AbstractGroup<Jacks
         if (entry.getParent() != null) {
             entry.getParent().removeEntry(entry);
         }
-        this.entry.add(entry);
-        entry.parent=this;
+        this.entries.add(entry);
+        entry.parent = this;
         touch();
         return entry;
     }
@@ -193,7 +241,7 @@ public class JacksonGroup extends org.linguafranca.pwdb.base.AbstractGroup<Jacks
         if (this.database != entry.database) {
             throw new IllegalStateException("Must be from same database");
         }
-        this.entry.remove(entry);
+        this.entries.remove(entry);
         entry.parent = null;
         return entry;
     }
@@ -232,14 +280,13 @@ public class JacksonGroup extends org.linguafranca.pwdb.base.AbstractGroup<Jacks
     }
 
     private void touch() {
-        if(this.times != null) {
+        if (this.times != null) {
             this.times.setLastModificationTime(new Date());
         }
-        
-        if(this.database != null) {
+
+        if (this.database != null) {
             this.database.setDirty(true);
         }
-        
+
     }
 }
-

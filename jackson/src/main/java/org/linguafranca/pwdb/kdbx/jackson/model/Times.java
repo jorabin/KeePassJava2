@@ -16,33 +16,35 @@
 
 package org.linguafranca.pwdb.kdbx.jackson.model;
 
-
 import java.util.Date;
 
-import org.linguafranca.pwdb.kdbx.jackson.converter.TimeConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.DateToStringConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.StringToDateConverter;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement;
 
-
-
-@JacksonXmlRootElement(localName = "Times")
+// @JacksonXmlRootElement(localName = "Times")
 public class Times {
     @JacksonXmlProperty(localName = "LastModificationTime")
-    @JsonDeserialize(converter = TimeConverter.class)
+    @JsonDeserialize(converter = StringToDateConverter.class)
+    @JsonSerialize(converter = DateToStringConverter.class)
     protected Date lastModificationTime;
 
     @JacksonXmlProperty(localName = "CreationTime")
-    @JsonDeserialize(converter = TimeConverter.class)
+    @JsonDeserialize(converter = StringToDateConverter.class)
+    @JsonSerialize(converter = DateToStringConverter.class)
     protected Date creationTime;
 
     @JacksonXmlProperty(localName = "LastAccessTime")
-    @JsonDeserialize(converter = TimeConverter.class)
+    @JsonDeserialize(converter = StringToDateConverter.class)
+    @JsonSerialize(converter = DateToStringConverter.class)
     protected Date lastAccessTime;
 
     @JacksonXmlProperty(localName = "ExpiryTime")
-    @JsonDeserialize(converter = TimeConverter.class)
+    @JsonSerialize(converter = DateToStringConverter.class)
+    @JsonDeserialize(converter = StringToDateConverter.class)
     protected Date expiryTime;
 
     @JacksonXmlProperty(localName = "Expires")
@@ -50,9 +52,10 @@ public class Times {
 
     @JacksonXmlProperty(localName = "UsageCount")
     protected int usageCount;
-    
+
     @JacksonXmlProperty(localName = "LocationChanged")
-    @JsonDeserialize(converter = TimeConverter.class)
+    @JsonDeserialize(converter = StringToDateConverter.class)
+    @JsonSerialize(converter = DateToStringConverter.class)
     protected Date locationChanged;
 
     public Date getLastModificationTime() {
@@ -112,8 +115,9 @@ public class Times {
     }
 
     public Times() {
-        this(new Date(System.currentTimeMillis()/1000*1000));
+        this(new Date(System.currentTimeMillis() / 1000 * 1000));
     }
+
     public Times(Date date) {
         lastModificationTime = date;
         lastAccessTime = date;

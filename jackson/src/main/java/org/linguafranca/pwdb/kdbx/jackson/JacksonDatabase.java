@@ -21,20 +21,23 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.StreamConfiguration;
 import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.base.AbstractDatabase;
+import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
+import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
 import com.fasterxml.jackson.databind.DatabindException;
 
 import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.createEmptyDatabase;;
 
-public class JacksonDatabase extends AbstractDatabase<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon>{
+public class JacksonDatabase extends AbstractDatabase<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
 
     KeePassFile keePassFile;
     StreamFormat<?> streamFormat;
@@ -53,6 +56,7 @@ public class JacksonDatabase extends AbstractDatabase<JacksonDatabase, JacksonGr
             throw new IllegalStateException(e);
         }
     }
+
     /**
      * Load plaintext XML
      *
@@ -61,7 +65,7 @@ public class JacksonDatabase extends AbstractDatabase<JacksonDatabase, JacksonGr
      * @throws Exception on load failure
      */
     public static JacksonDatabase loadXml(InputStream inputStream) throws Exception {
-        
+
         KeePassFile keePassFile = new JacksonSerializableDatabase().load(inputStream).keePassFile;
         keePassFile.root.group.uuid = UUID.randomUUID();
         return new JacksonDatabase(keePassFile, null);
@@ -82,34 +86,35 @@ public class JacksonDatabase extends AbstractDatabase<JacksonDatabase, JacksonGr
     }
 
     /**
-     * Save the database with the same stream format that it was loaded with, or V4 default if none
-     * @param credentials credentials to use
+     * Save the database with the same stream format that it was loaded with, or V4
+     * default if none
+     * 
+     * @param credentials  credentials to use
      * @param outputStream where to write to
      */
     @Override
     public void save(Credentials credentials, OutputStream outputStream) throws IOException {
-        // save with the stream format used to load if it exists, otherwise save V4
-        // if (Objects.isNull(streamFormat)) {
-        //     streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
-        // }
+        if (Objects.isNull(streamFormat)) {
+            streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
+        }
         save(streamFormat, credentials, outputStream);
     }
 
     /**
      * Save the database with a choice of stream format
+     * 
      * @param streamFormat the format to use
-     * @param credentials credentials to use
+     * @param credentials  credentials to use
      * @param outputStream where to write to
      */
     @Override
     public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
-                                                     OutputStream outputStream) throws IOException{
-        // keePassFile.meta.generator = "KeePassJava2-Simple";
-        // SimpleSerializableDatabase simpleSerializableDatabase = new SimpleSerializableDatabase(this.keePassFile);
-        // streamFormat.save(simpleSerializableDatabase, credentials, outputStream);
-        // setDirty(false);
+            OutputStream outputStream) throws IOException {
+            keePassFile.meta.generator = "KeePassJava2-Jackson";
+            JacksonSerializableDatabase simpleSerializableDatabase = new JacksonSerializableDatabase(this.keePassFile);
+            streamFormat.save(simpleSerializableDatabase, credentials, outputStream);
+            setDirty(false);
     }
-
 
     @Override
     public JacksonGroup getRootGroup() {
@@ -190,17 +195,16 @@ public class JacksonDatabase extends AbstractDatabase<JacksonDatabase, JacksonGr
         return keePassFile.meta.memoryProtection.shouldProtect(s);
     }
 
-
     public List<KeePassFile.Binary> getBinaries() {
-        return keePassFile.getBinaries();
+        return keePassFile.meta.binaries;
     }
 
-    public void addBinary(byte [] bytes, int index) {
-        // SimpleSerializableDatabase.addBinary(this.keePassFile, index, bytes);
+    public void addBinary(byte[] bytes, int index) {
+        JacksonSerializableDatabase.addBinary(this.keePassFile, index, bytes);
     }
 
     public StreamFormat<?> getStreamFormat() {
         return streamFormat;
     }
-    
+
 }
