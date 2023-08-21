@@ -41,7 +41,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
 After a a period of neglect, the project is (May 2023) back in development.
 
-The current code is version 2.2-SNAPSHOT. This is on the main branch. See [Build from Source](#build-from-source)
+The current code is version 2.2.2-SNAPSHOT. This is on the main branch. See [Build from Source](#build-from-source)
 
 Key updates:
 - Java 8 (dependencies no longer support Java 7)
@@ -54,21 +54,21 @@ See the [changelog](CHANGELOG.md) for more details.
 
 ### Release
 
-The composite POM for the last release (2.1), Java 7 compatible, is
+The composite POM for the last release (2.2.1), Java 8 compatible, is
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.1.4</version>
+        <version>2.2.1</version>
 
 at Maven Central. Note that the artifactId has become Camel Case from release 2.1.x onwards.
 
 ### Snapshot
 
-Snapshot build at [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/org/linguafranca/pwdb/):
+Snapshot builds are erratically available at [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/org/linguafranca/pwdb/):
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.2-SNAPSHOT</version>
+        <version>2.2.2-SNAPSHOT</version>
  
 with appropriate `<repositories>` entry, like:
 
