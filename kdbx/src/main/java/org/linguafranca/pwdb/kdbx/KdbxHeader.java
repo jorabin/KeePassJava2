@@ -37,12 +37,12 @@ import static org.linguafranca.pwdb.security.Encryption.getSha256MessageDigestIn
 /**
  * This class represents the header portion of a KeePass KDBX file or stream. The header is received in
  * plain text and describes the encryption and compression of the remainder of the file.
- * <p/>
+ * <p>
  * In V4 the header became Outer Header and Inner Header. The class stores the configuration
  * contents of both and binary attachments.
- * <p/>
+ * <p>
  * It is a factory for encryption and decryption streams. It provides for verification of its own serialization.
- * <p/>
+ * <p>
  * While KDBX streams are Little-Endian, data is passed to and from this class in standard Java byte order.
  */
 @SuppressWarnings("WeakerAccess")

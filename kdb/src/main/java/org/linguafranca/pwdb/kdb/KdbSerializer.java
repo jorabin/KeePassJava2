@@ -31,16 +31,16 @@ import java.util.*;
 
 /**
  * This class provides support for reading a KDB stream and constructing an in memory database.
- * <p/>
+ * <p>
  * A KDB stream consists of:
  * <ol>
  * <li>16 bits of file signature</li>
  * <li>An unencrypted header containing encryption and other information such as the count of groups and entries</li>
- * <li>In an Encrypted form:</li>
+ * <li>In an Encrypted form:
  * <ol>
  * <li>Repeated serialised form of all Groups</li>
  * <li>Repeated serialised form of all Entries</li>
- * </ol>
+ * </ol></li>
  * </ol>
  *
  * @author jo
@@ -291,11 +291,11 @@ public class KdbSerializer {
 
     /**
      * Figure out who the parent of this group is.
-     * <p/>
+     * <p>
      * Groups are serialised in a depth first traversal
      * so any group's parent is the nearest parent group
      * with a level of one less in the hierarchy.
-     * <p/>
+     * <p>
      * Since the database tree is built progressively the group passed in the "lastGroup" parameter has
      * already been knitted into the hierarchy and so either this group is a sub group of that group or is a subgroup
      * of the nearest ancestor to the last group that has a level less than the group we are reading.
