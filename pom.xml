@@ -42,7 +42,7 @@
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -51,7 +51,7 @@
         <connection>scm:git:git://github.com/jorabin/KeePassJava2.git</connection>
         <developerConnection>scm:git:git@github.com:jorabin/KeePassJava2.git</developerConnection>
         <url>https://github.com/jorabin/KeePassJava2</url>
-        <tag>KeePassJava2-2.2</tag>
+        <tag>KeePassJava2-2.2.2</tag>
     </scm>
 
     <developers>
@@ -65,10 +65,6 @@
         </developer>
     </developers>
 
-    <prerequisites>
-        <maven>3.0.4</maven>
-    </prerequisites>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
@@ -81,6 +77,8 @@
         <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
         <maven-release-plugin.version>3.0.0</maven-release-plugin.version>
         <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
+        <!-- reduce the chattiness of output - see profile of same name below -->
+        <inhibitConsoleOutput>false</inhibitConsoleOutput>
     </properties>
 
     <build>
@@ -141,7 +139,7 @@
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>releaseToMaven,signJar</releaseProfiles>
+                    <releaseProfiles>releaseToMaven</releaseProfiles>
                     <goals>deploy</goals>
                 </configuration>
             </plugin>
@@ -220,7 +218,7 @@
             </properties>
         </profile>
         <profile>
-            <id>signJar</id>
+            <id>releaseToMaven</id>
             <build>
                 <plugins>
                     <plugin>
@@ -237,13 +235,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>releaseToMaven</id>
-            <build>
-                <plugins>
                     <plugin>
                         <groupId>org.sonatype.plugins</groupId>
                         <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -279,7 +270,7 @@
                                     <goal>jar</goal>
                                 </goals>
                                 <configuration>
-                                    <doclint>none</doclint>
+                                    <doclint>html, syntax</doclint>
                                 </configuration>
                             </execution>
                         </executions>
