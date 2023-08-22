@@ -111,6 +111,9 @@ or
 
       Database database = DomDatabaseWrapper.load(credentials, inputStream)
 
+or
+      Database database = JacksonDatabase.load(credentials, inputStream)
+
 Different implementations have varying characteristics, primarily speed. 
 The table below illustrates timings for the file `test1.kdbx` 
 (in the test module resources -
@@ -121,14 +124,17 @@ as assessed by [this test](https://github.com/jorabin/KeePassJava2/blob/master/e
     Simple 5 loads 20 iterations 257 millis
     Jaxb 5 loads 20 iterations 326 millis
     Dom 5 loads 20 iterations 758 millis
+    Jackson 5 loads 20 iterations 374 millis
 
     Simple 10 loads 1 iterations 340 millis
     Jaxb 10 loads 1 iterations 552 millis
     Dom 10 loads 1 iterations 175 millis
+    Jackson 10 loads 1 iterations 343 millis
 
     Simple 1 loads 50 iterations 28 millis
     Jaxb 1 loads 50 iterations 47 millis
     Dom 1 loads 50 iterations 251 millis
+    Jackson 1 loads 50 iterations 34 millis
 
 Load time is dominant in this example for JAXB and Simple,
 database traversal for the DOM implementation. 
@@ -196,6 +202,9 @@ The Simple XML implementation additionally depends on:
 
 - [Simple XML Serialisation Framework](http://simple.sourceforge.net/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
 - [Faster XML Aalto](https://github.com/FasterXML/aalto-xml) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0.txt)).
+
+The Jackson implementation depends on:
+- [Faster XML Jackson](https://github.com/FasterXML/jackson)
 
 For Java 11 and later Jaxb implementation depends on explicit inclusion [no longer provided by JDK](https://docs.oracle.com/en/java/javase/11/migrate/index.html#JSMIG-GUID-F640FA9D-FB66-4D85-AD2B-D931174C09A3) of:
 
