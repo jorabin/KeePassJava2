@@ -2,6 +2,12 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+##[2.2.2]
+
+### Added
+
+- implementation of database using Jackson
+
 ##[2.2.1]
 
 ### Added
@@ -44,7 +50,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - Various functionality for searching databases
 - Recycle bin functionality
 - An experimental implementation of [keepasshttp](https://github.com/pfn/keepasshttp/) see
-[the readme](http/readme.md) for warnings, limitations, etc. about this.
+[the readme](./readme.md) for warnings, limitations, etc. about this.
 
 ## [2.1.2] 2018-01-20
 

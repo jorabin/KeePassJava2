@@ -2,7 +2,8 @@ testOutput
 build
 .vscode/*
 *.versionsBackup
-*/target
+**/target
+
 #settings.gradle
 #gradlew
 #gradlew.bat
