@@ -2,7 +2,7 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-##[2.2-Snapshot]
+##[2.2.1]
 
 ### Added
 
