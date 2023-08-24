@@ -29,20 +29,20 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-public class ValueDeserialized extends StdDeserializer<EntryClasses.StringProperty.Value> {
+public class ValueDeserializer extends StdDeserializer<EntryClasses.StringProperty.Value> {
 
     private StreamEncryptor encryptor;
 
-    public ValueDeserialized() {
-        super(ValueDeserialized.class);
+    public ValueDeserializer() {
+        super(ValueDeserializer.class);
     }
 
-    public ValueDeserialized(Class<EntryClasses.StringProperty.Value> v) {
+    public ValueDeserializer(Class<EntryClasses.StringProperty.Value> v) {
         super(v);
     }
 
-    public ValueDeserialized(StreamEncryptor encryptor) {
-        super(ValueDeserialized.class);
+    public ValueDeserializer(StreamEncryptor encryptor) {
+        super(ValueDeserializer.class);
         this.encryptor = encryptor;
     }
 

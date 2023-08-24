@@ -186,7 +186,7 @@ public class JaxbSerializableDatabase implements SerializableDatabase {
     }
 
     /**
-     * Create a list of names of peroperties that should be encrypted by default
+     * Create a list of names of properties that should be encrypted by default
      */
     @NotNull
     private List<String> getToEncrypt() {

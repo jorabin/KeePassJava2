@@ -21,7 +21,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.jetbrains.annotations.NotNull;
+import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
@@ -51,9 +53,8 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 "entry",
 "group",
 })
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class JacksonGroup
-        extends org.linguafranca.pwdb.base.AbstractGroup<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
+@JsonIgnoreProperties(ignoreUnknown=true)
+public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
 
     @JacksonXmlProperty(localName = "UUID")
     @JsonDeserialize(converter = Base64ToUUIDConverter.class)
@@ -100,12 +101,12 @@ public class JacksonGroup
     @JsonSerialize(converter = UUIDToBase64Converter.class)
     protected UUID lastTopVisibleEntry;
 
-    @JacksonXmlProperty(localName = "Entry") /** Workaround jackson **/
+    @JacksonXmlProperty(localName = "Entry") /* Workaround jackson */
     @JacksonXmlElementWrapper(useWrapping = false)
     protected List<JacksonEntry> entries;
 
 
-    @JacksonXmlProperty(localName = "Group") /** Workaround jackson **/
+    @JacksonXmlProperty(localName = "Group") /* Workaround jackson */
     @JacksonXmlElementWrapper(useWrapping = false)
     protected List<JacksonGroup> groups;
 

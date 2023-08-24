@@ -212,7 +212,7 @@ public abstract class EntryClasses {
 
     public static class History {
 
-        @JacksonXmlProperty(localName = "Entry") /** Workaround jackson **/
+        @JacksonXmlProperty(localName = "Entry") /* Workaround jackson */
         @JacksonXmlElementWrapper(useWrapping = false)
         private List<JacksonEntry> list;
 

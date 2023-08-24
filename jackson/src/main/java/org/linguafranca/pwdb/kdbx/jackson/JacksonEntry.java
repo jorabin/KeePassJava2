@@ -94,18 +94,18 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
     @JacksonXmlProperty(localName = "Times")
     protected Times times;
 
-    @JacksonXmlProperty(localName = "String") /** Workaround jackson **/
+    @JacksonXmlProperty(localName = "String") /* Workaround jackson */
     @JacksonXmlElementWrapper(useWrapping = false)
     protected List<StringProperty> string;
 
-    @JacksonXmlProperty(localName = "Binary") /** Workaround jackson **/
+    @JacksonXmlProperty(localName = "Binary") /* Workaround jackson */
     @JacksonXmlElementWrapper(useWrapping = false)
     protected List<BinaryProperty> binary;
 
     @JacksonXmlProperty(localName = "AutoType")
     protected AutoType autoType;
 
-    @JacksonXmlProperty(localName = "History") /** Workaround jackson **/
+    @JacksonXmlProperty(localName = "History") /* Workaround jackson */
     protected JacksonHistory history;
 
     @JsonIgnore
