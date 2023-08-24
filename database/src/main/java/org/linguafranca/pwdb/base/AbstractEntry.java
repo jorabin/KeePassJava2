@@ -16,17 +16,15 @@
 
 package org.linguafranca.pwdb.base;
 
-import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
-import org.linguafranca.pwdb.Icon;
 
 /**
  * Base implementation of Entry
  *
  * @author Jo
  */
-public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon> implements Entry<D,G,E,I> {
+public abstract class AbstractEntry<E extends Entry<E>> implements Entry<E> {
 
     @Override
     public  boolean matchTitle(String text){
@@ -60,7 +58,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
 
     @Override
     public String getPath() {
-        Group parent = this.getParent();
+        Group<?, E> parent = this.getParent();
         String result = "";
         if (parent != null) {
             result = parent.getPath();

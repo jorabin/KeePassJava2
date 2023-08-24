@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx.jaxb;
 
 import org.jetbrains.annotations.NotNull;
+import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.JaxbEntryBinding;
 import org.linguafranca.pwdb.kdbx.jaxb.binding.JaxbGroupBinding;
@@ -35,7 +36,7 @@ import java.util.UUID;
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
-public class JaxbGroup extends AbstractGroup<JaxbDatabase, JaxbGroup, JaxbEntry, JaxbIcon> {
+public class JaxbGroup extends AbstractGroup<JaxbGroup, JaxbEntry> {
 
     protected JaxbDatabase database;
     protected JaxbGroupBinding delegate;
@@ -198,7 +199,7 @@ public class JaxbGroup extends AbstractGroup<JaxbDatabase, JaxbGroup, JaxbEntry,
     }
 
     @Override
-    public void setIcon(JaxbIcon icon) {
+    public void setIcon(Icon icon) {
         this.delegate.setIconID(icon.getIndex());
     }
 

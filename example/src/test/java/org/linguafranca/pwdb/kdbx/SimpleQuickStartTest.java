@@ -37,7 +37,7 @@ import static org.junit.Assert.assertEquals;
  * 
  * @author jo
  */
-public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper> {
+public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper> {
 
 
     @Override

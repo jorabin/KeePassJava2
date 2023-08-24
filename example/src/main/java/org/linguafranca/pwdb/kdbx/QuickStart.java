@@ -37,7 +37,7 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D, G, E, I>, I extends Icon> {
+public abstract class QuickStart<D extends Database<G, E>, G extends Group<G, E>, E extends Entry<E>> {
 
     static PrintStream printStream = getTestPrintStream();
 
@@ -95,7 +95,7 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
     /**
      * Splice - add a group from one database to a parent from another (or copy from the same db)
      */
-    public void splice(G newParent, Group<?, ?, ?, ?> groupToSplice) {
+    public void splice(G newParent, G groupToSplice) {
         G addedGroup = newParent.addGroup(newParent.getDatabase().newGroup(groupToSplice));
         addedGroup.copy(groupToSplice);
     }

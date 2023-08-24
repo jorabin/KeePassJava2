@@ -23,7 +23,7 @@ import java.io.PrintStream;
  *
  * @author jo
  */
-public interface Visitor <D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon> {
+public interface Visitor <G extends Group<G,E>, E extends Entry<E>> {
     /**
      * Called on entry to a group visit
      * @param group the group being visited
@@ -51,8 +51,7 @@ public interface Visitor <D extends Database<D, G, E, I>, G extends Group<D, G, 
     /**
      * Empty implementation of Visitor
      */
-    abstract class Default <D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon>
-            implements Visitor <D, G, E, I>{
+    abstract class Default <G extends Group<G,E>, E extends Entry<E>> implements Visitor <G,E>{
 
         @Override
         public void startVisit(G group) {}
@@ -72,8 +71,7 @@ public interface Visitor <D extends Database<D, G, E, I>, G extends Group<D, G, 
     /**
      * Visitor prints the Groups and Entries it visits to console
      */
-    class Print <D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon>
-            extends Default<D, G, E, I> {
+    class Print <G extends Group<G,E>, E extends Entry<E>> extends Default<G,E> {
 
         private final PrintStream printStream;
 
@@ -94,6 +92,5 @@ public interface Visitor <D extends Database<D, G, E, I>, G extends Group<D, G, 
         public void visit(E entry) {
             printStream.println(entry.toString());
         }
-
     }
 }

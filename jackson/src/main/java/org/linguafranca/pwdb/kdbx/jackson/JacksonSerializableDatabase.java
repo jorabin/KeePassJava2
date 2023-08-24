@@ -78,7 +78,7 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
     public void save(OutputStream outputStream) throws IOException {
         
         try {
-           
+            System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");
             XMLOutputFactory xmlOutputFactory = XMLOutputFactory.newFactory();
             XmlMapper mapper = new XmlMapper();
             SimpleModule module = new SimpleModule();

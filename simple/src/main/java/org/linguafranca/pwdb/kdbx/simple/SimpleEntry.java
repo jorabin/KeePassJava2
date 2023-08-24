@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx.simple;
 
 import org.jetbrains.annotations.NotNull;
+import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.simple.converter.UuidConverter;
@@ -43,7 +44,7 @@ import static org.linguafranca.pwdb.kdbx.simple.model.EntryClasses.*;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Root(name="Entry")
-public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, SimpleEntry, SimpleIcon> {
+public class SimpleEntry extends AbstractEntry<SimpleEntry> {
     @Element(name = "UUID", type=UUID.class)
     @Convert(UuidConverter.class)
     protected UUID uuid;
@@ -222,7 +223,7 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
     }
 
     @Override
-    public void setIcon(SimpleIcon icon) {
+    public void setIcon(Icon icon) {
         iconID = icon.getIndex();
     }
 

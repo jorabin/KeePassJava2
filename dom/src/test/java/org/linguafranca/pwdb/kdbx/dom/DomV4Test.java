@@ -20,9 +20,9 @@ public class DomV4Test {
     public void loadKdbxV4() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx");
         DomDatabaseWrapper database = DomDatabaseWrapper.load(new KdbxCreds("123".getBytes()), inputStream);
-        database.visit(new Visitor.Print<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper>(printStream));
+        database.visit(new Visitor.Print<DomGroupWrapper, DomEntryWrapper>(printStream));
         // test what happens to dates in V4
-        database.visit(new Visitor.Default<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper>(){
+        database.visit(new Visitor.Default<DomGroupWrapper, DomEntryWrapper>(){
 
             @Override
             public void visit(DomEntryWrapper entry) {

@@ -43,7 +43,7 @@ import static org.linguafranca.pwdb.kdbx.simple.SimpleSerializableDatabase.getSe
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
-public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup, SimpleEntry, SimpleIcon>{
+public class SimpleDatabase extends AbstractDatabase<SimpleGroup, SimpleEntry>{
 
     KeePassFile keePassFile;
     StreamFormat<?> streamFormat;

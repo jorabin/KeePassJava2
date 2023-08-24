@@ -44,8 +44,7 @@ import static org.linguafranca.pwdb.kdbx.dom.DomHelper.*;
  *
  * @author jo
  */
-public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper,
-        DomIconWrapper> {
+public class DomDatabaseWrapper extends AbstractDatabase<DomGroupWrapper, DomEntryWrapper> {
 
     private final DomSerializableDatabase domDatabase = DomSerializableDatabase.createEmptyDatabase();
     Element dbMeta;
@@ -64,7 +63,6 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
      * load a database
      * @param credentials credentials to use
      * @param inputStream where to read from
-     * @return a database
      */
     public DomDatabaseWrapper(Credentials credentials, InputStream inputStream) throws IOException {
         this.streamFormat = new KdbxStreamFormat();

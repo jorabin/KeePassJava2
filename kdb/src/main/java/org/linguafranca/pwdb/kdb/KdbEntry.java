@@ -32,13 +32,13 @@ import java.util.UUID;
  *
  * @author jo
  */
-public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, KdbIcon> {
+public class KdbEntry extends AbstractEntry<KdbEntry> {
     KdbGroup parent;
     private UUID uuid = UUID.randomUUID();
     private String title = "";
     private String url = "";
     private String notes = "";
-    private KdbIcon icon = new KdbIcon(0);
+    private int iconIndex = 0;
     private String username = "";
     private String password = "";
     private Date creationTime = new Date((System.currentTimeMillis())); // to the next lower second
@@ -154,12 +154,12 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
 
     @Override
     public KdbIcon getIcon() {
-        return icon;
+        return new KdbIcon(iconIndex);
     }
 
     @Override
-    public void setIcon(KdbIcon icon) {
-        this.icon = icon;
+    public void setIcon(Icon icon) {
+        this.iconIndex = icon.getIndex();
     }
     
     void setCreationTime(Date creationTime) {

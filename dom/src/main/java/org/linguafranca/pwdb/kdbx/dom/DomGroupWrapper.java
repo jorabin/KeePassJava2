@@ -33,7 +33,7 @@ import static org.linguafranca.pwdb.kdbx.dom.DomHelper.*;
  *
  * @author jo
  */
-public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper> {
+public class DomGroupWrapper extends AbstractGroup<DomGroupWrapper, DomEntryWrapper> {
 
     static Map<String, ValueCreator> mandatoryGroupElements = new HashMap<String, ValueCreator>() {{
         put(UUID_ELEMENT_NAME, new UuidValueCreator());
@@ -190,7 +190,7 @@ public class DomGroupWrapper extends AbstractGroup<DomDatabaseWrapper, DomGroupW
     }
 
     @Override
-    public void setIcon(DomIconWrapper icon) {
+    public void setIcon(Icon icon) {
         setElementContent(ICON_ELEMENT_NAME, element, String.valueOf(icon.getIndex()));
         database.setDirty(true);
     }

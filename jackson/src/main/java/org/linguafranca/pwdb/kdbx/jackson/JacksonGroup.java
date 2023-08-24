@@ -22,6 +22,9 @@ import java.util.List;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
+import org.linguafranca.pwdb.Group;
+import org.linguafranca.pwdb.Icon;
+import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
@@ -52,8 +55,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 "group",
 })
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class JacksonGroup
-        extends org.linguafranca.pwdb.base.AbstractGroup<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
+public class JacksonGroup extends AbstractGroup<JacksonGroup, JacksonEntry> {
 
     @JacksonXmlProperty(localName = "UUID")
     @JsonDeserialize(converter = Base64ToUUIDConverter.class)
@@ -150,14 +152,14 @@ public class JacksonGroup
         if (isRootGroup()) {
             throw new IllegalStateException("Cannot add root group to another group");
         }
-        if (this.database != group.database) {
+        if (this.database != ((JacksonGroup) group).database) {
             throw new IllegalStateException("Must be from same database");
         }
         if (parent != null) {
             parent.removeGroup(group);
             parent.touch();
         }
-        parent = group;
+        parent = ((JacksonGroup) group);
         parent.touch();
         touch();
     }
@@ -182,7 +184,7 @@ public class JacksonGroup
         if (group.isRootGroup()) {
             throw new IllegalStateException("Cannot add root group to another group");
         }
-        if (this.database != group.database) {
+        if (this.database != ((JacksonGroup) group).database) {
             throw new IllegalStateException("Must be from same database");
         }
         if (group.getParent() != null) {
@@ -261,12 +263,14 @@ public class JacksonGroup
     }
 
     @Override
+    @JsonIgnore
     public JacksonIcon getIcon() {
         return new JacksonIcon(iconID);
     }
 
     @Override
-    public void setIcon(JacksonIcon icon) {
+    @JsonIgnore
+    public void setIcon(Icon icon) {
         this.iconID = icon.getIndex();
         touch();
     }

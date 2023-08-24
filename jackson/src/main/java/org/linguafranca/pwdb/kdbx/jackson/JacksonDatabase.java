@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.DatabindException;
 
 import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.createEmptyDatabase;;
 
-public class JacksonDatabase extends AbstractDatabase<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
+public class JacksonDatabase extends AbstractDatabase<JacksonGroup, JacksonEntry> {
 
     KeePassFile keePassFile;
     StreamFormat<?> streamFormat;

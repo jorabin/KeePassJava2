@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx.dom;
 
+import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.w3c.dom.Element;
@@ -27,7 +28,7 @@ import java.util.*;
  *
  * @author jo
  */
-public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper>{
+public class DomEntryWrapper extends AbstractEntry <DomEntryWrapper>{
 
     private static Map<String, DomHelper.ValueCreator> mandatoryEntryElements = new HashMap<String, DomHelper.ValueCreator>() {{
         put(DomHelper.UUID_ELEMENT_NAME, new DomHelper.UuidValueCreator());
@@ -164,7 +165,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
     }
 
     @Override
-    public void setIcon(DomIconWrapper icon) {
+    public void setIcon(Icon icon) {
         DomHelper.getElement(DomHelper.ICON_ELEMENT_NAME, element, true).setTextContent(String.valueOf(icon.getIndex()));
         DomHelper.touchElement(DomHelper.LAST_MODIFICATION_TIME_ELEMENT_NAME, element);
         database.setDirty(true);

@@ -18,6 +18,8 @@ package org.linguafranca.pwdb.kdbx.simple;
 
 import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Group;
+import org.linguafranca.pwdb.Icon;
+import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.simple.converter.KeePassBooleanConverter;
 import org.linguafranca.pwdb.kdbx.simple.converter.UuidConverter;
 import org.linguafranca.pwdb.kdbx.simple.model.Times;
@@ -38,7 +40,7 @@ import java.util.UUID;
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
 @Root(name = "Group")
-public class SimpleGroup extends org.linguafranca.pwdb.base.AbstractGroup<SimpleDatabase, SimpleGroup, SimpleEntry, SimpleIcon> {
+public class SimpleGroup extends AbstractGroup<SimpleGroup, SimpleEntry> {
     @Element(name = "UUID", type = UUID.class)
     @Convert(UuidConverter.class)
     protected UUID uuid;
@@ -226,7 +228,7 @@ public class SimpleGroup extends org.linguafranca.pwdb.base.AbstractGroup<Simple
     }
 
     @Override
-    public void setIcon(SimpleIcon icon) {
+    public void setIcon(Icon icon) {
         this.iconID = icon.getIndex();
         touch();
     }

@@ -29,7 +29,7 @@ import java.io.OutputStream;
 /**
  * @author jo
  */
-public class JaxbSaveAndReloadTest extends SaveAndReloadChecks<JaxbDatabase, JaxbGroup, JaxbEntry, JaxbIcon> {
+public class JaxbSaveAndReloadTest extends SaveAndReloadChecks<JaxbDatabase, JaxbGroup, JaxbEntry> {
     @Override
     public JaxbDatabase getDatabase() {
         return new JaxbDatabase();

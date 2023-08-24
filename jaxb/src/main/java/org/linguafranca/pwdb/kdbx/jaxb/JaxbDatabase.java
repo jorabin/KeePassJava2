@@ -39,7 +39,7 @@ import java.util.UUID;
  * @author jo
  */
 
-public class JaxbDatabase extends AbstractDatabase<JaxbDatabase, JaxbGroup, JaxbEntry, JaxbIcon> {
+public class JaxbDatabase extends AbstractDatabase<JaxbGroup, JaxbEntry> {
 
     private final KeePassFile keePassFile;
     private final ObjectFactory objectFactory = new ObjectFactory();

@@ -5,6 +5,7 @@ import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
+import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
 import org.linguafranca.pwdb.kdbx.jaxb.JaxbDatabase;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 
@@ -16,11 +17,12 @@ import java.util.List;
 
 public class Util {
 
-    List<Class> implementations = new ArrayList<>(Arrays.asList(DomDatabaseWrapper.class, SimpleDatabase.class, JaxbDatabase.class));
+    List<Class<? extends Database<?,?>>> implementations = new ArrayList<>(
+            Arrays.asList(DomDatabaseWrapper.class, SimpleDatabase.class, JaxbDatabase.class, JacksonDatabase.class));
 
     @FunctionalInterface
     public interface DatabaseLoader {
-        Database<?,?,?,?> load(Credentials c, InputStream i) throws IOException;
+        Database<?,?> load(Credentials c, InputStream i) throws IOException;
     }
 
     List<DatabaseLoader> dbLoader = Arrays.asList(DomDatabaseWrapper::load, SimpleDatabase::load, JaxbDatabase::load);
@@ -50,7 +52,7 @@ public class Util {
      * Example shows how to list XML from a database using specified loader
      */
     public static void listDatabase(DatabaseLoader loader, String resourceName, Credentials creds, OutputStream outputStream) throws IOException {
-        Database<?, ?, ?, ?> database = loader.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
+        Database<?, ?> database = loader.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
         database.save(new StreamFormat.None(), new KdbxCreds.None(), outputStream);
     }
 

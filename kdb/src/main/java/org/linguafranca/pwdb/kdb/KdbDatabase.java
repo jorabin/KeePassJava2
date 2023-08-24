@@ -30,7 +30,7 @@ import java.util.UUID;
  *
  * @author jo
  */
-public class KdbDatabase extends AbstractDatabase<KdbDatabase, KdbGroup, KdbEntry, KdbIcon> {
+public class KdbDatabase extends AbstractDatabase<KdbGroup, KdbEntry> {
     private String description;
     private final KdbGroup rootGroup;
 

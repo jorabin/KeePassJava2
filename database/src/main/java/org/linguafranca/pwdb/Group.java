@@ -37,7 +37,7 @@ import java.util.UUID;
  *
  * @author Jo
  */
-public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon> {
+public interface Group <G extends Group<G,E>, E extends Entry<E>> {
     /**
      * Returns true if this is the root group of a database
      */
@@ -71,7 +71,7 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      *
      * @return a modifiable list of groups
      */
-    List<? extends G> getGroups();
+    List<G> getGroups();
 
     /**
      * Returns the number of groups that are direct children of this group
@@ -100,7 +100,7 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * @param groupName the name of the groups sought
      * @return a modifiable list
      */
-    List<? extends G> findGroups(String groupName);
+    List<G> findGroups(String groupName);
 
     /**
      * Removes the group supplied from this group. The group removed
@@ -119,7 +119,7 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
     /**
      * Returns a modifiable by the caller list of entries contained in this group.
      */
-    List<? extends E> getEntries();
+    List<E> getEntries();
 
     /**
      * Returns the number of entries in this group
@@ -142,7 +142,7 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * @return a modifiable-by-caller list
      * @see Entry#match(String)
      */
-    List<? extends E> findEntries(String match, boolean recursive);
+    List<E> findEntries(String match, boolean recursive);
 
     /**
      * Finds all entries in this group that match using the matcher supplied.
@@ -157,7 +157,7 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * @return a modifiable-by-caller list
      * @see Entry#match(Entry.Matcher)
      */
-    List<? extends E> findEntries(Entry.Matcher matcher, boolean recursive);
+    List<E> findEntries(Entry.Matcher matcher, boolean recursive);
 
     /**
      * Adds an entry to this group removing it from another group
@@ -179,7 +179,7 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * Make a deep copy of the children a group and add to this group. Does not copy the parent group.
      * @param parent the group to deep copy
      */
-    void copy(Group<? extends Database, ? extends Group, ? extends Entry, ? extends Icon> parent);
+    void copy(Group<?, ?> parent);
 
     /**
      * Returns an XPath-like string of the names of Groups from the Root
@@ -210,10 +210,10 @@ public interface Group <D extends Database<D, G, E, I>, G extends Group<D, G, E,
     /**
      * Set the Icon of this group
      */
-    void setIcon(I icon);
+    <I extends Icon> void setIcon(I icon);
 
     /**
      * Get the database this group was created from
      */
-    @NotNull D getDatabase();
+    @NotNull Database<G, E> getDatabase();
 }

@@ -27,7 +27,7 @@ import java.util.UUID;
  *
  * @author Jo
  */
-public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon> implements Database<D, G, E, I> {
+public abstract class AbstractDatabase<G extends Group<G, E>, E extends Entry<E>> implements Database<G, E> {
 
     private boolean isDirty;
 
@@ -41,14 +41,14 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     }
 
     @Override
-    public void visit(Visitor visitor) {
+    public void visit(Visitor<G, E> visitor) {
         visitor.startVisit(getRootGroup());
         visit(getRootGroup(), visitor);
         visitor.endVisit(getRootGroup());
     }
 
     @Override
-    public void visit(G group, Visitor visitor) {
+    public void visit(G group, Visitor<G, E> visitor) {
 
         if (visitor.isEntriesFirst()) {
             for (E entry : group.getEntries()) {
@@ -63,19 +63,19 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
         }
 
         if (!visitor.isEntriesFirst()) {
-            for (Entry entry : group.getEntries()) {
+            for (E entry : group.getEntries()) {
                 visitor.visit(entry);
             }
         }
     }
 
     @Override
-    public List<? extends E> findEntries(Entry.Matcher matcher) {
+    public List<E> findEntries(Entry.Matcher matcher) {
         return getRootGroup().findEntries(matcher, true);
     }
 
     @Override
-    public List<? extends E> findEntries(String find) {
+    public List<E> findEntries(String find) {
         return getRootGroup().findEntries(find, true);
     }
 
@@ -87,7 +87,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     }
 
     @Override
-    public G newGroup(Group group) {
+    public G newGroup(Group<?, ?> group) {
         G result = newGroup();
         result.setName(group.getName());
         result.setIcon(this.newIcon(group.getIcon().getIndex()));
@@ -102,7 +102,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     }
 
     @Override
-    public E newEntry(Entry<?,?,?,?> entry) {
+    public E newEntry(Entry<?> entry) {
         E result = newEntry();
         for (String propertyName: entry.getPropertyNames()) {
             try {
@@ -131,16 +131,11 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
 
     @Override
     public E findEntry(final UUID uuid) {
-        List<? extends E> entries = findEntries(new Entry.Matcher() {
-            @Override
-            public boolean matches(Entry entry) {
-                return entry.getUuid().equals(uuid);
-            }
-        });
+        List<E> entries = findEntries(entry -> entry.getUuid().equals(uuid));
         if (entries.size() > 1) {
             throw new IllegalStateException("Two entries same UUID");
         }
-        if (entries.size() == 0) {
+        if (entries.isEmpty()) {
             return null;
         }
         return entries.get(0);
@@ -165,14 +160,14 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     @Override
     public G findGroup(final UUID uuid){
         final List<G> groups = new ArrayList<>();
-        visit(new Visitor.Default() {
+        visit(new Visitor.Default<G, E>() {
             // set to true while visiting sub groups of recycle bin
             boolean recycle;
             @Override
-            public void startVisit(Group group) {
+            public void startVisit(G group) {
                 if (!recycle && group.getUuid().equals(uuid)) {
-                    //noinspection unchecked
-                    groups.add((G) group);
+                    //noinspection
+                    groups.add(group);
                 }
                 if (group.isRecycleBin()) {
                     recycle = true;
@@ -180,7 +175,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
             }
 
             @Override
-            public void endVisit(Group group) {
+            public void endVisit(G group) {
                 if (group.isRecycleBin()) {
                     recycle = false;
                 }
@@ -189,7 +184,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
         if (groups.size() > 1) {
             throw new IllegalStateException("Two groups same UUID");
         }
-        if (groups.size() == 0) {
+        if (groups.isEmpty()) {
             return null;
         }
         return groups.get(0);
