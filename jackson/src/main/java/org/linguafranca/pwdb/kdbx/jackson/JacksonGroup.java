@@ -16,20 +16,6 @@
 
 package org.linguafranca.pwdb.kdbx.jackson;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import org.jetbrains.annotations.NotNull;
-import org.linguafranca.pwdb.base.AbstractGroup;
-import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
-import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
-import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
-import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
-import org.linguafranca.pwdb.kdbx.jackson.model.Times;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -37,6 +23,18 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
+import org.jetbrains.annotations.NotNull;
+import org.linguafranca.pwdb.base.AbstractGroup;
+import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
+import org.linguafranca.pwdb.kdbx.jackson.model.Times;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @JsonPropertyOrder({
 "uuid",
@@ -165,11 +163,7 @@ public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, J
 
     @Override
     public List<JacksonGroup> getGroups() {
-        List<JacksonGroup> result = new ArrayList<>();
-        for (JacksonGroup aGroup : groups) {
-            result.add(aGroup);
-        }
-        return result;
+        return new ArrayList<>(groups);
     }
 
     @Override
@@ -208,11 +202,7 @@ public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, J
 
     @Override
     public List<JacksonEntry> getEntries() {
-        List<JacksonEntry> result = new ArrayList<>();
-        for (JacksonEntry entry : this.entries) {
-            result.add(entry);
-        }
-        return result;
+        return new ArrayList<>(this.entries);
     }
 
     @Override

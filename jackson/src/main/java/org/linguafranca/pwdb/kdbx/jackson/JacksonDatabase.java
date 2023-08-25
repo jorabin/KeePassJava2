@@ -16,14 +16,6 @@
 
 package org.linguafranca.pwdb.kdbx.jackson;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.StreamConfiguration;
 import org.linguafranca.pwdb.StreamFormat;
@@ -32,17 +24,22 @@ import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
-import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.createEmptyDatabase;;
+import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.createEmptyDatabase;
 
 public class JacksonDatabase extends AbstractDatabase<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
 
     KeePassFile keePassFile;
     StreamFormat<?> streamFormat;
 
-    public JacksonDatabase() throws StreamReadException, DatabindException, IOException {
+    public JacksonDatabase() throws IOException {
         this(createEmptyDatabase(), null);
     }
 
