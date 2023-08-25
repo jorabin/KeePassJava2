@@ -25,11 +25,6 @@ public class UUIDToBase64Converter extends StdConverter<UUID, String> {
 
     @Override
     public String convert(UUID value) {
-       
-        if(value != null) {
-            return Helpers.base64FromUuid(value);
-        }
-        return new String();
+        return Helpers.base64FromUuid(value);
     }
-    
 }
