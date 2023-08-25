@@ -2,13 +2,13 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-##[2.2.2]
+## [2.2.2-SNAPSHOT]
 
 ### Added
 
 - implementation of database using Jackson
 
-##[2.2.1]
+## [2.2.1] 2023-08-21
 
 ### Added
 
