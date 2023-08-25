@@ -23,12 +23,12 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 public class JacksonHistory {
 
-    @JacksonXmlProperty(localName = "Entry") /** Workaround jackson **/
+    @JacksonXmlProperty(localName = "Entry") /* Workaround jackson */
     @JacksonXmlElementWrapper(useWrapping = false)
     private List<JacksonEntry> entry;
 
     public JacksonHistory() {
-        entry = new ArrayList<JacksonEntry>();
+        entry = new ArrayList<>();
     }
 
     /**

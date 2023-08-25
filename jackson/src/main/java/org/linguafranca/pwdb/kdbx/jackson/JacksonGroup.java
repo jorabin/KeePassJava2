@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
-import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
@@ -54,7 +53,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 "entry",
 "group",
 })
-@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class JacksonGroup extends AbstractGroup<JacksonGroup, JacksonEntry> {
 
     @JacksonXmlProperty(localName = "UUID")
@@ -102,12 +101,12 @@ public class JacksonGroup extends AbstractGroup<JacksonGroup, JacksonEntry> {
     @JsonSerialize(converter = UUIDToBase64Converter.class)
     protected UUID lastTopVisibleEntry;
 
-    @JacksonXmlProperty(localName = "Entry") /** Workaround jackson **/
+    @JacksonXmlProperty(localName = "Entry") /* Workaround jackson */
     @JacksonXmlElementWrapper(useWrapping = false)
     protected List<JacksonEntry> entries;
 
 
-    @JacksonXmlProperty(localName = "Group") /** Workaround jackson **/
+    @JacksonXmlProperty(localName = "Group") /* Workaround jackson */
     @JacksonXmlElementWrapper(useWrapping = false)
     protected List<JacksonGroup> groups;
 
@@ -152,14 +151,14 @@ public class JacksonGroup extends AbstractGroup<JacksonGroup, JacksonEntry> {
         if (isRootGroup()) {
             throw new IllegalStateException("Cannot add root group to another group");
         }
-        if (this.database != ((JacksonGroup) group).database) {
+        if (this.database != group.database) {
             throw new IllegalStateException("Must be from same database");
         }
         if (parent != null) {
             parent.removeGroup(group);
             parent.touch();
         }
-        parent = ((JacksonGroup) group);
+        parent = group;
         parent.touch();
         touch();
     }
@@ -184,7 +183,7 @@ public class JacksonGroup extends AbstractGroup<JacksonGroup, JacksonEntry> {
         if (group.isRootGroup()) {
             throw new IllegalStateException("Cannot add root group to another group");
         }
-        if (this.database != ((JacksonGroup) group).database) {
+        if (this.database != group.database) {
             throw new IllegalStateException("Must be from same database");
         }
         if (group.getParent() != null) {

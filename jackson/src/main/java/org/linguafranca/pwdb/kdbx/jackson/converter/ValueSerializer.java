@@ -30,15 +30,7 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
 public class ValueSerializer extends StdSerializer<EntryClasses.StringProperty.Value>{
 
-    private StreamEncryptor encryptor;
-
-    public ValueSerializer() {
-        super(ValueSerializer.class, false);
-    }
-
-    public ValueSerializer(Class<EntryClasses.StringProperty.Value> v) {
-        super(v);
-    }
+    private final StreamEncryptor encryptor;
 
     public ValueSerializer(StreamEncryptor encryptor) {
         super(ValueSerializer.class, false);
@@ -52,8 +44,9 @@ public class ValueSerializer extends StdSerializer<EntryClasses.StringProperty.V
         final ToXmlGenerator xmlGenerator = (ToXmlGenerator) gen;
         xmlGenerator.writeStartObject();
 
+        String stringToWrite = value.getText();
         //We need to encrypt and convert to base64 every protected element
-        if(value.getProtectOnOutput()) {
+        if (value.getProtectOnOutput()) {
             xmlGenerator.setNextIsAttribute(true);
             gen.writeStringField("Protected", "True"); 
             String plain = value.getText();
@@ -63,17 +56,12 @@ public class ValueSerializer extends StdSerializer<EntryClasses.StringProperty.V
             //Cipher
             byte[] encrypted = encryptor.encrypt(plain.getBytes()); 
             //Convert to base64
-            String base64 = new String(Base64.encodeBase64(encrypted));
-
-            //Destroy from memory the plain value
-            plain = null;
-            value.setText(base64);
-
+            stringToWrite = new String(Base64.encodeBase64(encrypted));
         }
 
         xmlGenerator.setNextIsAttribute(false);
         xmlGenerator.setNextIsUnwrapped(true);
-        xmlGenerator.writeStringField("text",value.getText());
+        xmlGenerator.writeStringField("text", stringToWrite);
         
         gen.writeEndObject();
     
