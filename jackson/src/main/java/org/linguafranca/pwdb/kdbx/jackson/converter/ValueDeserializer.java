@@ -31,15 +31,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
 public class ValueDeserializer extends StdDeserializer<EntryClasses.StringProperty.Value> {
 
-    private StreamEncryptor encryptor;
-
-    public ValueDeserializer() {
-        super(ValueDeserializer.class);
-    }
-
-    public ValueDeserializer(Class<EntryClasses.StringProperty.Value> v) {
-        super(v);
-    }
+    private final StreamEncryptor encryptor;
 
     public ValueDeserializer(StreamEncryptor encryptor) {
         super(ValueDeserializer.class);
@@ -47,8 +39,7 @@ public class ValueDeserializer extends StdDeserializer<EntryClasses.StringProper
     }
 
     @Override
-    public EntryClasses.StringProperty.Value deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
-
+    public EntryClasses.StringProperty.Value deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
         
         JsonNode node = p.getCodec().readTree(p);
         
@@ -56,14 +47,12 @@ public class ValueDeserializer extends StdDeserializer<EntryClasses.StringProper
 
         if(node.isTextual()) {
             result.setText(node.textValue());
-        } else if(node.isObject()) {
-
+            return result;
+        }
+        if(node.isObject()) {
+            // TODO not clear what is happening here, looks like it's not exactly correct
             //We need to decrypt all Protected values
-            if(node.has("Protected")) {
-
-                //Check if Protected=True
-                Boolean nodeEncrypted = Helpers.toBoolean(node.get("Protected").asText());
-                if(nodeEncrypted) {
+            if(node.has("Protected") && Boolean.TRUE.equals(Helpers.toBoolean(node.get("Protected").asText()))) {
                     if(node.has("")) {
                         String cipherText = node.get("").asText();
                         if(cipherText != null && !cipherText.isEmpty()) {
@@ -75,7 +64,6 @@ public class ValueDeserializer extends StdDeserializer<EntryClasses.StringProper
                             result.setProtectOnOutput(true);           
                         }
                     }
-                }
             } else {
                 //If an element is not marked us Protected we need to copy the value as is
                 if(node.has("ProtectInMemory")) {
@@ -88,8 +76,6 @@ public class ValueDeserializer extends StdDeserializer<EntryClasses.StringProper
                 }                 
             }
         }
-        
         return result;
     }
-
 }

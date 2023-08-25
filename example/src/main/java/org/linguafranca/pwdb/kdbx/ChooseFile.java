@@ -67,14 +67,12 @@ public class ChooseFile {
                 return;
             }
             logger.info("Opening {}", fc.getSelectedFile().getPath());
-/*
             Util.listXml(fc.getSelectedFile().getName(),
                     new KdbxCreds(s.getBytes()),
                     new PrintWriter(outputStream));
-*/
-            try (InputStream is = Files.newInputStream(Paths.get(fc.getSelectedFile().getPath()))) {
+/*            try (InputStream is = Files.newInputStream(Paths.get(fc.getSelectedFile().getPath()))) {
                 HexViewer.list(is);
-            }
+            }*/
         }
     }
 }

@@ -16,6 +16,7 @@
 package org.linguafranca.pwdb.kdbx.jackson.converter;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.linguafranca.pwdb.kdbx.Helpers;
 
@@ -25,17 +26,13 @@ public class StringToDateConverter extends StdConverter<String, Date> {
 
     @Override
     public Date convert(String value) {
-        Date result = null;
-        if(value != null) {
-            if(value.equals("${creationDate}")) {
-                result = new Date();
-            }
-            try {
-                result =  Helpers.toDate(value);
-            } catch(Exception e) {
-                result = new Date();
-            }
+        // TODO: It would really be better if we could inhibit deserialize date elements that are not present
+        if (Objects.isNull(value) || value.isEmpty()) {
+            return null;
         }
-        return result;
+        if(value.equals("${creationDate}")) {
+            return new Date();
+        }
+        return Helpers.toDate(value);
     }
 }

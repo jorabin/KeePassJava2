@@ -48,13 +48,13 @@ public class ValueSerializer extends StdSerializer<EntryClasses.StringProperty.V
         //We need to encrypt and convert to base64 every protected element
         if (value.getProtectOnOutput()) {
             xmlGenerator.setNextIsAttribute(true);
-            gen.writeStringField("Protected", "True"); 
+            xmlGenerator.writeStringField("Protected", "True");
             String plain = value.getText();
             if(plain == null) {
                 plain = "";
             }
             //Cipher
-            byte[] encrypted = encryptor.encrypt(plain.getBytes()); 
+            byte[] encrypted = encryptor.encrypt(plain.getBytes());
             //Convert to base64
             stringToWrite = new String(Base64.encodeBase64(encrypted));
         }
@@ -62,9 +62,6 @@ public class ValueSerializer extends StdSerializer<EntryClasses.StringProperty.V
         xmlGenerator.setNextIsAttribute(false);
         xmlGenerator.setNextIsUnwrapped(true);
         xmlGenerator.writeStringField("text", stringToWrite);
-        
-        gen.writeEndObject();
-    
+        xmlGenerator.writeEndObject();
     }
-    
 }
