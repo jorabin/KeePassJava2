@@ -15,20 +15,19 @@
  */
 package org.linguafranca.pwdb.kdbx.jackson.converter;
 
-import java.io.IOException;
-
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import org.apache.commons.codec.binary.Base64;
 import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses;
 import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses.StringProperty.Value;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
+import java.io.IOException;
 
 
-public class ValueSerializer extends StdSerializer<EntryClasses.StringProperty.Value>{
+public class ValueSerializer extends StdSerializer<EntryClasses.StringProperty.Value> {
 
     private final StreamEncryptor encryptor;
 
@@ -40,7 +39,7 @@ public class ValueSerializer extends StdSerializer<EntryClasses.StringProperty.V
 
     @Override
     public void serialize(Value value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-        
+
         final ToXmlGenerator xmlGenerator = (ToXmlGenerator) gen;
         xmlGenerator.writeStartObject();
 
@@ -50,7 +49,7 @@ public class ValueSerializer extends StdSerializer<EntryClasses.StringProperty.V
             xmlGenerator.setNextIsAttribute(true);
             xmlGenerator.writeStringField("Protected", "True");
             String plain = value.getText();
-            if(plain == null) {
+            if (plain == null) {
                 plain = "";
             }
             //Cipher
