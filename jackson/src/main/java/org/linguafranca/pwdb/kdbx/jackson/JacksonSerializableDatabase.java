@@ -46,7 +46,6 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 
-import static org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME_TITLE;
 
 public class JacksonSerializableDatabase implements SerializableDatabase {
 
@@ -58,8 +57,7 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
         InputStream inputStream = JacksonSerializableDatabase.class.getClassLoader()
                 .getResourceAsStream("base.kdbx.xml");
         XmlMapper mapper = new XmlMapper();
-        KeePassFile res = mapper.readValue(inputStream, KeePassFile.class);
-        return res;
+        return mapper.readValue(inputStream, KeePassFile.class);
 
     }
 
@@ -210,7 +208,7 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
     static void fixUp(JacksonGroup parent) {
 
         for (JacksonGroup group : parent.getGroups()) {
-            group.setParent(parent);
+            group.parent = parent;
             group.database = parent.database;
             fixUp(group);
         }

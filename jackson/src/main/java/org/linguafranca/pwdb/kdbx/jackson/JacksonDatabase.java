@@ -32,17 +32,14 @@ import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
 
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-
-import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.createEmptyDatabase;;
+import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.createEmptyDatabase;
 
 public class JacksonDatabase extends AbstractDatabase<JacksonGroup, JacksonEntry> {
 
     KeePassFile keePassFile;
     StreamFormat<?> streamFormat;
 
-    public JacksonDatabase() throws StreamReadException, DatabindException, IOException {
+    public JacksonDatabase() throws IOException {
         this(createEmptyDatabase(), null);
     }
 

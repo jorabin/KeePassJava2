@@ -165,11 +165,7 @@ public class JacksonGroup extends AbstractGroup<JacksonGroup, JacksonEntry> {
 
     @Override
     public List<JacksonGroup> getGroups() {
-        List<JacksonGroup> result = new ArrayList<>();
-        for (JacksonGroup aGroup : groups) {
-            result.add(aGroup);
-        }
-        return result;
+        return new ArrayList<>(groups);
     }
 
     @Override
@@ -208,11 +204,7 @@ public class JacksonGroup extends AbstractGroup<JacksonGroup, JacksonEntry> {
 
     @Override
     public List<JacksonEntry> getEntries() {
-        List<JacksonEntry> result = new ArrayList<>();
-        for (JacksonEntry entry : this.entries) {
-            result.add(entry);
-        }
-        return result;
+        return new ArrayList<>(this.entries);
     }
 
     @Override
