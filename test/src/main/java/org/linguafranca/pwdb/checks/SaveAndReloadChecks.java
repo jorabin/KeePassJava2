@@ -81,6 +81,33 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         printStream.format("Test took %d millis", System.currentTimeMillis() - now);
     }
 
+    @Test
+    public void saveAndReloadTestPasswordBytes() throws IOException {
+
+        long now = System.currentTimeMillis();
+
+        // create database with known content
+        D output = createNewDatabase();
+        verifyContentsPasswordBytes(output);
+        //output.save(new StreamFormat.None(), new Credentials.None(), printStream);
+
+        FileOutputStream fos = new FileOutputStream("testOutput/test1.kdbx");
+        saveDatabase(output, getCreds("123".getBytes()), fos);
+        Assert.assertFalse(output.isDirty());
+        fos.flush();
+        fos.close();
+        // make sure that saving didn't mess up content
+        verifyContentsPasswordBytes(output);
+        //output.save(new StreamFormat.None(), new Credentials.None(), printStream);
+
+
+        FileInputStream fis = new FileInputStream("testOutput/test1.kdbx");
+        D input = loadDatabase(getCreds("123".getBytes()), fis);
+        verifyContentsPasswordBytes(input);
+        //input.save(new StreamFormat.None(),  new Credentials.None(), printStream);
+        printStream.format("Test took %d millis", System.currentTimeMillis() - now);
+    }
+
     /**
      * Test verifies that attachments are saved and reloaded correctly
      */
@@ -170,6 +197,25 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
                 assertEquals(g + "-" + e, entry.getTitle());
                 assertEquals(g + " - un - " + e, entry.getUsername());
                 assertEquals(g + "- p -" + e, entry.getPassword());
+                assertEquals(g + "- url - " + e, entry.getUrl());
+                assertEquals(g + "- n - " + e, entry.getNotes());
+                assertEquals(group, entry.getParent());
+            }
+        }
+    }
+
+    private void verifyContentsPasswordBytes(D database) {
+        for (Integer g = 0; g< 5; g++){
+            G group = database.getRootGroup().getGroups().get(g);
+            assertEquals(g.toString(), group.getName());
+            assertEquals(g + 1, group.getEntries().size());
+            assertEquals(g+1, group.getEntriesCount());
+            assertEquals(database.getRootGroup(), group.getParent());
+            for (int e = 0; e <= g; e++) {
+                E entry = group.getEntries().get(e);
+                assertEquals(g + "-" + e, entry.getTitle());
+                assertEquals(g + " - un - " + e, entry.getUsername());
+                assertEquals(g + "- p -" + e, new String(entry.getPasswordAsBytes()));
                 assertEquals(g + "- url - " + e, entry.getUrl());
                 assertEquals(g + "- n - " + e, entry.getNotes());
                 assertEquals(group, entry.getParent());
@@ -280,6 +326,93 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         E entry2 = database.newEntry(entry1);
         entry2.setPassword("pass2");
         assertEquals("pass2", entry2.getPassword());
+        group2.addEntry(entry2);
+
+        assertEquals(2, group2.getEntries().size());
+        root.removeGroup(group1);
+        root.removeGroup(group2);
+
+        assertEquals(0, root.getGroups().size());
+        assertEquals(0, database.findEntries("").size());
+    }
+
+    @Test
+    public void testNewDatabasePasswordBytes() throws IOException {
+        D database = getDatabase();
+        G root = database.getRootGroup();
+        Assert.assertTrue(root.isRootGroup());
+        assertEquals(0, root.getGroups().size());
+        assertEquals(0, root.getEntries().size());
+
+        Assert.assertTrue(database.shouldProtect("Password"));
+        Assert.assertFalse(database.shouldProtect("Title"));
+        Assert.assertFalse(database.shouldProtect("Bogus"));
+
+        assertEquals("New Database", database.getName());
+        database.setName("Modified Database");
+        assertEquals("Modified Database", database.getName());
+
+        assertEquals("New Database created by KeePassJava2", database.getDescription());
+        database.setDescription("Test Database");
+        assertEquals("Test Database", database.getDescription());
+
+        G group1 = database.newGroup("Group 1");
+        UUID newGroupUUID = group1.getUuid();
+
+        root.addGroup(group1);
+        assertEquals("Group 1", group1.getName());
+        Assert.assertFalse(group1.isRootGroup());
+        Assert.assertTrue(root.isRootGroup());
+
+        assertEquals(1, root.getGroups().size());
+        assertEquals(newGroupUUID, root.getGroups().get(0).getUuid());
+
+        group1.setParent(root);
+        root.addGroup(group1);
+
+        root.removeGroup(group1);
+        assertNull(group1.getParent());
+        assertEquals(0, root.getGroups().size());
+        root.addGroup(group1);
+        assertEquals(1, root.getGroups().size());
+        assertEquals(newGroupUUID, root.getGroups().get(0).getUuid());
+
+        try {
+            root.setParent(group1);
+            Assert.fail("Cannot add root group to another group");
+        } catch (Exception ignored) {
+        }
+
+        G group2 = database.newGroup();
+        group2.setName("Group 2");
+        group1.addGroup(group2);
+        assertEquals(1, group1.getGroups().size());
+        assertEquals(1, root.getGroups().size());
+
+        root.addGroup(group2);
+        assertEquals(0, group1.getGroups().size());
+        assertEquals(2, root.getGroups().size());
+
+        E entry1 = database.newEntry();
+        entry1.setTitle("A new entry");
+        assertEquals("A new entry", entry1.getTitle());
+        entry1.setUsername("user name");
+        assertEquals("user name", entry1.getUsername());
+        entry1.setProperty("random", "new");
+        assertEquals("new", entry1.getProperty("random"));
+        entry1.setProperty("random", "old");
+        assertEquals("old", entry1.getProperty("random"));
+
+
+        group2.addEntry(entry1);
+
+        assertEquals(1, group2.getEntries().size());
+        entry1.setPassword("pass");
+        assertEquals("pass", new String(entry1.getPasswordAsBytes()));
+
+        E entry2 = database.newEntry(entry1);
+        entry2.setPassword("pass2");
+        assertEquals("pass2", new String(entry2.getPasswordAsBytes()));
         group2.addEntry(entry2);
 
         assertEquals(2, group2.getEntries().size());

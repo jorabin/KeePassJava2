@@ -26,6 +26,7 @@ import org.linguafranca.pwdb.Icon;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -168,6 +169,60 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
     }
 
     @Test
+    public void testSetFieldsPasswordAsBytes() {
+        E e1 = database.newEntry("Entry 1");
+        e1.setNotes("this looks a little like Entry 2");
+        assertEquals("this looks a little like Entry 2", e1.getNotes());
+        e1.setUsername("jake@window.com");
+        assertEquals("jake@window.com", e1.getUsername());
+        e1.setPassword("supercalifragelisticexpialidocious");
+        assertEquals("supercalifragelisticexpialidocious", new String(e1.getPasswordAsBytes()));
+        e1.setUrl("https://window.com");
+        assertEquals("https://window.com", e1.getUrl());
+
+
+        Assert.assertTrue(e1.match("2"));
+        Assert.assertTrue(e1.matchTitle("1"));
+        Assert.assertFalse(e1.matchTitle("doggy"));
+
+        I ic1 = database.newIcon(27);
+        e1.setIcon(ic1);
+        assertEquals(e1.getIcon(), ic1);
+
+        // databases have to support setting of standard properties
+        e1.setProperty(Entry.STANDARD_PROPERTY_NAME_TITLE, "A title");
+        assertEquals("A title", e1.getTitle());
+        e1.setProperty(Entry.STANDARD_PROPERTY_NAME_USER_NAME, "username");
+        assertEquals("username", e1.getUsername());
+        e1.setProperty(Entry.STANDARD_PROPERTY_NAME_NOTES, "notes");
+        assertEquals("notes", e1.getNotes());
+        e1.setProperty(Entry.STANDARD_PROPERTY_NAME_PASSWORD, "password");
+        assertEquals("password", new String(e1.getPasswordAsBytes()));
+        e1.setProperty(Entry.STANDARD_PROPERTY_NAME_URL, "url");
+        assertEquals("url", e1.getUrl());
+
+        try {
+            e1.setProperty("silly", "hello");
+            assertEquals("hello", e1.getProperty("silly"));
+            List<String> properties = new ArrayList<>(Entry.STANDARD_PROPERTY_NAMES);
+            properties.add("silly");
+            // remove all properties to show that getProperties returns all the values we want
+            properties.removeAll(e1.getPropertyNames());
+            Assert.assertEquals(0, properties.size());
+        } catch (UnsupportedOperationException e) {
+            // databases don't have to support arbitrary properties
+            assertFalse(database.supportsNonStandardPropertyNames());
+            assertArrayEquals(e1.getPropertyNames().toArray(), Entry.STANDARD_PROPERTY_NAMES.toArray());
+        }
+
+        e1.setNotes("How much is that doggy in the window?");
+        assertEquals("How much is that doggy in the window?", e1.getNotes());
+        e1.setTitle("Entry 2");
+        assertEquals("Entry 2", e1.getTitle());
+        assertEquals("Entry 2", e1.getPath());
+    }
+
+    @Test
     public void testTimes() {
         long beforeSecond = Instant.now().toEpochMilli()/1000;
         E entry = database.newEntry();
@@ -234,6 +289,22 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
     }
 
     @Test
+    public void testNewEntryPasswordBytes() {
+        E e2 = database.newEntry();
+        Assert.assertNull(e2.getParent());
+        assertEquals("", new String(e2.getPasswordAsBytes()));
+        Assert.assertNotNull(e2.getUuid());
+        assertEquals("", e2.getUrl());
+        assertEquals("", e2.getNotes());
+        assertEquals("", e2.getUsername());
+        assertEquals("", e2.getTitle());
+        Assert.assertNull(e2.getProperty("silly"));
+        List<String> l = e2.getPropertyNames();
+        l.removeAll(Entry.STANDARD_PROPERTY_NAMES);
+        Assert.assertEquals(0, l.size());
+    }
+
+    @Test
     public void testCopy() throws IOException {
         E entry1 = database.newEntry();
         entry1.setTitle("Entry");
@@ -251,6 +322,39 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
         assertEquals(entry1.getTitle(), entry2.getTitle());
         assertEquals(entry1.getUsername(), entry2.getUsername());
         assertEquals(entry1.getPassword(), entry2.getPassword());
+        assertEquals(entry1.getUrl(), entry2.getUrl());
+        assertEquals(entry1.getNotes(), entry2.getNotes());
+        assertEquals(entry1.getIcon(), entry2.getIcon());
+        assertNotEquals(entry1.getUuid(), entry2.getUuid());
+
+        G group1 = database.newGroup();
+        group1.setName("Group");
+        group1.setIcon(database.newIcon(3));
+
+        G group2 = database2.newGroup(group1);
+        assertEquals(group1.getName(), group2.getName());
+        assertEquals(group1.getIcon(), group2.getIcon());
+        assertNotEquals(group1.getUuid(), group2.getUuid());
+    }
+
+    @Test
+    public void testCopyPasswordBytes() throws IOException {
+        E entry1 = database.newEntry();
+        entry1.setTitle("Entry");
+        entry1.setUsername("Username");
+        entry1.setPassword("Password");
+        entry1.setUrl("https://dont.follow.me");
+        entry1.setNotes("Notes");
+        entry1.setIcon(database.newIcon(2));
+
+        // create a new Database
+        Database<D,G,E,I> database2 = createDatabase();
+        // create a new Entry in new Database
+        E entry2 = database2.newEntry(entry1);
+
+        assertEquals(entry1.getTitle(), entry2.getTitle());
+        assertEquals(entry1.getUsername(), entry2.getUsername());
+        assertEquals(true, Arrays.equals(entry1.getPasswordAsBytes(), entry2.getPasswordAsBytes()));
         assertEquals(entry1.getUrl(), entry2.getUrl());
         assertEquals(entry1.getNotes(), entry2.getNotes());
         assertEquals(entry1.getIcon(), entry2.getIcon());

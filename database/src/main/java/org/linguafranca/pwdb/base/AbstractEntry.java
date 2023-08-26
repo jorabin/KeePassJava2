@@ -84,8 +84,14 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
     }
 
     @Override
+    @Deprecated
     public String getPassword() {
         return getProperty(STANDARD_PROPERTY_NAME_PASSWORD);
+    }
+
+    @Override
+    public byte[] getPasswordAsBytes() {
+        return getPropertyAsBytes(STANDARD_PROPERTY_NAME_PASSWORD);
     }
 
     @Override

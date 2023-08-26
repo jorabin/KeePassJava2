@@ -316,4 +316,9 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
         this.times.setLastModificationTime(new Date());
         this.database.setDirty(true);
     }
+
+    @Override
+    public byte[] getPropertyAsBytes(String name) {
+        return getByteContent(getStringProperty(name, string));
+    }
 }

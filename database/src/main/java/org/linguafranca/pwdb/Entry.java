@@ -118,6 +118,17 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      */
     void setProperty(String name, String value);
 
+     /**
+     * Gets the value of a property.
+     *
+     * <p>All implementations of Entry are required to support reading and writing of
+     * {@link #STANDARD_PROPERTY_NAMES}.
+     * @param name the name of the property to get
+     * @return a value or null if the property is not known, or if setting of arbitrary properties is not supported
+     * @see Database#supportsNonStandardPropertyNames()
+     */
+    
+    byte[] getPropertyAsBytes(String name);
     /**
      * Removes this non-standard  property, if it exists.
      *
@@ -219,10 +230,22 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * Gets the (unencrypted) password field for this entry.
      *
      * <p>Implementations should Touch LastAccessedTime when this method is called.
+     * 
+     * @deprecated because the string is immutable, and cannot be wiped from memory
+     * 
+     * @return a password
+     */
+    @Deprecated
+    String getPassword();
+
+    /**
+     * Gets the (unencrypted) password field for this entry.
+     *
+     * <p>Implementations should Touch LastAccessedTime when this method is called.
      *
      * @return a password
      */
-    String getPassword();
+    public byte[] getPasswordAsBytes();
 
     /**
      * Sets the plaintext password for this Entry.

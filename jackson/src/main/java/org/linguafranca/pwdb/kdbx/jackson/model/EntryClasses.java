@@ -44,6 +44,10 @@ public abstract class EntryClasses {
         return property == null || property.value == null ? null : property.value.text;
     }
 
+    public static byte[] getByteContent(StringProperty property) {
+        return property == null || property.value == null ? null : property.value.text.getBytes();
+    }
+
     public static BinaryProperty getBinaryProp(String name, List<BinaryProperty> binary) {
         for (BinaryProperty property : binary) {
             if (property.key.equals(name)) {

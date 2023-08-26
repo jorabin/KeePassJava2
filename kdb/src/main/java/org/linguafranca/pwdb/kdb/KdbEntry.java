@@ -250,4 +250,16 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     protected void touch() {
         lastModificationTime = new Date();
     }
+
+    @Override
+    public byte[] getPropertyAsBytes(String name) {
+        switch (name) {
+            case STANDARD_PROPERTY_NAME_USER_NAME: return getUsername().getBytes();
+            case STANDARD_PROPERTY_NAME_PASSWORD: return getPassword().getBytes();
+            case STANDARD_PROPERTY_NAME_URL: return getUrl().getBytes();
+            case STANDARD_PROPERTY_NAME_TITLE: return getTitle().getBytes();
+            case STANDARD_PROPERTY_NAME_NOTES: return getNotes().getBytes();
+            default: return null;
+        }
+    }
 }

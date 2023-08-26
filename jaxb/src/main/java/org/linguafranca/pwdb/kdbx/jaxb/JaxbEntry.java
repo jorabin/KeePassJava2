@@ -280,4 +280,14 @@ public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry,
         database.setDirty(true);
         delegate.getTimes().setLastModificationTime(new Date());
     }
+
+    @Override
+    public byte[] getPropertyAsBytes(String name) {
+        for (StringField field: delegate.getString()){
+            if (field.getKey().equals(name)){
+                return field.getValue().getValueAsByte();
+            }
+        }
+        return null;
+    }
 }

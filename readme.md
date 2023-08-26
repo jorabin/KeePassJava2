@@ -270,7 +270,7 @@ bindings might be useful for building other interfaces.</td></tr>
 <td>A DOM based implementation of KDBX. Being DOM based it is rather slow, but 
 messes less with existing content than the other two implementations. Known to work on Android.</td></tr>
 
-<tr><td><a href="dom">dom</a></td><td>KeePassJava2-jackson</td>
+<tr><td><a href="jackson">jackson</a></td><td>KeePassJava2-jackson</td>
 <td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-jackson.svg" alt="Javadocs"></a></td>
 <td>A Jackson based implementation of KDBX. Intended to replace the Simple XML implementation. Simple XML seems no
 longer to be maintained.</td></tr>

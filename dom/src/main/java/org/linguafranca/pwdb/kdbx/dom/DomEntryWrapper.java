@@ -80,6 +80,11 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
     }
 
     @Override
+    public byte[] getPropertyAsBytes(String name) {
+       return getProperty(name).getBytes();
+    }
+
+    @Override
     public boolean removeProperty(String name) throws IllegalArgumentException {
         if (STANDARD_PROPERTY_NAMES.contains(name)) throw new IllegalArgumentException("may not remove property: " + name);
         boolean wasRemoved = DomHelper.removeElement(String.format(DomHelper.PROPERTY_ELEMENT_FORMAT, name), element);

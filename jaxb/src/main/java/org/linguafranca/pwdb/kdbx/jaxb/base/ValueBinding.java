@@ -22,6 +22,10 @@ public abstract class ValueBinding {
         return value;
     }
 
+    public byte[] getValueAsByte() {
+        return value.getBytes();
+    }
+
     public void setValue(String string){
         value = string;
     }

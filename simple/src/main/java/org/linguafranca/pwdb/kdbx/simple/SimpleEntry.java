@@ -267,4 +267,13 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
         this.times.setLastModificationTime(new Date());
         this.database.setDirty(true);
     }
+
+    @Override
+    public byte[] getPropertyAsBytes(String name) {
+        if(name != null) {
+            return getStringContent(getStringProperty(name, string)).getBytes();
+        }
+        return null;
+        
+    }
 }

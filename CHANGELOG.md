@@ -2,6 +2,20 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [2.2.3-SNAPSHOT]
+
+### Changed
+
+- Deprecated method Entry.getPassword(): This means that the method getPassword() in the Entry class has been marked as deprecated. Deprecated methods are no longer recommended for use and might be removed in future versions of the code.
+
+### Added
+
+- byte[] getPasswordAsBytes() to AbstractEntry class: This means that a new method getPasswordAsBytes() has been added to the AbstractEntry class. This method likely returns the password in the form of a byte array instead of a plain string.
+
+- byte[] getPropertyAsBytes(String name) to the Entry interface: This indicates that a new method getPropertyAsBytes(String name) has been added to the Entry interface. This method likely returns a specific property as a byte array.
+
+- Added test cases to ensure the byte password is used correctly: This means that new test cases have been added to the codebase to ensure that the handling of byte passwords is functioning correctly. These tests will help verify that the newly introduced methods are working as expected.
+
 ## [2.2.2-SNAPSHOT]
 
 ### Added
