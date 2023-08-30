@@ -15,31 +15,21 @@
  */
 package org.linguafranca.pwdb.kdbx.jackson.converter;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.apache.commons.codec.binary.Base64;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class ValueDeserializer extends StdDeserializer<EntryClasses.StringProperty.Value> {
 
-    private StreamEncryptor encryptor;
-
-    public ValueDeserializer() {
-        super(ValueDeserializer.class);
-    }
-
-    public ValueDeserializer(Class<EntryClasses.StringProperty.Value> v) {
-        super(v);
-    }
+    private final StreamEncryptor encryptor;
 
     public ValueDeserializer(StreamEncryptor encryptor) {
         super(ValueDeserializer.class);
@@ -47,49 +37,43 @@ public class ValueDeserializer extends StdDeserializer<EntryClasses.StringProper
     }
 
     @Override
-    public EntryClasses.StringProperty.Value deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+    public EntryClasses.StringProperty.Value deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
 
-        
         JsonNode node = p.getCodec().readTree(p);
-        
+
         EntryClasses.StringProperty.Value result = new EntryClasses.StringProperty.Value();
 
-        if(node.isTextual()) {
+        if (node.isTextual()) {
             result.setText(node.textValue());
-        } else if(node.isObject()) {
-
+            return result;
+        }
+        if (node.isObject()) {
+            // TODO not clear what is happening here, looks like it's not exactly correct
             //We need to decrypt all Protected values
-            if(node.has("Protected")) {
+            if (node.has("Protected") && Boolean.TRUE.equals(Helpers.toBoolean(node.get("Protected").asText()))) {
+                if (node.has("")) {
+                    String cipherText = node.get("").asText();
+                    if (cipherText != null && !cipherText.isEmpty()) {
 
-                //Check if Protected=True
-                Boolean nodeEncrypted = Helpers.toBoolean(node.get("Protected").asText());
-                if(nodeEncrypted) {
-                    if(node.has("")) {
-                        String cipherText = node.get("").asText();
-                        if(cipherText != null && !cipherText.isEmpty()) {
-
-                            //Decode to byte the Base64 text
-                            byte[] encrypted = Base64.decodeBase64(cipherText.getBytes());
-                            String decrypted = new String(encryptor.decrypt(encrypted), StandardCharsets.UTF_8);
-                            result.setText(decrypted);
-                            result.setProtectOnOutput(true);           
-                        }
+                        //Decode to byte the Base64 text
+                        byte[] encrypted = Base64.decodeBase64(cipherText.getBytes());
+                        String decrypted = new String(encryptor.decrypt(encrypted), StandardCharsets.UTF_8);
+                        result.setText(decrypted);
+                        result.setProtectOnOutput(true);
                     }
                 }
             } else {
                 //If an element is not marked us Protected we need to copy the value as is
-                if(node.has("ProtectInMemory")) {
+                if (node.has("ProtectInMemory")) {
                     Boolean protectInMemory = Helpers.toBoolean(node.get("ProtectInMemory").asText());
                     result.setProtectInMemory(protectInMemory);
-                    
-                    if(node.has("")) {
+
+                    if (node.has("")) {
                         result.setText(node.get("").asText());
                     }
-                }                 
+                }
             }
         }
-        
         return result;
     }
-
 }

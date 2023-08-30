@@ -15,18 +15,13 @@
  */
 package org.linguafranca.pwdb.kdbx.jackson;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
-
+import com.ctc.wstx.api.WstxInputProperties;
+import com.ctc.wstx.api.WstxOutputProperties;
 import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.SerializableDatabase;
@@ -37,22 +32,22 @@ import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses;
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 
-import com.ctc.wstx.api.WstxInputProperties;
-import com.ctc.wstx.api.WstxOutputProperties;
-import com.fasterxml.jackson.core.exc.StreamReadException;
-import com.fasterxml.jackson.databind.DatabindException;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class JacksonSerializableDatabase implements SerializableDatabase {
 
     public KeePassFile keePassFile;
     private StreamEncryptor encryptor;
 
-    public static KeePassFile createEmptyDatabase() throws StreamReadException, DatabindException, IOException {
+    public static KeePassFile createEmptyDatabase() throws IOException {
 
         InputStream inputStream = JacksonSerializableDatabase.class.getClassLoader()
                 .getResourceAsStream("base.kdbx.xml");
@@ -80,7 +75,7 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
 
 
     @Override
-    public void save(OutputStream outputStream) throws IOException {
+    public void save(OutputStream outputStream) {
         prepareForSave(keePassFile.root.group);
         try {
 
@@ -144,18 +139,18 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
      * @param parent the group to start from
      */
     private static void prepareForSave(JacksonGroup parent){
-        for (JacksonGroup group: parent.getGroups()) {
+        for (JacksonGroup group: parent.groups) {
             prepareForSave(group);
         }
-        for (JacksonEntry entry: parent.getEntries()) {
+        for (JacksonEntry entry: parent.entries) {
             for (EntryClasses.StringProperty property : entry.string) {
-                boolean shouldProtect = parent.getDatabase().shouldProtect(property.getKey());
+                boolean shouldProtect = parent.database.shouldProtect(property.getKey());
                 property.getValue().setProtectOnOutput(shouldProtect || property.getValue().getProtectOnOutput());
             }
             if (Objects.nonNull(entry.history)) {
                 for (JacksonEntry entry2 : entry.history.getEntry()) {
                     for (EntryClasses.StringProperty property : entry2.string) {
-                        boolean shouldProtect = parent.getDatabase().shouldProtect(property.getKey());
+                        boolean shouldProtect = parent.database.shouldProtect(property.getKey());
                         property.getValue().setProtectOnOutput(shouldProtect || property.getValue().getProtectOnOutput());
                     }
                 }
@@ -207,7 +202,7 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
      */
     static void fixUp(JacksonGroup parent) {
 
-        for (JacksonGroup group : parent.getGroups()) {
+        for (JacksonGroup group : parent.groups) {
             group.parent = parent;
             group.database = parent.database;
             fixUp(group);

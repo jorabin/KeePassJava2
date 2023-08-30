@@ -24,7 +24,6 @@ public class Base64ToByteConverter extends StdConverter<String, byte[]> {
 
     @Override
     public byte[] convert(String value) {
-        byte[] decode = Base64.getDecoder().decode(value);
-        return decode;
+        return Base64.getDecoder().decode(value);
     }
 }
