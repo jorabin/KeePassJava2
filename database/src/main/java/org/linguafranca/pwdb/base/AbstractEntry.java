@@ -60,7 +60,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
 
     @Override
     public String getPath() {
-        Group parent = this.getParent();
+        G parent = this.getParent();
         String result = "";
         if (parent != null) {
             result = parent.getPath();

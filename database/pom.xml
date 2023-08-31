@@ -25,5 +25,10 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.github.novacrypto</groupId>
+            <artifactId>SecureString</artifactId>
+            <version>2022.01.17</version>
+        </dependency>
     </dependencies>
 </project>
