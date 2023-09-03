@@ -18,6 +18,7 @@ package org.linguafranca.pwdb.kdbx;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.linguafranca.pwdb.security.Encryption;
 import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -26,6 +27,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.io.InputStream;
+import java.security.MessageDigest;
 
 /**
  * Class has a static method to load a key from a KDBX XML Key File
@@ -52,7 +54,22 @@ public class KdbxKeyFile {
                 return null;
             }
             if (version.equals("2.0")) {
-                return Hex.decodeHex(data.replaceAll("\\s",""));
+               
+                byte[] hexData = Hex.decodeHex(data.replaceAll("\\s",""));
+               
+                MessageDigest md = Encryption.getSha256MessageDigestInstance();
+                byte[] computedHash = md.digest(hexData);
+               
+                String hashToCheck = (String) xpath.evaluate("//KeyFile/Key/Data/@Hash", doc, XPathConstants.STRING);
+                byte[] verifiedHash = Hex.decodeHex(hashToCheck);
+                
+                for(int i = 0; i < verifiedHash.length; i++) {
+                    if(computedHash[i] != verifiedHash[i]) {
+                        return null;
+                    }
+                }
+                return hexData;
+                
             }
             return Base64.decodeBase64(data.getBytes());
         } catch (Exception e) {
