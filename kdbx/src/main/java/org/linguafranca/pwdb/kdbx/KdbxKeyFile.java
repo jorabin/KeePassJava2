@@ -28,6 +28,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 import java.io.InputStream;
 import java.security.MessageDigest;
+import java.util.Arrays;
 
 /**
  * Class has a static method to load a key from a KDBX XML Key File
@@ -63,10 +64,9 @@ public class KdbxKeyFile {
                 String hashToCheck = (String) xpath.evaluate("//KeyFile/Key/Data/@Hash", doc, XPathConstants.STRING);
                 byte[] verifiedHash = Hex.decodeHex(hashToCheck);
                 
-                for(int i = 0; i < verifiedHash.length; i++) {
-                    if(computedHash[i] != verifiedHash[i]) {
-                        return null;
-                    }
+                boolean isHashVerified = Arrays.equals(Arrays.copyOf(computedHash, verifiedHash.length), verifiedHash);
+                if(!isHashVerified) {
+                    throw new IllegalStateException("Hash mismatch error");        
                 }
                 return hexData;
                 

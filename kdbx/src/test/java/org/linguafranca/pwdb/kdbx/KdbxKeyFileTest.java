@@ -111,6 +111,9 @@ public class KdbxKeyFileTest {
         toConsole(decryptedInputStream);
     }
 
+     /**
+     * Test hash fails in KeyFile (v2.0)
+     */
     @Test(expected = RuntimeException.class)
     public void testSignatureFails() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("kdbx_hash_test.kdbx");
