@@ -21,14 +21,20 @@ import org.apache.commons.codec.binary.Hex;
 import org.linguafranca.pwdb.security.Encryption;
 import org.w3c.dom.Document;
 
+import com.google.common.io.ByteStreams;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
+
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
+
+
 
 /**
  * Class has a static method to load a key from a KDBX XML Key File
@@ -46,32 +52,61 @@ public class KdbxKeyFile {
      * @return the key
      */
     public static byte[] load(InputStream inputStream) {
+
         try {
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document doc = documentBuilder.parse(inputStream);
-            String version = (String) xpath.evaluate("//KeyFile/Meta/Version/text()", doc, XPathConstants.STRING);
-            String data = (String) xpath.evaluate("//KeyFile/Key/Data/text()", doc, XPathConstants.STRING);
-            if (data == null) {
-                return null;
-            }
-            if (version.equals("2.0")) {
-               
-                byte[] hexData = Hex.decodeHex(data.replaceAll("\\s",""));
-               
-                MessageDigest md = Encryption.getSha256MessageDigestInstance();
-                byte[] computedHash = md.digest(hexData);
-               
-                String hashToCheck = (String) xpath.evaluate("//KeyFile/Key/Data/@Hash", doc, XPathConstants.STRING);
-                byte[] verifiedHash = Hex.decodeHex(hashToCheck);
-                
-                boolean isHashVerified = Arrays.equals(Arrays.copyOf(computedHash, verifiedHash.length), verifiedHash);
-                if(!isHashVerified) {
-                    throw new IllegalStateException("Hash mismatch error");        
+            byte[] inputBytes = ByteStreams.toByteArray(inputStream);
+            if (inputBytes.length == 32) {
+                //32 bytes KeyFile
+                return inputBytes;
+            } else if (inputBytes.length == 64) {
+                //64 bytes KeyFile (only Hexadecimal values)
+                if (Helpers.isValidHexString(inputBytes)) {
+                    byte[] keyFile = org.bouncycastle.util.encoders.Hex.decode(inputBytes);
+                    return keyFile;
+                } else {
+                    throw new IllegalStateException("KeyFile contains not allowed characters");
                 }
-                return hexData;
-                
+            } else {
+
+                //Standard KeyFile
+                if (Helpers.checkIfKeyFileIsXml(inputBytes)) {
+                    
+                    InputStream is = new ByteArrayInputStream(inputBytes);
+                    DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+                    Document doc = documentBuilder.parse(is);
+                    String version = (String) xpath.evaluate("//KeyFile/Meta/Version/text()", doc,
+                            XPathConstants.STRING);
+                    String data = (String) xpath.evaluate("//KeyFile/Key/Data/text()", doc, XPathConstants.STRING);
+                    if (data == null) {
+                        return null;
+                    }
+                    if (version.equals("2.0")) {
+
+                        byte[] hexData = Hex.decodeHex(data.replaceAll("\\s", ""));
+
+                        MessageDigest md = Encryption.getSha256MessageDigestInstance();
+                        byte[] computedHash = md.digest(hexData);
+
+                        String hashToCheck = (String) xpath.evaluate("//KeyFile/Key/Data/@Hash", doc,
+                                XPathConstants.STRING);
+                        byte[] verifiedHash = Hex.decodeHex(hashToCheck);
+
+                        boolean isHashVerified = Arrays.equals(Arrays.copyOf(computedHash, verifiedHash.length),
+                                                 verifiedHash);
+                        if (!isHashVerified) {
+                            throw new IllegalStateException("Hash mismatch error");
+                        }
+                        return hexData;
+                    }
+                    return Base64.decodeBase64(data.getBytes());
+                } else {
+                    //Any file compute the hash
+                    MessageDigest md = Encryption.getSha256MessageDigestInstance();
+                    byte[] keyFile = md.digest(inputBytes);
+                    return keyFile;
+                }
             }
-            return Base64.decodeBase64(data.getBytes());
+
         } catch (Exception e) {
             throw new RuntimeException("Key File input stream cannot be null");
         }

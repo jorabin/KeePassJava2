@@ -23,6 +23,7 @@ import org.apache.commons.codec.binary.Hex;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.SimpleDateFormat;
@@ -32,8 +33,13 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 /**
  * The class provides helpers to marshal and unmarshal values of KDBX files
@@ -201,4 +207,40 @@ public class Helpers {
                 .putInt(value);
         return longBuffer;
     }
+
+    /**
+     * Check if the data is an XML file.
+     * 
+     * @param data the file to check
+     * @return true if and only if the data is an XML parsable
+     */
+    public static boolean checkIfKeyFileIsXml(byte[] data) {
+        try {
+            InputStream is = new ByteArrayInputStream(data);
+            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            documentBuilder.parse(is);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * Check if the data is a valid hex
+     * 
+     * @param data the data to check
+     * @return true if and only if the key contained in the KeyFile is an Hex format
+     * @throws IllegalAccessException if the length of the data is not equal to 64
+     */
+    public static boolean isValidHexString(byte[] data)  {
+
+        if(data == null) {
+            return false;
+        }
+
+        final Pattern hexPattern = Pattern.compile("\\p{XDigit}+");
+        final Matcher matcher = hexPattern.matcher(new String(data));
+        return matcher.matches();
+    }
+
 }
