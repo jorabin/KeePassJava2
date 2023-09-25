@@ -42,8 +42,6 @@ import java.util.Objects;
 
 /**
  * Class has a static method to load a key from an {@link InputStream}
- *
- * @author jo
  */
 @SuppressWarnings("WeakerAccess")
 public class KdbxKeyFile {
@@ -53,21 +51,20 @@ public class KdbxKeyFile {
     private static final int KEY_LEN_32 = 32;
     private static final int KEY_LEN_64 = 64;
 
-    private static class HashMismatchException extends Exception {}
-
     /**
      * Load a key from an InputStream
      * <p>
-     *     The InputStream can represent ... TODO write about the formats
+     * The InputStream can represent ... TODO write about the formats
      *
      * @param inputStream the input stream holding the key, caller should close
      * @return the key
      */
     public static byte[] load(InputStream inputStream) {
-        DigestInputStream digestInputStream = new DigestInputStream(inputStream, Encryption.getSha256MessageDigestInstance());
+        DigestInputStream digestInputStream = new DigestInputStream(inputStream,
+                Encryption.getSha256MessageDigestInstance());
         PushbackInputStream pis = new PushbackInputStream(digestInputStream, BUFFER_SIZE);
         try {
-            byte[] buffer = new byte[65];
+            byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead = pis.read(buffer);
             if (bytesRead == KEY_LEN_32) {
                 // if length 32 assume binary key file
@@ -80,29 +77,28 @@ public class KdbxKeyFile {
                 try {
                     // see if it's an XML key file
                     pis.unread(buffer);
-                    return tryComputeXmlKeyFile(new FilterInputStream(pis){
+                    return tryComputeXmlKeyFile(new FilterInputStream(pis) {
+                        // suppress ability to close, so we can carry on reading on exception
                         @Override
-                        public void close() {
-                            // suppress ability to close, so we can carry on reading on exception
-                        }
+                        public void close() { /* nothing */ }
                     });
                 } catch (HashMismatchException e) {
                     throw new IllegalArgumentException("Invalid key in signature file");
-                } catch (Exception e) {
-                    byte [] sink = new byte[1024];
-                    // xml file was invalid so read the remainder of file
-                    //noinspection StatementWithEmptyBody
-                    while (digestInputStream.read(sink) > 0) {
-                        // just reading file to get its digest
-                    }
-                    return digestInputStream.getMessageDigest().digest();
+                } catch (Exception ignored) {
+                    // fall through
                 }
+                // xml file was invalid so read the remainder of file
+                byte[] sink = new byte[1024];
+                // read file to get its digest
+                //noinspection StatementWithEmptyBody
+                while (digestInputStream.read(sink) > 0) { /* nothing */ }
+                return digestInputStream.getMessageDigest().digest();
+
             }
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
     }
-
 
     /**
      * Read the InputStream (kdbx xml keyfile) and compute the hash (SHA-256) to build a key
@@ -120,7 +116,7 @@ public class KdbxKeyFile {
             if (data == null) {
                 return null;
             }
-            if (Objects.isNull(version) || !version.equals("2.0")){
+            if (Objects.isNull(version) || !version.equals("2.0")) {
                 return Base64.decodeBase64(data);
             }
 
@@ -135,8 +131,12 @@ public class KdbxKeyFile {
                 throw new HashMismatchException();
             }
             return hexData;
-        } catch(IOException | SAXException | ParserConfigurationException | XPathExpressionException | DecoderException e) {
+        } catch (IOException | SAXException | ParserConfigurationException | XPathExpressionException |
+                 DecoderException e) {
             throw new IllegalArgumentException("An error occurred during XML parsing: " + e.getMessage());
         }
+    }
+
+    private static class HashMismatchException extends Exception {
     }
 }
