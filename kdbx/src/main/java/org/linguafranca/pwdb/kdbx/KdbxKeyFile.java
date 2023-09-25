@@ -40,7 +40,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * Class has a static method to load a key from a KDBX XML Key File
+ * Class has a static method to load a key from an {@link InputStream}
  *
  * @author jo
  */
