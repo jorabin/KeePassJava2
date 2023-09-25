@@ -34,6 +34,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.nio.ByteBuffer;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.util.Arrays;
@@ -72,11 +73,10 @@ public class KdbxKeyFile {
                 // if length 32 assume binary key file
                 return buffer;
             } else if (bytesRead == KEY_LEN_64) {
-                // if length 64 assume hex encoded key file
-                return Hex.decodeHex(new String(Arrays.copyOf(buffer, bytesRead)));
+                // if length 64 assume hex encoded key file (avoid creating a String)
+                return Hex.decodeHex(ByteBuffer.wrap(buffer).asCharBuffer().array());
             } else {
                 // if length not 32 or 64 either an XML key file or just a file to get digest
-                pis.unread(buffer);
                 try {
                     // see if it's an XML key file
                     pis.unread(buffer);
@@ -121,7 +121,7 @@ public class KdbxKeyFile {
                 return null;
             }
             if (Objects.isNull(version) || !version.equals("2.0")){
-                return Base64.decodeBase64(data.getBytes());
+                return Base64.decodeBase64(data);
             }
 
             byte[] hexData = Hex.decodeHex(data.replaceAll("\\s", ""));
