@@ -60,42 +60,48 @@ public class KdbxKeyFile {
      * @return the key
      */
     public static byte[] load(InputStream inputStream) {
+        // wrap the stream to get its digest (in case we need it)
         DigestInputStream digestInputStream = new DigestInputStream(inputStream,
                 Encryption.getSha256MessageDigestInstance());
+        // wrap the stream, so we can test reading from it but then push back to get original stream
         PushbackInputStream pis = new PushbackInputStream(digestInputStream, BUFFER_SIZE);
         try {
             byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead = pis.read(buffer);
-            if (bytesRead == KEY_LEN_32) {
-                // if length 32 assume binary key file
-                return buffer;
-            } else if (bytesRead == KEY_LEN_64) {
-                // if length 64 assume hex encoded key file (avoid creating a String)
-                return Hex.decodeHex(ByteBuffer.wrap(buffer).asCharBuffer().array());
-            } else {
-                // if length not 32 or 64 either an XML key file or just a file to get digest
-                try {
-                    // see if it's an XML key file
-                    pis.unread(buffer);
-                    return tryComputeXmlKeyFile(new FilterInputStream(pis) {
-                        // suppress ability to close, so we can carry on reading on exception
-                        @Override
-                        public void close() { /* nothing */ }
-                    });
-                } catch (HashMismatchException e) {
-                    throw new IllegalArgumentException("Invalid key in signature file");
-                } catch (Exception ignored) {
-                    // fall through
-                }
-                // xml file was invalid so read the remainder of file
-                byte[] sink = new byte[1024];
-                // read file to get its digest
-                //noinspection StatementWithEmptyBody
-                while (digestInputStream.read(sink) > 0) { /* nothing */ }
-                return digestInputStream.getMessageDigest().digest();
 
+            // if length 32 assume binary key file
+            if (bytesRead == KEY_LEN_32) {
+                return buffer;
             }
-        } catch (Exception e) {
+
+            // if length 64 may be hex encoded key file
+            if (bytesRead == KEY_LEN_64) {
+                try {
+                    return Hex.decodeHex(ByteBuffer.wrap(buffer).asCharBuffer().array()); // (avoid creating a String)
+                } catch (DecoderException ignored) {
+                    // fall through it may be an XML file or just a file whose digest we want
+                }
+            }
+            // restore stream
+            pis.unread(buffer);
+
+            // if length not 32 or 64 either an XML key file or just a file to get digest
+            try {
+                // see if it's an XML key file
+                return tryComputeXmlKeyFile(pis);
+            } catch (HashMismatchException e) {
+                throw new IllegalArgumentException("Invalid key in signature file");
+            } catch (Exception ignored) {
+                // fall through to get file digest
+            }
+
+            // is not a valid xml file, so read the remainder of file
+            byte[] sink = new byte[1024];
+            // read file to get its digest
+            //noinspection StatementWithEmptyBody
+            while (digestInputStream.read(sink) > 0) { /* nothing */ }
+            return digestInputStream.getMessageDigest().digest();
+        } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
     }
@@ -103,34 +109,43 @@ public class KdbxKeyFile {
     /**
      * Read the InputStream (kdbx xml keyfile) and compute the hash (SHA-256) to build a key
      *
-     * @param is The KeyFile as an InputStream
+     * @param is The KeyFile as an InputStream, must return with stream open on error
      * @return the computed byte array (keyFile) to compute the MasterKey
      */
     private static byte[] tryComputeXmlKeyFile(InputStream is) throws HashMismatchException {
-
+        // DocumentBuilder closes input stream so wrap inputStream to inhibit this in case of failure
+        InputStream unCloseable = new FilterInputStream(is) {
+            @Override
+            public void close() { /* nothing */ }
+        };
         try {
             DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            Document doc = documentBuilder.parse(is);
-            String version = (String) xpath.evaluate("//KeyFile/Meta/Version/text()", doc, XPathConstants.STRING);
+            Document doc = documentBuilder.parse(unCloseable);
+            // get the key
             String data = (String) xpath.evaluate("//KeyFile/Key/Data/text()", doc, XPathConstants.STRING);
             if (data == null) {
-                return null;
+                throw new IllegalArgumentException("Key file does not contain a key");
             }
+            // get the file version
+            String version = (String) xpath.evaluate("//KeyFile/Meta/Version/text()", doc, XPathConstants.STRING);
+            // if not 2.0 then key is base64 encoded
             if (Objects.isNull(version) || !version.equals("2.0")) {
                 return Base64.decodeBase64(data);
             }
 
-            byte[] hexData = Hex.decodeHex(data.replaceAll("\\s", ""));
-            MessageDigest md = Encryption.getSha256MessageDigestInstance();
-            byte[] computedHash = md.digest(hexData);
+            // key data may contain white space
+            byte[] decodedData = Hex.decodeHex(data.replaceAll("\\s", ""));
+            byte[] decodedDataHash = Encryption.getSha256MessageDigestInstance().digest(decodedData);
 
+            // hash used to verify the data
             String hashToCheck = (String) xpath.evaluate("//KeyFile/Key/Data/@Hash", doc, XPathConstants.STRING);
-            byte[] verifiedHash = Hex.decodeHex(hashToCheck);
+            byte[] decodedHashToCheck = Hex.decodeHex(hashToCheck);
 
-            if (!Arrays.equals(Arrays.copyOf(computedHash, verifiedHash.length), verifiedHash)) {
+            // hashToCheck is a truncated version of the actual hash
+            if (!Arrays.equals(Arrays.copyOf(decodedDataHash, decodedHashToCheck.length), decodedHashToCheck)) {
                 throw new HashMismatchException();
             }
-            return hexData;
+            return decodedData;
         } catch (IOException | SAXException | ParserConfigurationException | XPathExpressionException |
                  DecoderException e) {
             throw new IllegalArgumentException("An error occurred during XML parsing: " + e.getMessage());
