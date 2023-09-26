@@ -36,7 +36,6 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.nio.ByteBuffer;
 import java.security.DigestInputStream;
-import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Objects;
 
