@@ -35,6 +35,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.DigestInputStream;
 import java.util.Arrays;
 import java.util.Objects;
@@ -51,9 +54,17 @@ public class KdbxKeyFile {
     private static final int KEY_LEN_64 = 64;
 
     /**
-     * Load a key from an InputStream
+     * Load a key from an InputStream, in this method the inputStrem represent the KeyFile
      * <p>
-     * The InputStream can represent ... TODO write about the formats
+     * A key file is a file that contains a key (and possibly additional data, e.g. a hash that allows to verify the integrity of the key). The file extension typically is 'keyx' or 'key'.
+     * </p>
+     *   Formats. KeePass supports the following key file formats:
+     *   <ul>
+     *       <li>XML (recommended, default). There is an XML format for key files. KeePass 2.x uses this format by default, i.e. when creating a key file in the master key dialog, an XML key file is created. The syntax and the semantics of the XML format allow to detect certain corruptions (especially such caused by faulty hardware or transfer problems), and a hash (in XML key files version 2.0 or higher) allows to verify the integrity of the key. This format is resistant to most encoding and new-line character changes (which is useful for instance when the user is opening and saving the key file or when transferring it from/to a server). Such a key file can be printed (as a backup on paper), and comments can be added in the file (with the usual XML syntax: <!-- ... -->). It is the most flexible format; new features can be added easily in the future.</li>
+     *       <li>32 bytes. If the key file contains exactly 32 bytes, these are used as a 256-bit cryptographic key. This format requires the least disk space.</li>
+     *       <li>Hexadecimal. If the key file contains exactly 64 hexadecimal characters (0-9 and A-F, in UTF-8/ASCII encoding, one line, no spaces), these are decoded to a 256-bit cryptographic key.</li>
+     *       <li>Hashed. If a key file does not match any of the formats above, its content is hashed using a cryptographic hash function in order to build a key (typically a 256-bit key with SHA-256). This allows to use arbitrary files as key files.</li>
+     *   </ul>
      *
      * @param inputStream the input stream holding the key, caller should close
      * @return the key
@@ -70,13 +81,19 @@ public class KdbxKeyFile {
 
             // if length 32 assume binary key file
             if (bytesRead == KEY_LEN_32) {
-                return buffer;
+                return Arrays.copyOf(buffer, bytesRead);
             }
 
             // if length 64 may be hex encoded key file
             if (bytesRead == KEY_LEN_64) {
-                try {
-                    return Hex.decodeHex(ByteBuffer.wrap(buffer).asCharBuffer().array()); // (avoid creating a String)
+                try {               
+                    ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
+                    Charset charSet = StandardCharsets.UTF_8;
+                    CharBuffer charBuffer = charSet.decode(byteBuffer);
+                    charBuffer.limit(KEY_LEN_64);
+                    char[] hexValue = new char[charBuffer.remaining()];
+                    charBuffer.get(hexValue);
+                    return Hex.decodeHex(hexValue); // (avoid creating a String)
                 } catch (DecoderException ignored) {
                     // fall through it may be an XML file or just a file whose digest we want
                 }
@@ -150,7 +167,6 @@ public class KdbxKeyFile {
             throw new IllegalArgumentException("An error occurred during XML parsing: " + e.getMessage());
         }
     }
-
     private static class HashMismatchException extends Exception {
     }
 }

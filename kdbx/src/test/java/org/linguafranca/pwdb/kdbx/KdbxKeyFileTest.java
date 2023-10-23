@@ -98,4 +98,64 @@ public class KdbxKeyFileTest {
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         toConsole(decryptedInputStream);
     }
+
+    /**
+     * Test the hash in KeyFile (v2.0)
+     */
+    @Test
+    public void testSignedKeyFile() throws Exception {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("kdbx_hash_test.kdbx");
+        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("kdbx_hash_test.keyx");
+        Credentials credentials = new KdbxCreds("123".getBytes(), inputStreamKeyFile);
+        InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
+        toConsole(decryptedInputStream);
+    }
+
+     /**
+     * Test hash fails in KeyFile (v2.0)
+     */
+    @Test(expected = RuntimeException.class)
+    public void testSignatureFails() throws Exception {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("kdbx_hash_test.kdbx");
+        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("kdbx_hash_test_wrong_hash.keyx");
+        Credentials credentials = new KdbxCreds("123".getBytes(), inputStreamKeyFile);
+        InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
+        toConsole(decryptedInputStream);
+    }
+
+    /**
+     * Test KDBX with random KeyFile and key
+     */
+    @Test
+    public void testKeyFileRandom() throws Exception {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("kdb_with_random_file.kdbx");
+        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("random_file");
+        Credentials credentials = new KdbxCreds("123".getBytes(), inputStreamKeyFile);
+        InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
+        toConsole(decryptedInputStream);
+    }
+
+    /**
+     * Test KDBX with 64 bytes hex KeyFile and key
+     */
+    @Test
+    public void testKeyFileHex64() throws Exception {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("kdbx_keyfile64.kdbx");
+        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("keyfile64");
+        Credentials credentials = new KdbxCreds("123".getBytes(), inputStreamKeyFile);
+        InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
+        toConsole(decryptedInputStream);
+    }
+
+    /**
+     * Test KDBX with 32 bytes KeyFile and key
+     */
+    @Test
+    public void testKeyFile32() throws Exception {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("kdbx_keyfile32.kdbx");
+        InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("keyfile32");
+        Credentials credentials = new KdbxCreds("123".getBytes(), inputStreamKeyFile);
+        InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
+        toConsole(decryptedInputStream);
+    }
 }
