@@ -195,7 +195,7 @@ KeePass formats in the following locations:
 
 Aside from the JRE, at release 2.2, the API depends on:
 
-- [Google Guava](https://github.com/google/guava/wiki) ([Apache 2 license](https://github.com/google/guava/blob/master/COPYING)).
+- [Apache Commons IO](https://commons.apache.org/proper/commons-io/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
 - [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
 - [Bouncy Castle](https://github.com/bcgit/bc-java/blob/master/LICENSE.html) ([MIT License](https://github.com/bcgit/bc-java/blob/master/LICENSE.html)).
 

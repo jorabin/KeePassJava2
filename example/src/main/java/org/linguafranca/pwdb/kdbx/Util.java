@@ -1,6 +1,6 @@
 package org.linguafranca.pwdb.kdbx;
 
-import com.google.common.io.CharStreams;
+import org.apache.commons.io.IOUtils;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.StreamFormat;
@@ -8,7 +8,10 @@ import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
 import org.linguafranca.pwdb.kdbx.jaxb.JaxbDatabase;
 import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +38,7 @@ public class Util {
     }
 
     public static String streamToString(InputStream inputStream) throws IOException {
-        return CharStreams.toString(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
     }
 
     /**

@@ -16,7 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import com.google.common.io.CharStreams;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
 
@@ -38,7 +38,7 @@ public class KdbxKeyFileTest {
     static PrintStream printStream = getTestPrintStream();
 
     private static void toConsole(InputStream is) throws IOException {
-        printStream.println(CharStreams.toString(new InputStreamReader(is, StandardCharsets.UTF_8)));
+        printStream.println(IOUtils.toString(new InputStreamReader(is, StandardCharsets.UTF_8)));
     }
     /**
      * Test that we can load a key file and get a 32 byte base64 encoded value back

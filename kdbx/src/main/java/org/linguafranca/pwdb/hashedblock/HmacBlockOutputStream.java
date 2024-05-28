@@ -8,7 +8,7 @@ import java.io.*;
 import java.nio.ByteOrder;
 import javax.crypto.Mac;
 import org.jetbrains.annotations.NotNull;
-import com.google.common.io.LittleEndianDataOutputStream;
+import org.linguafranca.pwdb.util.SwappedDataOutputStream;
 
 /**
  * Takes a stream of (encrypted GZIPped) data and formats it as HMAC Hashed Blocks to the
@@ -60,8 +60,7 @@ public class HmacBlockOutputStream extends FilterOutputStream {
         this.key = key;
         this.byteOrder = littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
         if (this.byteOrder.equals(ByteOrder.LITTLE_ENDIAN)) {
-            //noinspection UnstableApiUsage
-            this.output = new LittleEndianDataOutputStream(out);
+            this.output = new SwappedDataOutputStream(out);
         } else {
             this.output = new DataOutputStream(out);
         }

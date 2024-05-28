@@ -35,7 +35,7 @@ import java.io.OutputStream;
 import java.util.Objects;
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 import static org.linguafranca.pwdb.kdbx.Helpers.base64FromUuid;
 import static org.linguafranca.pwdb.kdbx.dom.DomHelper.*;
 
@@ -81,8 +81,8 @@ public class DomDatabaseWrapper extends AbstractDatabase<DomDatabaseWrapper, Dom
     public static DomDatabaseWrapper load(@NotNull Credentials credentials,
                                           @NotNull InputStream inputStream) throws IOException {
         return new DomDatabaseWrapper(
-                checkNotNull(credentials, "Credentials must not be null"),
-                checkNotNull(inputStream, "InputStream must not be null"));
+                requireNonNull(credentials, "Credentials must not be null"),
+                requireNonNull(inputStream, "InputStream must not be null"));
     }
 
     private void init() {

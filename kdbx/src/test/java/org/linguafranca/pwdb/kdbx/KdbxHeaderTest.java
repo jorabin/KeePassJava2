@@ -1,13 +1,10 @@
 package org.linguafranca.pwdb.kdbx;
 
-import com.google.common.io.CharStreams;
-import com.google.common.io.LittleEndianDataInputStream;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.SwappedDataInputStream;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.hashedblock.HmacBlockInputStream;
-import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.KdbxHeader;
-import org.linguafranca.pwdb.kdbx.KdbxSerializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,10 +28,9 @@ public class KdbxHeaderTest {
         printStream.println("Version " + header.getVersion());
         KdbxCreds creds = new KdbxCreds("123".getBytes());
         assert inputStream != null;
-        //noinspection UnstableApiUsage
-        KdbxSerializer.readOuterHeaderVerification(header, creds, new LittleEndianDataInputStream(inputStream));
+        KdbxSerializer.readOuterHeaderVerification(header, creds, new SwappedDataInputStream(inputStream));
         HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(header.getHmacKey(creds), inputStream, true);
-        printStream.println(CharStreams.toString(new InputStreamReader(hmacBlockInputStream, StandardCharsets.UTF_8)));
+        printStream.println(IOUtils.toString(new InputStreamReader(hmacBlockInputStream, StandardCharsets.UTF_8)));
     }
 
     // check the correct version

@@ -1,6 +1,6 @@
 package org.linguafranca.util;
 
-import com.google.common.io.ByteStreams;
+import org.apache.commons.io.output.NullOutputStream;
 
 import java.io.PrintStream;
 
@@ -11,7 +11,7 @@ public class TestUtil {
      */
     public static PrintStream getTestPrintStream() {
         return Boolean.getBoolean("inhibitConsoleOutput") ?
-                new PrintStream(ByteStreams.nullOutputStream()) :
+                new PrintStream(NullOutputStream.INSTANCE) :
                 new PrintStream(System.out);
     }
 }

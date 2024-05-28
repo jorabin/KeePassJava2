@@ -16,10 +16,10 @@
 
 package org.linguafranca.pwdb.kdb;
 
-import com.google.common.io.ByteStreams;
+import org.apache.commons.io.IOUtils;
+import org.bouncycastle.util.encoders.Hex;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.security.Encryption;
-import org.bouncycastle.util.encoders.Hex;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,7 +63,7 @@ public interface KdbCredentials extends Credentials {
             md.update(pwKey);
 
             try {
-                byte [] keyFileData = ByteStreams.toByteArray(inputStream);
+                byte [] keyFileData = IOUtils.toByteArray(inputStream);
                 if (keyFileData.length == 64) {
                     keyFileData = Hex.decode(keyFileData);
                     key = md.digest(keyFileData);

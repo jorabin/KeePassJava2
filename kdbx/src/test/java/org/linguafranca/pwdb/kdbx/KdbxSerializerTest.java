@@ -16,7 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import com.google.common.io.CharStreams;
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
 
@@ -42,7 +42,7 @@ public class KdbxSerializerTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
         Credentials credentials = new KdbxCreds("123".getBytes());
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
-        printStream.println(CharStreams.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
+        printStream.println(IOUtils.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
     }
 
     /**
@@ -53,7 +53,7 @@ public class KdbxSerializerTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-ChaCha20-AES.kdbx");
         Credentials credentials = new KdbxCreds("123".getBytes());
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
-        printStream.println(CharStreams.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
+        printStream.println(IOUtils.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
     }
 
 

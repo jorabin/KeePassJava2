@@ -16,12 +16,12 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import com.google.common.io.LittleEndianDataInputStream;
-import com.google.common.io.LittleEndianDataOutputStream;
+import org.apache.commons.io.input.SwappedDataInputStream;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.hashedblock.*;
 import org.linguafranca.pwdb.security.Encryption;
 import org.linguafranca.pwdb.security.VariantDictionary;
+import org.linguafranca.pwdb.util.SwappedDataOutputStream;
 
 import javax.crypto.Mac;
 import java.io.*;
@@ -179,7 +179,7 @@ public class KdbxSerializer {
      * @throws IOException if the stream cannot be read, etc.
      */
     private static void checkStartBytes(KdbxHeader kdbxHeader, InputStream decryptedInputStream) throws IOException {
-        LittleEndianDataInputStream ledis = new LittleEndianDataInputStream(decryptedInputStream);
+        SwappedDataInputStream ledis = new SwappedDataInputStream(decryptedInputStream);
 
         byte [] startBytes = new byte[32];
         ledis.readFully(startBytes);
@@ -195,7 +195,7 @@ public class KdbxSerializer {
      * @throws IOException if the stream cannot be written, etc.
      */
     private static void writeStartBytes(KdbxHeader kdbxHeader, OutputStream encryptedOutputStream) throws IOException {
-        LittleEndianDataOutputStream ledos = new LittleEndianDataOutputStream(encryptedOutputStream);
+        SwappedDataOutputStream ledos = new SwappedDataOutputStream(encryptedOutputStream);
         ledos.write(kdbxHeader.getStreamStartBytes());
     }
 
@@ -236,7 +236,7 @@ public class KdbxSerializer {
         // HMac calculation depends on having collected a couple of the header fields
         CollectingInputStream collectingInputStream = new CollectingInputStream(shaDigestInputStream, true);
         // make values available from LittleEndian
-        LittleEndianDataInputStream ledis = new LittleEndianDataInputStream(collectingInputStream);
+        SwappedDataInputStream ledis = new SwappedDataInputStream(collectingInputStream);
 
         // file starts with magic number
         if (!verifyMagicNumber(ledis)) {
@@ -382,7 +382,7 @@ public class KdbxSerializer {
         MessageDigest messageDigest = Encryption.getSha256MessageDigestInstance();
         DigestOutputStream digestOutputStream = new DigestOutputStream(outputStream, messageDigest);
         CollectingOutputStream collectingOutputStream = new CollectingOutputStream(digestOutputStream);
-        LittleEndianDataOutputStream ledos = new LittleEndianDataOutputStream(collectingOutputStream);
+        SwappedDataOutputStream ledos = new SwappedDataOutputStream(collectingOutputStream);
 
         // lengths are short in v3 int in v4
         IntConsumer lengthWriter = (i -> {
@@ -483,7 +483,7 @@ public class KdbxSerializer {
      * @throws IOException on error
      */
     private static void readInnerHeader(KdbxHeader kdbxHeader, InputStream plainTextStream) throws IOException {
-        DataInput input = new LittleEndianDataInputStream(plainTextStream);
+        DataInput input = new SwappedDataInputStream(plainTextStream);
 
         byte headerType;
         do {
@@ -517,7 +517,7 @@ public class KdbxSerializer {
     }
 
     public static void writeInnerHeader(KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
-        DataOutput output = new LittleEndianDataOutputStream(outputStream);
+        DataOutput output = new SwappedDataOutputStream(outputStream);
 
         output.writeByte(InnerHeaderType.INNER_RANDOM_STREAM_ID);
         output.writeInt(4);
@@ -602,7 +602,7 @@ public class KdbxSerializer {
      * @return true if it looks like this is a kdbx file
      * @throws IOException on error
      */
-    private static boolean verifyMagicNumber(LittleEndianDataInputStream ledis) throws IOException {
+    private static boolean verifyMagicNumber(SwappedDataInputStream ledis) throws IOException {
         int sig1 = ledis.readInt();
         int sig2 = ledis.readInt();
         return sig1 == SIG1 && sig2 == SIG2;

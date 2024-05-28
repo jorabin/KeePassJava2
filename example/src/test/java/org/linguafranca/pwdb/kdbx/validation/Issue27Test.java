@@ -1,6 +1,6 @@
 package org.linguafranca.pwdb.kdbx.validation;
 
-import com.google.common.io.CharStreams;
+import org.apache.commons.io.IOUtils;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.kdbx.Helpers;
@@ -60,6 +60,6 @@ public class Issue27Test {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx");
         KdbxCreds creds = new KdbxCreds("passwordless".getBytes());
         InputStream plainText = KdbxSerializer.createUnencryptedInputStream(creds,new KdbxHeader(), is);
-        printStream.println(CharStreams.toString(new InputStreamReader(plainText, StandardCharsets.UTF_8)));
+        printStream.println(IOUtils.toString(new InputStreamReader(plainText, StandardCharsets.UTF_8)));
     }
 }

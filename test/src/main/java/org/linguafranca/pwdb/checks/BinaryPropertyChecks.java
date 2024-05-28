@@ -16,7 +16,7 @@
 
 package org.linguafranca.pwdb.checks;
 
-import com.google.common.io.ByteStreams;
+import org.apache.commons.io.IOUtils;
 import org.junit.Assert;
 import org.junit.Test;
 import org.linguafranca.pwdb.*;
@@ -67,7 +67,7 @@ public abstract class BinaryPropertyChecks  <D extends Database<D,G,E,I>, G exte
         byte [] letterJ = entry.getBinaryProperty("letter J.jpeg");
         InputStream testFile = getClass().getClassLoader().getResourceAsStream("letter J.jpeg");
         assert testFile != null;
-        byte [] original = ByteStreams.toByteArray(testFile);
+        byte [] original = IOUtils.toByteArray(testFile);
         Assert.assertArrayEquals(original, letterJ);
     }
 
@@ -80,7 +80,7 @@ public abstract class BinaryPropertyChecks  <D extends Database<D,G,E,I>, G exte
         byte [] letterL = entry.getBinaryProperty("letter L.jpeg");
         InputStream testFile = getClass().getClassLoader().getResourceAsStream("letter L.jpeg");
         assert testFile != null;
-        byte [] original = ByteStreams.toByteArray(testFile);
+        byte [] original = IOUtils.toByteArray(testFile);
         Assert.assertArrayEquals(original, letterL);
     }
 
@@ -91,7 +91,7 @@ public abstract class BinaryPropertyChecks  <D extends Database<D,G,E,I>, G exte
     public void setBinaryProperty() throws Exception {
         InputStream testFile = getClass().getClassLoader().getResourceAsStream("letter L.jpeg");
         assert testFile != null;
-        byte [] original = ByteStreams.toByteArray(testFile);
+        byte [] original = IOUtils.toByteArray(testFile);
         E entry = database.findEntries("Test attachment").get(0);
         entry.setBinaryProperty("letter L.jpeg", original);
         byte [] letterL = entry.getBinaryProperty("letter L.jpeg");
@@ -177,7 +177,7 @@ public abstract class BinaryPropertyChecks  <D extends Database<D,G,E,I>, G exte
         database1.getRootGroup().addEntry(entry);
         InputStream testFile = getClass().getClassLoader().getResourceAsStream("letter J.jpeg");
         assert testFile != null;
-        byte [] letterJ = ByteStreams.toByteArray(testFile);
+        byte [] letterJ = IOUtils.toByteArray(testFile);
         entry.setBinaryProperty("letter J.jpeg", letterJ);
         saveDatabase(database1, getCreds("123".getBytes()), Files.newOutputStream(file));
 

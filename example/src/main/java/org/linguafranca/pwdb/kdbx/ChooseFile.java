@@ -1,15 +1,15 @@
 package org.linguafranca.pwdb.kdbx;
 
-import com.google.common.base.Strings;
-import org.linguafranca.util.HexViewer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
@@ -63,7 +63,7 @@ public class ChooseFile {
                     null,
                     null,
                     "123");
-            if (Strings.isNullOrEmpty(s)) {
+            if (s == null || s.isEmpty()) {
                 return;
             }
             logger.info("Opening {}", fc.getSelectedFile().getPath());

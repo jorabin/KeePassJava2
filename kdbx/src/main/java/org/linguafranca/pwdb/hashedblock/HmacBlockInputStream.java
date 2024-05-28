@@ -1,6 +1,6 @@
 package org.linguafranca.pwdb.hashedblock;
 
-import com.google.common.io.LittleEndianDataInputStream;
+import org.apache.commons.io.input.SwappedDataInputStream;
 import org.jetbrains.annotations.NotNull;
 
 import javax.crypto.Mac;
@@ -62,7 +62,7 @@ public class HmacBlockInputStream extends FilterInputStream {
         this.byteOrder = littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
         this.key = key;
         if (littleEndian) {
-            input = new LittleEndianDataInputStream(in);
+            input = new SwappedDataInputStream(in);
         } else {
             input = new DataInputStream(in);
         }

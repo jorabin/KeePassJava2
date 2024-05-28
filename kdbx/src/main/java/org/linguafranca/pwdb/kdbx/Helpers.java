@@ -16,21 +16,21 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import com.google.common.io.ByteStreams;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.io.IOUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.text.SimpleDateFormat;
-import java.time.*;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
-import java.util.TimeZone;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -155,7 +155,7 @@ public class Helpers {
         ByteArrayInputStream bais = new ByteArrayInputStream(content);
         try {
             GZIPInputStream g = new GZIPInputStream(bais);
-            return ByteStreams.toByteArray(g);
+            return IOUtils.toByteArray(g);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

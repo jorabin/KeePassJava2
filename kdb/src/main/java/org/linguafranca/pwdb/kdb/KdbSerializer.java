@@ -16,7 +16,7 @@
 
 package org.linguafranca.pwdb.kdb;
 
-import com.google.common.io.LittleEndianDataInputStream;
+import org.apache.commons.io.input.SwappedDataInputStream;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.security.Encryption;
@@ -65,7 +65,7 @@ public class KdbSerializer {
      */
     public static KdbDatabase createKdbDatabase(Credentials credentials, KdbHeader kdbHeader, InputStream inputStream) throws IOException {
         // everything is little endian
-        DataInput dataInput = new LittleEndianDataInputStream(inputStream);
+        DataInput dataInput = new SwappedDataInputStream(inputStream);
         // check the magic values to verify file type
         checkSignature(dataInput);
         // load the header
@@ -79,7 +79,7 @@ public class KdbSerializer {
         DigestInputStream digestInputStream = new DigestInputStream(decryptedInputStream, digest);
 
         // Start the dataInput at wherever we have got to in the stream
-        dataInput = new LittleEndianDataInputStream(digestInputStream);
+        dataInput = new SwappedDataInputStream(digestInputStream);
 
         // read the decrypted serialized form of all groups
         KdbDatabase kdbDatabase = new KdbDatabase();

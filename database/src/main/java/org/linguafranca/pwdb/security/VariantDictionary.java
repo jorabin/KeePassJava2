@@ -3,14 +3,13 @@ package org.linguafranca.pwdb.security;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.concurrent.Immutable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 import static org.linguafranca.pwdb.security.VariantDictionary.EntryType.*;
 
 /**
@@ -59,7 +58,6 @@ public class VariantDictionary {
 
 
     @SuppressWarnings("WeakerAccess")
-    @Immutable
     public static class Entry {
         private final byte type;
         private final byte @NotNull [] value;
@@ -71,7 +69,7 @@ public class VariantDictionary {
 
         public Entry(EntryType entryType, byte @NotNull [] value, ByteOrder byteOrder) {
             this.type = entryType.value;
-            this.value = checkNotNull(value, vnn);
+            this.value = requireNonNull(value, vnn);
             this.byteOrder = byteOrder;
         }
 
@@ -173,7 +171,7 @@ public class VariantDictionary {
      * @param value a buffer containing an appropriate entry
      */
     public void put(@NotNull String key, EntryType type, byte @NotNull [] value) {
-        entries.put(checkNotNull(key), new Entry(type, checkNotNull(value)));
+        entries.put(requireNonNull(key), new Entry(type, requireNonNull(value)));
     }
 
     /**
@@ -184,14 +182,14 @@ public class VariantDictionary {
         ByteBuffer bb = ByteBuffer.wrap(buf);
         bb.putLong(0, uuid.getMostSignificantBits());
         bb.putLong(8, uuid.getLeastSignificantBits());
-        entries.put(checkNotNull(key, knn), new Entry(ARRAY, buf));
+        entries.put(requireNonNull(key, knn), new Entry(ARRAY, buf));
     }
 
     /**
      * Put a byte array under the key defined
      */
     public void putByteArray(@NotNull String key, byte @NotNull [] value) {
-        entries.put(checkNotNull(key, knn), new Entry(ARRAY, value));
+        entries.put(requireNonNull(key, knn), new Entry(ARRAY, value));
     }
 
     /**
@@ -201,7 +199,7 @@ public class VariantDictionary {
         byte[] buf = new byte[8];
         ByteBuffer bb = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN);
         bb.putLong(value);
-        entries.put(checkNotNull(key, knn), new Entry(INT64, buf));
+        entries.put(requireNonNull(key, knn), new Entry(INT64, buf));
     }
     /**
      * Put a long as an unsigned64 under the key defined
@@ -210,19 +208,19 @@ public class VariantDictionary {
         byte[] buf = new byte[8];
         ByteBuffer bb = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN);
         bb.putLong(value);
-        entries.put(checkNotNull(key, knn), new Entry(UINT64, buf));
+        entries.put(requireNonNull(key, knn), new Entry(UINT64, buf));
     }
 
     public void putInt(@NotNull String key, int value) {
         byte[] buf = new byte[4];
         ByteBuffer bb = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(value);
-        entries.put(checkNotNull(key, knn), new Entry(INT32, buf));
+        entries.put(requireNonNull(key, knn), new Entry(INT32, buf));
     }
     public void putUInt(@NotNull String key, int value) {
         byte[] buf = new byte[4];
         ByteBuffer bb = ByteBuffer.wrap(buf).order(ByteOrder.LITTLE_ENDIAN);
         bb.putInt(value);
-        entries.put(checkNotNull(key, knn), new Entry(UINT32, buf));
+        entries.put(requireNonNull(key, knn), new Entry(UINT32, buf));
     }
 }
