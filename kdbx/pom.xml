@@ -41,11 +41,13 @@
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
-        </dependency>
+			<version>1.17.0</version>
+		</dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-        </dependency>
+			<version>24.1.0</version>
+		</dependency>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
             <artifactId>test</artifactId>

@@ -9,6 +9,10 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - implementation of database using Jackson via @giusvale-dev
 - enhancement of KeyFile support via @giusvale-dev
 
+## Changed
+
+- Updated dependencies (leave jaxb and guava as is)
+
 ## [2.2.1] 2023-08-21
 
 ### Added
