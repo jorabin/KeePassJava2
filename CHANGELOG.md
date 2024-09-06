@@ -2,11 +2,12 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-## [2.2.2-SNAPSHOT]
+## [2.2.2] 2024-09-06
 
 ### Added
 
-- implementation of database using Jackson
+- implementation of database using Jackson via @giusvale-dev
+- enhancement of KeyFile support via @giusvale-dev
 
 ## [2.2.1] 2023-08-21
 

@@ -41,12 +41,14 @@ It is licensed under the Apache 2 License and is currently usable.
 
 After a period of neglect, the project is (May 2023) back in development.
 
-The current code is version 2.2.2-SNAPSHOT. This is on the main branch. See [Build from Source](#build-from-source)
+The current code is version 2.2.2. This is on the main branch. See [Build from Source](#build-from-source)
 
 Key updates relative to 2.1:
 - Java 8 (dependencies no longer support Java 7)
-- Updated dependencies to remove known vulnerabilities
 - File format version 4 support - with Argon2
+- Inclusion of Jackson based KDBX support with a view to removing SimpleXML and JAXB support
+- Updated keyfile support
+- Updated dependencies to remove known vulnerabilities
 
 See the [changelog](CHANGELOG.md) for more details.
 
@@ -54,11 +56,11 @@ See the [changelog](CHANGELOG.md) for more details.
 
 ### Release
 
-The composite POM for the last release (2.2.1), Java 8 compatible, is
+The composite POM for the last release (2.2.2), Java 8 compatible, is
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.2.1</version>
+        <version>2.2.2</version>
 
 at Maven Central. Note that the artifactId has become Camel Case from release 2.1.x onwards.
 
@@ -68,7 +70,7 @@ Snapshot builds are erratically available at [Sonatype](https://oss.sonatype.org
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.2.2-SNAPSHOT</version>
+        <version>2.2.3-SNAPSHOT</version>
  
 with appropriate `<repositories>` entry, like:
 
@@ -212,7 +214,7 @@ For Java 11 and later Jaxb implementation depends on explicit inclusion [no long
 
 - [JAXB](https://javaee.github.io/jaxb-v2/)
 
-It also depends on SLF4J and Junit for tests.
+It also depends on SLF4J and Junit 4 for tests.
 
 ## Build from Source
 
@@ -256,9 +258,17 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 <tr><td><a href="kdbx">kdbx</a></td><td>KeePassJava2-kdbx</td>
 <td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx.svg" alt="Javadocs"></a></td>
 <td>Provides support for KDBX streaming and security.</td></tr>
+
+
+<tr><td><a href="jackson">jackson</a></td><td>KeePassJava2-jackson</td>
+<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-jackson.svg" alt="Javadocs"></a></td>
+<td>A Jackson based implementation of KDBX. Intended to provide the main support going forward, replacing trhe
+modules below.</td></tr>
+
 <tr><td><a href="simple">simple</a></td><td>KeePassJava2-simple</td>
 <td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx.svg" alt="Javadocs"></a></td>
-<td>A Simple XML Platform implementation of KDBX. Could be useful for Android.</td></tr>
+<td>A Simple XML Platform implementation of KDBX. Could be useful for Android.
+Simple cannot be used with Java versions 17 and up.</td></tr>
 
 <tr><td><a href="jaxb">jaxb</a></td><td>KeePassJava2-jaxb</td>
 <td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jaxb"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-jaxb.svg" alt="Javadocs"></a></td>
@@ -268,12 +278,7 @@ bindings might be useful for building other interfaces.</td></tr>
 <tr><td><a href="dom">dom</a></td><td>KeePassJava2-dom</td>
 <td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-dom"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-dom.svg" alt="Javadocs"></a></td>
 <td>A DOM based implementation of KDBX. Being DOM based it is rather slow, but 
-messes less with existing content than the other two implementations. Known to work on Android.</td></tr>
-
-<tr><td><a href="dom">dom</a></td><td>KeePassJava2-jackson</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-jackson.svg" alt="Javadocs"></a></td>
-<td>A Jackson based implementation of KDBX. Intended to replace the Simple XML implementation. Simple XML seems no
-longer to be maintained.</td></tr>
+messes less with existing content than the other implementations. Known to work on Android.</td></tr>
 
 </tbody>
 </table>
@@ -301,13 +306,13 @@ Many thanks to Pavel Ivanov [@ivanovpv](https://github.com/ivanovpv) for
 his help with Android and Gradle compatibility issues.
 
 Thanks to Giuseppe Valente [@giusvale-dev](https://github.com/giusvale-dev) for 
-the contribution of the Jackson module.
+the contribution of the Jackson module and enhancements to KeyFile support.
 
 Thanks to other contributors and raisers of issues.
 
 ##  License
 
-Copyright (c) 2023 Jo Rabin
+Copyright (c) 2024 Jo Rabin
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
