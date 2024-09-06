@@ -20,7 +20,7 @@
 
     <groupId>org.linguafranca.pwdb</groupId>
     <artifactId>KeePassJava2-parent</artifactId>
-    <version>2.2.2-SNAPSHOT</version>
+    <version>2.2.2</version>
     <modules>
         <module>database</module>
         <module>test</module>
