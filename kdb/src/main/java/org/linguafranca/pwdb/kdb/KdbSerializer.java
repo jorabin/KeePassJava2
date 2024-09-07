@@ -54,7 +54,7 @@ public class KdbSerializer {
     }
 
     /**
-     * Construct a KDB database from the supplied inputstream.
+     * Construct a KDB database from the supplied inputStream.
      *
      * @param credentials the credentials
      * @param kdbHeader a header to be populated with values read from the stream
@@ -297,7 +297,7 @@ public class KdbSerializer {
      * with a level of one less in the hierarchy.
      * <p>
      * Since the database tree is built progressively the group passed in the "lastGroup" parameter has
-     * already been knitted into the hierarchy and so either this group is a sub group of that group or is a subgroup
+     * already been knitted into the hierarchy and so either this group is a subgroup of that group or is a subgroup
      * of the nearest ancestor to the last group that has a level less than the group we are reading.
      *
      * @param lastGroup the last group we saw in the stream
@@ -308,7 +308,7 @@ public class KdbSerializer {
     private static KdbGroup computeParentGroup(KdbGroup lastGroup, int level) {
         // the level of the last group
         int lastLevel = lastGroup.computedLevel();
-        // if we are one greater then we are its child
+        // if we are one greater, then we are its child
         if (level == lastLevel + 1) {
             return lastGroup;
         }
@@ -326,7 +326,7 @@ public class KdbSerializer {
     }
 
     /**
-     * Stucture is in this format: 00YYYYYY YYYYYYMM MMDDDDDH HHHHMMMM MMSSSSSS
+     * Structure is in this format: 00YYYYYY YYYYYYMM MMDDDDDH HHHHMMMM MMSSSSSS
      *
      * @param buffer 5 bytes containing a packed date
      * @return a date constructed from the buffer
@@ -364,7 +364,7 @@ public class KdbSerializer {
         cal.setTimeZone(TimeZone.getTimeZone("UTC"));
         //noinspection MagicConstant
         cal.set(year, month - 1, day, hour, minute, second);
-        // otherwise we seems to end up with arbitrary millis
+        // otherwise we seem to end up with arbitrary millis
         cal.set(GregorianCalendar.MILLISECOND, 0);
         return cal.getTime();
     }

@@ -247,11 +247,32 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
     <C extends StreamConfiguration> StreamFormat<C> getStreamFormat();
 
     /**
-     * Properties to encrypt
+     * Property to protect in memory
      * @param propertyName the property of interest
-     * @return true if it should be encrypted
+     * @return true if it should be protected by default
      */
     boolean shouldProtect(String propertyName);
+
+    /**
+     * Property to protect in memory
+     * @param propertyName the property of interest
+     * @param protect whether to protect by default
+     */
+    void setShouldProtect(String propertyName, boolean protect);
+
+    /**
+     * Obtain a list of those properties that should be protected by default
+     * @return a list of property names
+     */
+    List<String> getShouldProtect();
+
+    /**
+     * Set the default means of storage of unprotected and protected property values
+     * @param unprotectedPropertyFactory a builder for unprotected properties
+     * @param protectedPropertyFactory a builder for protected properties
+     */
+    void setPropertyValueStrategy(PropertyValue.Factory unprotectedPropertyFactory,
+                                  PropertyValue.Factory protectedPropertyFactory);
 
     /**
      * returns true if the database supports non-standard property names

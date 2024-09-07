@@ -95,7 +95,8 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
     String getPath();
 
     /**
-     * Gets the value of a property.
+     * Gets the value of a property as a String. Use of this method is not recommended for fields with protected values.
+     * Use {@link #getPropertyAsChars(String)} or {@link #getPropertyValue(String)}
      *
      * <p>All implementations of Entry are required to support reading and writing of
      * {@link #STANDARD_PROPERTY_NAMES}.
@@ -106,9 +107,32 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
     String getProperty(String name);
 
     /**
-     * Sets the value of a property.
+     * Gets the value of a property as a char array.
      *
-     * <p>Other than the {@link #STANDARD_PROPERTY_NAMES} support for this methd is optional.
+     * <p>All implementations of Entry are required to support reading and writing of
+     * {@link #STANDARD_PROPERTY_NAMES}.
+     * @param name the name of the property to get
+     * @return a value or null if the property is not known, or if setting of arbitrary properties is not supported
+     * @see Database#supportsNonStandardPropertyNames()
+     */
+    char [] getPropertyAsChars(String name);
+
+    /**
+     * Gets the value of a property as a PropertyValue.
+     *
+     * <p>All implementations of Entry are required to support reading and writing of
+     * {@link #STANDARD_PROPERTY_NAMES}.
+     * @param name the name of the property to get
+     * @return a value or null if the property is not known, or if setting of arbitrary properties is not supported
+     * @see Database#supportsNonStandardPropertyNames()
+     */
+    PropertyValue getPropertyValue(String name);
+
+    /**
+     * Sets the value of a property. Use of this method is not recommended for fields with protected values.
+     * Use {@link #setProperty(String, char[])} or {@link #setProperty(String, PropertyValue)}
+     *
+     * <p>Other than the {@link #STANDARD_PROPERTY_NAMES} support for this method is optional.
      *
      * @param name the name of the property to set
      * @param value the value to set it to
@@ -117,6 +141,34 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * @see Database#supportsNonStandardPropertyNames()
      */
     void setProperty(String name, String value);
+
+    /**
+     * Sets the value of a property as a property value. The method does not check whether the
+     * passed PropertyValue is protected relative to {@link Database#shouldProtect(String)}
+     *
+     * <p>Other than the {@link #STANDARD_PROPERTY_NAMES} support for this method is optional.
+     *
+     * @param name the name of the property to set
+     * @param value the value to set it to
+     * @throws UnsupportedOperationException if the name is not one of the standard properties and
+     * non-standard properties are not supported
+     * @see Database#supportsNonStandardPropertyNames()
+     */
+    void setProperty(String name, PropertyValue value);
+
+    /**
+     * Sets the value of a property using a char array. The method checks whether the value should be
+     * stored as a protected value or not by reference to {@link Database#shouldProtect(String)}
+     *
+     * <p>Other than the {@link #STANDARD_PROPERTY_NAMES} support for this method is optional.
+     *
+     * @param name the name of the property to set
+     * @param value the value to set it to
+     * @throws UnsupportedOperationException if the name is not one of the standard properties and
+     * non-standard properties are not supported
+     * @see Database#supportsNonStandardPropertyNames()
+     */
+    void setProperty(String name, char [] value);
 
     /**
      * Removes this non-standard  property, if it exists.
@@ -222,6 +274,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      *
      * @return a password
      */
+    @Deprecated
     String getPassword();
 
     /**
@@ -230,7 +283,9 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * <p>Implementations should Touch LastModifiedTime when this method is called.
      *
      * @param pass a password
+     * @deprecated use {@link #setProperty(String, PropertyValue)}
      */
+    @Deprecated
     void setPassword(String pass);
 
     /**
