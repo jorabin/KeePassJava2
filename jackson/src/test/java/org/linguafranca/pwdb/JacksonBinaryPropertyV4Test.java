@@ -51,8 +51,8 @@ public class JacksonBinaryPropertyV4Test extends BinaryPropertyChecks{
         Database result = null;
         try {
             result = new JacksonDatabase();
-        } catch(Exception e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
         return result;
         
