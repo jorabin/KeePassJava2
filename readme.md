@@ -180,7 +180,8 @@ There is also a discussion of the [enhancements in KDBX 4.1](https://keepass.inf
 as a discussion of [Key Files](https://keepass.info/help/base/keys.html#keyfiles).
 
 Massive credit also to the folks over at [KeePassXC](https://keepassxc.org/) who wrote some 
-[documentation](https://github.com/keepassxreboot/keepassxc-specs) about their understanding of various format things.
+[documentation](https://github.com/keepassxreboot/keepassxc-specs) about their understanding of various format things. Also, this is a 
+useful [discussion/investigation](https://github.com/scubajorgen/KeepassDecrypt) of the KDBX format.
 
 For the sake of
 clarification and my own satisfaction I have written about my understanding of 

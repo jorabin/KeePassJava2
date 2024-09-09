@@ -1,10 +1,14 @@
 package org.linguafranca.pwdb;
 
-import io.github.novacrypto.SecureCharBuffer;
+import org.apache.commons.lang3.CharSequenceUtils;
 
+import javax.crypto.*;
+
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
+import java.security.Key;
 
 /**
  * An interface through which property values can be stored in memory to make it
@@ -16,6 +20,8 @@ public interface PropertyValue {
     char [] getValueAsChars();
 
     byte [] getValueAsBytes();
+
+    CharSequence getValue();
 
     boolean isProtected();
 
@@ -30,64 +36,121 @@ public interface PropertyValue {
         PropertyValue of (byte [] value);
     }
 
-    CharSequence getValue();
+    interface Strategy {
+        PropertyValue.Factory getUnprotectectedValueFactory ();
+        PropertyValue.Factory getProtectectedValueFactory ();
+    }
 
-    /**
-     * Unprotected value does not use String
-     */
-
-    class Default implements PropertyValue {
-
-        private final CharBuffer value;
-
+    class StringStore implements PropertyValue {
+        private final String value;
         static class Factory implements PropertyValue.Factory {
 
             @Override
-            public PropertyValue of(CharSequence aCharSequence) {
-                return new Default(aCharSequence);
+            public StringStore of(CharSequence aCharSequence) {
+                return new StringStore(aCharSequence);
             }
 
             @Override
-            public PropertyValue of(char[] value) {
-                return new Default(value);
+            public StringStore of(char[] value) {
+                return new StringStore(value);
             }
 
             @Override
-            public PropertyValue of(byte[] value) {
-                return new Default(value);
+            public StringStore of(byte[] value) {
+                return new StringStore(value);
             }
         }
 
-        public Default(CharSequence aString) {
-            this.value = CharBuffer.wrap(aString);
+        public StringStore(CharSequence aCharSequence){
+            this.value = String.valueOf(aCharSequence);
         }
-
-        public Default(char [] value) {
-            this.value = CharBuffer.wrap(value);
+        public StringStore(char[] value){
+            this.value = String.valueOf(value);
         }
-
-        public Default(byte [] value) {
-            this.value = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(value));
+        public StringStore(byte[] value){
+            this.value = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(value)).toString();
         }
 
         @Override
         public String getValueAsString() {
-            return this.value.toString();
+            return value;
+        }
+
+        @Override
+        public char[] getValueAsChars() {
+            return value.toCharArray();
+        }
+
+        @Override
+        public byte[] getValueAsBytes() {
+            return value.getBytes(StandardCharsets.UTF_8);
         }
 
         @Override
         public CharSequence getValue() {
-            return this.value;
+            return value;
+        }
+
+        @Override
+        public boolean isProtected() {
+            return false;
+        }
+    }
+    /**
+     * Unprotected value does not use String
+     */
+    class CharsStore implements PropertyValue, Serializable {
+
+        private final char[] value;
+
+        static class Factory implements PropertyValue.Factory {
+
+            @Override
+            public CharsStore of(CharSequence aCharSequence) {
+                return new CharsStore(aCharSequence);
+            }
+
+            @Override
+            public CharsStore of(char[] value) {
+                return new CharsStore(value);
+            }
+
+            @Override
+            public CharsStore of(byte[] value) {
+                return new CharsStore(value);
+            }
+        }
+
+        public CharsStore(CharSequence aString) {
+            this.value = CharSequenceUtils.toCharArray(aString);
+        }
+
+        public CharsStore(char [] value) {
+            this.value = value;
+        }
+
+        public CharsStore(byte [] value) {
+            this.value = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(value)).array();
+        }
+
+        @Override
+        public String getValueAsString() {
+            return CharBuffer.wrap(this.value).toString();
+        }
+
+        @Override
+        public CharSequence getValue() {
+            return CharBuffer.wrap(this.value);
         }
 
         @Override
         public char [] getValueAsChars() {
-            return this.value.array();
+            return this.value;
         }
 
         @Override
         public byte [] getValueAsBytes() {
-            return StandardCharsets.UTF_8.encode(value).array();
+            return StandardCharsets.UTF_8.encode(CharBuffer.wrap(this.value)).array();
         }
 
         @Override
@@ -96,66 +159,62 @@ public interface PropertyValue {
         }
     }
 
-
     /**
-     * Protected Value uses {@link SecureCharBuffer}
+     * Encrypted property value storage intended for storing passwords in something other than
+     * plaintext using {@link javax.crypto.SealedObject} class.
+     * <p>
+     * Since the key and the sealed object are stored together this is a bit of a vulnerability.
      */
-    class Protected implements PropertyValue {
-        private final SecureCharBuffer value;
+    class SealedStore implements PropertyValue {
+        static KeyGenerator keyGenerator;
+        private final SealedObject sealedObject;
 
-        /**
-         * Builder for {@link PropertyValue.Protected}
-         */
-        static class Factory implements PropertyValue.Factory {
+        ByteBuffer buffer;
+        private final Key key;
 
-            @Override
-            public PropertyValue of(CharSequence aString) {
-                return new Protected(aString);
-            }
-
-            @Override
-            public PropertyValue of(char[] value) {
-                return new Protected(value);
-            }
-
-            @Override
-            public PropertyValue of(byte[] value) {
-                return new Protected(value);
+        static {
+            try {
+                keyGenerator= KeyGenerator.getInstance("AES");
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
 
-        public Protected(CharSequence aString) {
-            this.value = SecureCharBuffer.withCapacity(aString.length());
-            this.value.append(aString);
+        public SealedStore(CharsStore object){
+            try {
+                key = keyGenerator.generateKey();
+                Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+                cipher.init(Cipher.ENCRYPT_MODE, key);
+                sealedObject = new SealedObject(object, cipher);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
-
-        public Protected(char [] value) {
-            this.value = SecureCharBuffer.withCapacity(value.length);
-            this.value.append(CharBuffer.wrap(value));
-        }
-
-        public Protected(byte [] value) {
-            this.value = SecureCharBuffer.withCapacity(value.length);
-            this.value.append(StandardCharsets.UTF_8.decode(ByteBuffer.wrap(value)));
+        private CharsStore getAsDefault() {
+            try {
+                return ((CharsStore) sealedObject.getObject(key));
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
         @Override
         public String getValueAsString() {
-            return this.value.toStringAble().toString();
+            return getAsDefault().getValueAsString();
+        }
+
+        @Override
+        public char[] getValueAsChars() {
+            return getAsDefault().getValueAsChars();
+        }
+
+        @Override
+        public byte[] getValueAsBytes() {
+            return getAsDefault().getValueAsBytes();
         }
 
         @Override
         public CharSequence getValue() {
-            return this.value;
-        }
-
-        @Override
-        public char [] getValueAsChars() {
-            return CharBuffer.wrap(value).array();
-        }
-
-        @Override
-        public byte [] getValueAsBytes() {
-            return StandardCharsets.UTF_8.encode(CharBuffer.wrap(value)).array();
+            return getAsDefault().getValue();
         }
 
         @Override

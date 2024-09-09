@@ -104,12 +104,7 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
      * Group by title
      */
     public G groupByTitle(D database) {
-        List<? extends E> entries = database.findEntries(new Entry.Matcher() {
-            @Override
-            public boolean matches(Entry entry) {
-                return entry.getProperty(Entry.STANDARD_PROPERTY_NAME_TITLE).toLowerCase().contains("findme!");
-            }
-        });
+        List<? extends E> entries = database.findEntries(entry -> entry.getProperty(Entry.STANDARD_PROPERTY_NAME_TITLE).toLowerCase().contains("findme!"));
         // create a new group using DB factory method
         G newParent = database.newGroup("Found entries");
         // iterate over the found entries

@@ -16,10 +16,7 @@
 
 package org.linguafranca.pwdb.base;
 
-import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Group;
-import org.linguafranca.pwdb.Icon;
+import org.linguafranca.pwdb.*;
 
 /**
  * Base implementation of Entry
@@ -127,5 +124,23 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
         touch();
     }
 
+    @Override
+    public char[] getPropertyAsChars(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PropertyValue getPropertyValue(String name) {
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public void setProperty(String name, PropertyValue value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setProperty(String name, char[] value) {
+        throw new UnsupportedOperationException();
+    }
     protected abstract void touch();
 }
