@@ -85,20 +85,17 @@ public abstract class EntryClasses {
 
     public static class StringProperty {
 
-        public StringProperty() {
-            
-        }
-
-        public StringProperty(String key, Value value) {
-            this.key = key;
-            this.value = value;
-        }
-
         @JacksonXmlProperty(localName = "Key")
         String key;
 
         @JacksonXmlProperty(localName = "Value")
         Value value;
+
+        public StringProperty() {}
+        public StringProperty(String key, Value value) {
+            this.key = key;
+            this.value = value;
+        }
 
         public String getKey() {
             return key;
@@ -168,12 +165,10 @@ public abstract class EntryClasses {
                 this._protected = _protected;
             }
 
-
             public Boolean getProtectInMemory() {
                 return protectInMemory;
             }
 
- 
             public void setProtectInMemory(Boolean protectInMemory) {
                 this.protectInMemory = protectInMemory;
             }

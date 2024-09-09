@@ -4,12 +4,31 @@ import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.base.AbstractDatabase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Base class for Databases which support storage using {@link PropertyValue}s.
+ * <p>
+ * By default {@link Entry#STANDARD_PROPERTY_NAME_PASSWORD} is defined as protected and the property value strategy
+ * establishes {@link org.linguafranca.pwdb.PropertyValue.StringStore} storage for unprotected values and
+ * {@link org.linguafranca.pwdb.PropertyValue.SealedStore} for protected values.
+ */
 public abstract class ProtectedDatabase<D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon> extends AbstractDatabase<D,G,E,I> {
-    private final List<String> protectedProperties = new ArrayList<>();
-    private PropertyValue.Strategy valueStrategy;
+    @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
+    private final List<String> protectedProperties = new ArrayList<>(Arrays.asList(Entry.STANDARD_PROPERTY_NAME_PASSWORD));
+    private PropertyValue.Strategy valueStrategy = new PropertyValue.Strategy() {
+        @Override
+        public PropertyValue.Factory getUnprotectectedValueFactory() {
+            return new PropertyValue.StringStore.Factory();
+        }
+
+        @Override
+        public PropertyValue.Factory getProtectectedValueFactory() {
+            return new PropertyValue.SealedStore.Factory();
+        }
+    };
 
     @Override
     public boolean shouldProtect(String propertyName){

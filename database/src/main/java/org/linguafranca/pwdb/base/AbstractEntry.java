@@ -125,22 +125,14 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
     }
 
     @Override
-    public char[] getPropertyAsChars(String name) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public PropertyValue getPropertyValue(String name) {
         throw new UnsupportedOperationException();
     }
+
     @Override
     public void setProperty(String name, PropertyValue value) {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public void setProperty(String name, char[] value) {
-        throw new UnsupportedOperationException();
-    }
     protected abstract void touch();
 }
