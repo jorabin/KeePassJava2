@@ -154,6 +154,9 @@ public abstract class PropertyValueChecks<D extends Database<D, G, E, I>, G exte
             fos.flush();
             fos.close();
 
+            // wait for file to save
+            Thread.sleep(1000);
+
             // reload database, "random" is still protected even though it's not protected by default
             FileInputStream fis = new FileInputStream("testOutput/propertyValueReload.kdbx");
             D input = loadDatabase(getCreds("123".getBytes()), fis);
