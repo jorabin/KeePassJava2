@@ -285,7 +285,10 @@ load and save stuff that the implementation doesn't specifically know about. But
 
 Then came the JAXB implementation, but 
 belatedly it seems that Android support is in question. So latterly the Simple implementation. That was probably enough 
-KDBX implementations, however, the Simple XML library seems no longer to be maintained, and along comes the Jackson Implementation.
+KDBX implementations, however, the Simple XML library seems no longer to be maintained, 
+and along comes the Jackson Implementation.
+
+Jackson is the implementation going forward.
 
 ### Gradle
 
