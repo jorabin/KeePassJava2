@@ -148,13 +148,13 @@ public abstract class PropertyValueChecks<D extends Database<D, G, E, I>, G exte
 
         // Save database
 
-        FileOutputStream fos = new FileOutputStream("testOutput/propertyValueReload.kdbx");
+        FileOutputStream fos = new FileOutputStream("testOutput/test9.kdbx");
         saveDatabase(database, getCreds("123".getBytes()), fos);
         fos.flush();
         fos.close();
 
         // reload database, "random" is still protected even though it's not protected by default
-        FileInputStream fis = new FileInputStream("testOutput/propertyValueReload.kdbx");
+        FileInputStream fis = new FileInputStream("testOutput/test9.kdbx");
         D input = loadDatabase(getCreds("123".getBytes()), fis);
 
         List<? extends E> entries = input.findEntries("random");
