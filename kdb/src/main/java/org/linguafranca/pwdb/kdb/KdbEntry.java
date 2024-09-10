@@ -62,7 +62,7 @@ public class KdbEntry extends AbstractEntry<KdbDatabase, KdbGroup, KdbEntry, Kdb
     }
 
     @Override
-    public void setProperty(String name, String value) {
+    public void setPropertyValue(String name, String value) {
         switch (name) {
             case STANDARD_PROPERTY_NAME_USER_NAME: setUsername(value); break;
             case STANDARD_PROPERTY_NAME_PASSWORD: setPassword(value); break;

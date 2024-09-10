@@ -22,13 +22,11 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import org.jetbrains.annotations.NotNull;
-import org.linguafranca.pwdb.Entry;
+import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jackson.converter.ValueDeserializer;
 import org.linguafranca.pwdb.kdbx.jackson.converter.ValueSerializer;
-import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses;
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 
@@ -38,8 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class JacksonSerializableDatabase implements SerializableDatabase {
@@ -67,7 +63,7 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
     public JacksonSerializableDatabase load(InputStream inputStream) throws IOException {
         XmlMapper mapper = new XmlMapper();
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(EntryClasses.StringProperty.Value.class, new ValueDeserializer(encryptor));
+        module.addDeserializer(PropertyValue.class, new ValueDeserializer(encryptor, new PropertyValue.Strategy.Default()));
         mapper.registerModule(module);
         keePassFile = mapper.readValue(inputStream, KeePassFile.class);
         return this;
@@ -76,11 +72,10 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
 
     @Override
     public void save(OutputStream outputStream) {
-        prepareForSave(keePassFile.root.group);
         try {
 
             SimpleModule module = new SimpleModule();
-            module.addSerializer(EntryClasses.StringProperty.Value.class, new ValueSerializer(encryptor));
+            module.addSerializer(PropertyValue.class, new ValueSerializer(encryptor));
             // disable auto-detection, only use annotated values
             XmlMapper mapper = XmlMapper.builder()
                     .disable(MapperFeature.AUTO_DETECT_CREATORS,
@@ -116,45 +111,6 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
 
         } catch(Exception e) {
             throw new IllegalStateException(e);
-        }
-    }
-
-    /**
-     * Create a list of names of properties that should be encrypted by default
-     */
-    @NotNull
-    private List<String> getToEncrypt() {
-        final List<String> toEncrypt = new ArrayList<>();
-        for (String propertyName: Entry.STANDARD_PROPERTY_NAMES) {
-            if (keePassFile.meta.memoryProtection.shouldProtect(propertyName)) {
-                toEncrypt.add(propertyName);
-            }
-        }
-        return toEncrypt;
-    }
-
-    /**
-     * Utility to mark fields that need to be encrypted and vice versa
-     *
-     * @param parent the group to start from
-     */
-    private static void prepareForSave(JacksonGroup parent){
-        for (JacksonGroup group: parent.groups) {
-            prepareForSave(group);
-        }
-        for (JacksonEntry entry: parent.entries) {
-            for (EntryClasses.StringProperty property : entry.string) {
-                boolean shouldProtect = parent.database.shouldProtect(property.getKey());
-                property.getValue().setProtectOnOutput(shouldProtect || property.getValue().getProtectOnOutput());
-            }
-            if (Objects.nonNull(entry.history)) {
-                for (JacksonEntry entry2 : entry.history.getEntry()) {
-                    for (EntryClasses.StringProperty property : entry2.string) {
-                        boolean shouldProtect = parent.database.shouldProtect(property.getKey());
-                        property.getValue().setProtectOnOutput(shouldProtect || property.getValue().getProtectOnOutput());
-                    }
-                }
-            }
         }
     }
 

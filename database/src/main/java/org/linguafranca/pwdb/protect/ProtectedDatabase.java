@@ -3,8 +3,6 @@ package org.linguafranca.pwdb.protect;
 import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.base.AbstractDatabase;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,37 +14,25 @@ import java.util.List;
  * {@link org.linguafranca.pwdb.PropertyValue.SealedStore} for protected values.
  */
 public abstract class ProtectedDatabase<D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon> extends AbstractDatabase<D,G,E,I> {
-    @SuppressWarnings("ArraysAsListWithZeroOrOneArgument")
-    private final List<String> protectedProperties = new ArrayList<>(Arrays.asList(Entry.STANDARD_PROPERTY_NAME_PASSWORD));
-    private PropertyValue.Strategy valueStrategy = new PropertyValue.Strategy() {
-        @Override
-        public PropertyValue.Factory getUnprotectectedValueFactory() {
-            return new PropertyValue.StringStore.Factory();
-        }
-
-        @Override
-        public PropertyValue.Factory getProtectectedValueFactory() {
-            return new PropertyValue.SealedStore.Factory();
-        }
-    };
+    private PropertyValue.Strategy valueStrategy = new PropertyValue.Strategy.Default();
 
     @Override
     public boolean shouldProtect(String propertyName){
-        return protectedProperties.contains(propertyName);
+        return valueStrategy.getProtectedProperties().contains(propertyName);
     }
 
     @Override
     public void setShouldProtect(String propertyName, boolean protect){
         if (protect) {
-            protectedProperties.add(propertyName);
+            valueStrategy.getProtectedProperties().add(propertyName);
         } else {
-            protectedProperties.remove(propertyName);
+            valueStrategy.getProtectedProperties().remove(propertyName);
         }
     }
 
     @Override
     public List<String> listShouldProtect(){
-        return Collections.unmodifiableList(protectedProperties);
+        return Collections.unmodifiableList(valueStrategy.getProtectedProperties());
     }
 
     /**

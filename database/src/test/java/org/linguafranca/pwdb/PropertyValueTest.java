@@ -11,7 +11,33 @@ import static org.junit.Assert.*;
 public class PropertyValueTest {
 
     public static final String THIS_IS_A_SECRET = "This is a secret + לַחַיִּים";
+    public static final String ANOTHER_SECRET = "password with accents àéç";
     Logger logger = LoggerFactory.getLogger(PropertyValueTest.class);
+
+    @Test
+    public void charsTest() {
+        PropertyValue.CharsStore.Factory factory = new PropertyValue.CharsStore.Factory();
+
+        // test as CharSequence
+        PropertyValue.CharsStore testValue = factory.of(THIS_IS_A_SECRET);
+        assertEquals(THIS_IS_A_SECRET, testValue.getValue().toString());
+        assertEquals(THIS_IS_A_SECRET, testValue.getValueAsString());
+        assertArrayEquals(THIS_IS_A_SECRET.toCharArray(), testValue.getValueAsChars());
+        assertArrayEquals(THIS_IS_A_SECRET.getBytes(StandardCharsets.UTF_8), testValue.getValueAsBytes());
+        // test as char[]
+        testValue = factory.of(THIS_IS_A_SECRET.toCharArray());
+        assertEquals(THIS_IS_A_SECRET, testValue.getValue().toString());
+        assertEquals(THIS_IS_A_SECRET, testValue.getValueAsString());
+        assertArrayEquals(THIS_IS_A_SECRET.toCharArray(), testValue.getValueAsChars());
+        assertArrayEquals(THIS_IS_A_SECRET.getBytes(StandardCharsets.UTF_8), testValue.getValueAsBytes());
+        // test as byte[]
+        testValue = factory.of(THIS_IS_A_SECRET.getBytes());
+        assertEquals(THIS_IS_A_SECRET, testValue.getValue().toString());
+        assertEquals(THIS_IS_A_SECRET, testValue.getValueAsString());
+        assertArrayEquals(THIS_IS_A_SECRET.toCharArray(), testValue.getValueAsChars());
+        assertArrayEquals(THIS_IS_A_SECRET.getBytes(StandardCharsets.UTF_8), testValue.getValueAsBytes());
+    }
+
     @Test
     public void sealedObjectTest() {
         PropertyValue.CharsStore.Factory factory = new PropertyValue.CharsStore.Factory();
@@ -36,7 +62,7 @@ public class PropertyValueTest {
         assertEquals(testValue.getValueAsString(), sealed.getValueAsString());
     }
     @Test
-    public void NoOpTest() {
+    public void stringTest() {
         PropertyValue.StringStore.Factory factory = new PropertyValue.StringStore.Factory();
 
         PropertyValue.StringStore testValue = factory.of(THIS_IS_A_SECRET);
@@ -45,5 +71,16 @@ public class PropertyValueTest {
         assertEquals(THIS_IS_A_SECRET, testValue.getValueAsString());
         testValue = factory.of(THIS_IS_A_SECRET.getBytes(StandardCharsets.UTF_8));
         assertEquals(THIS_IS_A_SECRET, testValue.getValueAsString());
+    }
+
+    @Test
+    public void sealedScriptTest(){
+        PropertyValue.SealedStore sealed = new PropertyValue.SealedStore.Factory().of(ANOTHER_SECRET);
+        PropertyValue.CharsStore charStore = sealed.getAsCharsStore();
+        byte[] bytes1  = charStore.getValueAsBytes();
+        byte[] bytes = sealed.getValueAsBytes();
+        byte[] answer = ANOTHER_SECRET.getBytes(StandardCharsets.UTF_8);
+        assertArrayEquals(ANOTHER_SECRET.getBytes(StandardCharsets.UTF_8), bytes);
+
     }
 }

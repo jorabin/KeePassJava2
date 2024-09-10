@@ -106,7 +106,7 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
     }
 
     @Override
-    public void setProperty(String s, String s1) {
+    public void setPropertyValue(String s, String s1) {
         EntryClasses.StringProperty sp;
         if ((sp = getStringProperty(s, string)) != null) {
             this.string.remove(sp);

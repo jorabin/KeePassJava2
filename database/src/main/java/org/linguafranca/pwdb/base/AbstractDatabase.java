@@ -19,7 +19,6 @@ package org.linguafranca.pwdb.base;
 import org.linguafranca.pwdb.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -108,7 +107,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
         for (String propertyName: entry.getPropertyNames()) {
             try {
                 // all implementations must support setting of STANDARD_PROPERTY_NAMES
-                result.setProperty(propertyName, entry.getProperty(propertyName));
+                result.setPropertyValue(propertyName, entry.getProperty(propertyName));
             } catch (UnsupportedOperationException e) {
                 // oh well, we tried
             }

@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import org.apache.commons.codec.binary.Base64;
+import org.linguafranca.pwdb.Database;
+import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses;
 import org.linguafranca.pwdb.security.StreamEncryptor;
@@ -27,53 +29,43 @@ import org.linguafranca.pwdb.security.StreamEncryptor;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-public class ValueDeserializer extends StdDeserializer<EntryClasses.StringProperty.Value> {
+public class ValueDeserializer extends StdDeserializer<PropertyValue> {
 
     private final StreamEncryptor encryptor;
+    private final PropertyValue.Strategy strategy;
 
-    public ValueDeserializer(StreamEncryptor encryptor) {
+    public ValueDeserializer(StreamEncryptor encryptor, PropertyValue.Strategy strategy) {
         super(ValueDeserializer.class);
         this.encryptor = encryptor;
+        this.strategy = strategy;
     }
 
     @Override
-    public EntryClasses.StringProperty.Value deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+    public PropertyValue deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
 
         JsonNode node = p.getCodec().readTree(p);
 
-        EntryClasses.StringProperty.Value result = new EntryClasses.StringProperty.Value();
-
         if (node.isTextual()) {
-            result.setText(node.textValue());
-            return result;
+            return strategy.newUnprotected().of(node.textValue());
         }
+
         if (node.isObject()) {
             // TODO not clear what is happening here, looks like it's not exactly correct
             //We need to decrypt all Protected values
-            if (node.has("Protected") && Boolean.TRUE.equals(Helpers.toBoolean(node.get("Protected").asText()))) {
-                if (node.has("")) {
-                    String cipherText = node.get("").asText();
-                    if (cipherText != null && !cipherText.isEmpty()) {
-
-                        //Decode to byte the Base64 text
-                        byte[] encrypted = Base64.decodeBase64(cipherText.getBytes());
-                        String decrypted = new String(encryptor.decrypt(encrypted), StandardCharsets.UTF_8);
-                        result.setText(decrypted);
-                        result.setProtectOnOutput(true);
-                    }
-                }
-            } else {
-                //If an element is not marked us Protected we need to copy the value as is
-                if (node.has("ProtectInMemory")) {
-                    Boolean protectInMemory = Helpers.toBoolean(node.get("ProtectInMemory").asText());
-                    result.setProtectInMemory(protectInMemory);
-
-                    if (node.has("")) {
-                        result.setText(node.get("").asText());
-                    }
-                }
+            String cipherText = "";
+            if (node.has("")) {
+                cipherText = node.get("").asText();
             }
+
+            if (node.has("Protected") && Boolean.TRUE.equals(Helpers.toBoolean(node.get("Protected").asText()))) {
+                    //Decode to byte the Base64 text
+                    byte[] encrypted = Base64.decodeBase64(cipherText.getBytes());
+                    byte[] decrypted = encryptor.decrypt(encrypted);
+                    return strategy.newProtected().of(decrypted);
+            }
+            return strategy.newUnprotected().of(cipherText);
         }
-        return result;
+
+        throw new IllegalStateException("Error parsing XML node type is " + node.getClass());
     }
 }

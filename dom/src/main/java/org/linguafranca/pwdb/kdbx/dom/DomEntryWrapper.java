@@ -68,7 +68,7 @@ public class DomEntryWrapper extends AbstractEntry <DomDatabaseWrapper, DomGroup
     }
 
     @Override
-    public void setProperty(String name, String value) {
+    public void setPropertyValue(String name, String value) {
         Element property = DomHelper.getElement(String.format(DomHelper.PROPERTY_ELEMENT_FORMAT, name), element, false);
         if (property == null) {
             property = DomHelper.newElement("String", element);

@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
+import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
@@ -128,7 +129,7 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
         result.parent = null;
         // avoiding setProperty as it does a touch();
         for (String p : STANDARD_PROPERTY_NAMES) {
-            result.string.add(new StringProperty(p, new StringProperty.Value("")));
+            result.string.add(new StringProperty(p, database.getPropertyValueStrategy().newUnprotected().of("")));
         }
         return result;
     }
@@ -136,17 +137,44 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
     @Override
     @JsonIgnore
     public String getProperty(String s) {
-        return getStringContent(getStringProperty(s, string));
+        StringProperty sp = getStringProperty(s, string);
+        if (sp == null) {
+            return null;
+        }
+        if (sp.getValue().isProtected() && database.getPropertyValueStrategy().preventProtectedAccessAsString()) {
+            throw new IllegalStateException("Access to protected property as String is prevented by strategy");
+        }
+        return sp.getValue().getValueAsString();
     }
 
     @Override
     @JsonIgnore
-    public void setProperty(String s, String s1) {
-        StringProperty sp;
-        if ((sp = getStringProperty(s, string)) != null) {
-            this.string.remove(sp);
+    public void setPropertyValue(String s, String s1) {
+        StringProperty sp = getStringProperty(s, string);
+        if (sp != null) {
+            sp.setValue(database.getPropertyValueStrategy().newUnprotected().of(s1));
+            return;
         }
-        this.string.add(new StringProperty(s, new StringProperty.Value(s1)));
+        string.add(new StringProperty(s, database.getPropertyValueStrategy().newUnprotected().of(s1)));
+        touch();
+    }
+
+    @Override
+    @JsonIgnore
+    public PropertyValue getPropertyValue(String name) {
+        StringProperty sp = getStringProperty(name, string);
+        return sp != null? sp.getValue() : null;
+    }
+
+    @Override
+    @JsonIgnore
+    public void setPropertyValue(String name, PropertyValue value) {
+        StringProperty sp = getStringProperty(name, string);
+        if (sp != null) {
+            sp.setValue(value);
+            return;
+        }
+        string.add(new StringProperty(name, value));
         touch();
     }
 

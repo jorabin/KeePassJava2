@@ -18,8 +18,8 @@ package org.linguafranca.pwdb.kdbx.jackson.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
+import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonEntry;
 import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
@@ -28,7 +28,6 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlText;
 
 public abstract class EntryClasses {
     public static StringProperty getStringProperty(String name, List<StringProperty> string) {
@@ -38,10 +37,6 @@ public abstract class EntryClasses {
             }
         }
         return null;
-    }
-
-    public static String getStringContent(StringProperty property) {
-        return property == null || property.value == null ? null : property.value.text;
     }
 
     public static BinaryProperty getBinaryProp(String name, List<BinaryProperty> binary) {
@@ -89,10 +84,12 @@ public abstract class EntryClasses {
         String key;
 
         @JacksonXmlProperty(localName = "Value")
-        Value value;
+        PropertyValue value;
 
+        @SuppressWarnings("unused")
         public StringProperty() {}
-        public StringProperty(String key, Value value) {
+
+        public StringProperty(String key, PropertyValue value) {
             this.key = key;
             this.value = value;
         }
@@ -101,7 +98,7 @@ public abstract class EntryClasses {
             return key;
         }
 
-        public Value getValue() {
+        public PropertyValue getValue() {
             return value;
         }
 
@@ -109,69 +106,8 @@ public abstract class EntryClasses {
             this.key = key;
         }
 
-        public void setValue(Value value) {
+        public void setValue(PropertyValue value) {
             this.value = value;
-        }
-
-        public static class Value {
-
-            public Value() {
-            }
-
-            public Value(String text) {
-                this.text = text;
-                this._protected = false;
-            }
-
-            public Value(String text, Boolean _protected) {
-                this._protected = _protected;
-                this.text = text;
-            }
-
-            @JacksonXmlProperty(localName = "ProtectInMemory", isAttribute = true)
-            protected Boolean protectInMemory;
-
-            @JacksonXmlProperty(localName = "Protected", isAttribute = true)
-            Boolean _protected;
-
-
-            @JacksonXmlProperty(localName = "kpj2-ProtectOnOutput", isAttribute = true)
-            Boolean protectOnOutput;
-
-            @JacksonXmlText
-            String text;
-
-            public String getText() {
-                return text;
-            }
-
-            public void setText(String text) {
-                this.text = text;
-            }
-
-            public void setProtectOnOutput(boolean aProtected) {
-                this.protectOnOutput = aProtected;
-            }
-
-            public boolean getProtectOnOutput() {
-                return Objects.nonNull(this.protectOnOutput) && this.protectOnOutput;
-            }
-
-            public Boolean getProtected() {
-                return _protected;
-            }
-
-            public void setProtected(Boolean _protected) {
-                this._protected = _protected;
-            }
-
-            public Boolean getProtectInMemory() {
-                return protectInMemory;
-            }
-
-            public void setProtectInMemory(Boolean protectInMemory) {
-                this.protectInMemory = protectInMemory;
-            }
         }
     }
 

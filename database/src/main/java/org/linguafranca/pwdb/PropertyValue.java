@@ -9,6 +9,9 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * An interface through which (textual) property values can be stored in memory as something other than String
@@ -41,8 +44,49 @@ public interface PropertyValue {
      * A specification of which factories are to be used for unprotected values as opposed to protected values.
      */
     interface Strategy {
-        PropertyValue.Factory getUnprotectectedValueFactory ();
-        PropertyValue.Factory getProtectectedValueFactory ();
+        /**
+         * A list of the properties that should be protected by default
+         */
+        List<String> getProtectedProperties();
+
+        /**
+         * Whether to throw and illegalAccess Exception if an attempt is made to read a protected value as a String
+         */
+        boolean preventProtectedAccessAsString();
+
+        /**
+         * A factory for protected properties
+         */
+        PropertyValue.Factory newProtected();
+
+        /**
+         * A factory for unprotected property values
+         */
+        PropertyValue.Factory newUnprotected();
+
+        class Default implements Strategy {
+
+            @Override
+            public List<String> getProtectedProperties() {
+                //noinspection ArraysAsListWithZeroOrOneArgument
+                return new ArrayList<>(Arrays.asList(Entry.STANDARD_PROPERTY_NAME_PASSWORD));
+            }
+
+            @Override
+            public boolean preventProtectedAccessAsString() {
+                return false;
+            }
+
+            @Override
+            public Factory newProtected() {
+                return new PropertyValue.SealedStore.Factory();
+            }
+
+            @Override
+            public Factory newUnprotected() {
+                return new PropertyValue.StringStore.Factory();
+            }
+        }
     }
 
     /**
@@ -138,7 +182,11 @@ public interface PropertyValue {
         }
 
         public CharsStore(byte [] value) {
-            this.value = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(value)).array();
+            ByteBuffer bb = ByteBuffer.wrap(value);
+            CharBuffer cb = StandardCharsets.UTF_8.decode(bb);
+            char[] chars = new char[cb.limit()];
+            cb.get(chars);
+            this.value = chars;
         }
 
         @Override
@@ -158,7 +206,11 @@ public interface PropertyValue {
 
         @Override
         public byte [] getValueAsBytes() {
-            return StandardCharsets.UTF_8.encode(CharBuffer.wrap(this.value)).array();
+            CharBuffer cb = CharBuffer.wrap(this.value);
+            ByteBuffer bb = StandardCharsets.UTF_8.encode(cb);
+            byte[] result = new byte[bb.limit()];
+            bb.get(result);
+            return result;
         }
 
         @Override
@@ -244,7 +296,7 @@ public interface PropertyValue {
             }
         }
 
-        private CharsStore getAsDefault() {
+        public CharsStore getAsCharsStore() {
             try {
                 return ((CharsStore) sealedObject.getObject(retrieveKey(buffer)));
             } catch (Exception e) {
@@ -253,22 +305,22 @@ public interface PropertyValue {
         }
         @Override
         public String getValueAsString() {
-            return getAsDefault().getValueAsString();
+            return getAsCharsStore().getValueAsString();
         }
 
         @Override
         public char[] getValueAsChars() {
-            return getAsDefault().getValueAsChars();
+            return getAsCharsStore().getValueAsChars();
         }
 
         @Override
         public byte[] getValueAsBytes() {
-            return getAsDefault().getValueAsBytes();
+            return getAsCharsStore().getValueAsBytes();
         }
 
         @Override
         public CharSequence getValue() {
-            return getAsDefault().getValue();
+            return getAsCharsStore().getValue();
         }
 
         @Override

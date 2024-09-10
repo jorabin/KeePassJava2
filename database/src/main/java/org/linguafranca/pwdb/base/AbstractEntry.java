@@ -76,7 +76,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
 
     @Override
     public void setUsername(String username) {
-        setProperty(STANDARD_PROPERTY_NAME_USER_NAME, username);
+        setPropertyValue(STANDARD_PROPERTY_NAME_USER_NAME, username);
         touch();
     }
 
@@ -87,7 +87,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
 
     @Override
     public void setPassword(String pass) {
-        setProperty(STANDARD_PROPERTY_NAME_PASSWORD, pass);
+        setPropertyValue(STANDARD_PROPERTY_NAME_PASSWORD, pass);
         touch();
     }
 
@@ -98,7 +98,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
 
     @Override
     public void setUrl(String url) {
-        setProperty(STANDARD_PROPERTY_NAME_URL, url);
+        setPropertyValue(STANDARD_PROPERTY_NAME_URL, url);
         touch();
     }
 
@@ -109,7 +109,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
 
     @Override
     public void setTitle(String title) {
-        setProperty(STANDARD_PROPERTY_NAME_TITLE, title);
+        setPropertyValue(STANDARD_PROPERTY_NAME_TITLE, title);
         touch();
     }
 
@@ -120,7 +120,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
 
     @Override
     public void setNotes(String notes) {
-        setProperty(STANDARD_PROPERTY_NAME_NOTES, notes);
+        setPropertyValue(STANDARD_PROPERTY_NAME_NOTES, notes);
         touch();
     }
 
@@ -130,7 +130,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
     }
 
     @Override
-    public void setProperty(String name, PropertyValue value) {
+    public void setPropertyValue(String name, PropertyValue value) {
         throw new UnsupportedOperationException();
     }
 

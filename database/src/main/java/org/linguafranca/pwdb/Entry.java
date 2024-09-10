@@ -119,7 +119,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
 
     /**
      * Sets the value of a property. Use of this method is not recommended for fields with protected values.
-     * Use {@link #setProperty(String, PropertyValue)}
+     * Use {@link #setPropertyValue(String, PropertyValue)}
      *
      * <p>Other than the {@link #STANDARD_PROPERTY_NAMES} support for this method is optional.
      *
@@ -129,7 +129,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * non-standard properties are not supported
      * @see Database#supportsNonStandardPropertyNames()
      */
-    void setProperty(String name, String value);
+    void setPropertyValue(String name, String value);
 
     /**
      * Sets the value of a property as a property value. The method does not check whether the
@@ -143,7 +143,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * non-standard properties are not supported
      * @see Database#supportsNonStandardPropertyNames()
      */
-    void setProperty(String name, PropertyValue value);
+    void setPropertyValue(String name, PropertyValue value);
 
     /**
      * Removes this non-standard  property, if it exists.
@@ -258,7 +258,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * <p>Implementations should Touch LastModifiedTime when this method is called.
      *
      * @param pass a password
-     * @deprecated use {@link #setProperty(String, PropertyValue)}
+     * @deprecated use {@link #setPropertyValue(String, PropertyValue)}
      */
     @Deprecated
     void setPassword(String pass);

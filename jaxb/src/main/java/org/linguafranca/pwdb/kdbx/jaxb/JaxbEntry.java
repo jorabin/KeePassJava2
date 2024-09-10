@@ -82,7 +82,7 @@ public class JaxbEntry extends AbstractEntry<JaxbDatabase, JaxbGroup, JaxbEntry,
     }
 
     @Override
-    public void setProperty(String name, String value) {
+    public void setPropertyValue(String name, String value) {
         StringField toRemove = null;
         for (StringField field: delegate.getString()){
             if (field.getKey().equals(name)) {
