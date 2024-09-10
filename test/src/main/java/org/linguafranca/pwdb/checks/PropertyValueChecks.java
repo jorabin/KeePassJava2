@@ -94,7 +94,7 @@ public abstract class PropertyValueChecks<D extends Database<D, G, E, I>, G exte
     }
 
     @Test
-    public void expectedStorageType(){
+    public void expectedStorageType() throws IOException {
         if (!propertyValueSupported) {
             return;
         }
@@ -148,27 +148,19 @@ public abstract class PropertyValueChecks<D extends Database<D, G, E, I>, G exte
 
         // Save database
 
-        try {
-            FileOutputStream fos = new FileOutputStream("testOutput/propertyValueReload.kdbx");
-            saveDatabase(database, getCreds("123".getBytes()), fos);
-            fos.flush();
-            fos.close();
+        FileOutputStream fos = new FileOutputStream("testOutput/propertyValueReload.kdbx");
+        saveDatabase(database, getCreds("123".getBytes()), fos);
+        fos.flush();
+        fos.close();
 
-            // wait for file to save
-            Thread.sleep(1000);
+        // reload database, "random" is still protected even though it's not protected by default
+        FileInputStream fis = new FileInputStream("testOutput/propertyValueReload.kdbx");
+        D input = loadDatabase(getCreds("123".getBytes()), fis);
 
-            // reload database, "random" is still protected even though it's not protected by default
-            FileInputStream fis = new FileInputStream("testOutput/propertyValueReload.kdbx");
-            D input = loadDatabase(getCreds("123".getBytes()), fis);
-            List<? extends E> entries = input.findEntries("random");
-            assertEquals(1, entries.size());
-            assertTrue(entries.get(0).getPropertyValue("random").isProtected());
-            assertFalse(input.getPropertyValueStrategy().getProtectedProperties().contains("random"));
-
-
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
-    }
+        List<? extends E> entries = input.findEntries("random");
+        assertEquals(1, entries.size());
+        assertTrue(entries.get(0).getPropertyValue("random").isProtected());
+        assertFalse(input.getPropertyValueStrategy().getProtectedProperties().contains("random"));
+}
 
 }
