@@ -16,10 +16,13 @@
 
 package org.linguafranca.pwdb.checks;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.linguafranca.pwdb.*;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -38,6 +41,11 @@ public abstract class PropertyValueChecks<D extends Database<D, G, E, I>, G exte
 
     private final boolean propertyValueSupported;
     protected D database;
+
+    @BeforeClass
+    public static void ensureOutputDir() throws IOException {
+        Files.createDirectories(Paths.get("testOutput"));
+    }
 
     public PropertyValueChecks(boolean propertyValueSupported) throws IOException {
         this.database = createDatabase();
