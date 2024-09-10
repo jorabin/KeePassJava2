@@ -20,19 +20,22 @@ import org.linguafranca.pwdb.checks.PropertyValueChecks;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.JacksonEntry;
+import org.linguafranca.pwdb.kdbx.jackson.JacksonGroup;
+import org.linguafranca.pwdb.kdbx.jackson.JacksonIcon;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class JacksonPropertyValueTest extends PropertyValueChecks {
+public class JacksonPropertyValueTest extends PropertyValueChecks<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
 
     public JacksonPropertyValueTest() throws IOException {
         super(true);
     }
 
     @Override
-    public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
+    public void saveDatabase(JacksonDatabase database, Credentials credentials, OutputStream outputStream) throws IOException {
         database.save(credentials, outputStream);
     }
 
@@ -46,7 +49,7 @@ public class JacksonPropertyValueTest extends PropertyValueChecks {
         return new KdbxCreds(creds);
     }
     @Override
-    public Database createDatabase() throws IOException {
+    public JacksonDatabase createDatabase() throws IOException {
         return new JacksonDatabase();
     }
     
