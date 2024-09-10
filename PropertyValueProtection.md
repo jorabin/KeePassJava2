@@ -19,7 +19,7 @@ What KeePass means by property protection is firstly that they are additionally 
 overall encryption of the database file, this is so that when they are loaded as unencrypted XML
 they are not exposed within the process memory. Instead, they are decrypted and immediately stored in a
 secure way (DPAPI in Windows) so they can't be spied upon. 
-See [KeePass documentation in Inner Encyption](https://keepass.info/help/kb/kdbx.html#ienc ) and 
+See [KeePass documentation on Inner Encryption](https://keepass.info/help/kb/kdbx.html#ienc ) and 
 [Process Memory Protection](https://keepass.info/help/base/security.html#secmemprot).
 
 In summary, they are stored in an additionally secure way (additional to file security) in XML,
@@ -40,7 +40,7 @@ it runs on is more vulnerable.
 
 ### Alternatives to Storing Passwords as Strings
 
-You are probably at least as good as Google searches as me, good chance you may be better. So you]
+You are probably at least as good as Google searches as me, good chance you may be better. So you
 can read all about this there.
 
 #### When transferring
