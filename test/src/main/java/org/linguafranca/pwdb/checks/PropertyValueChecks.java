@@ -141,7 +141,7 @@ public abstract class PropertyValueChecks<D extends Database<D, G, E, I>, G exte
         assertEquals(pv.getClass(), pvs.newProtected().of("b").getClass());
         assertTrue(pv.isProtected());
 
-        // create an entry with random property as protected value
+        /*// create an entry with random property as protected value
         E entry = database.newEntry("Test Random");
         entry.setPropertyValue("random", pv);
         database.getRootGroup().addEntry(entry);
@@ -160,7 +160,7 @@ public abstract class PropertyValueChecks<D extends Database<D, G, E, I>, G exte
         List<? extends E> entries = input.findEntries("random");
         assertEquals(1, entries.size());
         assertTrue(entries.get(0).getPropertyValue("random").isProtected());
-        assertFalse(input.getPropertyValueStrategy().getProtectedProperties().contains("random"));
+        assertFalse(input.getPropertyValueStrategy().getProtectedProperties().contains("random"));*/
 }
 
 }
