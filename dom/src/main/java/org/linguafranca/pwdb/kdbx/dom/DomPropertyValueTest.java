@@ -13,22 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.linguafranca.pwdb;
+package org.linguafranca.pwdb.kdbx.dom;
 
-import org.linguafranca.pwdb.checks.BasicDatabaseChecks;
+import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.checks.PropertyValueChecks;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.KdbxHeader;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class JacksonPropertyValueTest extends PropertyValueChecks {
+public class DomPropertyValueTest extends PropertyValueChecks {
 
-    public JacksonPropertyValueTest() throws IOException {
-        super(true);
+    public DomPropertyValueTest() throws IOException {
+        super(false);
+    }
+
+
+    @Override
+    public Database createDatabase() throws IOException {
+        return new DomDatabaseWrapper();
     }
 
     @Override
@@ -37,17 +42,16 @@ public class JacksonPropertyValueTest extends PropertyValueChecks {
     }
 
     @Override
-    public JacksonDatabase loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
-        return JacksonDatabase.load(credentials, inputStream);
+    public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
+        try {
+            return DomDatabaseWrapper.load(credentials, inputStream);
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
     public Credentials getCreds(byte[] creds) {
         return new KdbxCreds(creds);
     }
-    @Override
-    public Database createDatabase() throws IOException {
-        return new JacksonDatabase();
-    }
-    
 }

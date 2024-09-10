@@ -141,9 +141,6 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
         if (sp == null) {
             return null;
         }
-        if (sp.getValue().isProtected() && database.getPropertyValueStrategy().preventProtectedAccessAsString()) {
-            throw new IllegalStateException("Access to protected property as String is prevented by strategy");
-        }
         return sp.getValue().getValueAsString();
     }
 

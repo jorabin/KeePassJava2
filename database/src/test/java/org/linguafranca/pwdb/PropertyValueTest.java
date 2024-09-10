@@ -16,7 +16,7 @@ public class PropertyValueTest {
 
     @Test
     public void charsTest() {
-        PropertyValue.CharsStore.Factory factory = new PropertyValue.CharsStore.Factory();
+        PropertyValue.CharsStore.Factory<PropertyValue.CharsStore> factory = PropertyValue.CharsStore.getFactory();
 
         // test as CharSequence
         PropertyValue.CharsStore testValue = factory.of(THIS_IS_A_SECRET);
@@ -40,7 +40,7 @@ public class PropertyValueTest {
 
     @Test
     public void sealedObjectTest() {
-        PropertyValue.CharsStore.Factory factory = new PropertyValue.CharsStore.Factory();
+        PropertyValue.CharsStore.Factory<PropertyValue.CharsStore> factory = PropertyValue.CharsStore.getFactory();
 
         PropertyValue.CharsStore testValue = factory.of(THIS_IS_A_SECRET);
         PropertyValue.SealedStore sealed = new PropertyValue.SealedStore(testValue);
@@ -63,9 +63,9 @@ public class PropertyValueTest {
     }
     @Test
     public void stringTest() {
-        PropertyValue.StringStore.Factory factory = new PropertyValue.StringStore.Factory();
+        PropertyValue.Factory<PropertyValue.StringStore> factory = PropertyValue.StringStore.getFactory();
 
-        PropertyValue.StringStore testValue = factory.of(THIS_IS_A_SECRET);
+        PropertyValue testValue = factory.of(THIS_IS_A_SECRET);
         assertEquals(THIS_IS_A_SECRET, testValue.getValueAsString());
         testValue = factory.of(THIS_IS_A_SECRET.toCharArray());
         assertEquals(THIS_IS_A_SECRET, testValue.getValueAsString());
@@ -75,7 +75,7 @@ public class PropertyValueTest {
 
     @Test
     public void sealedScriptTest(){
-        PropertyValue.SealedStore sealed = new PropertyValue.SealedStore.Factory().of(ANOTHER_SECRET);
+        PropertyValue.SealedStore sealed = PropertyValue.SealedStore.getFactory().of(ANOTHER_SECRET);
         PropertyValue.CharsStore charStore = sealed.getAsCharsStore();
         byte[] bytes1  = charStore.getValueAsBytes();
         byte[] bytes = sealed.getValueAsBytes();

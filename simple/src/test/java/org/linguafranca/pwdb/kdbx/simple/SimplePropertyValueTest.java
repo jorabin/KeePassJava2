@@ -15,10 +15,14 @@
  */
 package org.linguafranca.pwdb.kdbx.simple;
 
+import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.checks.PropertyValueChecks;
+import org.linguafranca.pwdb.kdbx.KdbxCreds;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class SimplePropertyValueTest extends PropertyValueChecks {
 
@@ -31,5 +35,23 @@ public class SimplePropertyValueTest extends PropertyValueChecks {
     public Database createDatabase() throws IOException {
         return new SimpleDatabase();
     }
-    
+
+    @Override
+    public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
+        database.save(credentials, outputStream);
+    }
+
+    @Override
+    public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException {
+        try {
+            return SimpleDatabase.load(credentials, inputStream);
+        } catch (Exception e) {
+            throw new IOException(e);
+        }
+    }
+
+    @Override
+    public Credentials getCreds(byte[] creds) {
+        return new KdbxCreds(creds);
+    }
 }

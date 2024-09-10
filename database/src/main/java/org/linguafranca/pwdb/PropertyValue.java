@@ -19,25 +19,25 @@ import java.util.List;
  * harder to access the values via a heap dump etc.
  */
 public interface PropertyValue {
-    String getValueAsString();
+    CharSequence getValue();
 
     char [] getValueAsChars();
 
     byte [] getValueAsBytes();
 
-    CharSequence getValue();
-
     boolean isProtected();
+
+    String getValueAsString();
 
     /**
      * A factory interface for PropertyValue.
      */
-    interface Factory {
-        PropertyValue of (CharSequence aCharSequence);
+    interface  Factory<P extends PropertyValue> {
+        P of (CharSequence aCharSequence);
 
-        PropertyValue of (char [] value);
+        P of (char [] value);
 
-        PropertyValue of (byte [] value);
+        P of (byte [] value);
     }
 
     /**
@@ -45,24 +45,28 @@ public interface PropertyValue {
      */
     interface Strategy {
         /**
-         * A list of the properties that should be protected by default
+         * A list of the properties that should be protected
          */
         List<String> getProtectedProperties();
 
         /**
-         * Whether to throw and illegalAccess Exception if an attempt is made to read a protected value as a String
-         */
-        boolean preventProtectedAccessAsString();
-
-        /**
          * A factory for protected properties
          */
-        PropertyValue.Factory newProtected();
+        PropertyValue.Factory<? extends PropertyValue> newProtected();
 
         /**
          * A factory for unprotected property values
          */
-        PropertyValue.Factory newUnprotected();
+        PropertyValue.Factory<? extends PropertyValue> newUnprotected();
+
+        /**
+         * Return a factory given a property name and the properties that should be protected
+         */
+        default PropertyValue.Factory<? extends PropertyValue> getFactoryFor(String propertyName) {
+            return getProtectedProperties().contains(propertyName) ?
+                    newProtected() :
+                    newUnprotected();
+        }
 
         class Default implements Strategy {
 
@@ -73,18 +77,13 @@ public interface PropertyValue {
             }
 
             @Override
-            public boolean preventProtectedAccessAsString() {
-                return false;
+            public Factory<? extends PropertyValue> newProtected() {
+                return SealedStore.getFactory();
             }
 
             @Override
-            public Factory newProtected() {
-                return new PropertyValue.SealedStore.Factory();
-            }
-
-            @Override
-            public Factory newUnprotected() {
-                return new PropertyValue.StringStore.Factory();
+            public Factory<? extends PropertyValue> newUnprotected() {
+                return CharsStore.getFactory();
             }
         }
     }
@@ -94,22 +93,26 @@ public interface PropertyValue {
      */
     class StringStore implements PropertyValue {
         private final String value;
-        public static class Factory implements PropertyValue.Factory {
+        private final static PropertyValue.Factory<StringStore> factory =
+                new PropertyValue.Factory<StringStore>(){
 
-            @Override
-            public StringStore of(CharSequence aCharSequence) {
-                return new StringStore(aCharSequence);
-            }
+                    @Override
+                    public StringStore of(CharSequence aCharSequence) {
+                        return new StringStore(aCharSequence);
+                    }
 
-            @Override
-            public StringStore of(char[] value) {
-                return new StringStore(value);
-            }
+                    @Override
+                    public StringStore of(char[] value) {
+                        return new StringStore(value);
+                    }
 
-            @Override
-            public StringStore of(byte[] value) {
-                return new StringStore(value);
-            }
+                    @Override
+                    public StringStore of(byte[] value) {
+                        return new StringStore((value));
+                    }
+                };
+        public static PropertyValue.Factory<StringStore> getFactory() {
+            return factory;
         }
 
         public StringStore(CharSequence aCharSequence){
@@ -155,24 +158,28 @@ public interface PropertyValue {
 
         private final char[] value;
 
-        public static class Factory implements PropertyValue.Factory {
+        private final static PropertyValue.Factory<CharsStore> factory =
+                new PropertyValue.Factory<CharsStore>(){
 
-            @Override
-            public CharsStore of(CharSequence aCharSequence) {
-                return new CharsStore(aCharSequence);
-            }
+                    @Override
+                    public CharsStore of(CharSequence aCharSequence) {
+                        return new CharsStore(aCharSequence);
+                    }
 
-            @Override
-            public CharsStore of(char[] value) {
-                return new CharsStore(value);
-            }
+                    @Override
+                    public CharsStore of(char[] value) {
+                        return new CharsStore(value);
+                    }
 
-            @Override
-            public CharsStore of(byte[] value) {
-                return new CharsStore(value);
-            }
+                    @Override
+                    public CharsStore of(byte[] value) {
+                        return new CharsStore((value));
+                    }
+                };
+
+        public static PropertyValue.Factory<CharsStore> getFactory() {
+            return factory;
         }
-
         public CharsStore(CharSequence aString) {
             this.value = CharSequenceUtils.toCharArray(aString);
         }
@@ -241,22 +248,27 @@ public interface PropertyValue {
             }
         }
 
-        public static class Factory implements PropertyValue.Factory {
+        private final static PropertyValue.Factory<SealedStore> factory =
+                new PropertyValue.Factory<SealedStore>(){
 
-            @Override
-            public SealedStore of(CharSequence aCharSequence) {
-                return new SealedStore(new CharsStore(aCharSequence));
-            }
+                    @Override
+                    public SealedStore of(CharSequence aCharSequence) {
+                        return new SealedStore(new CharsStore(aCharSequence));
+                    }
 
-            @Override
-            public SealedStore of(char[] value) {
-                return new SealedStore(new CharsStore(value));
-            }
+                    @Override
+                    public SealedStore of(char[] value) {
+                        return new SealedStore(new CharsStore(value));
+                    }
 
-            @Override
-            public SealedStore of(byte[] value) {
-                return new SealedStore(new CharsStore(value));
-            }
+                    @Override
+                    public SealedStore of(byte[] value) {
+                        return new SealedStore(new CharsStore(value));
+                    }
+                };
+
+        public static PropertyValue.Factory<SealedStore> getFactory() {
+            return factory;
         }
 
         public SealedStore(CharsStore object){
@@ -298,7 +310,8 @@ public interface PropertyValue {
 
         public CharsStore getAsCharsStore() {
             try {
-                return ((CharsStore) sealedObject.getObject(retrieveKey(buffer)));
+                Key key = retrieveKey(buffer);
+                return ((CharsStore) sealedObject.getObject(key));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
