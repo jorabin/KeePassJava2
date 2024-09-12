@@ -6,7 +6,7 @@ KeePass allows distinguishing more sensitive string valued properties from less 
 that have sensitive values are called "Protected Properties". 
 
 KDBX files contain a list of the standard properties and whether they are to be treated as protected
-by default. The standard properties include password, which is so treated. There doesn't seem to be a way of updating 
+by default. The standard properties include Password, which is so treated. There doesn't seem to be a way of updating 
 this list in the Windows KeePass implementation, and in any case documentation says that the
 list is updated to default after load of a database, so it seems that it ignored.
 
@@ -31,12 +31,14 @@ and they are stored in a secure way in memory.
 
 All property values are stored as Strings in process memory, meaning that they can be seen via process dumps
 and also, worse, Java Strings are immutable and this means that passwords stored as Strings
-end up in the String pool, can't be zeroed and will be garbage collected only when they are.
+end up in the String pool, can't be zeroed and will be removed only when garbage collected.
 
 I don't regard this is a *terrible* problem, but you don't have to try hard find loads 
 of discussion about how *awful* it is on Google, and for sure, it's certainly not as good as it could 
 be for more security conscious applications, or applications where the infrastructure
-it runs on is more vulnerable.
+it runs on is more vulnerable. I thought [this answer](https://stackoverflow.com/a/66287347) on StackOverflow 
+put it all in perspective quite well (the original question being why trying to destroy a SecretKey
+raises an exception, which does seem extremely odd).
 
 ### Alternatives to Storing Passwords as Strings
 
@@ -60,26 +62,37 @@ luck trying to avoid strings at all. Likewise, if you collect passwords from a d
 
 After the deserialization process, the passwords are stored in RAM. Therefore:
 
-- **Hashing the password is not feasible**, as the hash function is a one-way process.
+**Hashing the password is not feasible**, as the hash function is a one-way process.
 This means that once a password is hashed, it cannot be reverted back to its original form,
 which makes hashing unsuitable in this context. Since we need to retrieve and view
 the saved passwords (as per the requirements), hashing does not meet the objective.
 
-- **Encrypting and decrypting data in RAM is also problematic.** The question arises:
+**Encrypting and decrypting data in RAM is also problematic.** The question arises:
 What key should be used for this process? If the key is stored in RAM, we are essentially creating
 the same security vulnerability we are trying to avoid.
+
 While storing data in an encrypted form may seem appealing, keeping it encrypted in the KDBX InnerStream is impractical.
 This approach requires that the encrypted property values appear in the same order for both encryption and decryption, which makes it cumbersome.
 Encrypting and decrypting all protected fields each time we need to access or manipulate just one of them would add significant overhead.
+
+If the data is to be encrypted, then we need to find some way of storing the encryption key 
+that is not open to simple inspection.
 
 ## KeePassJava2 2.2.3 Property Value Strategy
 
 In the end it's up to the user of the library to decide what is the right approach to the 
 trade-off between vulnerability, risk and increased resource consumption.
 
+Because of this, KeePassJava2 provides an interface for the storage and retrieval of property values
+and while it provides some default implementations, users should form
+their own  opinions as to their suitability for their use cases.
+
 ### Retrieval and Storage of Property Values
 
-Because of this, KeePassJava2 provides an interface for the storage and retrieval of property values.
+Since the protected value has to be available in an unprotected form for storage and for use, it's 
+up to the user to minimise the length of time that this is the case and to make sure that where
+possible the data structures used are cleared after use (and as noted, in particular to avoid the use of String).
+
 ```Java
 public interface PropertyValue {
     CharSequence getValue();
@@ -124,7 +137,9 @@ any implementation or strategy to store a value.
 
 On save of the database, property values are saved to the inner stream as protected if the 
 `isProtected()` method of their implementation returns `true`. On reload, they will be stored
-using the strategy defined default class for whether they are protected or not. When a database is 
+using the class defined by the Strategy appropriate to whether they are protected or not. 
+
+When a database is 
 reloaded the default protected properties when it was saved will not be reloaded, as there's nowhere
 in KDBX to store this information in a standardized way. (True, it could be stored in a non-standard way.)
 
@@ -157,23 +172,27 @@ interface Strategy {
     }
 }
 ```
+
 #### Default Implementations of PropertyValue
 There are three default implementations of `PropertyValue`: 
 - `PropertyValue.StringStore` stores values as strings
-- `PropertyValue.CharsStore` stores values as char[]
-- `PropertyValue.SealedStore` stores values as `javax.crypto.SealedObject` and stores the key using a `ByteBuffer`
-obtained using the `ByteBuffer.allocateDirect()` method. 
+- `PropertyValue.BytesStore` stores values as byte[]
+- `PropertyValue.SealedStore` stores values as `javax.crypto.SealedObject` 
+and stores the key using a `ByteBuffer` obtained using the `ByteBuffer.allocateDirect()` method
+in order to try to have the key stored off-heap
+
 #### Default Implementation of Strategy
-- `PropertyValue.Strategy.Default` defines `passowrd` as the only protected value and `CharsStore` and 
+`PropertyValue.Strategy.Default` defines `Password` as the only protected value and `BytesStore` and 
 `SealedStore` as the unprotected and protected `PropertyValue` implementations.
 
 ### Implementation in Databases
 From KeepassJava2 2.2.3 the Jackson implementation supports setting and getting of `PropertyValue`s 
 from an `Entry`. 
 
-It supports setting and getting of `Strategy` from `Database`.
+It supports setting and getting of `Strategy` from `JacksonDatabase`.
 
-If `Database.supportsPropertyValueStrategy()` returns false, then attempts to use any methods associated with PropertyValue from other database implementations
+For other database implementations `Database.supportsPropertyValueStrategy()` returns false, 
+and attempts to use any methods associated with PropertyValue
 cause an `UnsupportedOperationException` to be raised.
 
 
