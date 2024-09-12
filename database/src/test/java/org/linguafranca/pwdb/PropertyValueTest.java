@@ -15,11 +15,11 @@ public class PropertyValueTest {
     Logger logger = LoggerFactory.getLogger(PropertyValueTest.class);
 
     @Test
-    public void charsTest() {
-        PropertyValue.CharsStore.Factory<PropertyValue.CharsStore> factory = PropertyValue.CharsStore.getFactory();
+    public void bytesTest() {
+        PropertyValue.BytesStore.Factory<PropertyValue.BytesStore> factory = PropertyValue.BytesStore.getFactory();
 
         // test as CharSequence
-        PropertyValue.CharsStore testValue = factory.of(THIS_IS_A_SECRET);
+        PropertyValue.BytesStore testValue = factory.of(THIS_IS_A_SECRET);
         assertEquals(THIS_IS_A_SECRET, testValue.getValue().toString());
         assertEquals(THIS_IS_A_SECRET, testValue.getValueAsString());
         assertArrayEquals(THIS_IS_A_SECRET.toCharArray(), testValue.getValueAsChars());
@@ -40,47 +40,79 @@ public class PropertyValueTest {
 
     @Test
     public void sealedObjectTest() {
-        PropertyValue.CharsStore.Factory<PropertyValue.CharsStore> factory = PropertyValue.CharsStore.getFactory();
+        PropertyValue.SealedStore.Factory<PropertyValue.SealedStore> factory = PropertyValue.SealedStore.getFactory();
 
-        PropertyValue.CharsStore testValue = factory.of(THIS_IS_A_SECRET);
-        PropertyValue.SealedStore sealed = new PropertyValue.SealedStore(testValue);
-        assertEquals(testValue.getValue(), sealed.getValue());
-        assertArrayEquals(testValue.getValueAsBytes(), sealed.getValueAsBytes());
-        assertArrayEquals(testValue.getValueAsChars(), sealed.getValueAsChars());
-        assertEquals(testValue.getValueAsString(), sealed.getValueAsString());
+        PropertyValue.SealedStore sealed = factory.of(THIS_IS_A_SECRET);
+        assertEquals(THIS_IS_A_SECRET, sealed.getValue().toString());
+        assertArrayEquals(THIS_IS_A_SECRET.getBytes(), sealed.getValueAsBytes());
+        assertArrayEquals(THIS_IS_A_SECRET.toCharArray(), sealed.getValueAsChars());
+        assertEquals(THIS_IS_A_SECRET, sealed.getValueAsString());
 
-        testValue = factory.of(THIS_IS_A_SECRET.getBytes());
-        sealed = new PropertyValue.SealedStore(testValue);
-        assertArrayEquals(testValue.getValueAsBytes(), sealed.getValueAsBytes());
-        assertArrayEquals(testValue.getValueAsChars(), sealed.getValueAsChars());
-        assertEquals(testValue.getValueAsString(), sealed.getValueAsString());
+        sealed = factory.of(THIS_IS_A_SECRET.getBytes());
+        assertEquals(THIS_IS_A_SECRET, sealed.getValue().toString());
+        assertArrayEquals(THIS_IS_A_SECRET.getBytes(), sealed.getValueAsBytes());
+        assertArrayEquals(THIS_IS_A_SECRET.toCharArray(), sealed.getValueAsChars());
+        assertEquals(THIS_IS_A_SECRET, sealed.getValueAsString());
 
-        testValue = factory.of(THIS_IS_A_SECRET.toCharArray());
-        sealed = new PropertyValue.SealedStore(testValue);
-        assertArrayEquals(testValue.getValueAsBytes(), sealed.getValueAsBytes());
-        assertArrayEquals(testValue.getValueAsChars(), sealed.getValueAsChars());
-        assertEquals(testValue.getValueAsString(), sealed.getValueAsString());
+        sealed =factory.of(THIS_IS_A_SECRET.toCharArray());
+        assertEquals(THIS_IS_A_SECRET, sealed.getValue().toString());
+        assertArrayEquals(THIS_IS_A_SECRET.getBytes(), sealed.getValueAsBytes());
+        assertArrayEquals(THIS_IS_A_SECRET.toCharArray(), sealed.getValueAsChars());
+        assertEquals(THIS_IS_A_SECRET, sealed.getValueAsString());
     }
     @Test
     public void stringTest() {
         PropertyValue.Factory<PropertyValue.StringStore> factory = PropertyValue.StringStore.getFactory();
 
-        PropertyValue testValue = factory.of(THIS_IS_A_SECRET);
-        assertEquals(THIS_IS_A_SECRET, testValue.getValueAsString());
-        testValue = factory.of(THIS_IS_A_SECRET.toCharArray());
-        assertEquals(THIS_IS_A_SECRET, testValue.getValueAsString());
-        testValue = factory.of(THIS_IS_A_SECRET.getBytes(StandardCharsets.UTF_8));
-        assertEquals(THIS_IS_A_SECRET, testValue.getValueAsString());
+        PropertyValue.StringStore stringStore = factory.of(THIS_IS_A_SECRET);
+        assertEquals(THIS_IS_A_SECRET, stringStore.getValue());
+        assertArrayEquals(THIS_IS_A_SECRET.getBytes(), stringStore.getValueAsBytes());
+        assertArrayEquals(THIS_IS_A_SECRET.toCharArray(), stringStore.getValueAsChars());
+        assertEquals(THIS_IS_A_SECRET, stringStore.getValueAsString());
+
+        stringStore = factory.of(THIS_IS_A_SECRET.getBytes());
+        assertEquals(THIS_IS_A_SECRET, stringStore.getValue());
+        assertArrayEquals(THIS_IS_A_SECRET.getBytes(), stringStore.getValueAsBytes());
+        assertArrayEquals(THIS_IS_A_SECRET.toCharArray(), stringStore.getValueAsChars());
+        assertEquals(THIS_IS_A_SECRET, stringStore.getValueAsString());
+
+        stringStore =factory.of(THIS_IS_A_SECRET.toCharArray());
+        assertEquals(THIS_IS_A_SECRET, stringStore.getValue());
+        assertArrayEquals(THIS_IS_A_SECRET.getBytes(), stringStore.getValueAsBytes());
+        assertArrayEquals(THIS_IS_A_SECRET.toCharArray(), stringStore.getValueAsChars());
+        assertEquals(THIS_IS_A_SECRET, stringStore.getValueAsString());
     }
 
     @Test
     public void sealedScriptTest(){
         PropertyValue.SealedStore sealed = PropertyValue.SealedStore.getFactory().of(ANOTHER_SECRET);
-        PropertyValue.CharsStore charStore = sealed.getAsCharsStore();
-        byte[] bytes1  = charStore.getValueAsBytes();
         byte[] bytes = sealed.getValueAsBytes();
-        byte[] answer = ANOTHER_SECRET.getBytes(StandardCharsets.UTF_8);
         assertArrayEquals(ANOTHER_SECRET.getBytes(StandardCharsets.UTF_8), bytes);
 
+    }
+
+    @Test
+    public void getCharsTest(){
+        PropertyValue.BytesStore cs = new PropertyValue.BytesStore("a test".toCharArray());
+        char [] value = cs.getValueAsChars();
+        value[0] = 'b';
+        // changing the retrieved copy doesn't change the source
+        assertArrayEquals("a test".toCharArray(), cs.getValueAsChars());
+
+        byte [] bytes = cs.getValueAsBytes();
+        bytes [0] = 0;
+        // same for bytes
+        assertArrayEquals("a test".getBytes(), cs.getValueAsBytes());
+    }
+
+    @Test
+    public void putCharsTest(){
+        String testValue = "a test";
+        char [] chars = testValue.toCharArray();
+        PropertyValue.BytesStore cs = new PropertyValue.BytesStore(chars);
+        chars[0] = 'b';
+        char [] value = cs.getValueAsChars();
+        // changing the source doesn't change the copy
+        assertArrayEquals(testValue.toCharArray(), cs.getValueAsChars());
     }
 }

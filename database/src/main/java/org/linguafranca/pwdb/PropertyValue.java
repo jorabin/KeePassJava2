@@ -1,14 +1,21 @@
 package org.linguafranca.pwdb;
 
-import org.apache.commons.lang3.CharSequenceUtils;
+import com.google.common.base.Charsets;
 
-import javax.crypto.*;
-
-import java.io.*;
+import javax.crypto.Cipher;
+import javax.crypto.SealedObject;
+import javax.crypto.SecretKey;
+import javax.security.auth.DestroyFailedException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +35,35 @@ public interface PropertyValue {
     boolean isProtected();
 
     String getValueAsString();
+
+    static byte[] charsToBytes(char[] value) {
+        CharBuffer cb = CharBuffer.wrap(value);
+        ByteBuffer bb = StandardCharsets.UTF_8.encode(cb);
+        byte[] result = new byte[bb.limit()];
+        bb.get(result);
+        return result;
+    }
+
+    static char[] bytesToChars(byte[] value) {
+        ByteBuffer bb = ByteBuffer.wrap(value);
+        CharBuffer cb = Charsets.UTF_8.decode(bb);
+        char[] chars = new char[cb.limit()];
+        cb.get(chars);
+        return chars;
+    }
+
+    static byte[] charSequenceToBytes(CharSequence charSequence){
+        CharBuffer cb = CharBuffer.wrap(charSequence);
+        ByteBuffer bb = StandardCharsets.UTF_8.encode(cb);
+        byte[] result = new byte[bb.limit()];
+        bb.get(result);
+        return result;
+    }
+
+    static CharSequence bytesToCharSequence(byte[] bytes){
+        ByteBuffer bb = ByteBuffer.wrap(bytes);
+        return StandardCharsets.UTF_8.decode(bb);
+    }
 
     /**
      * A factory interface for PropertyValue.
@@ -83,7 +119,7 @@ public interface PropertyValue {
 
             @Override
             public Factory<? extends PropertyValue> newUnprotected() {
-                return CharsStore.getFactory();
+                return BytesStore.getFactory();
             }
         }
     }
@@ -152,72 +188,65 @@ public interface PropertyValue {
     }
 
     /**
-     * Property values are stored as char arrays.
+     * Property values are stored as byte arrays.
      */
-    class CharsStore implements PropertyValue, Serializable {
+    class BytesStore implements PropertyValue, Serializable {
 
-        private final char[] value;
+        private final byte[] value;
 
-        private final static PropertyValue.Factory<CharsStore> factory =
-                new PropertyValue.Factory<CharsStore>(){
+        private final static PropertyValue.Factory<BytesStore> factory =
+                new PropertyValue.Factory<BytesStore>(){
 
                     @Override
-                    public CharsStore of(CharSequence aCharSequence) {
-                        return new CharsStore(aCharSequence);
+                    public BytesStore of(CharSequence aCharSequence) {
+                        return new BytesStore(aCharSequence);
                     }
 
                     @Override
-                    public CharsStore of(char[] value) {
-                        return new CharsStore(value);
+                    public BytesStore of(char[] value) {
+                        return new BytesStore(value);
                     }
 
                     @Override
-                    public CharsStore of(byte[] value) {
-                        return new CharsStore((value));
+                    public BytesStore of(byte[] value) {
+                        return new BytesStore((value));
                     }
                 };
 
-        public static PropertyValue.Factory<CharsStore> getFactory() {
+        public static PropertyValue.Factory<BytesStore> getFactory() {
             return factory;
         }
-        public CharsStore(CharSequence aString) {
-            this.value = CharSequenceUtils.toCharArray(aString);
+        public BytesStore(CharSequence aString) {
+            this.value = charSequenceToBytes(aString);
         }
 
-        public CharsStore(char [] value) {
-            this.value = value;
+        public BytesStore(char [] value) {
+            this.value = charsToBytes(value);
         }
 
-        public CharsStore(byte [] value) {
-            ByteBuffer bb = ByteBuffer.wrap(value);
-            CharBuffer cb = StandardCharsets.UTF_8.decode(bb);
-            char[] chars = new char[cb.limit()];
-            cb.get(chars);
-            this.value = chars;
+        public BytesStore(byte [] value) {
+            this.value = Arrays.copyOf(value, value.length);
         }
 
         @Override
         public String getValueAsString() {
-            return CharBuffer.wrap(this.value).toString();
+            return new String(this.value);
         }
 
         @Override
         public CharSequence getValue() {
-            return CharBuffer.wrap(this.value);
+            ByteBuffer bb = ByteBuffer.wrap(this.value);
+            return Charsets.UTF_8.decode(bb);
         }
 
         @Override
         public char [] getValueAsChars() {
-            return this.value;
+            return bytesToChars(this.value);
         }
 
         @Override
         public byte [] getValueAsBytes() {
-            CharBuffer cb = CharBuffer.wrap(this.value);
-            ByteBuffer bb = StandardCharsets.UTF_8.encode(cb);
-            byte[] result = new byte[bb.limit()];
-            bb.get(result);
-            return result;
+            return Arrays.copyOf(this.value, this.value.length);
         }
 
         @Override
@@ -236,13 +265,40 @@ public interface PropertyValue {
      * for storage off-heap may be significant.
      */
     class SealedStore implements PropertyValue {
-        static KeyGenerator keyGenerator;
+        static SecureRandom secureRandom = new SecureRandom();
         private final SealedObject sealedObject;
         private final ByteBuffer buffer;
 
-        static {
+        private ByteBuffer storeKey(SecretKey key) throws IOException {
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                 ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+                oos.writeObject(key);
+                ByteBuffer b = ByteBuffer.allocateDirect(baos.size());
+                b.put(baos.toByteArray());
+                return b;
+            }
+        }
+
+        private SecretKey retrieveKey(ByteBuffer buffer) {
+            byte [] bytes = new byte[buffer.position()];
+            buffer.rewind();
+            buffer.get(bytes);
             try {
-                keyGenerator= KeyGenerator.getInstance("AES");
+                try (ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+                     ObjectInputStream ois = new ObjectInputStream(bais)) {
+                    return (SecretKey) ois.readObject();
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private byte[] getBytes() {
+            try {
+                SecretKey key = retrieveKey(buffer);
+                byte[] cs = ((byte[]) sealedObject.getObject(key));
+                key.destroy();
+                return cs;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -253,17 +309,17 @@ public interface PropertyValue {
 
                     @Override
                     public SealedStore of(CharSequence aCharSequence) {
-                        return new SealedStore(new CharsStore(aCharSequence));
+                        return new SealedStore(aCharSequence);
                     }
 
                     @Override
                     public SealedStore of(char[] value) {
-                        return new SealedStore(new CharsStore(value));
+                        return new SealedStore(value);
                     }
 
                     @Override
                     public SealedStore of(byte[] value) {
-                        return new SealedStore(new CharsStore(value));
+                        return new SealedStore(value);
                     }
                 };
 
@@ -271,69 +327,86 @@ public interface PropertyValue {
             return factory;
         }
 
-        public SealedStore(CharsStore object){
+        /**
+         * Believe it or not ... a SecretKey generated by the standard KeyGenerator throws an
+         * exception when the destroy() method is called, so we roll our own
+         */
+        private static class AESKey implements SecretKey, Serializable {
+            private boolean destroyed = false;
+            private final byte[] key = new byte[16];
+            final String algorithm = "AES";
+
+            {
+                secureRandom.nextBytes(key);
+            }
+
+            @Override
+            public void destroy() {
+                Arrays.fill(this.key, (byte) 0);
+                this.destroyed = true;
+            }
+
+            @Override
+            public boolean isDestroyed() {
+                return this.destroyed;
+            }
+
+            @Override
+            public String getAlgorithm() {
+                return this.algorithm;
+            }
+
+            @Override
+            public String getFormat() {
+                return "RAW";
+            }
+
+            @Override
+            public byte[] getEncoded() {
+                return this.key.clone();
+            }
+        }
+
+        public SealedStore(byte [] bytes){
             try {
-                Key key = keyGenerator.generateKey();
-                buffer = storeKey(key);
                 Cipher cipher = Cipher.getInstance("AES/GCM/NoPadding");
+                SecretKey key = new AESKey();
                 cipher.init(Cipher.ENCRYPT_MODE, key);
-                sealedObject = new SealedObject(object, cipher);
+                buffer = storeKey(key);
+                key.destroy();
+                sealedObject = new SealedObject(bytes, cipher);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
 
-        private ByteBuffer storeKey(Key key) throws IOException {
-            try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                ObjectOutputStream oos = new ObjectOutputStream(baos)) {
-                oos.writeObject(key);
-                ByteBuffer b = ByteBuffer.allocateDirect(baos.size());
-                b.put(baos.toByteArray());
-                return b;
-            }
+        public SealedStore(char [] chars) {
+            this(charsToBytes(chars));
         }
 
-        private Key retrieveKey(ByteBuffer buffer) {
-            byte [] bytes = new byte[buffer.position()];
-            buffer.rewind();
-            buffer.get(bytes);
-            try {
-                try (
-                    ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-                    ObjectInputStream ois = new ObjectInputStream(bais)) {
-                    return (Key) ois.readObject();
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+        public SealedStore(CharSequence charSequence) {
+            this(charSequenceToBytes(charSequence));
         }
 
-        public CharsStore getAsCharsStore() {
-            try {
-                Key key = retrieveKey(buffer);
-                return ((CharsStore) sealedObject.getObject(key));
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        @Override
+         @Override
         public String getValueAsString() {
-            return getAsCharsStore().getValueAsString();
+            return new String(getBytes());
         }
 
         @Override
         public char[] getValueAsChars() {
-            return getAsCharsStore().getValueAsChars();
+            return bytesToChars(getBytes());
         }
 
         @Override
         public byte[] getValueAsBytes() {
-            return getAsCharsStore().getValueAsBytes();
+            byte [] result = getBytes();
+            return Arrays.copyOf(result, result.length);
         }
 
         @Override
         public CharSequence getValue() {
-            return getAsCharsStore().getValue();
+            return bytesToCharSequence(getBytes());
         }
 
         @Override
