@@ -58,15 +58,19 @@ luck trying to avoid strings at all. Likewise, if you collect passwords from a d
 
 #### At rest
 
-So, as to how to store protected data "at rest" in the application? As noted, using anything other 
-than a String improves the situation. Obfuscation of the data using a hash may improve it
-further, but a determined attacker will know (or might be able to find) the hash key anyway.
+After the deserialization process, the passwords are stored in RAM. Therefore:
 
-Storing the data in an encrypted form could be attractive. Leaving it in the encrypted form that 
-it appears in the KDBX InnerStream is not practical, as this stream encrypted approach
-depends on the encrypted property values appearing in the same order for encryption and decryption, and
-it would not be practical to encrypt/decrypt all protected fields when accessing or manipulating
-any one of them.
+- **Hashing the password is not feasible**, as the hash function is a one-way process.
+This means that once a password is hashed, it cannot be reverted back to its original form,
+which makes hashing unsuitable in this context. Since we need to retrieve and view
+the saved passwords (as per the requirements), hashing does not meet the objective.
+
+- **Encrypting and decrypting data in RAM is also problematic.** The question arises:
+What key should be used for this process? If the key is stored in RAM, we are essentially creating
+the same security vulnerability we are trying to avoid.
+While storing data in an encrypted form may seem appealing, keeping it encrypted in the KDBX InnerStream is impractical.
+This approach requires that the encrypted property values appear in the same order for both encryption and decryption, which makes it cumbersome.
+Encrypting and decrypting all protected fields each time we need to access or manipulate just one of them would add significant overhead.
 
 ## KeePassJava2 2.2.3 Property Value Strategy
 
