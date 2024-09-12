@@ -43,6 +43,8 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
     public KeePassFile keePassFile;
     private StreamEncryptor encryptor;
 
+    private PropertyValue.Strategy propertyValueStrategy = new PropertyValue.Strategy.Default();
+
     public static KeePassFile createEmptyDatabase() throws IOException {
 
         InputStream inputStream = JacksonSerializableDatabase.class.getClassLoader()
@@ -63,7 +65,7 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
     public JacksonSerializableDatabase load(InputStream inputStream) throws IOException {
         XmlMapper mapper = new XmlMapper();
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(PropertyValue.class, new ValueDeserializer(encryptor, new PropertyValue.Strategy.Default()));
+        module.addDeserializer(PropertyValue.class, new ValueDeserializer(encryptor, propertyValueStrategy));
         mapper.registerModule(module);
         keePassFile = mapper.readValue(inputStream, KeePassFile.class);
         return this;
@@ -73,9 +75,8 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
     @Override
     public void save(OutputStream outputStream) {
         try {
-
             SimpleModule module = new SimpleModule();
-            module.addSerializer(PropertyValue.class, new ValueSerializer(encryptor));
+            module.addSerializer(PropertyValue.class, new ValueSerializer(encryptor, propertyValueStrategy));
             // disable auto-detection, only use annotated values
             XmlMapper mapper = XmlMapper.builder()
                     .disable(MapperFeature.AUTO_DETECT_CREATORS,
@@ -183,6 +184,14 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
     @Override
     public void addBinary(int index, byte[] payload) {
         addBinary(keePassFile, index, payload);
+    }
+
+    public PropertyValue.Strategy getPropertyValueStrategy() {
+        return propertyValueStrategy;
+    }
+
+    public void setPropertyValueStrategy(PropertyValue.Strategy propertyValueStrategy) {
+        this.propertyValueStrategy = propertyValueStrategy;
     }
 
 }

@@ -108,8 +108,9 @@ public class JacksonDatabase extends ProtectedDatabase<JacksonDatabase, JacksonG
     public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
             OutputStream outputStream) throws IOException {
             keePassFile.meta.generator = "KeePassJava2-Jackson";
-            JacksonSerializableDatabase simpleSerializableDatabase = new JacksonSerializableDatabase(this.keePassFile);
-            streamFormat.save(simpleSerializableDatabase, credentials, outputStream);
+            JacksonSerializableDatabase jacksonSerializableDatabase = new JacksonSerializableDatabase(this.keePassFile);
+            jacksonSerializableDatabase.setPropertyValueStrategy(this.getPropertyValueStrategy());
+            streamFormat.save(jacksonSerializableDatabase, credentials, outputStream);
             setDirty(false);
     }
 

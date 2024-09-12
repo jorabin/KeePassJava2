@@ -188,7 +188,7 @@ only, with a view to being withdrawn, since they perform badly and/or depend on 
   existed in the original database then this is the one.
 
 Aside from dependencies on underlying frameworks, different implementations have varying characteristics, primarily speed. This is assessed
-by [this test](https://github.com/jorabin/KeePassJava2/blob/master/example/src/main/java/org/linguafranca/pwdb/kdbx/OpenDbExample.java) in the module `examples`;
+by [this test](https://github.com/jorabin/KeePassJava2/blob/master/example/src/main/java/org/linguafranca/pwdb/kdbx/OpenDbExample.java) in the module `examples`.
 
 ## Dependencies
 

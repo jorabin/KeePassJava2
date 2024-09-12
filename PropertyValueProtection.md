@@ -140,10 +140,17 @@ On save of the database, property values are saved to the inner stream as protec
 using the class defined by the Strategy appropriate to whether they are protected or not. 
 
 When a database is 
-reloaded the default protected properties when it was saved will not be reloaded, as there's nowhere
-in KDBX to store this information in a standardized way. (True, it could be stored in a non-standard way.)
+reloaded the default protected properties when it was saved will not be reloaded. Other than for the default properties
+of `Title`, `URL`, `UserName`, `Title` and `Notes` this information can't be saved in a standardized
+way in the KDBX format, and as noted below this information is ignored by the Windows KeePass implementation.
 
 Changing the strategy doesn't alter the way that existing values are stored in the database.
+
+**Note** KeePass (Windows) does the following: on load it loads values as protected if they
+are marked as such in the database file. It resets the default protection from however it
+is defined in the file to the default, 
+which is to protect the `Password` property and nothing else. When saving it saves properties
+that are protected in memory as protected, but additionally protects `Password` property values.
 
 ```Java
 interface Strategy {
