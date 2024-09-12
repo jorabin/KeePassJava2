@@ -34,7 +34,7 @@ import java.util.UUID;
 
 import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.createEmptyDatabase;
 
-public class JacksonDatabase extends ProtectedDatabase<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
+public class JacksonDatabase extends ProtectedDatabase<JacksonDatabase> {
 
     KeePassFile keePassFile;
     StreamFormat<?> streamFormat;

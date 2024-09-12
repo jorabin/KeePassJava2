@@ -23,24 +23,24 @@ import java.io.PrintStream;
  *
  * @author jo
  */
-public interface Visitor <D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon> {
+public interface Visitor <D extends Database<D>> {
     /**
      * Called on entry to a group visit
      * @param group the group being visited
      */
-    void startVisit(G group);
+    void startVisit(Group<D> group);
 
     /**
      * Called on exit from a group visit
      * @param group the group being exited
      */
-    void endVisit(G group);
+    void endVisit(Group<D> group );
 
     /**
      * Called on visit to an entry
      * @param entry the entry being visited
      */
-    void visit(E entry);
+    void visit(Entry<D> entry);
 
     /**
      * called to determine whether to visit entries before subgroups, or not
@@ -51,17 +51,16 @@ public interface Visitor <D extends Database<D, G, E, I>, G extends Group<D, G, 
     /**
      * Empty implementation of Visitor
      */
-    abstract class Default <D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon>
-            implements Visitor <D, G, E, I>{
+    abstract class Default <D extends Database<D>> implements Visitor <D> {
 
         @Override
-        public void startVisit(G group) {}
+        public void startVisit(Group<D> group) {}
 
         @Override
-        public void endVisit(G group) {}
+        public void endVisit(Group<D> group) {}
 
         @Override
-        public void visit(E entry) {}
+        public void visit(Entry<D> entry) {}
 
         @Override
         public boolean isEntriesFirst() {
@@ -72,8 +71,7 @@ public interface Visitor <D extends Database<D, G, E, I>, G extends Group<D, G, 
     /**
      * Visitor prints the Groups and Entries it visits to console
      */
-    class Print <D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon>
-            extends Default<D, G, E, I> {
+    class Print <D extends Database<D>> extends Default<D> {
 
         private final PrintStream printStream;
 
@@ -86,12 +84,12 @@ public interface Visitor <D extends Database<D, G, E, I>, G extends Group<D, G, 
         }
 
         @Override
-        public void startVisit(G group) {
+        public void startVisit(Group<D> group ) {
             printStream.println(group.toString());
         }
 
         @Override
-        public void visit(E entry) {
+        public void visit(Entry<D> entry) {
             printStream.println(entry.toString());
         }
 

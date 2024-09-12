@@ -32,7 +32,7 @@ import java.util.UUID;
  * The class holds a KDB Group
  * @author jo
  */
-public class KdbGroup extends AbstractGroup<KdbDatabase, KdbGroup, KdbEntry, KdbIcon> {
+public class KdbGroup extends AbstractGroup<KdbDatabase> {
     private boolean root;
     private KdbGroup parent;
     protected KdbDatabase database;

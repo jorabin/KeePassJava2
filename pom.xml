@@ -26,9 +26,6 @@
         <module>test</module>
         <module>kdb</module>
         <module>kdbx</module>
-        <module>dom</module>
-        <module>simple</module>
-        <module>jaxb</module>
         <module>jackson</module>
         <module>all</module>
         <module>example</module>

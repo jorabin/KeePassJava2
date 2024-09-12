@@ -24,6 +24,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.jetbrains.annotations.NotNull;
+import org.linguafranca.pwdb.Group;
+import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
@@ -52,7 +54,7 @@ import java.util.UUID;
 "group",
 })
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
+public class JacksonGroup extends AbstractGroup<JacksonDatabase> {
 
     @JacksonXmlProperty(localName = "UUID")
     @JsonDeserialize(converter = Base64ToUUIDConverter.class)
@@ -257,7 +259,7 @@ public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
-    public void setIcon(JacksonIcon icon) {
+    public void setIcon(Icon icon) {
         this.iconID = icon.getIndex();
         touch();
     }

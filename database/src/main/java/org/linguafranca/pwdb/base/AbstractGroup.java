@@ -19,7 +19,6 @@ package org.linguafranca.pwdb.base;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
-import org.linguafranca.pwdb.Icon;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,13 +29,13 @@ import java.util.Stack;
  *
  * @author Jo
  */
-public abstract class AbstractGroup<D extends Database<D, G, E, I>, G extends org.linguafranca.pwdb.base.AbstractGroup<D, G, E, I>, E extends Entry<D, G, E, I>, I extends Icon> implements Group<D, G, E, I> {
+public abstract class AbstractGroup<D extends Database<D>> implements Group<D> {
 
     @Override
-    public List<? extends G> findGroups(String group1) {
-        ArrayList<G> result = new ArrayList<>();
-        for (G g: getGroups()) {
-            if (g.getName().equals(group1)) {
+    public List<? extends Group<D>> findGroups(String group) {
+        ArrayList<Group<D>> result = new ArrayList<>();
+        for (Group<D> g: getGroups()) {
+            if (g.getName().equals(group)) {
                 result.add(g);
             }
         }
@@ -44,7 +43,7 @@ public abstract class AbstractGroup<D extends Database<D, G, E, I>, G extends or
     }
 
     @Override
-    public List<? extends E> findEntries(String find, boolean recursive) {
+    public List<? extends Entry<D>> findEntries(String find, boolean recursive) {
         /*
          * Local helper class to avoid violating DRY in {@link AbstractGroup#findEntries(String, boolean)}.
          * Would-be lambda in Java 8.
@@ -58,7 +57,7 @@ public abstract class AbstractGroup<D extends Database<D, G, E, I>, G extends or
             }
 
             @Override
-            public boolean matches(Entry entry) {
+            public boolean matches(Entry<? extends Database<?>> entry) {
                 return entry.match(text);
             }
         }
@@ -67,15 +66,15 @@ public abstract class AbstractGroup<D extends Database<D, G, E, I>, G extends or
     }
 
     @Override
-    public List<? extends E> findEntries(Entry.Matcher matcher, boolean recursive) {
-        List <E> result = new ArrayList<>(getEntries().size());
-        for (E entry: getEntries()){
+    public List<? extends Entry<D>> findEntries(Entry.Matcher matcher, boolean recursive) {
+        List <Entry<D>> result = new ArrayList<>(getEntries().size());
+        for (Entry<D> entry: getEntries()){
             if (entry.match(matcher)){
                 result.add(entry);
             }
         }
         if (recursive) {
-            for (G group : getGroups()) {
+            for (Group<D> group: getGroups()) {
                 // don't recurse into recycle bin
                 if (group.isRecycleBin()) {
                     continue;
@@ -87,26 +86,26 @@ public abstract class AbstractGroup<D extends Database<D, G, E, I>, G extends or
     }
 
     @Override
-    public void copy(Group<? extends Database, ? extends Group, ? extends Entry, ? extends Icon> parent) {
-        for (Group<?,?,?,?> child : parent.getGroups()) {
-            G addedGroup = addGroup(this.getDatabase().newGroup(child));
+    public void copy(Group<D> parent) {
+        for (Group<D> child : parent.getGroups()) {
+            Group<D> addedGroup = addGroup(this.getDatabase().newGroup(child));
             addedGroup.copy(child);
         }
-        for (Entry entry : parent.getEntries()) {
+        for (Entry<D> entry : parent.getEntries()) {
             addEntry(this.getDatabase().newEntry(entry));
         }
     }
 
     @Override
     public String getPath() {
-        Stack<Group> parents = new Stack<>();
-        Group parent = this;
+        Stack<Group<D>> parents = new Stack<>();
+        Group<D> parent = this;
         parents.push(this);
         while ((parent=parent.getParent()) != null) {
             parents.push(parent);
         }
         StringBuilder result = new StringBuilder("/");
-        while (parents.size() > 0) {
+        while (!parents.isEmpty()) {
             result.append(parents.pop().getName()).append("/");
         }
         return result.toString();

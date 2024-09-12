@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
+import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
@@ -64,7 +65,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 
 @JsonIgnoreProperties({"path", "username", "title", "notes", "url", "password"})
-public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
+public class JacksonEntry extends AbstractEntry<JacksonDatabase> {
 
 
     @JacksonXmlProperty(localName = "UUID")
@@ -287,7 +288,7 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
-    public void setIcon(JacksonIcon icon) {
+    public void setIcon(Icon icon) {
         iconID = icon.getIndex();
     }
 

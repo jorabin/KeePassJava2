@@ -43,7 +43,7 @@ import java.util.*;
  *
  * @author Jo
  */
-public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon> {
+public interface Entry <D extends Database<D>> {
     /**
      * Standard properties are attributes of Entries that are accessible either by
      * dedicated methods, such as getPassword, or by {@link #getProperty(String)}
@@ -67,7 +67,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * method
      */
     interface Matcher {
-        boolean matches(Entry entry);
+        boolean matches( Entry<? extends Database<?>> entry);
     }
 
     /**
@@ -213,7 +213,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * Get the parent of this entry
      * @return a parent or null if this entry currently does not have a parent
      */
-    @Nullable G getParent();
+    @Nullable Group<D> getParent();
 
     /**
      * Get the UUID of this entry. Databases (like KDB) that do not natively support
@@ -342,13 +342,13 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * Returns the {@link Icon} associated with this entry.
      * @return an Icon
      */
-    I getIcon();
+    Icon getIcon();
 
     /**
      * Sets the {@link Icon} associated with this entry.
      * @param icon an Icon
      */
-    void setIcon(I icon);
+    void setIcon(Icon icon);
 
     /**
      * Returns the date at which any value was retrieved from this entry.

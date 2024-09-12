@@ -27,7 +27,7 @@ import java.util.UUID;
  *
  * @author Jo
  */
-public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D,G,E,I>, I extends Icon> implements Database<D, G, E, I> {
+public abstract class AbstractDatabase<D extends Database<D>>  implements Database<D> {
 
     private boolean isDirty;
 
@@ -41,69 +41,69 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     }
 
     @Override
-    public void visit(Visitor<D, G, E, I> visitor) {
+    public void visit(Visitor<D> visitor) {
         visitor.startVisit(getRootGroup());
         visit(getRootGroup(), visitor);
         visitor.endVisit(getRootGroup());
     }
 
     @Override
-    public void visit(G group, Visitor<D, G, E, I> visitor) {
+    public void visit(Group<D> group, Visitor<D> visitor) {
 
         if (visitor.isEntriesFirst()) {
-            for (E entry : group.getEntries()) {
+            for (Entry<D> entry : group.getEntries()) {
                 visitor.visit(entry);
             }
         }
 
-        for (G g : group.getGroups()) {
+        for (Group<D> g : group.getGroups()) {
             visitor.startVisit(g);
             visit(g, visitor);
             visitor.endVisit(g);
         }
 
         if (!visitor.isEntriesFirst()) {
-            for (E entry : group.getEntries()) {
+            for (Entry<D> entry : group.getEntries()) {
                 visitor.visit(entry);
             }
         }
     }
 
     @Override
-    public List<? extends E> findEntries(Entry.Matcher matcher) {
+    public List<? extends Entry<D>> findEntries(Entry.Matcher matcher) {
         return getRootGroup().findEntries(matcher, true);
     }
 
     @Override
-    public List<? extends E> findEntries(String find) {
+    public List<? extends Entry<D>> findEntries(String find) {
         return getRootGroup().findEntries(find, true);
     }
 
     @Override
-    public G newGroup(String name) {
-        G result = newGroup();
+    public Group<D> newGroup(String name) {
+        Group<D> result = newGroup();
         result.setName(name);
         return result;
     }
 
     @Override
-    public G newGroup(Group <?,?,?,?> group) {
-        G result = newGroup();
+    public Group<D> newGroup(Group<?> group) {
+        Group<D> result = newGroup();
         result.setName(group.getName());
         result.setIcon(this.newIcon(group.getIcon().getIndex()));
         return result;
     }
 
     @Override
-    public E newEntry(String title) {
-        E result = newEntry();
+    public Entry<D> newEntry(String title) {
+        Entry<D> result = newEntry();
         result.setTitle(title);
         return result;
     }
 
     @Override
-    public E newEntry(Entry<?,?,?,?> entry) {
-        E result = newEntry();
+    public Entry<D> newEntry(Entry<?> entry) {
+        Entry<D> result = newEntry();
         for (String propertyName: entry.getPropertyNames()) {
             try {
                 // all implementations must support setting of STANDARD_PROPERTY_NAMES
@@ -130,8 +130,8 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     }
 
     @Override
-    public E findEntry(final UUID uuid) {
-        List<? extends E> entries = findEntries(entry -> entry.getUuid().equals(uuid));
+    public Entry<D> findEntry(final UUID uuid) {
+        List<? extends Entry<D>> entries = findEntries(entry -> entry.getUuid().equals(uuid));
         if (entries.size() > 1) {
             throw new IllegalStateException("Two entries same UUID");
         }
@@ -143,7 +143,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
 
     @Override
     public boolean deleteEntry(final UUID uuid) {
-        E e = findEntry(uuid);
+        Entry<D> e = findEntry(uuid);
         if (e == null) {
             return false;
         }
@@ -158,13 +158,13 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     }
 
     @Override
-    public G findGroup(final UUID uuid){
-        final List<G> groups = new ArrayList<>();
-        visit(new Visitor.Default<D, G, E, I>() {
+    public Group<D> findGroup(final UUID uuid){
+        final List<Group<D>> groups = new ArrayList<>();
+        visit(new Visitor.Default<D>() {
             // set to true while visiting sub groups of recycle bin
             boolean recycle;
             @Override
-            public void startVisit(G group) {
+            public void startVisit(Group<D> group) {
                 if (!recycle && group.getUuid().equals(uuid)) {
                     groups.add(group);
                 }
@@ -174,7 +174,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
             }
 
             @Override
-            public void endVisit(G group) {
+            public void endVisit(Group<D> group) {
                 if (group.isRecycleBin()) {
                     recycle = false;
                 }
@@ -191,7 +191,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
 
     @Override
     public boolean deleteGroup(final UUID uuid) {
-        G g = findGroup(uuid);
+        Group<D> g = findGroup(uuid);
         if (g==null) {
             return false;
         }
@@ -207,14 +207,14 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
 
     @Override
     public void emptyRecycleBin() {
-        G recycle = getRecycleBin();
+        Group<D> recycle = getRecycleBin();
         if (recycle == null) {
             return;
         }
-        for (G g: recycle.getGroups()){
+        for (Group<D> g: recycle.getGroups()){
             recycle.removeGroup(g);
         }
-        for (E e: recycle.getEntries()){
+        for (Entry<D> e: recycle.getEntries()){
             recycle.removeEntry(e);
         }
     }
