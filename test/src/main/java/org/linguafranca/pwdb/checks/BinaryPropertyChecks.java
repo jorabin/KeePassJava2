@@ -48,7 +48,7 @@ import static org.junit.Assert.*;
  *
  * @author jo
  */
-public abstract class BinaryPropertyChecks  <D extends Database<D,G,E,I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon> {
+public abstract class BinaryPropertyChecks  <D extends Database<G, E>, G extends Group<G,E>, E extends Entry<G,E>> {
 
     public D database;
 

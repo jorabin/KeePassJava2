@@ -32,11 +32,11 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
 /**
  * @author jo
  */
-public abstract class DatabaseLoaderChecks <D extends Database<D,G,E,I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon>{
+public abstract class DatabaseLoaderChecks <D extends Database<G, E>, G extends Group<G,E>, E extends Entry<G,E>> {
 
     static PrintStream printStream = getTestPrintStream();
 
-    protected Database<D,G,E,I> database;
+    protected Database<G,E> database;
     protected boolean skipDateCheck = false;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX");
     /**

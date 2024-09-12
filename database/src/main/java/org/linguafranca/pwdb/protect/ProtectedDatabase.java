@@ -13,7 +13,7 @@ import java.util.List;
  * establishes {@link org.linguafranca.pwdb.PropertyValue.StringStore} storage for unprotected values and
  * {@link org.linguafranca.pwdb.PropertyValue.SealedStore} for protected values.
  */
-public abstract class ProtectedDatabase<D extends Database<D>>  extends AbstractDatabase<D> {
+public abstract class ProtectedDatabase<G extends Group<G, E>, E extends Entry<G, E>>  extends AbstractDatabase<G, E> {
     private PropertyValue.Strategy valueStrategy = new PropertyValue.Strategy.Default();
 
     @Override

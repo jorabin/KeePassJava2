@@ -65,7 +65,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 
 @JsonIgnoreProperties({"path", "username", "title", "notes", "url", "password"})
-public class JacksonEntry extends AbstractEntry<JacksonDatabase> {
+public class JacksonEntry extends AbstractEntry<JacksonGroup, JacksonEntry> {
 
 
     @JacksonXmlProperty(localName = "UUID")

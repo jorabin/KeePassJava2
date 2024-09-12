@@ -18,10 +18,9 @@ package org.linguafranca.pwdb.kdbx;
 
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
-import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
-import org.linguafranca.pwdb.kdbx.dom.DomEntryWrapper;
-import org.linguafranca.pwdb.kdbx.dom.DomGroupWrapper;
-import org.linguafranca.pwdb.kdbx.dom.DomIconWrapper;
+import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.JacksonEntry;
+import org.linguafranca.pwdb.kdbx.jackson.JacksonGroup;
 import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.IOException;
@@ -37,18 +36,18 @@ import static org.junit.Assert.assertEquals;
  * 
  * @author jo
  */
-public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper> {
+public class SimpleQuickStartTest extends QuickStart<JacksonDatabase, JacksonGroup, JacksonEntry> {
 
 
     @Override
-    public DomDatabaseWrapper getDatabase() {
-        return new DomDatabaseWrapper();
+    public JacksonDatabase getDatabase() {
+        return new JacksonDatabase();
     }
 
     @Override
-    public DomDatabaseWrapper loadDatabase(Credentials credentials, InputStream inputStream){
+    public JacksonDatabase loadDatabase(Credentials credentials, InputStream inputStream){
         try {
-            return DomDatabaseWrapper.load(credentials, inputStream);
+            return JacksonDatabase.load(credentials, inputStream);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -76,7 +75,7 @@ public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGrou
         loadKdbx3SaveKdbx4("test123.kdbx","123".getBytes(), Files.newOutputStream(path));
 
         // load newly created V4 database
-        DomDatabaseWrapper db = DomDatabaseWrapper.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
+        JacksonDatabase db = JacksonDatabase.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
         KdbxStreamFormat streamFormat = (KdbxStreamFormat) db.getStreamFormat();
         assertEquals(4, streamFormat.getStreamConfiguration().getVersion());
         assertEquals(Encryption.Cipher.CHA_CHA_20, streamFormat.getStreamConfiguration().getCipherAlgorithm());
@@ -90,7 +89,7 @@ public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGrou
         loadKdbx4SaveKdbx3("V4-ChaCha20-Argon2-Attachment.kdbx","123".getBytes(), Files.newOutputStream(path));
 
         // load newly created V4 database
-        DomDatabaseWrapper db = DomDatabaseWrapper.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
+        JacksonDatabase db = JacksonDatabase.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
         KdbxStreamFormat streamFormat = (KdbxStreamFormat) db.getStreamFormat();
         assertEquals(3, streamFormat.getStreamConfiguration().getVersion());
         assertEquals(Encryption.Cipher.AES, streamFormat.getStreamConfiguration().getCipherAlgorithm());

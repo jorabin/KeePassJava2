@@ -11,9 +11,9 @@ import static org.junit.Assert.*;
 /**
  * @author jo
  */
-public abstract class RecycleBinChecks  <D extends Database<D,G,E,I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon>  {
+public abstract class RecycleBinChecks  <D extends Database<G, E>, G extends Group<G,E>, E extends Entry<G,E>>  {
 
-    protected Database<D,G,E,I> database;
+    protected Database<G,E> database;
 
     @Test
     public void recycleBinEntries() {

@@ -7,8 +7,8 @@ import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxSerializer;
-import org.linguafranca.pwdb.kdbx.jaxb.JaxbDatabase;
-import org.linguafranca.pwdb.kdbx.jaxb.JaxbEntry;
+import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.JacksonEntry;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,10 +29,10 @@ public class Issue27Test {
     public void testIssue27() throws IOException {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx");
         KdbxCreds creds = new KdbxCreds("passwordless".getBytes());
-        JaxbDatabase db = JaxbDatabase.load(creds, is);
-        List<? extends JaxbEntry> entries = db.findEntries("testtitle");
+        JacksonDatabase db = JacksonDatabase.load(creds, is);
+        List<? extends JacksonEntry> entries = db.findEntries("testtitle");
 
-        for (JaxbEntry entry: entries) {
+        for (JacksonEntry entry: entries) {
             printStream.println(Helpers.fromDateV3(entry.getCreationTime()));
             assertEquals("2021-01-11T09:18:56Z", Helpers.fromDateV3(entry.getCreationTime()));
         }
@@ -45,10 +45,10 @@ public class Issue27Test {
     public void testV4Date() throws IOException {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("V4-AES-AES.kdbx");
         KdbxCreds creds = new KdbxCreds("123".getBytes());
-        JaxbDatabase db = JaxbDatabase.load(creds, is);
-        List<? extends JaxbEntry> entries = db.findEntries("Sample Entry #2 - Copy");
+        JacksonDatabase db = JacksonDatabase.load(creds, is);
+        List<? extends JacksonEntry> entries = db.findEntries("Sample Entry #2 - Copy");
 
-        for (JaxbEntry entry: entries) {
+        for (JacksonEntry entry: entries) {
             printStream.println(Helpers.fromDate(entry.getCreationTime()));
             assertEquals("2018-01-26T13:20:58Z", Helpers.fromDateV3(entry.getCreationTime()));
         }

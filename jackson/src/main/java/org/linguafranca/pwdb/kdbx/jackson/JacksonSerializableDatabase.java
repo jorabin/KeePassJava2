@@ -45,12 +45,16 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
 
     private PropertyValue.Strategy propertyValueStrategy = new PropertyValue.Strategy.Default();
 
-    public static KeePassFile createEmptyDatabase() throws IOException {
+    public static KeePassFile createEmptyDatabase()  {
 
         InputStream inputStream = JacksonSerializableDatabase.class.getClassLoader()
                 .getResourceAsStream("base.kdbx.xml");
         XmlMapper mapper = new XmlMapper();
-        return mapper.readValue(inputStream, KeePassFile.class);
+        try {
+            return mapper.readValue(inputStream, KeePassFile.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

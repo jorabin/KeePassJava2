@@ -34,12 +34,12 @@ import java.util.UUID;
 
 import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.createEmptyDatabase;
 
-public class JacksonDatabase extends ProtectedDatabase<JacksonDatabase> {
+public class JacksonDatabase extends ProtectedDatabase<JacksonGroup, JacksonEntry> {
 
     KeePassFile keePassFile;
     StreamFormat<?> streamFormat;
 
-    public JacksonDatabase() throws IOException {
+    public JacksonDatabase() {
         this(createEmptyDatabase(), null);
     }
 

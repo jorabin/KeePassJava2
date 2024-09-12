@@ -39,7 +39,7 @@ import org.linguafranca.pwdb.kdbx.jackson.JacksonGroup;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonIcon;
 
 
-public class JacksonSaveAndReloadTest extends SaveAndReloadChecks<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon>{
+public class JacksonSaveAndReloadTest extends SaveAndReloadChecks<JacksonDatabase, JacksonGroup, JacksonEntry>{
  
     @Override
     public JacksonDatabase getDatabase() {

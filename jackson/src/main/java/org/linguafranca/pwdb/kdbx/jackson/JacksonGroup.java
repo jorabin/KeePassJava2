@@ -24,7 +24,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import org.jetbrains.annotations.NotNull;
-import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
@@ -54,7 +53,7 @@ import java.util.UUID;
 "group",
 })
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class JacksonGroup extends AbstractGroup<JacksonDatabase> {
+public class JacksonGroup extends AbstractGroup<JacksonGroup, JacksonEntry>{
 
     @JacksonXmlProperty(localName = "UUID")
     @JsonDeserialize(converter = Base64ToUUIDConverter.class)
@@ -116,7 +115,7 @@ public class JacksonGroup extends AbstractGroup<JacksonDatabase> {
     @JsonIgnore
     protected JacksonGroup parent;
 
-    protected JacksonGroup() {
+    public JacksonGroup() {
         entries = new ArrayList<>();
         groups = new ArrayList<>();
         times = new Times();

@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class JacksonPropertyValueTest extends PropertyValueChecks<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
+public class JacksonPropertyValueTest extends PropertyValueChecks<JacksonDatabase, JacksonGroup, JacksonEntry> {
 
     public JacksonPropertyValueTest() throws IOException {
         super(true);

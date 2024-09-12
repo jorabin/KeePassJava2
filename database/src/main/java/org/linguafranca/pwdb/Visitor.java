@@ -23,24 +23,24 @@ import java.io.PrintStream;
  *
  * @author jo
  */
-public interface Visitor <D extends Database<D>> {
+public interface Visitor <G extends Group<G, E>, E extends Entry<G, E>> {
     /**
      * Called on entry to a group visit
      * @param group the group being visited
      */
-    void startVisit(Group<D> group);
+    void startVisit(G group);
 
     /**
      * Called on exit from a group visit
      * @param group the group being exited
      */
-    void endVisit(Group<D> group );
+    void endVisit(G group );
 
     /**
      * Called on visit to an entry
      * @param entry the entry being visited
      */
-    void visit(Entry<D> entry);
+    void visit(E entry);
 
     /**
      * called to determine whether to visit entries before subgroups, or not
@@ -51,16 +51,16 @@ public interface Visitor <D extends Database<D>> {
     /**
      * Empty implementation of Visitor
      */
-    abstract class Default <D extends Database<D>> implements Visitor <D> {
+    abstract class Default <G extends Group<G, E>, E extends Entry<G, E>>  implements Visitor <G, E> {
 
         @Override
-        public void startVisit(Group<D> group) {}
+        public void startVisit(G group) {}
 
         @Override
-        public void endVisit(Group<D> group) {}
+        public void endVisit(G group) {}
 
         @Override
-        public void visit(Entry<D> entry) {}
+        public void visit(E entry) {}
 
         @Override
         public boolean isEntriesFirst() {
@@ -71,7 +71,7 @@ public interface Visitor <D extends Database<D>> {
     /**
      * Visitor prints the Groups and Entries it visits to console
      */
-    class Print <D extends Database<D>> extends Default<D> {
+    class Print <G extends Group<G, E>, E extends Entry<G, E>>  extends Default<G, E> {
 
         private final PrintStream printStream;
 
@@ -84,12 +84,12 @@ public interface Visitor <D extends Database<D>> {
         }
 
         @Override
-        public void startVisit(Group<D> group ) {
+        public void startVisit(G group ) {
             printStream.println(group.toString());
         }
 
         @Override
-        public void visit(Entry<D> entry) {
+        public void visit(E entry) {
             printStream.println(entry.toString());
         }
 

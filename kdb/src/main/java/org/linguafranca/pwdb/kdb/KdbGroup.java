@@ -32,13 +32,13 @@ import java.util.UUID;
  * The class holds a KDB Group
  * @author jo
  */
-public class KdbGroup extends AbstractGroup<KdbDatabase> {
+public class KdbGroup extends AbstractGroup<KdbGroup, KdbEntry> {
     private boolean root;
     private KdbGroup parent;
     protected KdbDatabase database;
     private UUID uuid = UUID.randomUUID();
     private String name = "";
-    private KdbIcon icon = new KdbIcon(0);
+    private Icon icon = new KdbIcon(0);
     private List<KdbGroup> groups = new ArrayList<>();
     private List<KdbEntry> entries = new ArrayList<>();
     private Date creationTime;
@@ -158,12 +158,12 @@ public class KdbGroup extends AbstractGroup<KdbDatabase> {
     }
 
     @Override
-    public KdbIcon getIcon() {
+    public Icon getIcon() {
         return icon;
     }
 
     @Override
-    public void setIcon(KdbIcon icon) {
+    public void setIcon(Icon icon) {
         this.icon = icon;
     }
 

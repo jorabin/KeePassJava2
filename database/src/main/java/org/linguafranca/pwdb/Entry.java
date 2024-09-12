@@ -43,7 +43,7 @@ import java.util.*;
  *
  * @author Jo
  */
-public interface Entry <D extends Database<D>> {
+public interface Entry <G extends Group<G, E>, E extends Entry<G, E>> {
     /**
      * Standard properties are attributes of Entries that are accessible either by
      * dedicated methods, such as getPassword, or by {@link #getProperty(String)}
@@ -67,7 +67,8 @@ public interface Entry <D extends Database<D>> {
      * method
      */
     interface Matcher {
-        boolean matches( Entry<? extends Database<?>> entry);
+        // needs to be raw type so that we can use lambdas
+        boolean matches(@SuppressWarnings("rawtypes") Entry entry);
     }
 
     /**
@@ -213,7 +214,7 @@ public interface Entry <D extends Database<D>> {
      * Get the parent of this entry
      * @return a parent or null if this entry currently does not have a parent
      */
-    @Nullable Group<D> getParent();
+    @Nullable G getParent();
 
     /**
      * Get the UUID of this entry. Databases (like KDB) that do not natively support

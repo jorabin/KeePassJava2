@@ -20,7 +20,7 @@ import org.junit.BeforeClass;
 import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.kdb.KdbCredentials;
 import org.linguafranca.pwdb.kdb.KdbDatabase;
-import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
+import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
 import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.*;
@@ -37,7 +37,7 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group<D, G, E, I>, E extends Entry<D, G, E, I>, I extends Icon> {
+public abstract class QuickStart<D extends Database<G, E>, G extends Group<G, E>, E extends Entry<G, E>> {
 
     static PrintStream printStream = getTestPrintStream();
 
@@ -78,11 +78,11 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
         D database = getDatabase();
 
         // add some groups and entries
-        for (Integer g = 0; g < 5; g++) {
-            G group = database.getRootGroup().addGroup(database.newGroup(g.toString()));
+        for (int g = 0; g < 5; g++) {
+            G group = database.getRootGroup().addGroup(database.newGroup(Integer.toString(g)));
             for (int e = 0; e <= g; e++) {
                 // entry factory is a local helper to populate an entry
-                group.addEntry(entryFactory(database, g.toString(), e));
+                group.addEntry(entryFactory(database, Integer.toString(g), e));
             }
         }
 
@@ -95,7 +95,7 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
     /**
      * Splice - add a group from one database to a parent from another (or copy from the same db)
      */
-    public void splice(G newParent, Group<?, ?, ?, ?> groupToSplice) {
+    public void splice(G newParent, Group<?, ?> groupToSplice) {
         G addedGroup = newParent.addGroup(newParent.getDatabase().newGroup(groupToSplice));
         addedGroup.copy(groupToSplice);
     }
@@ -144,12 +144,12 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
      * Load KDBX V3 save as KDBX V4
      */
     public void loadKdbx3SaveKdbx4(String resourceName, byte[] password, OutputStream v4OutputStream) throws IOException {
-        DomDatabaseWrapper database;
+        JacksonDatabase database;
         // password credentials
         KdbxCreds credentials = new KdbxCreds(password);
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
             // load KdbDatabase
-            database = DomDatabaseWrapper.load(credentials, inputStream);
+            database = JacksonDatabase.load(credentials, inputStream);
         }
 
         // create a KDBX (database
@@ -176,12 +176,12 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
      * Load KDBX V3 save as KDBX V4
      */
     public void loadKdbx4SaveKdbx3(String resourceName, byte[] password, OutputStream v3OutputStream) throws IOException {
-        DomDatabaseWrapper database;
+        JacksonDatabase database;
         // password credentials
         KdbxCreds credentials = new KdbxCreds(password);
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
             // load KdbDatabase
-            database = DomDatabaseWrapper.load(credentials, inputStream);
+            database = JacksonDatabase.load(credentials, inputStream);
         }
 
         // create a KDBX (database

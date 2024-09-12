@@ -4,9 +4,7 @@ import com.google.common.io.CharStreams;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.StreamFormat;
-import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
-import org.linguafranca.pwdb.kdbx.jaxb.JaxbDatabase;
-import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -16,14 +14,14 @@ import java.util.List;
 
 public class Util {
 
-    List<Class> implementations = new ArrayList<>(Arrays.asList(DomDatabaseWrapper.class, SimpleDatabase.class, JaxbDatabase.class));
+    List<Class> implementations = new ArrayList<>(Arrays.asList(JacksonDatabase.class));
 
     @FunctionalInterface
     public interface DatabaseLoader {
-        Database<?,?,?,?> load(Credentials c, InputStream i) throws IOException;
+        Database<?,?> load(Credentials c, InputStream i) throws IOException;
     }
 
-    List<DatabaseLoader> dbLoader = Arrays.asList(DomDatabaseWrapper::load, SimpleDatabase::load, JaxbDatabase::load);
+    List<DatabaseLoader> dbLoader = Arrays.asList(JacksonDatabase::load);
 
     public static InputStream getDecryptedInputStream (String resourceName, Credentials credentials) throws IOException {
         return getDecryptedInputStream(resourceName, credentials, new KdbxHeader());
@@ -42,7 +40,7 @@ public class Util {
      * Example shows how to list XML from a database (but not decrypted passwords)
      */
     public static void listDatabase(String resourceName, Credentials creds, OutputStream outputStream) throws IOException {
-        SimpleDatabase database = SimpleDatabase.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
+        JacksonDatabase database = JacksonDatabase.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
         database.save(new StreamFormat.None(), new KdbxCreds.None(), outputStream);
     }
 
@@ -50,7 +48,7 @@ public class Util {
      * Example shows how to list XML from a database using specified loader
      */
     public static void listDatabase(DatabaseLoader loader, String resourceName, Credentials creds, OutputStream outputStream) throws IOException {
-        Database<?, ?, ?, ?> database = loader.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
+        Database<?, ?> database = loader.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
         database.save(new StreamFormat.None(), new KdbxCreds.None(), outputStream);
     }
 

@@ -37,7 +37,7 @@ import java.util.UUID;
  *
  * @author Jo
  */
-public interface Group <D extends Database<D>> {
+public interface Group <G extends Group<G, E>, E extends Entry<G, E>> {
     /**
      * Returns true if this is the root group of a database
      */
@@ -54,7 +54,7 @@ public interface Group <D extends Database<D>> {
      * a parent - e.g. if it is newly created or if it has
      * been removed from a previous parent.
       */
-    @Nullable Group<D> getParent();
+    @Nullable G getParent();
 
     /**
      * Add this group to a parent. The group must be of a type compatible with the database
@@ -62,7 +62,7 @@ public interface Group <D extends Database<D>> {
      *
      * @param parent a prospective parent
      */
-    void setParent(Group<D> parent);
+     void setParent(G parent);
 
     /**
      * Returns a list of groups that are the children of this group.
@@ -71,7 +71,7 @@ public interface Group <D extends Database<D>> {
      *
      * @return a modifiable list of groups
      */
-    List<? extends Group<D>> getGroups();
+    List<? extends G> getGroups();
 
     /**
      * Returns the number of groups that are direct children of this group
@@ -90,7 +90,7 @@ public interface Group <D extends Database<D>> {
      * @param group the group to add
      * @return the group added
      */
-    Group<D> addGroup(Group<D> group);
+    G addGroup(G group);
 
     /**
      * Returns a list of child Groups whose name exactly matches that supplied.
@@ -100,7 +100,7 @@ public interface Group <D extends Database<D>> {
      * @param groupName the name of the groups sought
      * @return a modifiable list
      */
-    List<? extends Group<D>> findGroups(String groupName);
+    List<? extends G> findGroups(String groupName);
 
     /**
      * Removes the group supplied from this group. The group removed
@@ -114,12 +114,12 @@ public interface Group <D extends Database<D>> {
      * @return the group passed for removal
      * @throws IllegalArgumentException if the group is not a child of this group
      */
-    Group<D> removeGroup(Group<D> group);
+    G removeGroup(G group);
 
     /**
      * Returns a modifiable by the caller list of entries contained in this group.
      */
-    List<? extends Entry<D>> getEntries();
+    List<? extends E> getEntries();
 
     /**
      * Returns the number of entries in this group
@@ -142,7 +142,7 @@ public interface Group <D extends Database<D>> {
      * @return a modifiable-by-caller list
      * @see Entry#match(String)
      */
-    List<? extends Entry<D>> findEntries(String match, boolean recursive);
+    List<? extends E> findEntries(String match, boolean recursive);
 
     /**
      * Finds all entries in this group that match using the matcher supplied.
@@ -157,7 +157,7 @@ public interface Group <D extends Database<D>> {
      * @return a modifiable-by-caller list
      * @see Entry#match(Entry.Matcher)
      */
-    List<? extends Entry<D>> findEntries(Entry.Matcher matcher, boolean recursive);
+    List<? extends E> findEntries(Entry.Matcher matcher, boolean recursive);
 
     /**
      * Adds an entry to this group removing it from another group
@@ -165,7 +165,7 @@ public interface Group <D extends Database<D>> {
      * @param entry the entry to add
      * @return the entry added
      */
-    Entry<D> addEntry(Entry<D> entry);
+    E addEntry(E entry);
 
     /**
      * Remove an entry from this group and hence from the database.
@@ -173,13 +173,13 @@ public interface Group <D extends Database<D>> {
      * @return the entry removed
      * @throws IllegalArgumentException if the Entry is not in the group
      */
-    Entry<D> removeEntry( Entry<D> entry);
+    E removeEntry(E entry);
 
     /**
      * Make a deep copy of the children a group and add to this group. Does not copy the parent group.
      * @param parent the group to deep copy
      */
-    void copy(Group<D> parent);
+    void copy(Group<?,?> parent);
 
     /**
      * Returns an XPath-like string of the names of Groups from the Root
@@ -215,5 +215,5 @@ public interface Group <D extends Database<D>> {
     /**
      * Get the database this group was created from
      */
-    @NotNull D getDatabase();
+    @NotNull Database<G, E> getDatabase();
 }

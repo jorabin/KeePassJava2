@@ -29,12 +29,12 @@ import java.util.Stack;
  *
  * @author Jo
  */
-public abstract class AbstractGroup<D extends Database<D>> implements Group<D> {
+public abstract class AbstractGroup<G extends Group<G, E>, E extends Entry<G, E>> implements Group<G, E> {
 
     @Override
-    public List<? extends Group<D>> findGroups(String group) {
-        ArrayList<Group<D>> result = new ArrayList<>();
-        for (Group<D> g: getGroups()) {
+    public List<? extends G> findGroups(String group) {
+        ArrayList<G> result = new ArrayList<>();
+        for (G g: getGroups()) {
             if (g.getName().equals(group)) {
                 result.add(g);
             }
@@ -43,38 +43,20 @@ public abstract class AbstractGroup<D extends Database<D>> implements Group<D> {
     }
 
     @Override
-    public List<? extends Entry<D>> findEntries(String find, boolean recursive) {
-        /*
-         * Local helper class to avoid violating DRY in {@link AbstractGroup#findEntries(String, boolean)}.
-         * Would-be lambda in Java 8.
-         */
-        class TextMatcher implements Entry.Matcher {
-
-            private final String text;
-
-            private TextMatcher(String text) {
-                this.text = text;
-            }
-
-            @Override
-            public boolean matches(Entry<? extends Database<?>> entry) {
-                return entry.match(text);
-            }
-        }
-
-        return findEntries(new TextMatcher(find), recursive);
+    public List<? extends E> findEntries(String find, boolean recursive) {
+        return findEntries(entry -> entry.match(find), recursive);
     }
 
     @Override
-    public List<? extends Entry<D>> findEntries(Entry.Matcher matcher, boolean recursive) {
-        List <Entry<D>> result = new ArrayList<>(getEntries().size());
-        for (Entry<D> entry: getEntries()){
+    public List<? extends E> findEntries(Entry.Matcher matcher, boolean recursive) {
+        List <E> result = new ArrayList<>(getEntries().size());
+        for (E entry: getEntries()){
             if (entry.match(matcher)){
                 result.add(entry);
             }
         }
         if (recursive) {
-            for (Group<D> group: getGroups()) {
+            for (G group: getGroups()) {
                 // don't recurse into recycle bin
                 if (group.isRecycleBin()) {
                     continue;
@@ -86,21 +68,21 @@ public abstract class AbstractGroup<D extends Database<D>> implements Group<D> {
     }
 
     @Override
-    public void copy(Group<D> parent) {
-        for (Group<D> child : parent.getGroups()) {
-            Group<D> addedGroup = addGroup(this.getDatabase().newGroup(child));
+    public void copy(Group<?,?> parent) {
+        for (Group<?,?> child : parent.getGroups()) {
+            G addedGroup = addGroup(this.getDatabase().newGroup(child));
             addedGroup.copy(child);
         }
-        for (Entry<D> entry : parent.getEntries()) {
+        for (Entry<?,?> entry : parent.getEntries()) {
             addEntry(this.getDatabase().newEntry(entry));
         }
     }
 
     @Override
     public String getPath() {
-        Stack<Group<D>> parents = new Stack<>();
-        Group<D> parent = this;
-        parents.push(this);
+        Stack<G> parents = new Stack<>();
+        G parent = (G)this;
+        parents.push((G)this);
         while ((parent=parent.getParent()) != null) {
             parents.push(parent);
         }

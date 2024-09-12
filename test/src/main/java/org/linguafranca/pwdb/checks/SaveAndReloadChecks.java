@@ -33,7 +33,7 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
 /**
  * @author jo
  */
-public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon>{
+public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends Group<G,E>, E extends Entry<G,E>> {
 
     static PrintStream printStream = getTestPrintStream();
 

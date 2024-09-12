@@ -49,26 +49,26 @@ import java.util.UUID;
  * the caller without affecting the underlying database structure, however changes
  * to the Groups and Entries contained in the lists do modify the database.
  */
-public interface Database <D extends Database<D>> {
+public interface Database <G extends Group<G, E>, E extends Entry<G, E>> {
 
     /**
      * get the root group for the database
      * @return the root group
      */
-    Group<D> getRootGroup();
+    G getRootGroup();
 
     /**
      * Create a new Group
      * @return the group created
      */
-    Group<D> newGroup();
+    G newGroup();
 
     /**
      * Create a new named Group
      * @param name the name of the group
      * @return the group created
      */
-    Group<D> newGroup(String name);
+    G newGroup(String name);
 
     /**
      * Create a new Group copying the details of the supplied group, but not copying its children
@@ -77,19 +77,19 @@ public interface Database <D extends Database<D>> {
      * @param group the group to copy
      * @return the group created
      */
-    Group<D> newGroup(Group<? extends Database<?>> group);
+    G newGroup(Group<?, ?> group);
 
     /**
      * Create a new Entry
      * @return the entry created
      */
-    Entry<D> newEntry();
+    E newEntry();
 
     /**
      * Create a new Entry with a title
      * @return the entry created
      */
-    Entry<D> newEntry(String title);
+    E newEntry(String title);
 
     /**
      * Create a new Entry copying the details of the supplied entry
@@ -98,7 +98,7 @@ public interface Database <D extends Database<D>> {
      * @param entry the entry to copy
      * @return the entry created
      */
-    Entry<D> newEntry(Entry<?> entry);
+    E newEntry(Entry<?, ?> entry);
 
     /**
      * Create a new default icon
@@ -118,7 +118,7 @@ public interface Database <D extends Database<D>> {
      * @param uuid the UUID
      * @return an entry or null if not found
      */
-    @Nullable Entry<D> findEntry(UUID uuid);
+    @Nullable E findEntry(UUID uuid);
 
     /**
      * Delete an entry with this UUID from anywhere in the database except the recycle bin
@@ -133,7 +133,7 @@ public interface Database <D extends Database<D>> {
      * @param uuid the UUID
      * @return a group or null if not found
      */
-    @Nullable Group<D> findGroup(UUID uuid);
+    @Nullable G findGroup(UUID uuid);
 
     /**
      * Delete a group with this UUID from anywhere in the database except the recycle bin
@@ -163,7 +163,7 @@ public interface Database <D extends Database<D>> {
      * or if recycle bin is not supported then return null.
      * @see #supportsRecycleBin()
      */
-    @Nullable Group<D> getRecycleBin();
+    @Nullable G getRecycleBin();
 
     /**
      * empty the recycle bin whether it is enabled or disabled
@@ -177,14 +177,14 @@ public interface Database <D extends Database<D>> {
      *
      * @param visitor the visitor to use
      */
-    void visit(Visitor<D> visitor);
+    void visit(Visitor<G, E> visitor);
 
     /**
      * Visit all entries starting from a group
      * @param group the group to start at
      * @param visitor the visitor to use
      */
-    void visit(Group<D> group, Visitor<D> visitor);
+    void visit(G group, Visitor<G, E> visitor);
 
     /**
      * Find all entries that match the criteria
@@ -192,7 +192,7 @@ public interface Database <D extends Database<D>> {
      * @param matcher the matcher to use
      * @return a list of entries
      */
-    List<? extends Entry<D>> findEntries(Entry.Matcher matcher);
+    List<? extends E> findEntries(Entry.Matcher matcher);
 
     /**
      * Find all entries that match {@link Entry#match(String)}
@@ -200,7 +200,7 @@ public interface Database <D extends Database<D>> {
      * @param find string to find
      * @return a list of entries
      */
-    List<? extends Entry<D>> findEntries(String find);
+    List<? extends E> findEntries(String find);
 
     /**
      * Gets the name of the database or null if not supported

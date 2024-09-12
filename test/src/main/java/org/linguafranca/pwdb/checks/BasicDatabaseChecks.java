@@ -34,11 +34,11 @@ import static org.junit.Assert.*;
 /**
  * @author Jo
  */
-public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extends Group<D,G,E,I>, E extends Entry<D,G,E,I>, I extends Icon> {
+public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry<G,E>> {
 
-    protected Database<D,G,E,I> database;
+    protected Database<G, E> database;
 
-    public abstract Database<D,G,E,I> createDatabase() throws IOException;
+    public abstract Database<G,E> createDatabase() throws IOException;
 
     public BasicDatabaseChecks() throws IOException {
         this.database = createDatabase();
@@ -75,7 +75,7 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
 
     @Test
     public void testDeleteGroup () {
-        Group<D,G,E,I> g1 = database.getRootGroup().addGroup(database.newGroup("group1"));
+        Group<G,E> g1 = database.getRootGroup().addGroup(database.newGroup("group1"));
         List<? extends G> l1 = database.getRootGroup().findGroups("group1");
         assertEquals(1, l1.size());
         G g2 = l1.get(0);
@@ -130,7 +130,7 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
         Assert.assertTrue(e1.matchTitle("1"));
         Assert.assertFalse(e1.matchTitle("doggy"));
 
-        I ic1 = database.newIcon(27);
+        Icon ic1 = database.newIcon(27);
         e1.setIcon(ic1);
         assertEquals(e1.getIcon(), ic1);
 
@@ -244,7 +244,7 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
         entry1.setIcon(database.newIcon(2));
 
         // create a new Database
-        Database<D,G,E,I> database2 = createDatabase();
+        Database<G,E> database2 = createDatabase();
         // create a new Entry in new Database
         E entry2 = database2.newEntry(entry1);
 

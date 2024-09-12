@@ -32,8 +32,7 @@ import static org.junit.Assert.*;
 /**
  * Testing the operation of PropertyValue mechanisms
  */
-public abstract class PropertyValueChecks<D extends Database<D, G, E, I>, G extends Group<D, G, E, I>,
-        E extends Entry<D, G, E, I>, I extends Icon> {
+public abstract class PropertyValueChecks<D extends Database<G, E>, G extends Group<G,E>, E extends Entry<G,E>>  {
 
     public abstract void saveDatabase(D database, Credentials credentials, OutputStream outputStream) throws IOException;
     public abstract D loadDatabase(Credentials credentials, InputStream inputStream) throws IOException;

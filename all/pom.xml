@@ -19,7 +19,7 @@
     <parent>
         <artifactId>KeePassJava2-parent</artifactId>
         <groupId>org.linguafranca.pwdb</groupId>
-        <version>2.2.3-SNAPSHOT</version>
+        <version>2.3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -27,27 +27,12 @@
 
     <artifactId>KeePassJava2</artifactId>
     <name>KeePassJava2 :: All</name>
-    <description>KDB Database support as well as KDBX 3.1: DOM, JAXB and Simple implementations.</description>
+    <description>KDBX and KDB Database support.</description>
 
     <dependencies>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
             <artifactId>KeePassJava2-kdb</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>KeePassJava2-dom</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>KeePassJava2-jaxb</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>KeePassJava2-simple</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
