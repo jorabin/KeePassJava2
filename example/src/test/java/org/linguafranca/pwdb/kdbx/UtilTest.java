@@ -1,6 +1,7 @@
 package org.linguafranca.pwdb.kdbx;
 
 import org.junit.Test;
+import org.linguafranca.pwdb.format.KdbxCreds;
 
 import java.io.IOException;
 import java.io.OutputStream;

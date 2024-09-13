@@ -18,9 +18,11 @@ package org.linguafranca.pwdb.kdbx;
 
 import org.junit.BeforeClass;
 import org.linguafranca.pwdb.*;
+import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.format.KdbxHeader;
+import org.linguafranca.pwdb.format.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdb.KdbCredentials;
 import org.linguafranca.pwdb.kdb.KdbDatabase;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
 import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.*;
@@ -144,12 +146,12 @@ public abstract class QuickStart {
      * Load KDBX V3 save as KDBX V4
      */
     public void loadKdbx3SaveKdbx4(String resourceName, byte[] password, OutputStream v4OutputStream) throws IOException {
-        JacksonDatabase database;
+        KdbxDatabase database;
         // password credentials
         KdbxCreds credentials = new KdbxCreds(password);
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
             // load KdbDatabase
-            database = JacksonDatabase.load(credentials, inputStream);
+            database = KdbxDatabase.load(credentials, inputStream);
         }
 
         // create a KDBX (database
@@ -176,12 +178,12 @@ public abstract class QuickStart {
      * Load KDBX V3 save as KDBX V4
      */
     public void loadKdbx4SaveKdbx3(String resourceName, byte[] password, OutputStream v3OutputStream) throws IOException {
-        JacksonDatabase database;
+        KdbxDatabase database;
         // password credentials
         KdbxCreds credentials = new KdbxCreds(password);
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
             // load KdbDatabase
-            database = JacksonDatabase.load(credentials, inputStream);
+            database = KdbxDatabase.load(credentials, inputStream);
         }
 
         // create a KDBX (database)

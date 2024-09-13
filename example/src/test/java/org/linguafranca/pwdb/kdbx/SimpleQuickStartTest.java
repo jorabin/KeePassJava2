@@ -18,9 +18,8 @@ package org.linguafranca.pwdb.kdbx;
 
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonEntry;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonGroup;
+import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.format.KdbxStreamFormat;
 import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.IOException;
@@ -40,14 +39,14 @@ public class SimpleQuickStartTest extends QuickStart {
 
 
     @Override
-    public JacksonDatabase getDatabase() {
-        return new JacksonDatabase();
+    public KdbxDatabase getDatabase() {
+        return new KdbxDatabase();
     }
 
     @Override
-    public JacksonDatabase loadDatabase(Credentials credentials, InputStream inputStream){
+    public KdbxDatabase loadDatabase(Credentials credentials, InputStream inputStream){
         try {
-            return JacksonDatabase.load(credentials, inputStream);
+            return KdbxDatabase.load(credentials, inputStream);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -75,7 +74,7 @@ public class SimpleQuickStartTest extends QuickStart {
         loadKdbx3SaveKdbx4("test123.kdbx","123".getBytes(), Files.newOutputStream(path));
 
         // load newly created V4 database
-        JacksonDatabase db = JacksonDatabase.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
+        KdbxDatabase db = KdbxDatabase.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
         KdbxStreamFormat streamFormat = (KdbxStreamFormat) db.getStreamFormat();
         assertEquals(4, streamFormat.getStreamConfiguration().getVersion());
         assertEquals(Encryption.Cipher.CHA_CHA_20, streamFormat.getStreamConfiguration().getCipherAlgorithm());
@@ -89,7 +88,7 @@ public class SimpleQuickStartTest extends QuickStart {
         loadKdbx4SaveKdbx3("V4-ChaCha20-Argon2-Attachment.kdbx","123".getBytes(), Files.newOutputStream(path));
 
         // load newly created V4 database
-        JacksonDatabase db = JacksonDatabase.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
+        KdbxDatabase db = KdbxDatabase.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
         KdbxStreamFormat streamFormat = (KdbxStreamFormat) db.getStreamFormat();
         assertEquals(3, streamFormat.getStreamConfiguration().getVersion());
         assertEquals(Encryption.Cipher.AES, streamFormat.getStreamConfiguration().getCipherAlgorithm());

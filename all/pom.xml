@@ -37,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>KeePassJava2-jackson</artifactId>
+            <artifactId>KeePassJava2-kdbx-database</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

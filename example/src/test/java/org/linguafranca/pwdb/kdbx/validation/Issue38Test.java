@@ -2,9 +2,8 @@ package org.linguafranca.pwdb.kdbx.validation;
 
 import org.junit.Test;
 import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonEntry;
+import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.kdbx.KdbxDatabase;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +25,7 @@ public class Issue38Test {
         assert keyStream != null;
         KdbxCreds creds = new KdbxCreds("MyPassword".getBytes(), keyStream);
         assert databaseStream != null;
-        JacksonDatabase database = JacksonDatabase.load(creds, databaseStream);
+        KdbxDatabase database = KdbxDatabase.load(creds, databaseStream);
         List<? extends Entry> entries = database.findEntries("Sample Entry");
         Entry entry = entries.get(0);
         printStream.println(entry.getTitle());

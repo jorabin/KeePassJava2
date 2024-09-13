@@ -2,7 +2,7 @@ package org.linguafranca.pwdb.kdbx;
 
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Visitor;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
+import org.linguafranca.pwdb.format.KdbxCreds;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -25,7 +25,7 @@ public class OpenDbExample {
     private static class JacksonDbLoader implements DbLoader {
         @Override
         public Database load(KdbxCreds creds, InputStream inputStream) throws Exception {
-            return JacksonDatabase.load(creds, inputStream);
+            return KdbxDatabase.load(creds, inputStream);
         }
     }
 

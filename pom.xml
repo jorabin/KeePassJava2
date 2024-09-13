@@ -25,8 +25,8 @@
         <module>database</module>
         <module>test</module>
         <module>kdb</module>
-        <module>kdbx</module>
-        <module>jackson</module>
+        <module>kdbx-io</module>
+        <module>kdbx-database</module>
         <module>all</module>
         <module>example</module>
     </modules>

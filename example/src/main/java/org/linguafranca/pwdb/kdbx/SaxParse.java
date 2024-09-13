@@ -17,6 +17,9 @@
 package org.linguafranca.pwdb.kdbx;
 
 import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.format.Helpers;
+import org.linguafranca.pwdb.format.KdbxHeader;
+import org.linguafranca.pwdb.format.KdbxSerializer;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;

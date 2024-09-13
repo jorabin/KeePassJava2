@@ -4,7 +4,9 @@ import com.google.common.io.CharStreams;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.StreamFormat;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
+import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.format.KdbxHeader;
+import org.linguafranca.pwdb.format.KdbxSerializer;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -14,14 +16,14 @@ import java.util.List;
 
 public class Util {
 
-    List<Class> implementations = new ArrayList<>(Arrays.asList(JacksonDatabase.class));
+    List<Class> implementations = new ArrayList<>(Arrays.asList(KdbxDatabase.class));
 
     @FunctionalInterface
     public interface DatabaseLoader {
         Database load(Credentials c, InputStream i) throws IOException;
     }
 
-    List<DatabaseLoader> dbLoader = Arrays.asList(JacksonDatabase::load);
+    List<DatabaseLoader> dbLoader = Arrays.asList(KdbxDatabase::load);
 
     public static InputStream getDecryptedInputStream (String resourceName, Credentials credentials) throws IOException {
         return getDecryptedInputStream(resourceName, credentials, new KdbxHeader());
@@ -40,7 +42,7 @@ public class Util {
      * Example shows how to list XML from a database (but not decrypted passwords)
      */
     public static void listDatabase(String resourceName, Credentials creds, OutputStream outputStream) throws IOException {
-        JacksonDatabase database = JacksonDatabase.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
+        KdbxDatabase database = KdbxDatabase.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
         database.save(new StreamFormat.None(), new KdbxCreds.None(), outputStream);
     }
 

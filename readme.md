@@ -3,10 +3,11 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent)
 [![javadoc](https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2/javadoc.svg)](https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2)
 
-![alt text](https://badgen.net/badge/Build/2.2.2/blue?icon=github)
-master [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
-develop [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
+![alt text](https://badgen.net/badge/Branch/master/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.2/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
 
+![alt text](https://badgen.net/badge/Branch/develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.3-SNAPSHOT/blue?icon=github)[![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
+
+![alt text](https://badgen.net/badge/Branch/v3/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.3-SNAPSHOT/blue?icon=github)[![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3)
 
 
 A Java 8 API for databases compatible with the renowned [KeePass](http://keepass.info) password
@@ -18,10 +19,11 @@ Features to date:
 
 - Read and write KeePass 2.x format (KDBX file formats V3 and V4)
 - Keepass 2.x Password and Keyfile Credentials
-- Read KeePass 1.x format (Rijndael only)
+- Read KeePass 1.x format (KDB format, Rijndael only)
 - *No* requirement for JCE Policy Files
 - Android compatible
 - Interfaces for Database, Group and Entry allow compatible addition of other formats
+- Pluggable memory storage and protection strategy
 
 It is licensed under the Apache 2 License and is currently usable.
 
@@ -39,7 +41,9 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-The current code is version 2.2.2 - released to Maven September 2024. This is on the main branch. See [Build from Source](#build-from-source)
+This version is 2.3-SNAPSHOT
+
+The current released code is version 2.2.2 - released to Maven September 2024. This is on the main branch. See [Build from Source](#build-from-source)
 
 Key updates relative to 2.1:
 - Java 8 (dependencies no longer support Java 7)
@@ -64,7 +68,7 @@ at Maven Central. Note that the artifactId has become Camel Case from release 2.
 
 ### Snapshot
 
-Snapshot builds are erratically available at [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/org/linguafranca/pwdb/):
+Snapshot builds are erratically available at [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/org/linguafranca/pwdb/) e.g.:
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
@@ -99,22 +103,19 @@ Create credentials and an input stream for the password vault in question:
       KdbxCreds creds = new KdbxCreds("123".getBytes());
       InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test1.kdbx");
       
-then choose the Jackson based database implementation, and load the database
+then load the database:
 
-      Database database = JacksonDatabase.load(credentials, inputStream)
+      Database database = KdbxDatabase.load(credentials, inputStream)
 
-See below for discussion of other database implementations. Note that they will not be 
-maintained in the future - and see the following regarding making the storage of
-passwords more secure. 
+> In the past there were a number of different database implementations, at present there
+are two, one for KDBX (`KdbxDatabase` - previously called `JacksonDatabase`, because it uses Jackson for XML serialization)
+and one to support the KeePass V2 KDB format (`KdbDatabase`).
 
 ### Storing Passwords
 
 There are numerous well-understood problems
 with storing passwords as Strings in Java. See [this discussion](./PropertyValueProtection.md) about the
-KeePassJava2 approach to storing passwords.
-
-> Available from release 2.2.3 the enhanced **Jackson implementation** is the only KeePassJava2 database implementation that provides a
-means of storing passwords other than as String.  
+KeePassJava2 approach to storing passwords, which is implemented in this release.
 
 ### Discussion
 
@@ -175,41 +176,19 @@ KeePass formats in the following locations:
 KeePass - or more specifically its file format KDBX - is an XML based format, so one of the main tasks
 is serializing and deserializing XML. Over time (KeePassJava2 was originally released in 2014) approaches
 to Java and XML have been a bit mysterious. However, Jackson has now been chosen as the 
-underlying framework for implementation of KeePassJava2.
+underlying framework for implementation of KeePassJava2. From 2.2.3 a single KDBX implementation is available.
 
 There are several other database implementations which will be maintained for bug-fix purposes
 only, with a view to being withdrawn, since they perform badly and/or depend on obsolete technology.
 
-- `SimpleXML` - no longer maintained, does not work with Java 17 and up
-- `JAXB` - this causes problems with `javax` and `jakarta` namespaces, it's not worth maintaining
-  as it offers no compelling performance or other advantage
-- `DOM` the was the original implementation and validates the fact that DOM based implementations
-  are slow. That said, if you want to load a database and then save it while maintaining whatever quirks
-  existed in the original database then this is the one.
-
-Aside from dependencies on underlying frameworks, different implementations have varying characteristics, primarily speed. This is assessed
-by [this test](https://github.com/jorabin/KeePassJava2/blob/master/example/src/main/java/org/linguafranca/pwdb/kdbx/OpenDbExample.java) in the module `examples`.
-
 ## Dependencies
 
-Aside from the JRE, at release 2.2, the API depends on:
+Aside from the JRE, at release 2.3, the API depends on:
 
 - [Google Guava](https://github.com/google/guava/wiki) ([Apache 2 license](https://github.com/google/guava/blob/master/COPYING)).
 - [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
 - [Bouncy Castle](https://github.com/bcgit/bc-java/blob/master/LICENSE.html) ([MIT License](https://github.com/bcgit/bc-java/blob/master/LICENSE.html)).
-
-The Jackson implementation depends on:
-
 - [Faster XML Jackson](https://github.com/FasterXML/jackson)
-
-The (historical) Simple XML implementation additionally depends on:
-
-- [Simple XML Serialisation Framework](http://simple.sourceforge.net/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
-- [Faster XML Aalto](https://github.com/FasterXML/aalto-xml) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0.txt)).
-
-For Java 11 and later, Jaxb implementation depends on explicit inclusion [no longer provided by JDK](https://docs.oracle.com/en/java/javase/11/migrate/index.html#JSMIG-GUID-F640FA9D-FB66-4D85-AD2B-D931174C09A3) of:
-
-- [JAXB](https://javaee.github.io/jaxb-v2/)
 
 It also depends on SLF4J and Junit 4 for tests.
 
@@ -252,43 +231,17 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 <td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdb"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdb.svg" alt="Javadocs"></a></td>
 <td>An implementation of the Database APIs supporting KeePass KDB format.</td></tr>
 
-<tr><td><a href="kdbx">kdbx</a></td><td>KeePassJava2-kdbx</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx.svg" alt="Javadocs"></a></td>
+<tr><td><a href="kdbx-io">kdbx-io</a></td><td>KeePassJava2-kdbx-io</td>
+<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx-io.svg" alt="Javadocs"></a></td>
 <td>Provides support for KDBX streaming and security.</td></tr>
 
 
-<tr><td><a href="jackson">jackson</a></td><td>KeePassJava2-jackson</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-jackson.svg" alt="Javadocs"></a></td>
-<td>A Jackson based implementation of KDBX. Intended to provide the main support going forward, replacing trhe
-modules below.</td></tr>
-
-<tr><td><a href="simple">simple</a></td><td>KeePassJava2-simple</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx.svg" alt="Javadocs"></a></td>
-<td>A Simple XML Platform implementation of KDBX. Could be useful for Android.
-Simple cannot be used with Java versions 17 and up.</td></tr>
-
-<tr><td><a href="jaxb">jaxb</a></td><td>KeePassJava2-jaxb</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jaxb"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-jaxb.svg" alt="Javadocs"></a></td>
-<td>A JAXB implementation of KDBX. Probably not useful for Android. The generated class
-bindings might be useful for building other interfaces.</td></tr>
-
-<tr><td><a href="dom">dom</a></td><td>KeePassJava2-dom</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-dom"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-dom.svg" alt="Javadocs"></a></td>
-<td>A DOM based implementation of KDBX. Being DOM based it is rather slow, but 
-messes less with existing content than the other implementations. Known to work on Android.</td></tr>
+<tr><td><a href="kdbx-database">kdbx-database</a></td><td>KeePassJava2-kdbx-database</td>
+<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx-database.svg" alt="Javadocs"></a></td>
+<td>Provides support for KDBX data access and memory protection.</td></tr>
 
 </tbody>
 </table>
-
-Why are there so many implementations for KDBX? Well, the DOM implementation came first, because it can 
-load and save stuff that the implementation doesn't specifically know about. But it is very slow.
-
-Then came the JAXB implementation, but 
-belatedly it seems that Android support is in question. So latterly the Simple implementation. That was probably enough 
-KDBX implementations, however, the Simple XML library seems no longer to be maintained, 
-and along comes the Jackson Implementation.
-
-Jackson is the implementation going forward.
 
 ### Gradle
 

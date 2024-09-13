@@ -4,12 +4,11 @@ import com.google.common.io.CharStreams;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.kdbx.Helpers;
-import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.KdbxHeader;
-import org.linguafranca.pwdb.kdbx.KdbxSerializer;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonEntry;
+import org.linguafranca.pwdb.format.Helpers;
+import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.format.KdbxHeader;
+import org.linguafranca.pwdb.format.KdbxSerializer;
+import org.linguafranca.pwdb.kdbx.KdbxDatabase;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +29,7 @@ public class Issue27Test {
     public void testIssue27() throws IOException {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx");
         KdbxCreds creds = new KdbxCreds("passwordless".getBytes());
-        JacksonDatabase db = JacksonDatabase.load(creds, is);
+        KdbxDatabase db = KdbxDatabase.load(creds, is);
         List<? extends Entry> entries = db.findEntries("testtitle");
 
         for (Entry entry: entries) {
@@ -46,7 +45,7 @@ public class Issue27Test {
     public void testV4Date() throws IOException {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("V4-AES-AES.kdbx");
         KdbxCreds creds = new KdbxCreds("123".getBytes());
-        JacksonDatabase db = JacksonDatabase.load(creds, is);
+        KdbxDatabase db = KdbxDatabase.load(creds, is);
         List<? extends Entry> entries = db.findEntries("Sample Entry #2 - Copy");
 
         for (Entry entry: entries) {

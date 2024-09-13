@@ -17,6 +17,7 @@
 package org.linguafranca.pwdb.kdbx;
 
 import org.junit.Test;
+import org.linguafranca.pwdb.format.KdbxCreds;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;

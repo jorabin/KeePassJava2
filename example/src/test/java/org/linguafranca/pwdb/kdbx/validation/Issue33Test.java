@@ -6,10 +6,10 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.StreamFormat;
-import org.linguafranca.pwdb.kdbx.Helpers;
-import org.linguafranca.pwdb.kdbx.KdbxCreds;
+import org.linguafranca.pwdb.format.Helpers;
+import org.linguafranca.pwdb.format.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.Util;
-import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
+import org.linguafranca.pwdb.kdbx.KdbxDatabase;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -42,7 +42,7 @@ public class Issue33Test {
 
     @Test
     public void testJacksonDatabase() throws IOException {
-        JacksonDatabase database = JacksonDatabase.load(CREDENTIALS, inputStream);
+        KdbxDatabase database = KdbxDatabase.load(CREDENTIALS, inputStream);
         database.save(new StreamFormat.None(), new Credentials.None(), Files.newOutputStream(Paths.get(TEST_OUTPUT_DIR, "Issue33Jackson.xml")));
     }
 }

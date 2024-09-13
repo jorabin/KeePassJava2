@@ -1,7 +1,7 @@
 package org.linguafranca.pwdb.kdbx;
 
 import com.google.common.base.Strings;
-import org.linguafranca.util.HexViewer;
+import org.linguafranca.pwdb.format.KdbxCreds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +9,6 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
