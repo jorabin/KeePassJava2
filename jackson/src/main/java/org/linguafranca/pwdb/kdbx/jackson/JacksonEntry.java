@@ -147,7 +147,7 @@ public class JacksonEntry extends AbstractEntry<JacksonGroup, JacksonEntry> {
 
     @Override
     @JsonIgnore
-    public void setPropertyValue(String s, String s1) {
+    public void setProperty(String s, String s1) {
         StringProperty sp = getStringProperty(s, string);
         if (sp != null) {
             sp.setValue(database.getPropertyValueStrategy().newUnprotected().of(s1));

@@ -76,7 +76,7 @@ public abstract class AbstractEntry<G extends Group<G, E>, E extends Entry<G, E>
 
     @Override
     public void setUsername(String username) {
-        setPropertyValue(STANDARD_PROPERTY_NAME_USER_NAME, username);
+        setProperty(STANDARD_PROPERTY_NAME_USER_NAME, username);
         touch();
     }
 
@@ -87,7 +87,7 @@ public abstract class AbstractEntry<G extends Group<G, E>, E extends Entry<G, E>
 
     @Override
     public void setPassword(String pass) {
-        setPropertyValue(STANDARD_PROPERTY_NAME_PASSWORD, pass);
+        setProperty(STANDARD_PROPERTY_NAME_PASSWORD, pass);
         touch();
     }
 
@@ -98,7 +98,7 @@ public abstract class AbstractEntry<G extends Group<G, E>, E extends Entry<G, E>
 
     @Override
     public void setUrl(String url) {
-        setPropertyValue(STANDARD_PROPERTY_NAME_URL, url);
+        setProperty(STANDARD_PROPERTY_NAME_URL, url);
         touch();
     }
 
@@ -109,7 +109,7 @@ public abstract class AbstractEntry<G extends Group<G, E>, E extends Entry<G, E>
 
     @Override
     public void setTitle(String title) {
-        setPropertyValue(STANDARD_PROPERTY_NAME_TITLE, title);
+        setProperty(STANDARD_PROPERTY_NAME_TITLE, title);
         touch();
     }
 
@@ -120,7 +120,7 @@ public abstract class AbstractEntry<G extends Group<G, E>, E extends Entry<G, E>
 
     @Override
     public void setNotes(String notes) {
-        setPropertyValue(STANDARD_PROPERTY_NAME_NOTES, notes);
+        setProperty(STANDARD_PROPERTY_NAME_NOTES, notes);
         touch();
     }
 

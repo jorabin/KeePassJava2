@@ -107,7 +107,7 @@ public abstract class AbstractDatabase<G extends Group<G, E>, E extends Entry<G,
         for (String propertyName: entry.getPropertyNames()) {
             try {
                 // all implementations must support setting of STANDARD_PROPERTY_NAMES
-                result.setPropertyValue(propertyName, entry.getProperty(propertyName));
+                result.setProperty(propertyName, entry.getProperty(propertyName));
             } catch (UnsupportedOperationException e) {
                 // oh well, we tried
             }
