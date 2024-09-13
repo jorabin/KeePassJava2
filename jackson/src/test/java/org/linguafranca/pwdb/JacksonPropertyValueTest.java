@@ -28,14 +28,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class JacksonPropertyValueTest extends PropertyValueChecks<JacksonDatabase, JacksonGroup, JacksonEntry> {
+public class JacksonPropertyValueTest extends PropertyValueChecks {
 
     public JacksonPropertyValueTest() throws IOException {
         super(true);
     }
 
     @Override
-    public void saveDatabase(JacksonDatabase database, Credentials credentials, OutputStream outputStream) throws IOException {
+    public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
         database.save(credentials, outputStream);
     }
 

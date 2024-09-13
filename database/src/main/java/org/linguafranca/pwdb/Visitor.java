@@ -23,24 +23,24 @@ import java.io.PrintStream;
  *
  * @author jo
  */
-public interface Visitor <G extends Group<G, E>, E extends Entry<G, E>> {
+public interface Visitor {
     /**
      * Called on entry to a group visit
      * @param group the group being visited
      */
-    void startVisit(G group);
+    void startVisit(Group group);
 
     /**
      * Called on exit from a group visit
      * @param group the group being exited
      */
-    void endVisit(G group );
+    void endVisit(Group group );
 
     /**
      * Called on visit to an entry
      * @param entry the entry being visited
      */
-    void visit(E entry);
+    void visit(Entry entry);
 
     /**
      * called to determine whether to visit entries before subgroups, or not
@@ -51,16 +51,16 @@ public interface Visitor <G extends Group<G, E>, E extends Entry<G, E>> {
     /**
      * Empty implementation of Visitor
      */
-    abstract class Default <G extends Group<G, E>, E extends Entry<G, E>>  implements Visitor <G, E> {
+    abstract class Default implements Visitor {
 
         @Override
-        public void startVisit(G group) {}
+        public void startVisit(Group group) {}
 
         @Override
-        public void endVisit(G group) {}
+        public void endVisit(Group group) {}
 
         @Override
-        public void visit(E entry) {}
+        public void visit(Entry entry) {}
 
         @Override
         public boolean isEntriesFirst() {
@@ -71,7 +71,7 @@ public interface Visitor <G extends Group<G, E>, E extends Entry<G, E>> {
     /**
      * Visitor prints the Groups and Entries it visits to console
      */
-    class Print <G extends Group<G, E>, E extends Entry<G, E>>  extends Default<G, E> {
+    class Print extends Default{
 
         private final PrintStream printStream;
 
@@ -84,12 +84,12 @@ public interface Visitor <G extends Group<G, E>, E extends Entry<G, E>> {
         }
 
         @Override
-        public void startVisit(G group ) {
+        public void startVisit(Group group ) {
             printStream.println(group.toString());
         }
 
         @Override
-        public void visit(E entry) {
+        public void visit(Entry entry) {
             printStream.println(entry.toString());
         }
 

@@ -33,15 +33,15 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
 /**
  * @author jo
  */
-public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends Group<G,E>, E extends Entry<G,E>> {
+public abstract class SaveAndReloadChecks {
 
     static PrintStream printStream = getTestPrintStream();
 
-    public abstract D getDatabase();
-    public abstract D getDatabase(String name, Credentials credentials) throws IOException;
+    public abstract Database getDatabase();
+    public abstract Database getDatabase(String name, Credentials credentials) throws IOException;
 
-    public abstract void saveDatabase(D database, Credentials credentials, OutputStream outputStream) throws IOException;
-    public abstract D loadDatabase(Credentials credentials, InputStream inputStream) throws IOException;
+    public abstract void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException;
+    public abstract Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException;
     public abstract Credentials getCreds(byte[] creds);
     public abstract boolean verifyStreamFormat (StreamFormat<?> s1, StreamFormat<?> s2);
 
@@ -60,7 +60,7 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
         long now = System.currentTimeMillis();
 
         // create database with known content
-        D output = createNewDatabase();
+        Database output = createNewDatabase();
         verifyContents(output);
         //output.save(new StreamFormat.None(), new Credentials.None(), printStream);
 
@@ -75,7 +75,7 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
 
 
         FileInputStream fis = new FileInputStream("testOutput/test1.kdbx");
-        D input = loadDatabase(getCreds("123".getBytes()), fis);
+        Database input = loadDatabase(getCreds("123".getBytes()), fis);
         verifyContents(input);
         //input.save(new StreamFormat.None(),  new Credentials.None(), printStream);
         printStream.format("Test took %d millis", System.currentTimeMillis() - now);
@@ -86,12 +86,12 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
      */
     @Test
     public void saveAndReloadTest2() throws IOException {
-        D attachment = getDatabase("Attachment.kdbx", getCreds("123".getBytes()));
+        Database attachment = getDatabase("Attachment.kdbx", getCreds("123".getBytes()));
 
-        E entry = attachment.findEntries("Test attachment").get(0);
+        Entry entry = attachment.findEntries("Test attachment").get(0);
         assertArrayEquals(new String[] {"letter J.jpeg"}, entry.getBinaryPropertyNames().toArray());
 
-        E entry2 = attachment.findEntries("Test 2 attachment").get(0);
+        Entry entry2 = attachment.findEntries("Test 2 attachment").get(0);
         assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry2.getBinaryPropertyNames().toArray());
 
         byte[] content = entry2.getBinaryProperty("letter L.jpeg");
@@ -104,7 +104,7 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
         fos.close();
 
         FileInputStream fis = new FileInputStream("testOutput/test2.kdbx");
-        D input = loadDatabase(getCreds("123".getBytes()), fis);
+        Database input = loadDatabase(getCreds("123".getBytes()), fis);
 
         entry = input.findEntries("Test attachment").get(0);
         assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
@@ -123,23 +123,23 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
     @Test
     public void saveAndReloadTest3() throws IOException {
         for (String resource: testFiles) {
-            D database = getDatabase(resource, this.getCreds("123".getBytes()));
+            Database database = getDatabase(resource, this.getCreds("123".getBytes()));
             StreamFormat<?> format1 = database.getStreamFormat();
 
             database.save(getCreds("123".getBytes()), Files.newOutputStream(Paths.get("testOutput/test3.kdbx")));
 
             FileInputStream fis = new FileInputStream("testOutput/test3.kdbx");
-            D input = loadDatabase(getCreds("123".getBytes()), fis);
+            Database input = loadDatabase(getCreds("123".getBytes()), fis);
             StreamFormat<?> format2 = input.getStreamFormat();
             assertTrue(verifyStreamFormat(format1, format2));
         }
     }
 
-    private D createNewDatabase() throws IOException {
-        D database = getDatabase();
+    private Database createNewDatabase() throws IOException {
+        Database database = getDatabase();
 
         for (@SuppressWarnings("WrapperTypeMayBePrimitive") Integer g = 0; g < 5; g++){
-            G group = database.getRootGroup().addGroup(database.newGroup(g.toString()));
+            Group group = database.getRootGroup().addGroup(database.newGroup(g.toString()));
             for (int e = 0; e <= g; e++) {
                 group.addEntry(entryFactory(database, g.toString(), e));
             }
@@ -148,8 +148,8 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
         return database;
     }
 
-    private E entryFactory(D database, String g, int e) {
-        E result = database.newEntry();
+    private Entry entryFactory(Database database, String g, int e) {
+        Entry result = database.newEntry();
         result.setTitle(g + "-" + e);
         result.setUsername(g + " - un - " + e);
         result.setPassword(g + "- p -" + e);
@@ -158,15 +158,15 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
         return result;
     }
 
-    private void verifyContents(D database) {
+    private void verifyContents(Database database) {
         for (Integer g = 0; g< 5; g++){
-            G group = database.getRootGroup().getGroups().get(g);
+            Group group = database.getRootGroup().getGroups().get(g);
             assertEquals(g.toString(), group.getName());
             assertEquals(g + 1, group.getEntries().size());
             assertEquals(g+1, group.getEntriesCount());
             assertEquals(database.getRootGroup(), group.getParent());
             for (int e = 0; e <= g; e++) {
-                E entry = group.getEntries().get(e);
+                Entry entry = group.getEntries().get(e);
                 assertEquals(g + "-" + e, entry.getTitle());
                 assertEquals(g + " - un - " + e, entry.getUsername());
                 assertEquals(g + "- p -" + e, entry.getPassword());
@@ -184,7 +184,7 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
      */
     @Test @Ignore
     public void saveNewDatabase () throws IOException {
-        D database = createNewDatabase();
+        Database database = createNewDatabase();
 
         FileOutputStream outputStream = new FileOutputStream("compatibility.kdbx");
         saveDatabase(database, getCreds("123".getBytes()), outputStream);
@@ -196,7 +196,7 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
      */
     @Test @Ignore
     public void inspectNewDatabase () throws IOException {
-        D database = createNewDatabase();
+        Database database = createNewDatabase();
 
         database.visit(new Visitor.Print(printStream));
     }
@@ -205,8 +205,8 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
     // the assertions here somewhat duplicate those in BasicDatabaseChecks
     @Test
     public void testNewDatabase() throws IOException {
-        D database = getDatabase();
-        G root = database.getRootGroup();
+        Database database = getDatabase();
+        Group root = database.getRootGroup();
         Assert.assertTrue(root.isRootGroup());
         assertEquals(0, root.getGroups().size());
         assertEquals(0, root.getEntries().size());
@@ -223,7 +223,7 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
         database.setDescription("Test Database");
         assertEquals("Test Database", database.getDescription());
 
-        G group1 = database.newGroup("Group 1");
+        Group group1 = database.newGroup("Group 1");
         UUID newGroupUUID = group1.getUuid();
 
         root.addGroup(group1);
@@ -250,7 +250,7 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
         } catch (Exception ignored) {
         }
 
-        G group2 = database.newGroup();
+        Group group2 = database.newGroup();
         group2.setName("Group 2");
         group1.addGroup(group2);
         assertEquals(1, group1.getGroups().size());
@@ -260,7 +260,7 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
         assertEquals(0, group1.getGroups().size());
         assertEquals(2, root.getGroups().size());
 
-        E entry1 = database.newEntry();
+        Entry entry1 = database.newEntry();
         entry1.setTitle("A new entry");
         assertEquals("A new entry", entry1.getTitle());
         entry1.setUsername("user name");
@@ -277,7 +277,7 @@ public abstract class SaveAndReloadChecks <D extends Database<G, E>, G extends G
         entry1.setPassword("pass");
         assertEquals("pass", entry1.getPassword());
 
-        E entry2 = database.newEntry(entry1);
+        Entry entry2 = database.newEntry(entry1);
         entry2.setPassword("pass2");
         assertEquals("pass2", entry2.getPassword());
         group2.addEntry(entry2);

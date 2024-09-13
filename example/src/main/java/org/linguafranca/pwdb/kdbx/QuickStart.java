@@ -37,13 +37,13 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
  * @author jo
  */
 @SuppressWarnings("WeakerAccess")
-public abstract class QuickStart<D extends Database<G, E>, G extends Group<G, E>, E extends Entry<G, E>> {
+public abstract class QuickStart {
 
     static PrintStream printStream = getTestPrintStream();
 
 
-    public abstract D getDatabase();
-    public abstract D loadDatabase(Credentials creds, InputStream inputStream);
+    public abstract Database getDatabase();
+    public abstract Database loadDatabase(Credentials creds, InputStream inputStream);
 
     @BeforeClass
     public static void ensureOutputDir() throws IOException {
@@ -59,7 +59,7 @@ public abstract class QuickStart<D extends Database<G, E>, G extends Group<G, E>
             // password credentials
             Credentials credentials = new KdbxCreds("123".getBytes());
             // Jaxb implementation seems a lot faster than the DOM implementation
-            D database = loadDatabase(credentials, inputStream);
+            Database database = loadDatabase(credentials, inputStream);
             // visit all groups and entries and list them to console
             database.visit(new Visitor.Print(printStream));
         }
@@ -69,17 +69,17 @@ public abstract class QuickStart<D extends Database<G, E>, G extends Group<G, E>
      * Save KDBX
      */
 
-    private E entryFactory(D database, String s, int e) {
+    private Entry entryFactory(Database database, String s, int e) {
         return database.newEntry(String.format("Group %s Entry %d", s, e));
     }
 
     public void saveKdbx() throws IOException {
         // create an empty database
-        D database = getDatabase();
+        Database database = getDatabase();
 
         // add some groups and entries
         for (int g = 0; g < 5; g++) {
-            G group = database.getRootGroup().addGroup(database.newGroup(Integer.toString(g)));
+            Group group = database.getRootGroup().addGroup(database.newGroup(Integer.toString(g)));
             for (int e = 0; e <= g; e++) {
                 // entry factory is a local helper to populate an entry
                 group.addEntry(entryFactory(database, Integer.toString(g), e));
@@ -95,22 +95,22 @@ public abstract class QuickStart<D extends Database<G, E>, G extends Group<G, E>
     /**
      * Splice - add a group from one database to a parent from another (or copy from the same db)
      */
-    public void splice(G newParent, Group<?, ?> groupToSplice) {
-        G addedGroup = newParent.addGroup(newParent.getDatabase().newGroup(groupToSplice));
+    public void splice(Group newParent, Group groupToSplice) {
+        Group addedGroup = newParent.addGroup(newParent.getDatabase().newGroup(groupToSplice));
         addedGroup.copy(groupToSplice);
     }
 
     /**
      * Group by title
      */
-    public G groupByTitle(D database) {
-        List<? extends E> entries = database.findEntries(entry -> entry.getProperty(Entry.STANDARD_PROPERTY_NAME_TITLE).toLowerCase().contains("findme!"));
+    public Group groupByTitle(Database database) {
+        List<? extends Entry> entries = database.findEntries(entry -> entry.getProperty(Entry.STANDARD_PROPERTY_NAME_TITLE).toLowerCase().contains("findme!"));
         // create a new group using DB factory method
-        G newParent = database.newGroup("Found entries");
+        Group newParent = database.newGroup("Found entries");
         // iterate over the found entries
-        for (E entry : entries) {
+        for (Entry entry : entries) {
             // copy the entry using DB factory so that it remains where it was found as well as being in new group
-            E copy = database.newEntry(entry);
+            Entry copy = database.newEntry(entry);
             // add new entry to new group
             newParent.addEntry(copy);
         }
@@ -129,7 +129,7 @@ public abstract class QuickStart<D extends Database<G, E>, G extends Group<G, E>
         // visit all groups and entries and list them to console
 
         // create a KDBX (database
-        D kdbxDatabase = getDatabase();
+        Database kdbxDatabase = getDatabase();
         kdbxDatabase.setName("New Database");
         kdbxDatabase.setDescription("Migration of KDB Database to KDBX Database");
         // deep copy from group (not including source group, KDB database has simulated root)
@@ -153,7 +153,7 @@ public abstract class QuickStart<D extends Database<G, E>, G extends Group<G, E>
         }
 
         // create a KDBX (database
-        D kdbxDatabase = getDatabase();
+        Database kdbxDatabase = getDatabase();
         kdbxDatabase.setName("New Database");
         kdbxDatabase.setDescription("Migration of KDBX 3 Database to KDBX 4 Database");
         // deep copy from group (not including source group, KDB database has simulated root)
@@ -184,14 +184,14 @@ public abstract class QuickStart<D extends Database<G, E>, G extends Group<G, E>
             database = JacksonDatabase.load(credentials, inputStream);
         }
 
-        // create a KDBX (database
-        D kdbxDatabase = getDatabase();
+        // create a KDBX (database)
+        Database kdbxDatabase = getDatabase();
         kdbxDatabase.setName("New Database");
         kdbxDatabase.setDescription("Migration of KDBX 4 Database to KDBX 3 Database");
-        // deep copy from group (not including source group, KDB database has simulated root)
+        // deep copy from group (not including source group
         kdbxDatabase.getRootGroup().copy(database.getRootGroup());
 
-        // choose a stream format - V4 Kdbx and choose some algorithms
+        // choose a stream format - V3
         KdbxHeader kdbxHeader = new KdbxHeader(KdbxHeader.KdbxHeaderOpts.V3_AES_SALSA_20);
         KdbxStreamFormat formatV3 = new KdbxStreamFormat(kdbxHeader);
 

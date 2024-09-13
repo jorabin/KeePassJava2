@@ -3,6 +3,7 @@ package org.linguafranca.pwdb.kdbx.validation;
 import com.google.common.io.CharStreams;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.KdbxHeader;
@@ -30,9 +31,9 @@ public class Issue27Test {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx");
         KdbxCreds creds = new KdbxCreds("passwordless".getBytes());
         JacksonDatabase db = JacksonDatabase.load(creds, is);
-        List<? extends JacksonEntry> entries = db.findEntries("testtitle");
+        List<? extends Entry> entries = db.findEntries("testtitle");
 
-        for (JacksonEntry entry: entries) {
+        for (Entry entry: entries) {
             printStream.println(Helpers.fromDateV3(entry.getCreationTime()));
             assertEquals("2021-01-11T09:18:56Z", Helpers.fromDateV3(entry.getCreationTime()));
         }
@@ -46,9 +47,9 @@ public class Issue27Test {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("V4-AES-AES.kdbx");
         KdbxCreds creds = new KdbxCreds("123".getBytes());
         JacksonDatabase db = JacksonDatabase.load(creds, is);
-        List<? extends JacksonEntry> entries = db.findEntries("Sample Entry #2 - Copy");
+        List<? extends Entry> entries = db.findEntries("Sample Entry #2 - Copy");
 
-        for (JacksonEntry entry: entries) {
+        for (Entry entry: entries) {
             printStream.println(Helpers.fromDate(entry.getCreationTime()));
             assertEquals("2018-01-26T13:20:58Z", Helpers.fromDateV3(entry.getCreationTime()));
         }

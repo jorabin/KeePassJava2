@@ -39,7 +39,7 @@ import org.linguafranca.pwdb.kdbx.jackson.JacksonGroup;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonIcon;
 
 
-public class JacksonSaveAndReloadTest extends SaveAndReloadChecks<JacksonDatabase, JacksonGroup, JacksonEntry>{
+public class JacksonSaveAndReloadTest extends SaveAndReloadChecks{
  
     @Override
     public JacksonDatabase getDatabase() {
@@ -58,7 +58,7 @@ public class JacksonSaveAndReloadTest extends SaveAndReloadChecks<JacksonDatabas
     }
 
     @Override
-    public void saveDatabase(JacksonDatabase database, Credentials credentials, OutputStream outputStream) throws IOException {
+    public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
         database.save(credentials, outputStream);
     }
 

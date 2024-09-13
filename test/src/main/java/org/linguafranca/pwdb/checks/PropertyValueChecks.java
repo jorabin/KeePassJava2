@@ -32,14 +32,14 @@ import static org.junit.Assert.*;
 /**
  * Testing the operation of PropertyValue mechanisms
  */
-public abstract class PropertyValueChecks<D extends Database<G, E>, G extends Group<G,E>, E extends Entry<G,E>>  {
+public abstract class PropertyValueChecks  {
 
-    public abstract void saveDatabase(D database, Credentials credentials, OutputStream outputStream) throws IOException;
-    public abstract D loadDatabase(Credentials credentials, InputStream inputStream) throws IOException;
+    public abstract void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException;
+    public abstract Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException;
     public abstract Credentials getCreds(byte[] creds);
 
     private final boolean propertyValueSupported;
-    protected D database;
+    protected Database database;
 
     @BeforeClass
     public static void ensureOutputDir() throws IOException {
@@ -51,7 +51,7 @@ public abstract class PropertyValueChecks<D extends Database<G, E>, G extends Gr
         this.propertyValueSupported = propertyValueSupported;
     }
 
-    public abstract D createDatabase() throws IOException;
+    public abstract Database createDatabase() throws IOException;
 
     /**
      * Catches expected thrown exception
@@ -84,7 +84,7 @@ public abstract class PropertyValueChecks<D extends Database<G, E>, G extends Gr
         catchException((z) -> database.setShouldProtect(null, true), UnsupportedOperationException.class);
         catchException((z) -> database.listShouldProtect(), UnsupportedOperationException.class);
 
-        E entry = database.newEntry();
+        Entry entry = database.newEntry();
         catchException((z) -> entry.getPropertyValue(null), UnsupportedOperationException.class);
         catchException((z) -> entry.setPropertyValue(null, (PropertyValue) null), UnsupportedOperationException.class);
 
@@ -149,7 +149,7 @@ public abstract class PropertyValueChecks<D extends Database<G, E>, G extends Gr
         assertTrue(pv.isProtected());
 
         // create an entry with random property as protected value
-        E entry = database.newEntry("Test Random");
+        Entry entry = database.newEntry("Test Random");
         entry.setPropertyValue("random", pv);
         database.getRootGroup().addEntry(entry);
 
@@ -162,9 +162,9 @@ public abstract class PropertyValueChecks<D extends Database<G, E>, G extends Gr
 
         // reload database, "random" is still protected even though it's not protected by default
         FileInputStream fis = new FileInputStream("testOutput/test9.kdbx");
-        D input = loadDatabase(getCreds("123".getBytes()), fis);
+        Database input = loadDatabase(getCreds("123".getBytes()), fis);
 
-        List<? extends E> entries = input.findEntries("random");
+        List<? extends Entry> entries = input.findEntries("random");
         assertEquals(1, entries.size());
         assertTrue(entries.get(0).getPropertyValue("random").isProtected());
         assertFalse(input.getPropertyValueStrategy().getProtectedProperties().contains("random"));

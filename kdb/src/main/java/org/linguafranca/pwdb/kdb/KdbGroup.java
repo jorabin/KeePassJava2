@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
+import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.base.AbstractGroup;
 import org.linguafranca.pwdb.Entry;
 
@@ -32,7 +33,7 @@ import java.util.UUID;
  * The class holds a KDB Group
  * @author jo
  */
-public class KdbGroup extends AbstractGroup<KdbGroup, KdbEntry> {
+public class KdbGroup extends AbstractGroup {
     private boolean root;
     private KdbGroup parent;
     protected KdbDatabase database;
@@ -55,7 +56,8 @@ public class KdbGroup extends AbstractGroup<KdbGroup, KdbEntry> {
     }
 
     @Override
-    public KdbGroup addGroup(KdbGroup group) {
+    public KdbGroup addGroup(Group g) {
+        KdbGroup group = (KdbGroup) g;
         groups.add(group);
         if (group.getParent() != null) {
             group.getParent().removeGroup(group);
@@ -65,7 +67,8 @@ public class KdbGroup extends AbstractGroup<KdbGroup, KdbEntry> {
     }
 
     @Override
-    public KdbGroup removeGroup(KdbGroup group) {
+    public KdbGroup removeGroup(Group g) {
+        KdbGroup group = (KdbGroup) g;
         groups.remove(group);
         group.parent = null;
         return group;
@@ -82,7 +85,8 @@ public class KdbGroup extends AbstractGroup<KdbGroup, KdbEntry> {
     }
 
     @Override
-    public KdbEntry addEntry(KdbEntry entry) {
+    public KdbEntry addEntry(Entry e) {
+        KdbEntry entry = ((KdbEntry) e);
         KdbGroup entryParent = entry.parent;
         if (entryParent != null) {
             entryParent.removeEntry(entry);
@@ -93,7 +97,8 @@ public class KdbGroup extends AbstractGroup<KdbGroup, KdbEntry> {
     }
 
     @Override
-    public KdbEntry removeEntry(KdbEntry entry) {
+    public KdbEntry removeEntry(Entry e) {
+        KdbEntry entry = ((KdbEntry) e);
         entries.remove(entry);
         entry.parent = null;
         return entry;
@@ -144,7 +149,7 @@ public class KdbGroup extends AbstractGroup<KdbGroup, KdbEntry> {
     }
 
     @Override
-    public void setParent(KdbGroup parent) {
+    public void setParent(Group parent) {
         parent.addGroup(this);
     }
 

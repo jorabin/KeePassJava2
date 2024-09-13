@@ -32,11 +32,11 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
 /**
  * @author jo
  */
-public abstract class DatabaseLoaderChecks <D extends Database<G, E>, G extends Group<G,E>, E extends Entry<G,E>> {
+public abstract class DatabaseLoaderChecks {
 
     static PrintStream printStream = getTestPrintStream();
 
-    protected Database<G,E> database;
+    protected Database database;
     protected boolean skipDateCheck = false;
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX");
     /**
@@ -50,11 +50,11 @@ public abstract class DatabaseLoaderChecks <D extends Database<G, E>, G extends 
 
         // find all entries in the database
         // the kdb version has three additional system related entries
-        List<? extends E> anything = database.findEntries("");
+        List<? extends Entry> anything = database.findEntries("");
         Assert.assertTrue(10 <= anything.size());
 
         // find all entries in the database that have the string "test" in them
-        List<? extends E> tests = database.findEntries("test");
+        List<? extends Entry> tests = database.findEntries("test");
         for (Entry tes: tests) {
             printStream.println(tes.getTitle());
         }
@@ -73,14 +73,14 @@ public abstract class DatabaseLoaderChecks <D extends Database<G, E>, G extends 
             Assert.assertEquals("123", pass2);
         }
 
-        List<? extends E> passwords = database.findEntries("password");
+        List<? extends Entry> passwords = database.findEntries("password");
         Assert.assertEquals(4, passwords.size());
         for (Entry passwordEntry : passwords) {
             assertEquals(passwordEntry.getTitle(), passwordEntry.getPassword());
             printStream.println(passwordEntry.getTitle());
         }
 
-        List<? extends E> entries = database.findEntries(new Entry.Matcher() {
+        List<? extends Entry> entries = database.findEntries(new Entry.Matcher() {
             @Override
             public boolean matches(Entry entry) {
                 return entry.getTitle().equals("hello world");

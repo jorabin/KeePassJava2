@@ -23,7 +23,7 @@ import org.linguafranca.pwdb.*;
  *
  * @author Jo
  */
-public abstract class AbstractEntry<G extends Group<G, E>, E extends Entry<G, E>>  implements Entry<G, E> {
+public abstract class AbstractEntry implements Entry {
 
     @Override
     public  boolean matchTitle(String text){
@@ -57,7 +57,7 @@ public abstract class AbstractEntry<G extends Group<G, E>, E extends Entry<G, E>
 
     @Override
     public String getPath() {
-        G parent = this.getParent();
+        Group parent = this.getParent();
         String result = "";
         if (parent != null) {
             result = parent.getPath();

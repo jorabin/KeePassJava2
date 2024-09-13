@@ -32,7 +32,7 @@ import java.util.UUID;
  *
  * @author jo
  */
-public class KdbEntry extends AbstractEntry<KdbGroup, KdbEntry> {
+public class KdbEntry extends AbstractEntry {
     KdbGroup parent;
     private UUID uuid = UUID.randomUUID();
     private String title = "";

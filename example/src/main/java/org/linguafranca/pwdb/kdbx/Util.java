@@ -18,7 +18,7 @@ public class Util {
 
     @FunctionalInterface
     public interface DatabaseLoader {
-        Database<?,?> load(Credentials c, InputStream i) throws IOException;
+        Database load(Credentials c, InputStream i) throws IOException;
     }
 
     List<DatabaseLoader> dbLoader = Arrays.asList(JacksonDatabase::load);
@@ -48,7 +48,7 @@ public class Util {
      * Example shows how to list XML from a database using specified loader
      */
     public static void listDatabase(DatabaseLoader loader, String resourceName, Credentials creds, OutputStream outputStream) throws IOException {
-        Database<?, ?> database = loader.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
+        Database database = loader.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
         database.save(new StreamFormat.None(), new KdbxCreds.None(), outputStream);
     }
 

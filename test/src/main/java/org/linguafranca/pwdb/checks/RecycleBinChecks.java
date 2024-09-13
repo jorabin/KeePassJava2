@@ -11,9 +11,9 @@ import static org.junit.Assert.*;
 /**
  * @author jo
  */
-public abstract class RecycleBinChecks  <D extends Database<G, E>, G extends Group<G,E>, E extends Entry<G,E>>  {
+public abstract class RecycleBinChecks {
 
-    protected Database<G,E> database;
+    protected Database database;
 
     @Test
     public void recycleBinEntries() {
@@ -22,10 +22,10 @@ public abstract class RecycleBinChecks  <D extends Database<G, E>, G extends Gro
         assertNull(database.getRecycleBin());
         database.enableRecycleBin(true);
         assertTrue(database.isRecycleBinEnabled());
-        G recycleBin = database.getRecycleBin();
+        Group recycleBin = database.getRecycleBin();
         assertNotNull(recycleBin);
 
-        E entry = database.newEntry();
+        Entry entry = database.newEntry();
         assertEquals(entry, database.getRootGroup().addEntry(entry));
         assertEquals(1, database.getRootGroup().getEntriesCount());
 
@@ -51,10 +51,10 @@ public abstract class RecycleBinChecks  <D extends Database<G, E>, G extends Gro
     public void recycleBinGroups() {
         database.enableRecycleBin(true);
         assertTrue(database.isRecycleBinEnabled());
-        G recycleBin = database.getRecycleBin();
+        Group recycleBin = database.getRecycleBin();
         assertNotNull(recycleBin);
 
-        G group= database.newGroup();
+        Group group= database.newGroup();
         assertEquals(group, database.getRootGroup().addGroup(group));
         assertEquals(2, database.getRootGroup().getGroupsCount());
 

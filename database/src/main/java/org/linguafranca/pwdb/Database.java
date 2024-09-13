@@ -49,26 +49,26 @@ import java.util.UUID;
  * the caller without affecting the underlying database structure, however changes
  * to the Groups and Entries contained in the lists do modify the database.
  */
-public interface Database <G extends Group<G, E>, E extends Entry<G, E>> {
+public interface Database {
 
     /**
      * get the root group for the database
      * @return the root group
      */
-    G getRootGroup();
+    Group getRootGroup();
 
     /**
      * Create a new Group
      * @return the group created
      */
-    G newGroup();
+    Group newGroup();
 
     /**
      * Create a new named Group
      * @param name the name of the group
      * @return the group created
      */
-    G newGroup(String name);
+    Group newGroup(String name);
 
     /**
      * Create a new Group copying the details of the supplied group, but not copying its children
@@ -77,19 +77,19 @@ public interface Database <G extends Group<G, E>, E extends Entry<G, E>> {
      * @param group the group to copy
      * @return the group created
      */
-    G newGroup(Group<?, ?> group);
+    Group newGroup(Group group);
 
     /**
      * Create a new Entry
      * @return the entry created
      */
-    E newEntry();
+    Entry newEntry();
 
     /**
      * Create a new Entry with a title
      * @return the entry created
      */
-    E newEntry(String title);
+    Entry newEntry(String title);
 
     /**
      * Create a new Entry copying the details of the supplied entry
@@ -98,7 +98,7 @@ public interface Database <G extends Group<G, E>, E extends Entry<G, E>> {
      * @param entry the entry to copy
      * @return the entry created
      */
-    E newEntry(Entry<?, ?> entry);
+    Entry newEntry(Entry entry);
 
     /**
      * Create a new default icon
@@ -118,7 +118,7 @@ public interface Database <G extends Group<G, E>, E extends Entry<G, E>> {
      * @param uuid the UUID
      * @return an entry or null if not found
      */
-    @Nullable E findEntry(UUID uuid);
+    @Nullable Entry findEntry(UUID uuid);
 
     /**
      * Delete an entry with this UUID from anywhere in the database except the recycle bin
@@ -133,7 +133,7 @@ public interface Database <G extends Group<G, E>, E extends Entry<G, E>> {
      * @param uuid the UUID
      * @return a group or null if not found
      */
-    @Nullable G findGroup(UUID uuid);
+    @Nullable Group findGroup(UUID uuid);
 
     /**
      * Delete a group with this UUID from anywhere in the database except the recycle bin
@@ -163,7 +163,7 @@ public interface Database <G extends Group<G, E>, E extends Entry<G, E>> {
      * or if recycle bin is not supported then return null.
      * @see #supportsRecycleBin()
      */
-    @Nullable G getRecycleBin();
+    @Nullable Group getRecycleBin();
 
     /**
      * empty the recycle bin whether it is enabled or disabled
@@ -177,14 +177,14 @@ public interface Database <G extends Group<G, E>, E extends Entry<G, E>> {
      *
      * @param visitor the visitor to use
      */
-    void visit(Visitor<G, E> visitor);
+    void visit(Visitor visitor);
 
     /**
      * Visit all entries starting from a group
      * @param group the group to start at
      * @param visitor the visitor to use
      */
-    void visit(G group, Visitor<G, E> visitor);
+    void visit(Group group, Visitor visitor);
 
     /**
      * Find all entries that match the criteria
@@ -192,7 +192,7 @@ public interface Database <G extends Group<G, E>, E extends Entry<G, E>> {
      * @param matcher the matcher to use
      * @return a list of entries
      */
-    List<? extends E> findEntries(Entry.Matcher matcher);
+    List<? extends Entry> findEntries(Entry.Matcher matcher);
 
     /**
      * Find all entries that match {@link Entry#match(String)}
@@ -200,7 +200,7 @@ public interface Database <G extends Group<G, E>, E extends Entry<G, E>> {
      * @param find string to find
      * @return a list of entries
      */
-    List<? extends E> findEntries(String find);
+    List<? extends Entry> findEntries(String find);
 
     /**
      * Gets the name of the database or null if not supported
@@ -269,7 +269,7 @@ public interface Database <G extends Group<G, E>, E extends Entry<G, E>> {
     /**
      * Get the default means of storage of unprotected and protected property values
      */
-    public PropertyValue.Strategy getPropertyValueStrategy();
+    PropertyValue.Strategy getPropertyValueStrategy();
 
     /**
      * Set the default means of storage of unprotected and protected property values

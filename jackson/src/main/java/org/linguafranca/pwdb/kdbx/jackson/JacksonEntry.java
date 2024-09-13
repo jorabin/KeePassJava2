@@ -65,7 +65,32 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 
 @JsonIgnoreProperties({"path", "username", "title", "notes", "url", "password"})
-public class JacksonEntry extends AbstractEntry<JacksonGroup, JacksonEntry> {
+public class JacksonEntry extends AbstractEntry {
+
+    @JsonIgnore
+    JacksonDatabase database;
+
+    @JsonIgnore
+    JacksonGroup parent;
+
+    protected JacksonEntry() {
+        string = new ArrayList<>();
+        binary = new ArrayList<>();
+        times = new Times();
+        uuid = UUID.randomUUID();
+        iconID = 0;
+    }
+
+    public static JacksonEntry createEntry(JacksonDatabase database) {
+        JacksonEntry result = new JacksonEntry();
+        result.database = database;
+        result.parent = null;
+        // avoiding setProperty as it does a touch();
+        for (String p : STANDARD_PROPERTY_NAMES) {
+            result.string.add(new StringProperty(p, database.getPropertyValueStrategy().newUnprotected().of("")));
+        }
+        return result;
+    }
 
 
     @JacksonXmlProperty(localName = "UUID")
@@ -109,31 +134,6 @@ public class JacksonEntry extends AbstractEntry<JacksonGroup, JacksonEntry> {
 
     @JacksonXmlProperty(localName = "History") /* Workaround jackson */
     protected JacksonHistory history;
-
-    @JsonIgnore
-    JacksonDatabase database;
-
-    @JsonIgnore
-    JacksonGroup parent;
-
-    protected JacksonEntry() {
-        string = new ArrayList<>();
-        binary = new ArrayList<>();
-        times = new Times();
-        uuid = UUID.randomUUID();
-        iconID = 0;
-    }
-
-    public static JacksonEntry createEntry(JacksonDatabase database) {
-        JacksonEntry result = new JacksonEntry();
-        result.database = database;
-        result.parent = null;
-        // avoiding setProperty as it does a touch();
-        for (String p : STANDARD_PROPERTY_NAMES) {
-            result.string.add(new StringProperty(p, database.getPropertyValueStrategy().newUnprotected().of("")));
-        }
-        return result;
-    }
 
     @Override
     @JsonIgnore

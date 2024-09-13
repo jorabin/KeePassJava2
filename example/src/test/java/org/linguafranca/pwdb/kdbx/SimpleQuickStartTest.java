@@ -36,7 +36,7 @@ import static org.junit.Assert.assertEquals;
  * 
  * @author jo
  */
-public class SimpleQuickStartTest extends QuickStart<JacksonDatabase, JacksonGroup, JacksonEntry> {
+public class SimpleQuickStartTest extends QuickStart {
 
 
     @Override

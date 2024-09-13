@@ -34,11 +34,11 @@ import static org.junit.Assert.*;
 /**
  * @author Jo
  */
-public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry<G,E>> {
+public abstract class BasicDatabaseChecks  {
 
-    protected Database<G, E> database;
+    protected Database database;
 
-    public abstract Database<G,E> createDatabase() throws IOException;
+    public abstract Database createDatabase() throws IOException;
 
     public BasicDatabaseChecks() throws IOException {
         this.database = createDatabase();
@@ -53,14 +53,14 @@ public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry
 
     @Test
     public void testAddGroup() {
-        G g1 = database.getRootGroup().addGroup(database.newGroup("group1"));
+        Group g1 = database.getRootGroup().addGroup(database.newGroup("group1"));
         assertEquals(1, database.getRootGroup().getGroups().size());
         assertEquals("group1", g1.getName());
         assertEquals(0, g1.getGroups().size());
         assertEquals(0, g1.getEntries().size());
         assertEquals("root is not the parent of its child", g1.getParent(), database.getRootGroup());
 
-        G g2 = database.newGroup();
+        Group g2 = database.newGroup();
         assertEquals("", g2.getName());
         Assert.assertNotNull(g2.getUuid());
         assertEquals(0, g2.getIcon().getIndex());
@@ -75,12 +75,12 @@ public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry
 
     @Test
     public void testDeleteGroup () {
-        Group<G,E> g1 = database.getRootGroup().addGroup(database.newGroup("group1"));
-        List<? extends G> l1 = database.getRootGroup().findGroups("group1");
+        Group g1 = database.getRootGroup().addGroup(database.newGroup("group1"));
+        List<? extends Group> l1 = database.getRootGroup().findGroups("group1");
         assertEquals(1, l1.size());
-        G g2 = l1.get(0);
+        Group g2 = l1.get(0);
         assertEquals(g2, g1);
-        G g3 = database.getRootGroup().removeGroup(g2);
+        Group g3 = database.getRootGroup().removeGroup(g2);
         assertEquals(g3, g1);
         assertNull(g1.getParent());
         assertEquals(0, database.getRootGroup().getGroups().size());
@@ -89,13 +89,13 @@ public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry
 
     @Test
     public void testAddRemoveEntry() {
-        E e1 = database.getRootGroup().addEntry(database.newEntry());
+        Entry e1 = database.getRootGroup().addEntry(database.newEntry());
         e1.setTitle("entry1");
-        List<? extends E> l1 = database.findEntries("entry1");
+        List<? extends Entry> l1 = database.findEntries("entry1");
         assertEquals(1, l1.size());
 
-        E e12 = database.getRootGroup().addEntry(database.newEntry("entry12"));
-        List<? extends E> l2 = database.findEntries("entry1");
+        Entry e12 = database.getRootGroup().addEntry(database.newEntry("entry12"));
+        List<? extends Entry> l2 = database.findEntries("entry1");
         assertEquals(2, l2.size());
 
         // show that the entries are different
@@ -106,7 +106,7 @@ public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry
         assertEquals(2, database.findEntries("entry1").size());
 
         // show that we get an equivalent entry when we remove to when we inserted
-        E e12b = database.getRootGroup().removeEntry(e12);
+        Entry e12b = database.getRootGroup().removeEntry(e12);
         assertEquals(e12b, e12);
         // has been unhooked from parent
         assertNull(e12.getParent());
@@ -115,7 +115,7 @@ public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry
 
     @Test
     public void testSetFields () {
-        E e1 = database.newEntry("Entry 1");
+        Entry e1 = database.newEntry("Entry 1");
         e1.setNotes("this looks a little like Entry 2");
         assertEquals("this looks a little like Entry 2", e1.getNotes());
         e1.setUsername("jake@window.com");
@@ -170,7 +170,7 @@ public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry
     @Test
     public void testTimes() {
         long beforeSecond = Instant.now().toEpochMilli()/1000;
-        E entry = database.newEntry();
+        Entry entry = database.newEntry();
         long afterSecond = Instant.now().toEpochMilli()/1000;
         long createdSecond = entry.getCreationTime().getTime()/1000;
 
@@ -191,7 +191,7 @@ public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry
     @Test
     public void checkAddChangeRemoveProperty() {
         // only applies to databases that support arbitrary properties
-        E entry = database.newEntry();
+        Entry entry = database.newEntry();
         assertEquals(Entry.STANDARD_PROPERTY_NAMES.size(), entry.getPropertyNames().size());
         try {
             entry.setProperty("test", "test1");
@@ -219,7 +219,7 @@ public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry
 
     @Test
     public void testNewEntry() {
-        E e2 = database.newEntry();
+        Entry e2 = database.newEntry();
         Assert.assertNull(e2.getParent());
         assertEquals("", e2.getPassword());
         Assert.assertNotNull(e2.getUuid());
@@ -235,7 +235,7 @@ public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry
 
     @Test
     public void testCopy() throws IOException {
-        E entry1 = database.newEntry();
+        Entry entry1 = database.newEntry();
         entry1.setTitle("Entry");
         entry1.setUsername("Username");
         entry1.setPassword("Password");
@@ -244,9 +244,9 @@ public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry
         entry1.setIcon(database.newIcon(2));
 
         // create a new Database
-        Database<G,E> database2 = createDatabase();
+        Database database2 = createDatabase();
         // create a new Entry in new Database
-        E entry2 = database2.newEntry(entry1);
+        Entry entry2 = database2.newEntry(entry1);
 
         assertEquals(entry1.getTitle(), entry2.getTitle());
         assertEquals(entry1.getUsername(), entry2.getUsername());
@@ -256,11 +256,11 @@ public abstract class BasicDatabaseChecks <G extends Group<G,E>, E extends Entry
         assertEquals(entry1.getIcon(), entry2.getIcon());
         assertNotEquals(entry1.getUuid(), entry2.getUuid());
 
-        G group1 = database.newGroup();
+        Group group1 = database.newGroup();
         group1.setName("Group");
         group1.setIcon(database.newIcon(3));
 
-        G group2 = database2.newGroup(group1);
+        Group group2 = database2.newGroup(group1);
         assertEquals(group1.getName(), group2.getName());
         assertEquals(group1.getIcon(), group2.getIcon());
         assertNotEquals(group1.getUuid(), group2.getUuid());

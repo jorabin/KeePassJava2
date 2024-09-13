@@ -34,7 +34,7 @@ import java.util.UUID;
 
 import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.createEmptyDatabase;
 
-public class JacksonDatabase extends ProtectedDatabase<JacksonGroup, JacksonEntry> {
+public class JacksonDatabase extends ProtectedDatabase {
 
     KeePassFile keePassFile;
     StreamFormat<?> streamFormat;
@@ -154,9 +154,9 @@ public class JacksonDatabase extends ProtectedDatabase<JacksonGroup, JacksonEntr
     @Override
     public JacksonGroup getRecycleBin() {
         UUID recycleBinUuid = this.keePassFile.meta.recycleBinUUID;
-        JacksonGroup g = findGroup(recycleBinUuid);
+        JacksonGroup g = (JacksonGroup) findGroup(recycleBinUuid);
         if (g == null && isRecycleBinEnabled()) {
-            g = newGroup("Recycle Bin");
+            g = (JacksonGroup) newGroup("Recycle Bin");
             getRootGroup().addGroup(g);
             this.keePassFile.meta.recycleBinUUID = g.getUuid();
             this.keePassFile.meta.recycleBinChanged = new Date();
