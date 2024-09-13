@@ -16,20 +16,20 @@ public class SecureCharBufferPropertyValue implements PropertyValue {
     /**
      * Builder for {@link SecureCharBufferPropertyValue}
      */
-    static class Factory implements PropertyValue.Factory {
+    static class Factory implements PropertyValue.Factory<SecureCharBufferPropertyValue> {
 
         @Override
-        public PropertyValue of(CharSequence aString) {
+        public SecureCharBufferPropertyValue of(CharSequence aString) {
             return new SecureCharBufferPropertyValue(aString);
         }
 
         @Override
-        public PropertyValue of(char[] value) {
+        public SecureCharBufferPropertyValue of(char[] value) {
             return new SecureCharBufferPropertyValue(value);
         }
 
         @Override
-        public PropertyValue of(byte[] value) {
+        public SecureCharBufferPropertyValue of(byte[] value) {
             return new SecureCharBufferPropertyValue(value);
         }
     }
@@ -60,12 +60,19 @@ public class SecureCharBufferPropertyValue implements PropertyValue {
 
     @Override
     public char [] getValueAsChars() {
-        return CharBuffer.wrap(value).array();
+        CharBuffer cb = CharBuffer.wrap(value);
+        char[] result = new char[cb.limit()];
+        cb.get(result);
+        return result;
     }
 
     @Override
     public byte [] getValueAsBytes() {
-        return StandardCharsets.UTF_8.encode(CharBuffer.wrap(value)).array();
+        CharBuffer cb = CharBuffer.wrap(value);
+        ByteBuffer bb = StandardCharsets.UTF_8.encode(cb);
+        byte[] result = new byte[bb.limit()];
+        bb.get(result);
+        return result;
     }
 
     @Override
