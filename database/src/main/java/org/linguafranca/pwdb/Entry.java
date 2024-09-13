@@ -129,7 +129,7 @@ public interface Entry <D extends Database<D, G, E, I>, G extends Group<D, G, E,
      * non-standard properties are not supported
      * @see Database#supportsNonStandardPropertyNames()
      */
-    void setPropertyValue(String name, String value);
+    void setProperty(String name, String value);
 
     /**
      * Sets the value of a property as a property value. The method does not check whether the

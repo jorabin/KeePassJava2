@@ -135,19 +135,19 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
         assertEquals(e1.getIcon(), ic1);
 
         // databases have to support setting of standard properties
-        e1.setPropertyValue(Entry.STANDARD_PROPERTY_NAME_TITLE, "A title");
+        e1.setProperty(Entry.STANDARD_PROPERTY_NAME_TITLE, "A title");
         assertEquals("A title", e1.getTitle());
-        e1.setPropertyValue(Entry.STANDARD_PROPERTY_NAME_USER_NAME, "username");
+        e1.setProperty(Entry.STANDARD_PROPERTY_NAME_USER_NAME, "username");
         assertEquals("username", e1.getUsername());
-        e1.setPropertyValue(Entry.STANDARD_PROPERTY_NAME_NOTES, "notes");
+        e1.setProperty(Entry.STANDARD_PROPERTY_NAME_NOTES, "notes");
         assertEquals("notes", e1.getNotes());
-        e1.setPropertyValue(Entry.STANDARD_PROPERTY_NAME_PASSWORD, "password");
+        e1.setProperty(Entry.STANDARD_PROPERTY_NAME_PASSWORD, "password");
         assertEquals("password", e1.getPassword());
-        e1.setPropertyValue(Entry.STANDARD_PROPERTY_NAME_URL, "url");
+        e1.setProperty(Entry.STANDARD_PROPERTY_NAME_URL, "url");
         assertEquals("url", e1.getUrl());
 
         try {
-            e1.setPropertyValue("silly", "hello");
+            e1.setProperty("silly", "hello");
             assertEquals("hello", e1.getProperty("silly"));
             List<String> properties = new ArrayList<>(Entry.STANDARD_PROPERTY_NAMES);
             properties.add("silly");
@@ -194,7 +194,7 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
         E entry = database.newEntry();
         assertEquals(Entry.STANDARD_PROPERTY_NAMES.size(), entry.getPropertyNames().size());
         try {
-            entry.setPropertyValue("test", "test1");
+            entry.setProperty("test", "test1");
         } catch (UnsupportedOperationException e) {
             if (!database.supportsNonStandardPropertyNames()) {
                 return;
@@ -202,7 +202,7 @@ public abstract class BasicDatabaseChecks <D extends Database<D,G,E,I>, G extend
             fail("Database must report that it doesn't support non standrad properties");
         }
         assertEquals("test1", entry.getProperty("test"));
-        entry.setPropertyValue("test", "test2");
+        entry.setProperty("test", "test2");
         assertEquals("test2", entry.getProperty("test"));
         assertTrue(entry.removeProperty("test"));
         assertFalse(entry.removeProperty("test"));

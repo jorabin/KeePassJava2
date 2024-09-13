@@ -265,9 +265,9 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         assertEquals("A new entry", entry1.getTitle());
         entry1.setUsername("user name");
         assertEquals("user name", entry1.getUsername());
-        entry1.setPropertyValue("random", "new");
+        entry1.setProperty("random", "new");
         assertEquals("new", entry1.getProperty("random"));
-        entry1.setPropertyValue("random", "old");
+        entry1.setProperty("random", "old");
         assertEquals("old", entry1.getProperty("random"));
 
 
