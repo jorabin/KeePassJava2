@@ -41,14 +41,17 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-This version is 2.3-SNAPSHOT
+This version is 2.3-SNAPSHOT and is not backwards compatible with 2.2 and earlier versions.
 
 The current released code is version 2.2.2 - released to Maven September 2024. This is on the main branch. See [Build from Source](#build-from-source)
 
-Key updates relative to 2.1:
+Key updates relative to 2.1
 - Java 8 (dependencies no longer support Java 7)
 - File format version 4 support - with Argon2
-- Inclusion of Jackson based KDBX support with a view to removing SimpleXML, JAXB and JAXB support
+- Removal of SimpleXML, JAXB and JAXB database implementations
+- Implemented pluggable (protected) data storage model
+- Removed generics on database classes
+- Refactor modules and packages
 - Updated keyfile support
 - Updated dependencies
 
