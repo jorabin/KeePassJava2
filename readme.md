@@ -41,7 +41,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-This version is 2.3-SNAPSHOT and is not backwards compatible with 2.2 and earlier versions.
+This version is 3.0.0-SNAPSHOT and is not backwards compatible with 2.2 and earlier versions.
 
 The current released code is version 2.2.2 - released to Maven September 2024. This is on the main branch. See [Build from Source](#build-from-source)
 
@@ -215,15 +215,15 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 
 <tr><td><a href="database">database</a></td><td>database</td>
 <td>
-<a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/database"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/database.svg" alt="Javadocs"></a>
+<a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/database"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/database.svg" alt="Javadocs"></a>
 </td>
 <td>Base definition of the Database APIs.</td></tr>
 <tr><td><a href="">example</a></td><td>example</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/example"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/example.svg" alt="Javadocs"></a></td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/example"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/example.svg" alt="Javadocs"></a></td>
 <td>Worked examples of loading, saving, splicing etc. using the APIs</td></tr>
 
 <tr><td><a href="test">test</a></td><td>test</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/test"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/test.svg" alt="Javadocs"></a></td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/test"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/test.svg" alt="Javadocs"></a></td>
 <td>Shared tests to assess the viability of the implementation.</td></tr>
 
 <tr><td><a href="all">all</a></td><td><strong>KeePassJava2</strong></td>
@@ -231,16 +231,16 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 <td>This is the main KeePassJava2 Maven dependency. Provides a route to all artifacts (other than test and examples) via transitive dependency.</td></tr>
 
 <tr><td><a href="kdb">kdb</a></td><td>KeePassJava2-kdb</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdb"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdb.svg" alt="Javadocs"></a></td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdb"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdb.svg" alt="Javadocs"></a></td>
 <td>An implementation of the Database APIs supporting KeePass KDB format.</td></tr>
 
 <tr><td><a href="kdbx-io">kdbx-io</a></td><td>KeePassJava2-kdbx-io</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx-io.svg" alt="Javadocs"></a></td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx-io.svg" alt="Javadocs"></a></td>
 <td>Provides support for KDBX streaming and security.</td></tr>
 
 
 <tr><td><a href="kdbx-database">kdbx-database</a></td><td>KeePassJava2-kdbx-database</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx-database.svg" alt="Javadocs"></a></td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx-database.svg" alt="Javadocs"></a></td>
 <td>Provides support for KDBX data access and memory protection.</td></tr>
 
 </tbody>
