@@ -16,21 +16,21 @@
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <artifactId>KeePassJava2-parent</artifactId>
+    <artifactId>KeePassJava2.parent</artifactId>
     <groupId>org.linguafranca.pwdb</groupId>
     <version>3.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>KeePassJava2-kdbx-database</artifactId>
+  <artifactId>KeePassJava2.kdbx.database</artifactId>
   <name>KeePassJava2 :: Jackson</name>
   <description>Contains a Jackson XML implementation for KDBX.</description>
 
   <dependencies>
     <dependency>
       <groupId>org.linguafranca.pwdb</groupId>
-      <artifactId>KeePassJava2-kdbx-io</artifactId>
+      <artifactId>KeePassJava2.kdbx.io</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

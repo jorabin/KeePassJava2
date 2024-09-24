@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.linguafranca.pwdb</groupId>
-    <artifactId>KeePassJava2-parent</artifactId>
+    <artifactId>KeePassJava2.parent</artifactId>
     <version>3.0.0-SNAPSHOT</version>
     <modules>
         <module>database</module>
@@ -104,6 +104,18 @@
                                 <value>org.linguafranca.util.MavenRunListener</value>
                             </property>
                         </properties>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven-jar-plugin.version}</version>
+                    <configuration>
+                        <archive>
+                            <manifestEntries>
+                                <Automatic-Module-Name>${project.groupId}.${project.artifactId}</Automatic-Module-Name>
+                            </manifestEntries>
+                        </archive>
                     </configuration>
                 </plugin>
             </plugins>
