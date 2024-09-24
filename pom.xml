@@ -33,7 +33,7 @@
     <packaging>pom</packaging>
 
     <name>KeePassJava2</name>
-    <description>A Java 8 API for databases compatible with the renowned KeePass password safe for Windows</description>
+    <description>A Java 11 API for databases compatible with the renowned KeePass password safe for Windows</description>
     <url>https://github.com/jorabin/KeePassJava2</url>
 
     <licenses>
@@ -76,6 +76,8 @@
         <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
         <!-- reduce the chattiness of output - see profile of same name below -->
         <inhibitConsoleOutput>false</inhibitConsoleOutput>
+        <maven-dependency-plugin.version>3.6.0</maven-dependency-plugin.version>
+        <maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
     </properties>
 
     <build>
@@ -102,18 +104,6 @@
                                 <value>org.linguafranca.util.MavenRunListener</value>
                             </property>
                         </properties>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>${maven-jar-plugin.version}</version>
-                    <configuration>
-                        <archive>
-                            <manifestEntries>
-                                <Automatic-Module-Name>${project.groupId}.${project.artifactId}</Automatic-Module-Name>
-                            </manifestEntries>
-                        </archive>
                     </configuration>
                 </plugin>
             </plugins>
@@ -143,8 +133,21 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.6.0</version>
+                <version>${maven-dependency-plugin.version}</version>
             </plugin>
+            <plugin>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${maven-clean-plugin.version}</version>
+                <configuration>
+                    <filesets>
+                        <fileset>
+                            <directory>testOutput</directory>
+                            <followSymlinks>false</followSymlinks>
+                        </fileset>
+                    </filesets>
+                </configuration>
+            </plugin>
+
         </plugins>
     </build>
 
