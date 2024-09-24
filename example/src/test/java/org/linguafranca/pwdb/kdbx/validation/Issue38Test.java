@@ -3,7 +3,7 @@ package org.linguafranca.pwdb.kdbx.validation;
 import org.junit.Test;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.format.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.KdbxDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 import java.io.IOException;
 import java.io.InputStream;

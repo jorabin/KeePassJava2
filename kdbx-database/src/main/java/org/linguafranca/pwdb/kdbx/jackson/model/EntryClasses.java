@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.linguafranca.pwdb.PropertyValue;
-import org.linguafranca.pwdb.kdbx.KdbxEntry;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxEntry;
 import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
 

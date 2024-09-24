@@ -8,7 +8,7 @@ import org.linguafranca.pwdb.format.Helpers;
 import org.linguafranca.pwdb.format.KdbxCreds;
 import org.linguafranca.pwdb.format.KdbxHeader;
 import org.linguafranca.pwdb.format.KdbxSerializer;
-import org.linguafranca.pwdb.kdbx.KdbxDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 import java.io.IOException;
 import java.io.InputStream;

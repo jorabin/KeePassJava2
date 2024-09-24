@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx;
+package org.linguafranca.pwdb.kdbx.jackson;
 
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.StreamConfiguration;
@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import static org.linguafranca.pwdb.kdbx.KdbxSerializableDatabase.createEmptyDatabase;
+import static org.linguafranca.pwdb.kdbx.jackson.KdbxSerializableDatabase.createEmptyDatabase;
 
 public class KdbxDatabase extends ProtectedDatabase {
 

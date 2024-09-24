@@ -23,6 +23,7 @@ import org.linguafranca.pwdb.format.KdbxHeader;
 import org.linguafranca.pwdb.format.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdb.KdbCredentials;
 import org.linguafranca.pwdb.kdb.KdbDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.*;

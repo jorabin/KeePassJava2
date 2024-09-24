@@ -7,6 +7,7 @@ import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.format.KdbxCreds;
 import org.linguafranca.pwdb.format.KdbxHeader;
 import org.linguafranca.pwdb.format.KdbxSerializer;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

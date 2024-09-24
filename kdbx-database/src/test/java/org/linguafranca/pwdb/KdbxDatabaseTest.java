@@ -18,7 +18,7 @@ package org.linguafranca.pwdb;
 import java.io.IOException;
 
 import org.linguafranca.pwdb.checks.BasicDatabaseChecks;
-import org.linguafranca.pwdb.kdbx.KdbxDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 public class KdbxDatabaseTest extends BasicDatabaseChecks {
 

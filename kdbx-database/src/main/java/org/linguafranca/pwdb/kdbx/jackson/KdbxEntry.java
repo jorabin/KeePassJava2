@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.kdbx;
+package org.linguafranca.pwdb.kdbx.jackson;
 
 import java.util.ArrayList;
 import java.util.Date;

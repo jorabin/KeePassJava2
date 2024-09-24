@@ -20,7 +20,7 @@ import java.io.PrintStream;
 
 import org.junit.Test;
 import org.linguafranca.pwdb.format.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.KdbxDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 

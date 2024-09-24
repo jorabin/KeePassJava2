@@ -9,7 +9,7 @@ import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.format.Helpers;
 import org.linguafranca.pwdb.format.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.Util;
-import org.linguafranca.pwdb.kdbx.KdbxDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 import java.io.*;
 import java.nio.file.Files;

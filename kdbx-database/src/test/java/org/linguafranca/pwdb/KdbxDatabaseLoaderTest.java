@@ -19,7 +19,7 @@ import java.io.InputStream;
 
 import org.linguafranca.pwdb.checks.DatabaseLoaderChecks;
 import org.linguafranca.pwdb.format.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.KdbxDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 public class KdbxDatabaseLoaderTest extends DatabaseLoaderChecks{
     

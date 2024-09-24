@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.kdbx.KdbxGroup;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxGroup;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToByteConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;

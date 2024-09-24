@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.format.KdbxCreds;
 import org.linguafranca.pwdb.format.KdbxStreamFormat;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.IOException;

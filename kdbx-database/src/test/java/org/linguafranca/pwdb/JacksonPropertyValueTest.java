@@ -17,7 +17,7 @@ package org.linguafranca.pwdb;
 
 import org.linguafranca.pwdb.checks.PropertyValueChecks;
 import org.linguafranca.pwdb.format.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.KdbxDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 import java.io.IOException;
 import java.io.InputStream;

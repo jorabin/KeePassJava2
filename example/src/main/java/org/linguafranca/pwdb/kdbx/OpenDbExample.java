@@ -3,6 +3,7 @@ package org.linguafranca.pwdb.kdbx;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 import java.io.InputStream;
 import java.io.PrintStream;

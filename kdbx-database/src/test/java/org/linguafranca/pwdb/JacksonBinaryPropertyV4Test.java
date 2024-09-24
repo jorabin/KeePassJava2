@@ -21,7 +21,7 @@ import java.io.OutputStream;
 
 import org.linguafranca.pwdb.checks.BinaryPropertyChecks;
 import org.linguafranca.pwdb.format.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.KdbxDatabase;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 public class JacksonBinaryPropertyV4Test extends BinaryPropertyChecks{
 
