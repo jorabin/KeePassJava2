@@ -186,14 +186,15 @@ only, with a view to being withdrawn, since they perform badly and/or depend on 
 
 ## Dependencies
 
-Aside from the JRE, at release 2.3, the API depends on:
+Aside from the JRE, at release 3.0.0, the API depends on:
 
 - [Google Guava](https://github.com/google/guava/wiki) ([Apache 2 license](https://github.com/google/guava/blob/master/COPYING)).
 - [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
 - [Bouncy Castle](https://github.com/bcgit/bc-java/blob/master/LICENSE.html) ([MIT License](https://github.com/bcgit/bc-java/blob/master/LICENSE.html)).
-- [Faster XML Jackson](https://github.com/FasterXML/jackson)
+- [Jackson XML](https://github.com/FasterXML/jackson-dataformat-xml) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0))
+- [Woodstox](https://github.com/FasterXML/woodstox) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0))
 
-It also depends on SLF4J and Junit 4 for tests.
+It also depends on SLF4J, logback and Junit 4 for tests.
 
 ## Build from Source
 
