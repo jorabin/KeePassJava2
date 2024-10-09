@@ -130,7 +130,7 @@ public interface PropertyValue {
     class StringStore implements PropertyValue {
         private final String value;
         private final static PropertyValue.Factory<StringStore> factory =
-                new PropertyValue.Factory<StringStore>(){
+                new PropertyValue.Factory<>(){
 
                     @Override
                     public StringStore of(CharSequence aCharSequence) {
@@ -195,7 +195,7 @@ public interface PropertyValue {
         private final byte[] value;
 
         private final static PropertyValue.Factory<BytesStore> factory =
-                new PropertyValue.Factory<BytesStore>(){
+                new PropertyValue.Factory<>(){
 
                     @Override
                     public BytesStore of(CharSequence aCharSequence) {
@@ -305,7 +305,7 @@ public interface PropertyValue {
         }
 
         private final static PropertyValue.Factory<SealedStore> factory =
-                new PropertyValue.Factory<SealedStore>(){
+                new PropertyValue.Factory<>(){
 
                     @Override
                     public SealedStore of(CharSequence aCharSequence) {
