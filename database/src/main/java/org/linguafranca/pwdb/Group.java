@@ -77,7 +77,7 @@ public interface Group {
      * Returns the number of groups that are direct children of this group
      *
      * <p>It's possible that returning a list as in {@link #getGroups()} may incur significantly
-     * more overhead so use this method if only the count is reuqired
+     * more overhead so use this method if only the count is required
      */
     int getGroupsCount();
 
@@ -104,10 +104,10 @@ public interface Group {
 
     /**
      * Removes the group supplied from this group. The group removed
-     * no longer has a parent and so in not part of the database any more unless
+     * no longer has a parent and so in no longer part of the database unless
      * it is re-added to another group.
      * <p>
-     * If the group is incompatible with the databse an exception is thrown.
+     * If the group is incompatible with the database an exception is thrown.
      * <p>
      * If the group is not present no error is thrown.
      * @param group the group to remove
@@ -125,7 +125,7 @@ public interface Group {
      * Returns the number of entries in this group
      *
      * <p>It's possible that returning a list as in {@link #getEntries()} may incur significantly
-     * more overhead so use this method if only the count is reuqired
+     * more overhead so use this method if only the count is required
      */
     int getEntriesCount();
 
@@ -135,10 +135,10 @@ public interface Group {
      *
      * <p>Entry match is described under {@link Entry#match(String)}
      *
-     * <p><em>Note:</em> finding within recycle bin is supported, recusion into recycle bin is inhibited
+     * <p><em>Note:</em> finding within recycle bin is supported, recursion into recycle bin is inhibited
      *
      * @param match the text to match
-     * @param recursive whether to include sub groups in the process
+     * @param recursive whether to include subgroups in the process
      * @return a modifiable-by-caller list
      * @see Entry#match(String)
      */
@@ -150,10 +150,10 @@ public interface Group {
      *
      * <p>Entry match is described under {@link Entry#match(Entry.Matcher)}
      *
-     * <p><em>Note:</em> finding within recycle bin is supported, recusion into recycle bin is inhibited
+     * <p><em>Note:</em> finding within recycle bin is supported, recursion into recycle bin is inhibited
      *
-     * @param matcher the mathcher to use
-     * @param recursive whether to include sub groups in the process
+     * @param matcher the matcher to use
+     * @param recursive whether to include subgroups in the process
      * @return a modifiable-by-caller list
      * @see Entry#match(Entry.Matcher)
      */
@@ -166,6 +166,19 @@ public interface Group {
      * @return the entry added
      */
     Entry addEntry(Entry entry);
+
+    /**
+     * Adds a new entry to this group
+     * @return the entry added
+     */
+    Entry addEntry();
+
+    /**
+     * Adds a new entry to this group
+     * @param title the title of the entry to add
+     * @return the entry added
+     */
+    Entry addEntry(String title);
 
     /**
      * Remove an entry from this group and hence from the database.

@@ -62,7 +62,7 @@ public class KdbEntry extends AbstractEntry {
     }
 
     @Override
-    public void setProperty(String name, String value) {
+    public Entry setProperty(String name, String value) {
         switch (name) {
             case STANDARD_PROPERTY_NAME_USER_NAME: setUsername(value); break;
             case STANDARD_PROPERTY_NAME_PASSWORD: setPassword(value); break;
@@ -71,6 +71,7 @@ public class KdbEntry extends AbstractEntry {
             case STANDARD_PROPERTY_NAME_NOTES: setNotes(value); break;
             default: throw new UnsupportedOperationException("Cannot set non-standard properties in KDB format");
         }
+        return this;
     }
 
     @Override

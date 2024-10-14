@@ -130,7 +130,7 @@ public abstract class AbstractEntry implements Entry {
     }
 
     @Override
-    public void setPropertyValue(String name, PropertyValue value) {
+    public Entry setPropertyValue(String name, PropertyValue value) {
         throw new UnsupportedOperationException();
     }
 

@@ -264,6 +264,7 @@ public interface Database {
      * Obtain a list of those properties that should be protected by default
      * @return a list of property names
      */
+    @SuppressWarnings("UnusedReturnValue")
     List<String> listShouldProtect();
 
     /**

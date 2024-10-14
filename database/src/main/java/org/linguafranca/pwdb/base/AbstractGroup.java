@@ -16,7 +16,6 @@
 
 package org.linguafranca.pwdb.base;
 
-import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
 
@@ -30,6 +29,15 @@ import java.util.Stack;
  * @author Jo
  */
 public abstract class AbstractGroup implements Group {
+
+    public Entry addEntry() {
+        return getDatabase().newEntry();
+    }
+
+    @Override
+    public Entry addEntry(String title) {
+        return getDatabase().newEntry(title);
+    }
 
     @Override
     public List<? extends Group> findGroups(String group) {

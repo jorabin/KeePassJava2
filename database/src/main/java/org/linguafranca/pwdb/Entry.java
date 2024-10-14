@@ -55,12 +55,11 @@ public interface Entry {
     String STANDARD_PROPERTY_NAME_TITLE = "Title";
     String STANDARD_PROPERTY_NAME_NOTES = "Notes";
 
-    List<String> STANDARD_PROPERTY_NAMES =  Collections.unmodifiableList(Arrays.asList(
-            STANDARD_PROPERTY_NAME_USER_NAME,
+    List<String> STANDARD_PROPERTY_NAMES = List.of(STANDARD_PROPERTY_NAME_USER_NAME,
             STANDARD_PROPERTY_NAME_PASSWORD,
             STANDARD_PROPERTY_NAME_URL,
             STANDARD_PROPERTY_NAME_TITLE,
-            STANDARD_PROPERTY_NAME_NOTES));
+            STANDARD_PROPERTY_NAME_NOTES);
 
     /**
      * Interface to implement when using the {@link #match(Entry.Matcher)}
@@ -130,7 +129,7 @@ public interface Entry {
      * non-standard properties are not supported
      * @see Database#supportsNonStandardPropertyNames()
      */
-    void setProperty(String name, String value);
+    Entry setProperty(String name, String value);
 
     /**
      * Sets the value of a property as a property value. The method does not check whether the
@@ -144,7 +143,7 @@ public interface Entry {
      * non-standard properties are not supported
      * @see Database#supportsNonStandardPropertyNames()
      */
-    void setPropertyValue(String name, PropertyValue value);
+    Entry setPropertyValue(String name, PropertyValue value);
 
     /**
      * Removes this non-standard  property, if it exists.
@@ -250,6 +249,7 @@ public interface Entry {
      *
      * @return a password
      */
+    @SuppressWarnings("DeprecatedIsStillUsed")
     @Deprecated
     String getPassword();
 
@@ -261,6 +261,7 @@ public interface Entry {
      * @param pass a password
      * @deprecated use {@link #setPropertyValue(String, PropertyValue)}
      */
+    @SuppressWarnings("DeprecatedIsStillUsed")
     @Deprecated
     void setPassword(String pass);
 

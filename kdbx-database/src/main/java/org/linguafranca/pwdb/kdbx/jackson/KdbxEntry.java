@@ -147,14 +147,15 @@ public class KdbxEntry extends AbstractEntry {
 
     @Override
     @JsonIgnore
-    public void setProperty(String s, String s1) {
+    public KdbxEntry setProperty(String s, String s1) {
         StringProperty sp = getStringProperty(s, string);
         if (sp != null) {
             sp.setValue(database.getPropertyValueStrategy().newUnprotected().of(s1));
-            return;
+            return this;
         }
         string.add(new StringProperty(s, database.getPropertyValueStrategy().newUnprotected().of(s1)));
         touch();
+        return this;
     }
 
     @Override
@@ -166,14 +167,15 @@ public class KdbxEntry extends AbstractEntry {
 
     @Override
     @JsonIgnore
-    public void setPropertyValue(String name, PropertyValue value) {
+    public KdbxEntry setPropertyValue(String name, PropertyValue value) {
         StringProperty sp = getStringProperty(name, string);
         if (sp != null) {
             sp.setValue(value);
-            return;
+            return this;
         }
         string.add(new StringProperty(name, value));
         touch();
+        return this;
     }
 
     @Override
