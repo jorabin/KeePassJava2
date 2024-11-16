@@ -17,6 +17,16 @@
             <artifactId>database</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <!--
+                This module has helper classes in the main source.
+                Other modules will use <scope>test</scope> for this project,
+                so they won't leak junit as a transitive dependency
+             -->
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

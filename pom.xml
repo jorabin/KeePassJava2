@@ -152,10 +152,11 @@
     </build>
 
     <dependencies>
-        <dependency>
+        <!-- <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-        </dependency>
+            <scope>test</scope>
+        </dependency> -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -164,6 +165,11 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
