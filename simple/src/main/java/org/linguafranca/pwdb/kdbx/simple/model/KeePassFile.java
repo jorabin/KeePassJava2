@@ -249,6 +249,7 @@ public class KeePassFile {
         }
     }
 
+    @org.simpleframework.xml.Root(strict=false)
     public static class CustomData {
         protected List<Object> any;
     }

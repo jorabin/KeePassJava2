@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonGroup;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToByteConverter;
@@ -337,6 +338,7 @@ public class KeePassFile {
         }
     }
 
+    @JsonIgnoreType
     public static class CustomData {
 
         public CustomData() {
