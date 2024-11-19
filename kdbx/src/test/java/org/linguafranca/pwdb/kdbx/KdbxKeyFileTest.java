@@ -28,7 +28,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 /**
  * tests reading of kdbx with various combinations of key file and password

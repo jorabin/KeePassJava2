@@ -19,14 +19,13 @@ package org.linguafranca.pwdb.kdbx.simple;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo

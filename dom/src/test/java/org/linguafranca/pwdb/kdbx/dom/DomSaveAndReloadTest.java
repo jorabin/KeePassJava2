@@ -22,7 +22,6 @@ import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.kdbx.KdbxHeader;
-import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 
 import java.io.IOException;
 import java.io.InputStream;

@@ -22,7 +22,7 @@ import java.io.PrintStream;
 import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 /**
  * tests the operation of Hex conversion

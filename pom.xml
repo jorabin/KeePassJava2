@@ -32,6 +32,7 @@
         <module>jackson</module>
         <module>all</module>
         <module>example</module>
+        <module>util</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -102,7 +103,7 @@
                             <!-- this gives us more detailed logging during build -->
                             <property>
                                 <name>listener</name>
-                                <value>org.linguafranca.util.MavenRunListener</value>
+                                <value>org.linguafranca.test.maven.MavenRunListener</value>
                             </property>
                         </properties>
                     </configuration>
@@ -153,17 +154,22 @@
 
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.12</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -172,7 +178,7 @@
             <dependency>
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
-                <version>24.0.1</version>
+                <version>24.1.0</version>
             </dependency>
             <!-- for android and Java7 apparently -->
             <dependency>
@@ -188,7 +194,7 @@
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>2.0.5</version>
+                <version>2.0.12</version>
             </dependency>
             <!-- if you want to use logback versions from 1.2 on you need to use
                 SLF4J > 2.0, this was kind of hard to find out. -->

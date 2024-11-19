@@ -1,4 +1,4 @@
-package org.linguafranca.util;
+package org.linguafranca.test.maven;
 
 import org.junit.runner.Description;
 import org.junit.runner.notification.Failure;

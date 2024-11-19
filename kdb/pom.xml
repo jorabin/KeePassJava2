@@ -10,7 +10,7 @@
 
     <artifactId>KeePassJava2-kdb</artifactId>
     <name>KeePassJava2 :: KDB</name>
-    <description>Contains an implementaion that can load KDB files.</description>
+    <description>Contains an implementation that can load KDB files.</description>
 
     <dependencies>
         <dependency>
@@ -19,14 +19,10 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-			<version>24.1.0</version>
-		</dependency>
-        <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
             <artifactId>test</artifactId>
             <version>${project.version}</version>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>

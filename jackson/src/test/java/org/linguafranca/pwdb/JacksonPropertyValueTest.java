@@ -18,7 +18,6 @@ package org.linguafranca.pwdb;
 import org.linguafranca.pwdb.checks.BasicDatabaseChecks;
 import org.linguafranca.pwdb.checks.PropertyValueChecks;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
-import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonEntry;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonGroup;

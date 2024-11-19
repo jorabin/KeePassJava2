@@ -28,7 +28,7 @@ import org.linguafranca.pwdb.kdbx.KdbxSerializer;
 import java.io.*;
 
 import static org.junit.Assert.assertTrue;
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo

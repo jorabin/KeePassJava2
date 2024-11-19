@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 public class Issue27Test {
     static PrintStream printStream = getTestPrintStream();

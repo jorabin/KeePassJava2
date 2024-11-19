@@ -1,7 +1,6 @@
 package org.linguafranca.pwdb.kdbx;
 
 import com.google.common.base.Strings;
-import org.linguafranca.util.HexViewer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +11,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 /**
  * Utility to allow browsing of database files and listing content to console

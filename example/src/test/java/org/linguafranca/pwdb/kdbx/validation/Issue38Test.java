@@ -10,7 +10,7 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.List;
 
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 /**
  * Bug report on GitHub, the Keyfile is Version 2 (Hex)

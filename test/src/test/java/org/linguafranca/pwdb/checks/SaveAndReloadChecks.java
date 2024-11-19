@@ -28,7 +28,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo

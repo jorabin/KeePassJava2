@@ -16,19 +16,11 @@
 package org.linguafranca.pwdb;
 
 import static org.junit.Assert.assertTrue;
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintStream;
 
-import org.junit.Test;
 import org.linguafranca.pwdb.checks.SaveAndReloadChecks;
 import org.linguafranca.pwdb.kdbx.KdbxCreds;
 import org.linguafranca.pwdb.kdbx.KdbxHeader;

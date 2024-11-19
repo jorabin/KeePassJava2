@@ -16,7 +16,6 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.junit.BeforeClass;
 import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.kdb.KdbCredentials;
 import org.linguafranca.pwdb.kdb.KdbDatabase;
@@ -28,8 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 /**
  * Examples for QuickStart
@@ -45,7 +43,6 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
     public abstract D getDatabase();
     public abstract D loadDatabase(Credentials creds, InputStream inputStream);
 
-    @BeforeClass
     public static void ensureOutputDir() throws IOException {
         Files.createDirectories(Paths.get("testOutput"));
     }
