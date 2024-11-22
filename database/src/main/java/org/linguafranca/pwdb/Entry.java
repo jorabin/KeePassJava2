@@ -248,6 +248,7 @@ public interface Entry {
      * <p>Implementations should Touch LastAccessedTime when this method is called.
      *
      * @return a password
+     * @deprecated use {@link #getPropertyValue(String)} with {@link #STANDARD_PROPERTY_NAME_PASSWORD}
      */
     @SuppressWarnings("DeprecatedIsStillUsed")
     @Deprecated
@@ -259,7 +260,7 @@ public interface Entry {
      * <p>Implementations should Touch LastModifiedTime when this method is called.
      *
      * @param pass a password
-     * @deprecated use {@link #setPropertyValue(String, PropertyValue)}
+     * @deprecated use {@link #setPropertyValue(String, PropertyValue)} with {@link #STANDARD_PROPERTY_NAME_PASSWORD}
      */
     @SuppressWarnings("DeprecatedIsStillUsed")
     @Deprecated

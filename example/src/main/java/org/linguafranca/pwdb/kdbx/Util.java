@@ -11,20 +11,18 @@ import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Util {
 
-    List<Class> implementations = new ArrayList<>(Arrays.asList(KdbxDatabase.class));
+    List<Class<? extends Database>> implementations = List.of(KdbxDatabase.class);
 
     @FunctionalInterface
     public interface DatabaseLoader {
         Database load(Credentials c, InputStream i) throws IOException;
     }
 
-    List<DatabaseLoader> dbLoader = Arrays.asList(KdbxDatabase::load);
+    List<DatabaseLoader> dbLoader = List.of(KdbxDatabase::load);
 
     public static InputStream getDecryptedInputStream (String resourceName, Credentials credentials) throws IOException {
         return getDecryptedInputStream(resourceName, credentials, new KdbxHeader());

@@ -30,7 +30,7 @@ public class OpenDbExample {
         }
     }
 
-    public static void testDb (DbLoader loader, String label, int loads, int iterations) throws Exception {
+    private static void testDb (DbLoader loader, String label, int loads, int iterations) throws Exception {
         KdbxCreds creds = new KdbxCreds("123".getBytes());
         long start = System.currentTimeMillis();
         for (int i=0; i < loads; i++) {
