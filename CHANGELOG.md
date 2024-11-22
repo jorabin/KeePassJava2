@@ -2,7 +2,7 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-## 2024-09-13 [2.3-SNAPSHOT]
+## 2024-11-22 [3.0.0-SNAPSHOT]
 
 ### Changed
 
@@ -11,11 +11,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - remove DOM database
 - remove complicated generics on database classes
 
-### Added
-
-- added a service provider interface for extensibility
-
-## 2024-09-10 [2.2.3-SNAPSHOT]
+## 2024-11-22 [2.2.3-SNAPSHOT]
 
 ### Added
 
@@ -26,6 +22,11 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 
 - Jackson implementation supports this interface
 - Other implementations throw exceptions appropriately as unsupported
+- Module restructure to avoid test files, junit being dragged along in deployed JAR (Issue-71)
+
+### Fixed
+
+KDBX file format version 4.1 now supported (Issue-70) (in Jackson, not Simple)
 
 ## [2.2.2] 2024-09-06
 
