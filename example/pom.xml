@@ -39,14 +39,23 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>test</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>io.github.novacrypto</groupId>
             <artifactId>SecureString</artifactId>
             <version>2022.01.17</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.linguafranca.pwdb</groupId>
+            <artifactId>test</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
         </dependency>
     </dependencies>
 

@@ -14,8 +14,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
+            <groupId>org.linguafranca.pwdb</groupId>
+            <artifactId>util</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -24,6 +25,12 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
+        </dependency>
+        <!-- pull in junit as a compile time dependency, but don't deploy as run time -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 </project>

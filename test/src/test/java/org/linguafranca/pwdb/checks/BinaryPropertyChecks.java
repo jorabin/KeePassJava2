@@ -1,4 +1,4 @@
-/*
+package org.linguafranca.pwdb.checks;/*
  * Copyright 2015 Jo Rabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.checks;
-
 import com.google.common.io.ByteStreams;
-import org.junit.Assert;
 import org.junit.Test;
 import org.linguafranca.pwdb.*;
 
@@ -68,7 +65,7 @@ public abstract class BinaryPropertyChecks {
         InputStream testFile = getClass().getClassLoader().getResourceAsStream("letter J.jpeg");
         assert testFile != null;
         byte [] original = ByteStreams.toByteArray(testFile);
-        Assert.assertArrayEquals(original, letterJ);
+        assertArrayEquals(original, letterJ);
     }
 
     /**
@@ -81,7 +78,7 @@ public abstract class BinaryPropertyChecks {
         InputStream testFile = getClass().getClassLoader().getResourceAsStream("letter L.jpeg");
         assert testFile != null;
         byte [] original = ByteStreams.toByteArray(testFile);
-        Assert.assertArrayEquals(original, letterL);
+        assertArrayEquals(original, letterL);
     }
 
     /**
@@ -95,9 +92,9 @@ public abstract class BinaryPropertyChecks {
         Entry entry = database.findEntries("Test attachment").get(0);
         entry.setBinaryProperty("letter L.jpeg", original);
         byte [] letterL = entry.getBinaryProperty("letter L.jpeg");
-        Assert.assertArrayEquals(original, letterL);
+        assertArrayEquals(original, letterL);
         assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
-        Assert.assertTrue(database.isDirty());
+        assertTrue(database.isDirty());
     }
 
     /**

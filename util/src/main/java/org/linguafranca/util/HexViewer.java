@@ -13,14 +13,6 @@ public class HexViewer {
 
     static PrintStream printStream = getTestPrintStream();
 
-    public static void main(String[] args) throws IOException {
-
-
-        try (InputStream is = HexViewer.class.getClassLoader().getResourceAsStream("V4-AES-Argon2-CustomIcon.kdbx");) {
-            list(is);
-        }
-    }
-
     public static void list(InputStream is) throws IOException {
         for (int i = 0; i < 32; i++) {
             byte[] buf = new byte [16];

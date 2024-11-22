@@ -1,4 +1,4 @@
-/*
+package org.linguafranca.pwdb.checks;/*
  * Copyright 2015 Jo Rabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.checks;
-
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -66,7 +63,7 @@ public abstract class SaveAndReloadChecks {
 
         FileOutputStream fos = new FileOutputStream("testOutput/test1.kdbx");
         saveDatabase(output, getCreds("123".getBytes()), fos);
-        Assert.assertFalse(output.isDirty());
+        assertFalse(output.isDirty());
         fos.flush();
         fos.close();
         // make sure that saving didn't mess up content
@@ -207,13 +204,13 @@ public abstract class SaveAndReloadChecks {
     public void testNewDatabase() throws IOException {
         Database database = getDatabase();
         Group root = database.getRootGroup();
-        Assert.assertTrue(root.isRootGroup());
+        assertTrue(root.isRootGroup());
         assertEquals(0, root.getGroups().size());
         assertEquals(0, root.getEntries().size());
 
-        Assert.assertTrue(database.shouldProtect("Password"));
-        Assert.assertFalse(database.shouldProtect("Title"));
-        Assert.assertFalse(database.shouldProtect("Bogus"));
+        assertTrue(database.shouldProtect("Password"));
+        assertFalse(database.shouldProtect("Title"));
+        assertFalse(database.shouldProtect("Bogus"));
 
         assertEquals("New Database", database.getName());
         database.setName("Modified Database");
@@ -228,8 +225,8 @@ public abstract class SaveAndReloadChecks {
 
         root.addGroup(group1);
         assertEquals("Group 1", group1.getName());
-        Assert.assertFalse(group1.isRootGroup());
-        Assert.assertTrue(root.isRootGroup());
+        assertFalse(group1.isRootGroup());
+        assertTrue(root.isRootGroup());
 
         assertEquals(1, root.getGroups().size());
         assertEquals(newGroupUUID, root.getGroups().get(0).getUuid());
@@ -246,7 +243,7 @@ public abstract class SaveAndReloadChecks {
 
         try {
             root.setParent(group1);
-            Assert.fail("Cannot add root group to another group");
+            fail("Cannot add root group to another group");
         } catch (Exception ignored) {
         }
 

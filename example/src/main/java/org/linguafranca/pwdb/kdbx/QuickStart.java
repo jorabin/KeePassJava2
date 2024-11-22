@@ -16,7 +16,6 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.junit.BeforeClass;
 import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.format.KdbxCreds;
 import org.linguafranca.pwdb.format.KdbxHeader;
@@ -27,11 +26,8 @@ import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
@@ -42,16 +38,12 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
 @SuppressWarnings("WeakerAccess")
 public abstract class QuickStart {
 
+    public static final String TEST_OUTPUT_DIR = "testOutput";
     static PrintStream printStream = getTestPrintStream();
 
 
     public abstract Database getDatabase();
     public abstract Database loadDatabase(Credentials creds, InputStream inputStream);
-
-    @BeforeClass
-    public static void ensureOutputDir() throws IOException {
-        Files.createDirectories(Paths.get("testOutput"));
-    }
 
     /**
      * Load KDBX
@@ -90,7 +82,7 @@ public abstract class QuickStart {
         }
 
         // save to a file with password "123"
-        try (FileOutputStream outputStream = new FileOutputStream("testOutput/test.kdbx")) {
+        try (FileOutputStream outputStream = new FileOutputStream(TEST_OUTPUT_DIR + "/test.kdbx")) {
             database.save(new KdbxCreds("123".getBytes()), outputStream);
         }
     }
@@ -138,7 +130,7 @@ public abstract class QuickStart {
         // deep copy from group (not including source group, KDB database has simulated root)
         kdbxDatabase.getRootGroup().copy(database.getRootGroup());
         // save it
-        try (FileOutputStream f = new FileOutputStream("testOutput/migration.kdbx")) {
+        try (FileOutputStream f = new FileOutputStream(TEST_OUTPUT_DIR + "/migration.kdbx")) {
             kdbxDatabase.save(new KdbxCreds("123".getBytes()), f);
         }
     }

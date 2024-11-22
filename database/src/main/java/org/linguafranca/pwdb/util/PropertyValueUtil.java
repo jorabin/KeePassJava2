@@ -1,4 +1,4 @@
-package org.linguafranca.util;
+package org.linguafranca.pwdb.util;
 
 import org.linguafranca.pwdb.PropertyValue;
 
@@ -29,7 +29,7 @@ public class PropertyValueUtil {
 
 
         // test input byte[]
-        testValue = factory.of(THIS_IS_A_SECRET.getBytes());
+        testValue = factory.of(THIS_IS_A_SECRET.getBytes(StandardCharsets.UTF_8));
         test(testStringReturn, testValue);
 
     }

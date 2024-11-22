@@ -2,8 +2,7 @@ package org.linguafranca.pwdb.example;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-import static org.linguafranca.util.PropertyValueUtil.genericTest;
+import static org.linguafranca.pwdb.util.PropertyValueUtil.genericTest;
 
 public class SecureCharBufferPropertyValueTest {
 
