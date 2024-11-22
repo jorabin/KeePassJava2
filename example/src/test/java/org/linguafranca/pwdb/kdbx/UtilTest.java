@@ -20,10 +20,16 @@ public class UtilTest {
     @Test
     public void listXmlTest() throws IOException {
         PrintWriter writer = new PrintWriter(outputStream);
-        listXml("V3-CustomIcon.kdbx", new KdbxCreds("123".getBytes()), writer);
+        listXml("Database-4.1-123.kdbx", new KdbxCreds("123".getBytes()), writer);
         writer.flush();
     }
 
+    @Test
+    public void listXmlTest2() throws IOException {
+        PrintWriter writer = new PrintWriter(outputStream);
+        listXml("issue-70/test2.kdbx", new KdbxCreds("KeePassJava2".getBytes()), writer);
+        writer.flush();
+    }
     /**
      * List Database Encryption Characteristics
      */

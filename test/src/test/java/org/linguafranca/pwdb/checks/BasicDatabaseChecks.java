@@ -1,4 +1,4 @@
-/*
+package org.linguafranca.pwdb.checks;/*
  * Copyright 2015 Jo Rabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-package org.linguafranca.pwdb.checks;
-
-import org.junit.Assert;
 import org.junit.Test;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
@@ -62,7 +59,7 @@ public abstract class BasicDatabaseChecks  {
 
         Group g2 = database.newGroup();
         assertEquals("", g2.getName());
-        Assert.assertNotNull(g2.getUuid());
+        assertNotNull(g2.getUuid());
         assertEquals(0, g2.getIcon().getIndex());
         assertEquals(0, g2.getGroups().size());
         assertEquals(0, g2.getEntries().size());
@@ -126,9 +123,9 @@ public abstract class BasicDatabaseChecks  {
         assertEquals("https://window.com", e1.getUrl());
 
 
-        Assert.assertTrue(e1.match("2"));
-        Assert.assertTrue(e1.matchTitle("1"));
-        Assert.assertFalse(e1.matchTitle("doggy"));
+        assertTrue(e1.match("2"));
+        assertTrue(e1.matchTitle("1"));
+        assertFalse(e1.matchTitle("doggy"));
 
         Icon ic1 = database.newIcon(27);
         e1.setIcon(ic1);
@@ -153,7 +150,7 @@ public abstract class BasicDatabaseChecks  {
             properties.add("silly");
             // remove all properties to show that getProperties returns all the values we want
             properties.removeAll(e1.getPropertyNames());
-            Assert.assertEquals(0, properties.size());
+            assertEquals(0, properties.size());
         } catch (UnsupportedOperationException e) {
             // databases don't have to support arbitrary properties
             assertFalse(database.supportsNonStandardPropertyNames());
@@ -220,17 +217,17 @@ public abstract class BasicDatabaseChecks  {
     @Test
     public void testNewEntry() {
         Entry e2 = database.newEntry();
-        Assert.assertNull(e2.getParent());
+        assertNull(e2.getParent());
         assertEquals("", e2.getPassword());
-        Assert.assertNotNull(e2.getUuid());
+        assertNotNull(e2.getUuid());
         assertEquals("", e2.getUrl());
         assertEquals("", e2.getNotes());
         assertEquals("", e2.getUsername());
         assertEquals("", e2.getTitle());
-        Assert.assertNull(e2.getProperty("silly"));
+        assertNull(e2.getProperty("silly"));
         List<String> l = e2.getPropertyNames();
         l.removeAll(Entry.STANDARD_PROPERTY_NAMES);
-        Assert.assertEquals(0, l.size());
+        assertEquals(0, l.size());
     }
 
     @Test

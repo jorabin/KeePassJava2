@@ -114,7 +114,12 @@ public class KdbxEntry extends AbstractEntry {
    
     @JacksonXmlProperty(localName = "OverrideURL")
     protected String overrideURL;
-    
+
+    @JacksonXmlProperty(localName = "PreviousParentGroup")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
+    protected UUID previousParentGroup;
+
     @JacksonXmlProperty(localName = "Tags")
     protected String tags;
    

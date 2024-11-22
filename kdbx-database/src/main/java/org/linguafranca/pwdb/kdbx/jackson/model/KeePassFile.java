@@ -339,17 +339,30 @@ public class KeePassFile {
 
     public static class CustomData {
 
+        public static class CustomDataItem {
+            @JacksonXmlProperty(localName = "Key")
+            public String key;
+            @JacksonXmlProperty(localName = "Value")
+            public String value;
+            @JacksonXmlProperty(localName = "LastModificationTime")
+            @JsonDeserialize(converter = StringToDateConverter.class)
+            @JsonSerialize(converter = DateToStringConverter.class)
+            public Date lastModificationTime;
+        }
+
+        @JacksonXmlProperty(localName = "Item")
+        @JacksonXmlElementWrapper(useWrapping = false)
+        protected List<CustomDataItem> items;
+
         public CustomData() {
         }
 
-        public List<Object> getAny() {
-            return any;
+        public List<CustomDataItem> getItems() {
+            return items;
         }
 
-        public void setAny(List<Object> any) {
-            this.any = any;
+        public void setItems(List<CustomDataItem> items) {
+            this.items = items;
         }
-
-        protected List<Object> any;
     }
 }

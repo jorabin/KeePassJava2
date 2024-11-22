@@ -44,10 +44,11 @@
       <version>7.0.0</version>
     </dependency>
     <dependency>
-        <groupId>org.linguafranca.pwdb</groupId>
-        <artifactId>test</artifactId>
-        <version>${project.version}</version>
-        <scope>test</scope>
-      </dependency>
+      <groupId>org.linguafranca.pwdb</groupId>
+      <artifactId>test</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
     </dependencies>
   </project>

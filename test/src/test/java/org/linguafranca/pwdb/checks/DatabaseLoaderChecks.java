@@ -1,4 +1,4 @@
-/*
+package org.linguafranca.pwdb.checks;/*
  * Copyright 2015 Jo Rabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.linguafranca.pwdb.checks;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -58,7 +56,7 @@ public abstract class DatabaseLoaderChecks {
         for (Entry tes: tests) {
             printStream.println(tes.getTitle());
         }
-        Assert.assertEquals(4, tests.size());
+        assertEquals(4, tests.size());
         if (tests.size() > 0) {
             // copy the password of the first entry to the clipboard
             String pass = tests.get(0).getPassword();
@@ -69,12 +67,12 @@ public abstract class DatabaseLoaderChecks {
 */
             // all the relevant entries should have the password 123
             String pass2 = tests.get(0).getPassword();
-            Assert.assertEquals(pass, pass2);
-            Assert.assertEquals("123", pass2);
+            assertEquals(pass, pass2);
+            assertEquals("123", pass2);
         }
 
         List<? extends Entry> passwords = database.findEntries("password");
-        Assert.assertEquals(4, passwords.size());
+        assertEquals(4, passwords.size());
         for (Entry passwordEntry : passwords) {
             assertEquals(passwordEntry.getTitle(), passwordEntry.getPassword());
             printStream.println(passwordEntry.getTitle());
@@ -86,7 +84,7 @@ public abstract class DatabaseLoaderChecks {
                 return entry.getTitle().equals("hello world");
             }});
 
-        Assert.assertEquals(1, entries.size());
+        assertEquals(1, entries.size());
         assertEquals("pass", entries.get(0).getPassword());
 
         // kdb files don't have a time zone so can't make head or tail of the date - test file seems to have a local time in it
@@ -96,6 +94,6 @@ public abstract class DatabaseLoaderChecks {
 
         Date c = entries.get(0).getCreationTime();
         Date expected = sdf.parse("2015-10-24T17:20:41Z");
-        Assert.assertEquals(expected, c);
+        assertEquals(expected, c);
     }
 }

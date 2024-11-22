@@ -102,6 +102,14 @@ public class KdbxGroup extends AbstractGroup{
     @JsonSerialize(converter = UUIDToBase64Converter.class)
     protected UUID lastTopVisibleEntry;
 
+    @JacksonXmlProperty(localName = "PreviousParentGroup")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
+    protected UUID previousParentGroup;
+
+    @JacksonXmlProperty(localName = "Tags")
+    protected String tags;
+
     @JacksonXmlProperty(localName = "Entry") /* Workaround jackson */
     @JacksonXmlElementWrapper(useWrapping = false)
     protected List<KdbxEntry> entries;

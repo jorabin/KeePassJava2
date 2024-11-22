@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.format.KdbxCreds;
@@ -51,6 +52,11 @@ public class SimpleQuickStartTest extends QuickStart {
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    @BeforeClass
+    public static void ensureOutputDir() throws IOException {
+        Files.createDirectories(Paths.get(TEST_OUTPUT_DIR));
     }
 
     @Test

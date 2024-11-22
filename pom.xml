@@ -24,6 +24,7 @@
     <modules>
         <module>database</module>
         <module>test</module>
+        <module>util</module>
         <module>kdb</module>
         <module>kdbx-io</module>
         <module>kdbx-database</module>
@@ -192,16 +193,24 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -244,7 +253,7 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.13.2</version>
-                <!-- needs to be a "compile" dependency as we have shared tests -->
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

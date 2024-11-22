@@ -53,6 +53,7 @@ public class Util {
     public static void listDatabase(DatabaseLoader loader, String resourceName, Credentials creds, OutputStream outputStream) throws IOException {
         Database database = loader.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
         database.save(new StreamFormat.None(), new KdbxCreds.None(), outputStream);
+        outputStream.flush();
     }
 
 
