@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
+import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
@@ -64,50 +65,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 
 @JsonIgnoreProperties({"path", "username", "title", "notes", "url", "password"})
-public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
-
-
-    @JacksonXmlProperty(localName = "UUID")
-    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
-    @JsonSerialize(converter = UUIDToBase64Converter.class)
-    protected UUID uuid;
-
-    @JacksonXmlProperty(localName = "IconID")
-    protected int iconID;
-    
-    @JacksonXmlProperty(localName = "CustomIconUUID")
-    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
-    @JsonSerialize(converter = UUIDToBase64Converter.class)
-    protected UUID customIconUUID;
-   
-    @JacksonXmlProperty(localName = "ForegroundColor")
-    protected String foregroundColor;
-    
-    @JacksonXmlProperty(localName = "BackgroundColor")
-    protected String backgroundColor;
-   
-    @JacksonXmlProperty(localName = "OverrideURL")
-    protected String overrideURL;
-    
-    @JacksonXmlProperty(localName = "Tags")
-    protected String tags;
-   
-    @JacksonXmlProperty(localName = "Times")
-    protected Times times;
-
-    @JacksonXmlProperty(localName = "String") /* Workaround jackson */
-    @JacksonXmlElementWrapper(useWrapping = false)
-    protected List<StringProperty> string;
-
-    @JacksonXmlProperty(localName = "Binary") /* Workaround jackson */
-    @JacksonXmlElementWrapper(useWrapping = false)
-    protected List<BinaryProperty> binary;
-
-    @JacksonXmlProperty(localName = "AutoType")
-    protected AutoType autoType;
-
-    @JacksonXmlProperty(localName = "History") /* Workaround jackson */
-    protected JacksonHistory history;
+public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon>{
 
     @JsonIgnore
     JacksonDatabase database;
@@ -133,6 +91,54 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
         }
         return result;
     }
+
+
+    @JacksonXmlProperty(localName = "UUID")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
+    protected UUID uuid;
+
+    @JacksonXmlProperty(localName = "IconID")
+    protected int iconID;
+    
+    @JacksonXmlProperty(localName = "CustomIconUUID")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
+    protected UUID customIconUUID;
+   
+    @JacksonXmlProperty(localName = "ForegroundColor")
+    protected String foregroundColor;
+    
+    @JacksonXmlProperty(localName = "BackgroundColor")
+    protected String backgroundColor;
+   
+    @JacksonXmlProperty(localName = "OverrideURL")
+    protected String overrideURL;
+
+    @JacksonXmlProperty(localName = "PreviousParentGroup")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
+    protected UUID previousParentGroup;
+
+    @JacksonXmlProperty(localName = "Tags")
+    protected String tags;
+   
+    @JacksonXmlProperty(localName = "Times")
+    protected Times times;
+
+    @JacksonXmlProperty(localName = "String") /* Workaround jackson */
+    @JacksonXmlElementWrapper(useWrapping = false)
+    protected List<StringProperty> string;
+
+    @JacksonXmlProperty(localName = "Binary") /* Workaround jackson */
+    @JacksonXmlElementWrapper(useWrapping = false)
+    protected List<BinaryProperty> binary;
+
+    @JacksonXmlProperty(localName = "AutoType")
+    protected AutoType autoType;
+
+    @JacksonXmlProperty(localName = "History") /* Workaround jackson */
+    protected JacksonHistory history;
 
     @Override
     @JsonIgnore

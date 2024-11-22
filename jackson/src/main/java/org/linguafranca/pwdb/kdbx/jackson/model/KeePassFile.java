@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreType;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonGroup;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToByteConverter;
@@ -338,20 +337,32 @@ public class KeePassFile {
         }
     }
 
-    @JsonIgnoreType
     public static class CustomData {
+
+        public static class CustomDataItem {
+            @JacksonXmlProperty(localName = "Key")
+            public String key;
+            @JacksonXmlProperty(localName = "Value")
+            public String value;
+            @JacksonXmlProperty(localName = "LastModificationTime")
+            @JsonDeserialize(converter = StringToDateConverter.class)
+            @JsonSerialize(converter = DateToStringConverter.class)
+            public Date lastModificationTime;
+        }
+
+        @JacksonXmlProperty(localName = "Item")
+        @JacksonXmlElementWrapper(useWrapping = false)
+        protected List<CustomDataItem> items;
 
         public CustomData() {
         }
 
-        public List<Object> getAny() {
-            return any;
+        public List<CustomDataItem> getItems() {
+            return items;
         }
 
-        public void setAny(List<Object> any) {
-            this.any = any;
+        public void setItems(List<CustomDataItem> items) {
+            this.items = items;
         }
-
-        protected List<Object> any;
     }
 }

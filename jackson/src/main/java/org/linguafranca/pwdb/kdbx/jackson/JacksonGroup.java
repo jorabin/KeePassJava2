@@ -52,7 +52,7 @@ import java.util.UUID;
 "group",
 })
 @JsonIgnoreProperties(ignoreUnknown=true)
-public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
+public class JacksonGroup extends AbstractGroup <JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon>{
 
     @JacksonXmlProperty(localName = "UUID")
     @JsonDeserialize(converter = Base64ToUUIDConverter.class)
@@ -99,6 +99,14 @@ public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, J
     @JsonSerialize(converter = UUIDToBase64Converter.class)
     protected UUID lastTopVisibleEntry;
 
+    @JacksonXmlProperty(localName = "PreviousParentGroup")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
+    protected UUID previousParentGroup;
+
+    @JacksonXmlProperty(localName = "Tags")
+    protected String tags;
+
     @JacksonXmlProperty(localName = "Entry") /* Workaround jackson */
     @JacksonXmlElementWrapper(useWrapping = false)
     protected List<JacksonEntry> entries;
@@ -114,7 +122,7 @@ public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, J
     @JsonIgnore
     protected JacksonGroup parent;
 
-    protected JacksonGroup() {
+    public JacksonGroup() {
         entries = new ArrayList<>();
         groups = new ArrayList<>();
         times = new Times();
@@ -145,7 +153,8 @@ public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
-    public void setParent(JacksonGroup group) {
+    public void setParent(JacksonGroup g) {
+        JacksonGroup group = (JacksonGroup) g;
         if (isRootGroup()) {
             throw new IllegalStateException("Cannot add root group to another group");
         }
@@ -173,7 +182,8 @@ public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
-    public JacksonGroup addGroup(JacksonGroup group) {
+    public JacksonGroup addGroup(JacksonGroup g) {
+        JacksonGroup group = (JacksonGroup) g;
         if (group.isRootGroup()) {
             throw new IllegalStateException("Cannot add root group to another group");
         }
@@ -190,7 +200,8 @@ public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
-    public JacksonGroup removeGroup(JacksonGroup group) {
+    public JacksonGroup removeGroup(JacksonGroup g) {
+        JacksonGroup group = (JacksonGroup) g;
         if (this.database != group.database) {
             throw new IllegalStateException("Must be from same database");
         }
@@ -212,7 +223,8 @@ public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
-    public JacksonEntry addEntry(JacksonEntry entry) {
+    public JacksonEntry addEntry(JacksonEntry e) {
+        JacksonEntry entry = (JacksonEntry) e;
         if (this.database != entry.database) {
             throw new IllegalStateException("Must be from same database");
         }
@@ -226,7 +238,8 @@ public class JacksonGroup extends AbstractGroup<JacksonDatabase, JacksonGroup, J
     }
 
     @Override
-    public JacksonEntry removeEntry(JacksonEntry entry) {
+    public JacksonEntry removeEntry(JacksonEntry e) {
+        JacksonEntry entry = (JacksonEntry) e;
         if (this.database != entry.database) {
             throw new IllegalStateException("Must be from same database");
         }
