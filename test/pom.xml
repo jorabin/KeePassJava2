@@ -11,6 +11,10 @@
     <name>PWDB :: Test</name>
     <description>Contains the shared test classes for exercising the functionality of a PWDB database implementation.</description>
 
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
