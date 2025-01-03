@@ -212,7 +212,6 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>4.13.2</version>
-                <!-- needs to be a "compile" dependency as we have shared tests -->
             </dependency>
         </dependencies>
     </dependencyManagement>
