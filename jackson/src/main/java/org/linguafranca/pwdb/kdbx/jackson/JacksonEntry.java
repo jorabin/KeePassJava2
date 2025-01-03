@@ -55,11 +55,13 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
     "foregroundColor",
     "backgroundColor",
     "overrideURL",
+    "previousParentGroup",
     "tags",
     "times",
     "string",
     "binary",
     "autoType",
+    "customData",
     "history",
 })
 
@@ -136,6 +138,9 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
 
     @JacksonXmlProperty(localName = "AutoType")
     protected AutoType autoType;
+
+    @JacksonXmlProperty(localName = "CustomData")
+    protected KeePassFile.CustomData customData;
 
     @JacksonXmlProperty(localName = "History") /* Workaround jackson */
     protected JacksonHistory history;
