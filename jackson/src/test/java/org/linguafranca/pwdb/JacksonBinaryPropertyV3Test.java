@@ -52,7 +52,7 @@ public class JacksonBinaryPropertyV3Test extends BinaryPropertyChecks {
         try {
             result = new JacksonDatabase();
         } catch(Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return result;
         

@@ -41,14 +41,14 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     }
 
     @Override
-    public void visit(Visitor visitor) {
+    public void visit(Visitor<D, G, E, I> visitor) {
         visitor.startVisit(getRootGroup());
         visit(getRootGroup(), visitor);
         visitor.endVisit(getRootGroup());
     }
 
     @Override
-    public void visit(G group, Visitor visitor) {
+    public void visit(G group, Visitor<D, G, E, I> visitor) {
 
         if (visitor.isEntriesFirst()) {
             for (E entry : group.getEntries()) {
@@ -63,7 +63,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
         }
 
         if (!visitor.isEntriesFirst()) {
-            for (Entry entry : group.getEntries()) {
+            for (E entry : group.getEntries()) {
                 visitor.visit(entry);
             }
         }
@@ -87,7 +87,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     }
 
     @Override
-    public G newGroup(Group group) {
+    public G newGroup(Group <?,?,?,?> group) {
         G result = newGroup();
         result.setName(group.getName());
         result.setIcon(this.newIcon(group.getIcon().getIndex()));
@@ -131,16 +131,11 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
 
     @Override
     public E findEntry(final UUID uuid) {
-        List<? extends E> entries = findEntries(new Entry.Matcher() {
-            @Override
-            public boolean matches(Entry entry) {
-                return entry.getUuid().equals(uuid);
-            }
-        });
+        List<? extends E> entries = findEntries(entry -> entry.getUuid().equals(uuid));
         if (entries.size() > 1) {
             throw new IllegalStateException("Two entries same UUID");
         }
-        if (entries.size() == 0) {
+        if (entries.isEmpty()) {
             return null;
         }
         return entries.get(0);
@@ -165,14 +160,13 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     @Override
     public G findGroup(final UUID uuid){
         final List<G> groups = new ArrayList<>();
-        visit(new Visitor.Default() {
+        visit(new Visitor.Default<D, G, E, I>() {
             // set to true while visiting sub groups of recycle bin
             boolean recycle;
             @Override
-            public void startVisit(Group group) {
+            public void startVisit(G group) {
                 if (!recycle && group.getUuid().equals(uuid)) {
-                    //noinspection unchecked
-                    groups.add((G) group);
+                    groups.add(group);
                 }
                 if (group.isRecycleBin()) {
                     recycle = true;
@@ -180,7 +174,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
             }
 
             @Override
-            public void endVisit(Group group) {
+            public void endVisit(G group) {
                 if (group.isRecycleBin()) {
                     recycle = false;
                 }
@@ -189,7 +183,7 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
         if (groups.size() > 1) {
             throw new IllegalStateException("Two groups same UUID");
         }
-        if (groups.size() == 0) {
+        if (groups.isEmpty()) {
             return null;
         }
         return groups.get(0);
@@ -239,4 +233,33 @@ public abstract class AbstractDatabase<D extends Database<D, G, E, I>, G extends
     public boolean supportsRecycleBin() {
         return true;
     }
+
+    @Override
+    public boolean shouldProtect(String propertyName){
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setShouldProtect(String propertyName, boolean protect){
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<String> listShouldProtect(){
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public PropertyValue.Strategy getPropertyValueStrategy(){
+            throw new UnsupportedOperationException();
+    }
+    @Override
+    public void setPropertyValueStrategy(PropertyValue.Strategy strategy){
+        throw new UnsupportedOperationException();
+    }
+    @Override
+    public boolean supportsPropertyValueStrategy(){
+        return false;
+    }
+
 }

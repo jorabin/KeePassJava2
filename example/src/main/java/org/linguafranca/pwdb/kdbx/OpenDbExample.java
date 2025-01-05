@@ -10,7 +10,7 @@ import org.linguafranca.pwdb.kdbx.simple.SimpleDatabase;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 /**
  * Example and naive speed test for various implementations.

@@ -20,44 +20,44 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import org.apache.commons.codec.binary.Base64;
-import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses;
-import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses.StringProperty.Value;
+import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 
 import java.io.IOException;
 
 
-public class ValueSerializer extends StdSerializer<EntryClasses.StringProperty.Value> {
+public class ValueSerializer extends StdSerializer<PropertyValue> {
 
     private final StreamEncryptor encryptor;
+    private final PropertyValue.Strategy propertyValueStrategy;
 
-    public ValueSerializer(StreamEncryptor encryptor) {
+    public ValueSerializer(StreamEncryptor encryptor, PropertyValue.Strategy propertyValueStrategy) {
         super(ValueSerializer.class, false);
         this.encryptor = encryptor;
+        this.propertyValueStrategy = propertyValueStrategy;
     }
 
+    private String encrypt(byte[] bytes) {
+        //Cipher
+        byte[] encrypted = encryptor.encrypt(bytes);
+        //Convert to base64
+        return new String(Base64.encodeBase64(encrypted));
+    }
 
     @Override
-    public void serialize(Value value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+    public void serialize(PropertyValue value, JsonGenerator gen, SerializerProvider provider) throws IOException {
 
         final ToXmlGenerator xmlGenerator = (ToXmlGenerator) gen;
         xmlGenerator.writeStartObject();
 
-        String stringToWrite = value.getText();
-        //We need to encrypt and convert to base64 every protected element
-        if (value.getProtectOnOutput()) {
+        String stringToWrite = value.isProtected() ?
+                encrypt(value.getValueAsBytes()) :
+                value.getValueAsString();
+
+        if (value.isProtected()) {
             xmlGenerator.setNextIsAttribute(true);
             xmlGenerator.writeStringField("Protected", "True");
-            String plain = value.getText();
-            if (plain == null) {
-                plain = "";
-            }
-            //Cipher
-            byte[] encrypted = encryptor.encrypt(plain.getBytes());
-            //Convert to base64
-            stringToWrite = new String(Base64.encodeBase64(encrypted));
         }
-
         xmlGenerator.setNextIsAttribute(false);
         xmlGenerator.setNextIsUnwrapped(true);
         xmlGenerator.writeStringField("text", stringToWrite);

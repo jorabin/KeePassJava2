@@ -22,7 +22,7 @@ import org.linguafranca.pwdb.kdbx.Helpers;
 import java.io.PrintStream;
 
 import static org.junit.Assert.assertEquals;
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo

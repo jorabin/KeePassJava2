@@ -11,7 +11,7 @@ import java.util.Date;
 
 import static org.junit.Assert.*;
 import static org.linguafranca.pwdb.kdbx.Helpers.dateTimeFormatter;
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 public class HelpersTest {
 

@@ -16,10 +16,7 @@
 
 package org.linguafranca.pwdb.base;
 
-import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Group;
-import org.linguafranca.pwdb.Icon;
+import org.linguafranca.pwdb.*;
 
 /**
  * Base implementation of Entry
@@ -60,7 +57,7 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
 
     @Override
     public String getPath() {
-        Group parent = this.getParent();
+        G parent = this.getParent();
         String result = "";
         if (parent != null) {
             result = parent.getPath();
@@ -125,6 +122,16 @@ public abstract class AbstractEntry<D extends Database<D, G, E, I>, G extends Gr
     public void setNotes(String notes) {
         setProperty(STANDARD_PROPERTY_NAME_NOTES, notes);
         touch();
+    }
+
+    @Override
+    public PropertyValue getPropertyValue(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setPropertyValue(String name, PropertyValue value) {
+        throw new UnsupportedOperationException();
     }
 
     protected abstract void touch();

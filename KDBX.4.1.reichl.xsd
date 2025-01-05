@@ -1,0 +1,492 @@
+<!--
+Aside from this comment, this is a copy of the schema
+at https://keepass.info/help/download/KDBX_XML.xsd on 2025-01-04
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:annotation>
+		<xs:documentation> KDBX 4.1 XML Schema. Copyright (C) 2007-2025 Dominik Reichl. https://keepass.info/help/kb/kdbx.html </xs:documentation>
+	</xs:annotation>
+	<xs:element name="KeePassFile">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Meta" type="TMeta"/>
+				<xs:element name="Root" type="TRoot"/>
+			</xs:sequence>
+		</xs:complexType>
+		<xs:key name="KUuid">
+			<!--  History entries typically have the same UUID as their parent entry.  -->
+			<xs:selector xpath=".//Icon|.//Group|.//Group/Entry"/>
+			<xs:field xpath="UUID"/>
+		</xs:key>
+		<xs:key name="KCustomIcon">
+			<xs:selector xpath="Meta/CustomIcons/Icon"/>
+			<xs:field xpath="UUID"/>
+		</xs:key>
+		<xs:keyref name="RCustomIcon" refer="KCustomIcon">
+			<xs:selector xpath=".//CustomIconUUID"/>
+			<xs:field xpath="."/>
+		</xs:keyref>
+	</xs:element>
+	<xs:complexType name="TMeta">
+		<xs:all>
+			<xs:element name="Generator" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Name of the application that has generated the XML document. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="HeaderHash" type="xs:base64Binary" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Hash of the (unencrypted) header of a KDBX file. Used only in KDBX files prior to version 4. In KDBX ≥ 4, the integrity and the authenticity are ensured using a HMAC instead (see KDBX spec.). </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="SettingsChanged" type="TDateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Last date/time when a database setting (stored in the Meta element) has been changed. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DatabaseName" type="xs:string" minOccurs="0"/>
+			<xs:element name="DatabaseNameChanged" type="TDateTime" minOccurs="0"/>
+			<xs:element name="DatabaseDescription" type="xs:string" minOccurs="0"/>
+			<xs:element name="DatabaseDescriptionChanged" type="TDateTime" minOccurs="0"/>
+			<xs:element name="DefaultUserName" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> User name that is used by default for new entries. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DefaultUserNameChanged" type="TDateTime" minOccurs="0"/>
+			<xs:element name="MaintenanceHistoryDays" type="xs:unsignedInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Number of days until history entries are deleted in a database maintenance operation. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Color" type="TColor" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Database color. The user interface can colorize elements with this color in order to allow the user to quickly identify the database. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MasterKeyChanged" type="TDateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Last date/time when the master key has been changed. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MasterKeyChangeRec" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Number of days until a change of the master key is recommended. -1 means never. </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="-1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="MasterKeyChangeForce" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Number of days until a change of the master key is enforced. -1 means never. </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="-1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="MasterKeyChangeForceOnce" type="TBool" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> If true, a change of the master key should be enforced once directly after the user opens the database. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="MemoryProtection" type="TMemoryProtectionConfig" minOccurs="0"/>
+			<xs:element name="CustomIcons" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Icon" type="TCustomIcon" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="RecycleBinEnabled" type="TBool" minOccurs="0"/>
+			<xs:element name="RecycleBinUUID" type="TUuid" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> UUID of the group that is used as recycle bin. Zero UUID = create new group when necessary. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="RecycleBinChanged" type="TDateTime" minOccurs="0"/>
+			<xs:element name="EntryTemplatesGroup" type="TUuid" minOccurs="0"/>
+			<xs:element name="EntryTemplatesGroupChanged" type="TDateTime" minOccurs="0"/>
+			<xs:element name="HistoryMaxItems" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Maximum number of history entries that each entry may have. -1 means unlimited. </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:minInclusive value="-1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="HistoryMaxSize" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Maximum estimated size in bytes (in the process memory) of the history of each entry. -1 means unlimited. </xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:long">
+						<xs:minInclusive value="-1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="LastSelectedGroup" type="TUuid" minOccurs="0"/>
+			<xs:element name="LastTopVisibleGroup" type="TUuid" minOccurs="0"/>
+			<xs:element name="Binaries" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> In this element, the content of each binary is stored. Used only in unencrypted XML files and in KDBX files prior to version 4. In KDBX ≥ 4, binaries are stored in the inner header (encrypted) instead. </xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Binary" type="TProtectedBinaryDef" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+				<xs:key name="KProtectedBinaryDef">
+					<xs:selector xpath="Binary"/>
+					<xs:field xpath="@ID"/>
+				</xs:key>
+			</xs:element>
+			<xs:element name="CustomData" type="TCustomDataWithTimes" minOccurs="0"/>
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="TMemoryProtectionConfig">
+		<xs:annotation>
+			<xs:documentation> Process memory protection settings, describing which standard fields should be protected. KeePass resets these settings to their default values after opening a database. </xs:documentation>
+		</xs:annotation>
+		<xs:all>
+			<xs:element name="ProtectTitle" type="TBool" minOccurs="0"/>
+			<xs:element name="ProtectUserName" type="TBool" minOccurs="0"/>
+			<xs:element name="ProtectPassword" type="TBool" minOccurs="0"/>
+			<xs:element name="ProtectURL" type="TBool" minOccurs="0"/>
+			<xs:element name="ProtectNotes" type="TBool" minOccurs="0"/>
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="TCustomIcon">
+		<xs:all>
+			<xs:element name="UUID" type="TUuid"/>
+			<xs:element name="Data" type="xs:base64Binary"/>
+			<xs:element name="Name" type="xs:string" minOccurs="0"/>
+			<xs:element name="LastModificationTime" type="TDateTime" minOccurs="0"/>
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="TProtectedBinaryDef">
+		<xs:simpleContent>
+			<xs:extension base="xs:base64Binary">
+				<xs:attribute name="ID" type="TNonNegativeInt" use="required"/>
+				<xs:attribute name="Compressed" type="TBool" default="False"/>
+				<xs:attributeGroup ref="GProtectedData"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="TProtectedBinary">
+		<xs:sequence>
+			<xs:element name="Key" type="xs:string"/>
+			<xs:element name="Value">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:base64Binary">
+							<xs:attribute name="Ref" type="TNonNegativeInt">
+								<xs:annotation>
+									<xs:documentation> Reference to a binary content stored in the inner header (KDBX file) or in the Meta/Binaries element (unencrypted XML file). </xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TProtectedString">
+		<xs:sequence>
+			<xs:element name="Key" type="xs:string"/>
+			<xs:element name="Value">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attributeGroup ref="GProtectedData">
+								<xs:annotation>
+									<xs:documentation> Used in a KDBX file. </xs:documentation>
+								</xs:annotation>
+							</xs:attributeGroup>
+							<xs:attribute name="ProtectInMemory" type="TBool">
+								<xs:annotation>
+									<xs:documentation> Used in an unencrypted XML file. </xs:documentation>
+								</xs:annotation>
+							</xs:attribute>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:attributeGroup name="GProtectedData">
+		<xs:annotation>
+			<xs:documentation> If the attribute is true, the content of the element has been encrypted (and Base64-encoded). See "inner encryption" on https://keepass.info/help/kb/kdbx.html </xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="Protected" type="TBool" default="False"/>
+	</xs:attributeGroup>
+	<xs:group name="GCustomDataItem">
+		<xs:annotation>
+			<xs:documentation> Custom data item (key/value pair) for plugins/ports. The key should be unique, e.g. "PluginName_ItemName". </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="Key" type="xs:string"/>
+			<xs:element name="Value" type="xs:string"/>
+		</xs:sequence>
+	</xs:group>
+	<xs:complexType name="TCustomData">
+		<xs:sequence>
+			<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:group ref="GCustomDataItem"/>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TCustomDataWithTimes">
+		<xs:sequence>
+			<xs:element name="Item" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:group ref="GCustomDataItem"/>
+						<xs:element name="LastModificationTime" type="TDateTime" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TRoot">
+		<xs:sequence>
+			<xs:element name="Group" type="TGroup"/>
+			<xs:element name="DeletedObjects" type="TDeletedObjects" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TDeletedObjects">
+		<xs:annotation>
+			<xs:documentation> When the user deletes an object (group, entry, ...), an item is created in this list. When synchronizing/merging database files, this information can be used to decide whether an object has been deleted. </xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="DeletedObject" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="UUID" type="TUuid"/>
+						<xs:element name="DeletionTime" type="TDateTime"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TTimes">
+		<xs:all>
+			<xs:element name="CreationTime" type="TDateTime" minOccurs="0"/>
+			<xs:element name="LastModificationTime" type="TDateTime" minOccurs="0"/>
+			<xs:element name="LastAccessTime" type="TDateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> In general, last access times are not reliable, because an access is not considered to be a database change. See the UIFlags value 0x20000: https://keepass.info/help/v2_dev/customize.html#uiflags </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ExpiryTime" type="TDateTime" minOccurs="0"/>
+			<xs:element name="Expires" type="TBool" minOccurs="0"/>
+			<xs:element name="UsageCount" type="xs:unsignedLong" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Cf. LastAccessTime. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="LocationChanged" type="TDateTime" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Last date/time when the object has been moved (within its parent group or to a different group). This is used by the synchronization algorithm to determine the latest location of the object. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="TGroup">
+		<!--  This is actually unordered except for the Entry and Group child
+					elements, where the order matters.  -->
+		<xs:sequence>
+			<xs:element name="UUID" type="TUuid"/>
+			<xs:element name="Name" type="xs:string" minOccurs="0"/>
+			<xs:element name="Notes" type="xs:string" minOccurs="0"/>
+			<xs:element name="IconID" type="TNonNegativeInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> See the folder "Ext/Images_Client_HighRes" in the KeePass source code package. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CustomIconUUID" type="TUuid" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Reference to a custom icon stored in the KeePassFile/Meta/CustomIcons element. If non-zero, it overrides IconID. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Times" type="TTimes" minOccurs="0"/>
+			<xs:element name="IsExpanded" type="TBool" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Specifies whether the group is displayed as expanded in the user interface. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DefaultAutoTypeSequence" type="xs:string" minOccurs="0"/>
+			<xs:element name="EnableAutoType" type="TNullableBoolEx" minOccurs="0"/>
+			<xs:element name="EnableSearching" type="TNullableBoolEx" minOccurs="0"/>
+			<xs:element name="LastTopVisibleEntry" type="TUuid" minOccurs="0"/>
+			<xs:element name="PreviousParentGroup" type="TUuid" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> UUID of the group in which the current group was stored previously. This information can for instance be used by a recycle bin restoration command. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Tags" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> Tags associated with the group, separated using ';'. https://keepass.info/help/v2/entry.html#tags </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CustomData" type="TCustomData" minOccurs="0"/>
+			<xs:element name="Entry" type="TEntry" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Group" type="TGroup" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TEntry">
+		<!--  This is actually unordered except for the String, Binary and
+					History child elements, where the order matters.  -->
+		<xs:sequence>
+			<xs:element name="UUID" type="TUuid"/>
+			<xs:element name="IconID" type="TNonNegativeInt" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> See TGroup/IconID. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="CustomIconUUID" type="TUuid" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> See TGroup/CustomIconUUID. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ForegroundColor" type="TColor" minOccurs="0"/>
+			<xs:element name="BackgroundColor" type="TColor" minOccurs="0"/>
+			<xs:element name="OverrideURL" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> https://keepass.info/help/base/autourl.html#override </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="QualityCheck" type="TBool" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> https://keepass.info/help/v2/entry.html#gen https://keepass.info/help/kb/pw_quality_est.html </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Tags" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> See TGroup/Tags. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="PreviousParentGroup" type="TUuid" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> See TGroup/PreviousParentGroup. </xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Times" type="TTimes" minOccurs="0"/>
+			<xs:element name="String" type="TProtectedString" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Binary" type="TProtectedBinary" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="AutoType" type="TAutoType" minOccurs="0"/>
+			<xs:element name="CustomData" type="TCustomData" minOccurs="0"/>
+			<xs:element name="History" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation> https://keepass.info/help/v2/entry.html#hst </xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Entry" type="TEntry" minOccurs="0" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="TAutoType">
+		<xs:annotation>
+			<xs:documentation> https://keepass.info/help/base/autotype.html </xs:documentation>
+		</xs:annotation>
+		<!--  This is actually unordered except for the Association child
+					elements, where the order matters.  -->
+		<xs:sequence>
+			<xs:element name="Enabled" type="TBool" minOccurs="0"/>
+			<xs:element name="DataTransferObfuscation" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:enumeration value="0">
+							<xs:annotation>
+								<xs:documentation> No obfuscation. </xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="1">
+							<xs:annotation>
+								<xs:documentation> Two-channel auto-type obfuscation. https://keepass.info/help/v2/autotype_obfuscation.html </xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="DefaultSequence" type="xs:string" minOccurs="0"/>
+			<xs:element name="Association" minOccurs="0" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="Window" type="xs:string"/>
+						<xs:element name="KeystrokeSequence" type="xs:string"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="TBool">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="False"/>
+			<xs:enumeration value="True"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TNullableBoolEx">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Null"/>
+			<xs:enumeration value="null"/>
+			<xs:enumeration value="False"/>
+			<xs:enumeration value="false"/>
+			<xs:enumeration value="True"/>
+			<xs:enumeration value="true"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TColor">
+		<xs:annotation>
+			<xs:documentation> A hexadecimal CSS color of the form "#RRGGBB". For example, "#FFFF00" is yellow. An empty string means to use the default value (chosen by the application, suitable for the current UI). </xs:documentation>
+		</xs:annotation>
+		<xs:union>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:pattern value="\u0023[0-9A-F]{6}"/>
+				</xs:restriction>
+			</xs:simpleType>
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:length value="0"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="TDateTime">
+		<xs:annotation>
+			<xs:documentation> In a KDBX ≥ 4 file, dates are stored as the number of seconds (Int64) elapsed since 0001-01-01 00:00:00 UTC encoded using Base64. In an unencrypted XML file, dates are stored as xs:dateTime. </xs:documentation>
+		</xs:annotation>
+		<xs:union memberTypes="xs:dateTime">
+			<xs:simpleType>
+				<xs:restriction base="xs:base64Binary">
+					<xs:length value="8"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:union>
+	</xs:simpleType>
+	<xs:simpleType name="TNonNegativeInt">
+		<xs:restriction base="xs:int">
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="TUuid">
+		<xs:annotation>
+			<xs:documentation> A 128-bit UUID encoded using Base64. </xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:base64Binary">
+			<xs:length value="16"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

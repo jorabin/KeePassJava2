@@ -22,7 +22,7 @@ import java.io.*;
 import java.util.Arrays;
 
 import static org.junit.Assert.*;
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo

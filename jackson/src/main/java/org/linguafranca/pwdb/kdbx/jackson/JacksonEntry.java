@@ -23,9 +23,13 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
+import org.linguafranca.pwdb.Icon;
+import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
 
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
@@ -53,17 +57,44 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
     "foregroundColor",
     "backgroundColor",
     "overrideURL",
+    "previousParentGroup",
     "tags",
     "times",
     "string",
     "binary",
     "autoType",
+    "customData",
     "history",
 })
 
 
 @JsonIgnoreProperties({"path", "username", "title", "notes", "url", "password"})
-public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
+public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon>{
+
+    @JsonIgnore
+    JacksonDatabase database;
+
+    @JsonIgnore
+    JacksonGroup parent;
+
+    protected JacksonEntry() {
+        string = new ArrayList<>();
+        binary = new ArrayList<>();
+        times = new Times();
+        uuid = UUID.randomUUID();
+        iconID = 0;
+    }
+
+    public static JacksonEntry createEntry(JacksonDatabase database) {
+        JacksonEntry result = new JacksonEntry();
+        result.database = database;
+        result.parent = null;
+        // avoiding setProperty as it does a touch();
+        for (String p : STANDARD_PROPERTY_NAMES) {
+            result.string.add(new StringProperty(p, database.getPropertyValueStrategy().newUnprotected().of("")));
+        }
+        return result;
+    }
 
 
     @JacksonXmlProperty(localName = "UUID")
@@ -87,9 +118,19 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
    
     @JacksonXmlProperty(localName = "OverrideURL")
     protected String overrideURL;
-    
+
+    @JacksonXmlProperty(localName = "PreviousParentGroup")
+    @JsonDeserialize(converter = Base64ToUUIDConverter.class)
+    @JsonSerialize(converter = UUIDToBase64Converter.class)
+    protected UUID previousParentGroup;
+
     @JacksonXmlProperty(localName = "Tags")
     protected String tags;
+
+    @JacksonXmlProperty(localName = "QualityCheck")
+    @JsonDeserialize(converter = StringToBooleanConverter.class)
+    @JsonSerialize(converter = BooleanToStringConverter.class)
+    protected Boolean qualityCheck;
    
     @JacksonXmlProperty(localName = "Times")
     protected Times times;
@@ -105,48 +146,50 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
     @JacksonXmlProperty(localName = "AutoType")
     protected AutoType autoType;
 
+    @JacksonXmlProperty(localName = "CustomData")
+    protected KeePassFile.CustomData customData;
+
     @JacksonXmlProperty(localName = "History") /* Workaround jackson */
     protected JacksonHistory history;
-
-    @JsonIgnore
-    JacksonDatabase database;
-
-    @JsonIgnore
-    JacksonGroup parent;
-
-    protected JacksonEntry() {
-        string = new ArrayList<>();
-        binary = new ArrayList<>();
-        times = new Times();
-        uuid = UUID.randomUUID();
-        iconID = 0;
-    }
-
-    public static JacksonEntry createEntry(JacksonDatabase database) {
-        JacksonEntry result = new JacksonEntry();
-        result.database = database;
-        result.parent = null;
-        // avoiding setProperty as it does a touch();
-        for (String p : STANDARD_PROPERTY_NAMES) {
-            result.string.add(new StringProperty(p, new StringProperty.Value("")));
-        }
-        return result;
-    }
 
     @Override
     @JsonIgnore
     public String getProperty(String s) {
-        return getStringContent(getStringProperty(s, string));
+        StringProperty sp = getStringProperty(s, string);
+        if (sp == null) {
+            return null;
+        }
+        return sp.getValue().getValueAsString();
     }
 
     @Override
     @JsonIgnore
     public void setProperty(String s, String s1) {
-        StringProperty sp;
-        if ((sp = getStringProperty(s, string)) != null) {
-            this.string.remove(sp);
+        StringProperty sp = getStringProperty(s, string);
+        if (sp != null) {
+            sp.setValue(database.getPropertyValueStrategy().newUnprotected().of(s1));
+            return;
         }
-        this.string.add(new StringProperty(s, new StringProperty.Value(s1)));
+        string.add(new StringProperty(s, database.getPropertyValueStrategy().newUnprotected().of(s1)));
+        touch();
+    }
+
+    @Override
+    @JsonIgnore
+    public PropertyValue getPropertyValue(String name) {
+        StringProperty sp = getStringProperty(name, string);
+        return sp != null? sp.getValue() : null;
+    }
+
+    @Override
+    @JsonIgnore
+    public void setPropertyValue(String name, PropertyValue value) {
+        StringProperty sp = getStringProperty(name, string);
+        if (sp != null) {
+            sp.setValue(value);
+            return;
+        }
+        string.add(new StringProperty(name, value));
         touch();
     }
 

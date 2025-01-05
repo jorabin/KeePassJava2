@@ -19,10 +19,10 @@ package org.linguafranca.pwdb.kdbx.jackson;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.StreamConfiguration;
 import org.linguafranca.pwdb.StreamFormat;
-import org.linguafranca.pwdb.base.AbstractDatabase;
 import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
+import org.linguafranca.pwdb.protect.ProtectedDatabase;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,7 +34,7 @@ import java.util.UUID;
 
 import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.createEmptyDatabase;
 
-public class JacksonDatabase extends AbstractDatabase<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
+public class JacksonDatabase extends ProtectedDatabase<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
 
     KeePassFile keePassFile;
     StreamFormat<?> streamFormat;
@@ -108,8 +108,9 @@ public class JacksonDatabase extends AbstractDatabase<JacksonDatabase, JacksonGr
     public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
             OutputStream outputStream) throws IOException {
             keePassFile.meta.generator = "KeePassJava2-Jackson";
-            JacksonSerializableDatabase simpleSerializableDatabase = new JacksonSerializableDatabase(this.keePassFile);
-            streamFormat.save(simpleSerializableDatabase, credentials, outputStream);
+            JacksonSerializableDatabase jacksonSerializableDatabase = new JacksonSerializableDatabase(this.keePassFile);
+            jacksonSerializableDatabase.setPropertyValueStrategy(this.getPropertyValueStrategy());
+            streamFormat.save(jacksonSerializableDatabase, credentials, outputStream);
             setDirty(false);
     }
 

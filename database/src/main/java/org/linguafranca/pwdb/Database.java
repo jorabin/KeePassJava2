@@ -177,14 +177,14 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
      *
      * @param visitor the visitor to use
      */
-    void visit(Visitor visitor);
+    void visit(Visitor<D, G, E, I> visitor);
 
     /**
      * Visit all entries starting from a group
      * @param group the group to start at
      * @param visitor the visitor to use
      */
-    void visit(G group, Visitor visitor);
+    void visit(G group, Visitor<D, G, E, I> visitor);
 
     /**
      * Find all entries that match the criteria
@@ -247,11 +247,35 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
     <C extends StreamConfiguration> StreamFormat<C> getStreamFormat();
 
     /**
-     * Properties to encrypt
+     * Property to protect in memory
      * @param propertyName the property of interest
-     * @return true if it should be encrypted
+     * @return true if it should be protected by default
      */
     boolean shouldProtect(String propertyName);
+
+    /**
+     * Property to protect in memory
+     * @param propertyName the property of interest
+     * @param protect whether to protect by default
+     */
+    void setShouldProtect(String propertyName, boolean protect);
+
+    /**
+     * Obtain a list of those properties that should be protected by default
+     * @return a list of property names
+     */
+    List<String> listShouldProtect();
+
+    /**
+     * Get the default means of storage of unprotected and protected property values
+     */
+    public PropertyValue.Strategy getPropertyValueStrategy();
+
+    /**
+     * Set the default means of storage of unprotected and protected property values
+     * @param propertyValueStrategy a propertyValue strategy
+     */
+    void setPropertyValueStrategy(PropertyValue.Strategy propertyValueStrategy);
 
     /**
      * returns true if the database supports non-standard property names
@@ -267,5 +291,10 @@ public interface Database <D extends Database<D, G, E, I>, G extends Group<D, G,
      * returns true if the database supports recycle bin
      */
     boolean supportsRecycleBin();
+
+    /**
+     * returns true if the implementation supports a PropertyValueStrategy
+     */
+    boolean supportsPropertyValueStrategy();
 
 }

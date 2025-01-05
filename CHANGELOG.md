@@ -2,6 +2,20 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [2.2.3-SNAPSHOT]
+
+### Added
+
+- implementation of property value storage interface PropertyValue to allow memory protection of sensitive values
+- Default implementations of protected and unprotected storage
+
+### Changed
+
+- Jackson implementation supports this interface
+- Other implementations throw exceptions appropriately as unsupported
+- [Issue #70] Improved support for KDBX 4.1 format (Jackson only)
+- [Issue #71] Restructured to avoid pulling in Junit unnecessarily etc.
+
 ## [2.2.2] 2024-09-06
 
 ### Added

@@ -17,18 +17,17 @@ package org.linguafranca.pwdb.kdbx.jackson;
 
 import com.ctc.wstx.api.WstxInputProperties;
 import com.ctc.wstx.api.WstxOutputProperties;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
-import org.jetbrains.annotations.NotNull;
-import org.linguafranca.pwdb.Entry;
+import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.SerializableDatabase;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jackson.converter.ValueDeserializer;
 import org.linguafranca.pwdb.kdbx.jackson.converter.ValueSerializer;
-import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses;
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 
@@ -38,14 +37,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class JacksonSerializableDatabase implements SerializableDatabase {
 
+    /**
+     * By default, deserialization will fail if an unknown property is found. Historically,
+     * this has been because the file mapping is incomplete, rather than the incoming file being wrong.
+     * So use this feature with caution, if at all.
+      */
+    public static boolean FAIL_ON_UNKNOWN_PROPERTIES = true;
     public KeePassFile keePassFile;
     private StreamEncryptor encryptor;
+
+    private PropertyValue.Strategy propertyValueStrategy = new PropertyValue.Strategy.Default();
 
     public static KeePassFile createEmptyDatabase() throws IOException {
 
@@ -66,8 +71,10 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
     @Override
     public JacksonSerializableDatabase load(InputStream inputStream) throws IOException {
         XmlMapper mapper = new XmlMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                JacksonSerializableDatabase.FAIL_ON_UNKNOWN_PROPERTIES);
         SimpleModule module = new SimpleModule();
-        module.addDeserializer(EntryClasses.StringProperty.Value.class, new ValueDeserializer(encryptor));
+        module.addDeserializer(PropertyValue.class, new ValueDeserializer(encryptor, propertyValueStrategy));
         mapper.registerModule(module);
         keePassFile = mapper.readValue(inputStream, KeePassFile.class);
         return this;
@@ -76,11 +83,9 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
 
     @Override
     public void save(OutputStream outputStream) {
-        prepareForSave(keePassFile.root.group);
         try {
-
             SimpleModule module = new SimpleModule();
-            module.addSerializer(EntryClasses.StringProperty.Value.class, new ValueSerializer(encryptor));
+            module.addSerializer(PropertyValue.class, new ValueSerializer(encryptor, propertyValueStrategy));
             // disable auto-detection, only use annotated values
             XmlMapper mapper = XmlMapper.builder()
                     .disable(MapperFeature.AUTO_DETECT_CREATORS,
@@ -119,45 +124,6 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
         }
     }
 
-    /**
-     * Create a list of names of properties that should be encrypted by default
-     */
-    @NotNull
-    private List<String> getToEncrypt() {
-        final List<String> toEncrypt = new ArrayList<>();
-        for (String propertyName: Entry.STANDARD_PROPERTY_NAMES) {
-            if (keePassFile.meta.memoryProtection.shouldProtect(propertyName)) {
-                toEncrypt.add(propertyName);
-            }
-        }
-        return toEncrypt;
-    }
-
-    /**
-     * Utility to mark fields that need to be encrypted and vice versa
-     *
-     * @param parent the group to start from
-     */
-    private static void prepareForSave(JacksonGroup parent){
-        for (JacksonGroup group: parent.groups) {
-            prepareForSave(group);
-        }
-        for (JacksonEntry entry: parent.entries) {
-            for (EntryClasses.StringProperty property : entry.string) {
-                boolean shouldProtect = parent.database.shouldProtect(property.getKey());
-                property.getValue().setProtectOnOutput(shouldProtect || property.getValue().getProtectOnOutput());
-            }
-            if (Objects.nonNull(entry.history)) {
-                for (JacksonEntry entry2 : entry.history.getEntry()) {
-                    for (EntryClasses.StringProperty property : entry2.string) {
-                        boolean shouldProtect = parent.database.shouldProtect(property.getKey());
-                        property.getValue().setProtectOnOutput(shouldProtect || property.getValue().getProtectOnOutput());
-                    }
-                }
-            }
-        }
-    }
-
     @Override
     public byte[] getHeaderHash() {
         return keePassFile.meta.headerHash;
@@ -180,6 +146,7 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
         keePassFile.meta.binaries.add(newBin);
     }
 
+    // TODO this gets binary at index but does not get binary with ID
     @Override
     public byte[] getBinary(int index) {
         KeePassFile.Binary binary = keePassFile.meta.binaries.get(index);
@@ -227,6 +194,14 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
     @Override
     public void addBinary(int index, byte[] payload) {
         addBinary(keePassFile, index, payload);
+    }
+
+    public PropertyValue.Strategy getPropertyValueStrategy() {
+        return propertyValueStrategy;
+    }
+
+    public void setPropertyValueStrategy(PropertyValue.Strategy propertyValueStrategy) {
+        this.propertyValueStrategy = propertyValueStrategy;
     }
 
 }

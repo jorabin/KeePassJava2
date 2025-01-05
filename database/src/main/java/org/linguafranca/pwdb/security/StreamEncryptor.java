@@ -73,6 +73,7 @@ public interface StreamEncryptor {
     }
 
     class Salsa20 extends Default {
+        // This fixed iv shows up as a vulnerability but is part of the definition of Keepass
         private static final byte[] SALSA20_IV = Hex.decode("E830094B97205D2A".getBytes());
 
         public Salsa20(byte[] key) {
