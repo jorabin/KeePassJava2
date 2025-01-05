@@ -10,7 +10,7 @@
 ![alt text](https://badgen.net/badge/Branch/v3/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.3-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fe9059ac4d384b929f452149b9246658)](https://app.codacy.com/gh/jorabin/KeePassJava2/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 
-A Java 8 API for databases compatible with the renowned [KeePass](http://keepass.info) password
+A Java 11 API for databases compatible with the renowned [KeePass](http://keepass.info) password
 safe for Windows. This is a "headless" implementation - if you want something with a UI
 then [KeePassXC](https://keepassxc.org/) and [KeePassDX](https://www.keepassdx.com/) could
 be just the things for you.
@@ -41,12 +41,12 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-This version is 3.0.0-SNAPSHOT and is not backwards compatible with 2.2 and earlier versions.
+This version is 3.0.0-SNAPSHOT and is not backwards compatible with 2.3 and earlier versions.
 
-The current released code is version 2.2.2 - released to Maven September 2024. This is on the main branch. See [Build from Source](#build-from-source)
+The current released code is version 2.2.3 - released to Maven January 2025. This is on the main branch. See [Build from Source](#build-from-source)
 
-Key updates relative to 2.1
-- Java 8 (dependencies no longer support Java 7)
+Key updates relative to 2.x
+- Java 11 
 - File format version 4 support - with Argon2
 - Removal of SimpleXML, JAXB and JAXB database implementations
 - Implemented pluggable (protected) data storage model
@@ -61,11 +61,19 @@ See the [changelog](CHANGELOG.md) for more details.
 
 ### Release
 
-The composite POM for the last release (2.2.2), Java 8 compatible, is
+The POM for the last release (2.2.3), Java 8 compatible, is
+
+        <groupId>org.linguafranca.pwdb</groupId>
+        <artifactId>KeePassJava2-jackson</artifactId>
+        <version>2.2.3</version>
+
+at Maven Central. This provides access to the Jackson based implementation, 
+which is now the recommended implementation.  There is also a composite POM (deprecated) that
+provides access to all implementations (see [below](#database-implementations) for discussion).
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.2.2</version>
+        <version>2.2.3</version>
 
 at Maven Central. Note that the artifactId has become Camel Case from release 2.1.x onwards.
 
@@ -75,7 +83,7 @@ Snapshot builds are erratically available at [Sonatype](https://oss.sonatype.org
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.2.3-SNAPSHOT</version>
+        <version>3.0.0-SNAPSHOT</version>
  
 with appropriate `<repositories>` entry, like:
 
@@ -179,10 +187,20 @@ KeePass formats in the following locations:
 KeePass - or more specifically its file format KDBX - is an XML based format, so one of the main tasks
 is serializing and deserializing XML. Over time (KeePassJava2 was originally released in 2014) approaches
 to Java and XML have been a bit mysterious. However, Jackson has now been chosen as the 
-underlying framework for implementation of KeePassJava2. From 2.2.3 a single KDBX implementation is available.
+underlying framework for implementation of KeePassJava2. From 3.0.0 a single KDBX implementation is available.
 
 There are several other database implementations which will be maintained for bug-fix purposes
 only, with a view to being withdrawn, since they perform badly and/or depend on obsolete technology.
+
+- `SimpleXML` - no longer maintained, does not work with Java 17 and up
+- `JAXB` - this causes problems with `javax` and `jakarta` namespaces, it's not worth maintaining
+  as it offers no compelling performance or other advantage
+- `DOM` the was the original implementation and validates the fact that DOM based implementations
+  are slow. That said, if you want to load a database and then save it while maintaining whatever quirks
+  existed in the original database then this is the one.
+
+Aside from dependencies on underlying frameworks, different implementations have varying characteristics, primarily speed. This is assessed
+by [this test](https://github.com/jorabin/KeePassJava2/blob/master/example/src/main/java/org/linguafranca/pwdb/kdbx/OpenDbExample.java) in the module `examples`.
 
 ## Dependencies
 

@@ -8,7 +8,7 @@ that have sensitive values are called "Protected Properties".
 KDBX files contain a list of the standard properties and whether they are to be treated as protected
 by default. The standard properties include Password, which is so treated. There doesn't seem to be a way of updating 
 this list in the Windows KeePass implementation, and in any case documentation says that the
-list is updated to default after load of a database, so it seems that it ignored.
+list is updated to default after load of a database, so it seems that it is ignored.
 
 Individual properties can be marked as "protect in memory", but there is no way to indicate that 
 all properties of that name should be protected.
@@ -63,7 +63,7 @@ luck trying to avoid strings at all. Likewise, if you collect passwords from a d
 After the deserialization process, the passwords are stored in RAM. Therefore:
 
 **Hashing the password is not feasible**, as the hash function is a one-way process.
-This means that once a password is hashed, it cannot be reverted back to its original form,
+This means that once a password is hashed, it cannot be reverted to its original form,
 which makes hashing unsuitable in this context. Since we need to retrieve and view
 the saved passwords (as per the requirements), hashing does not meet the objective.
 

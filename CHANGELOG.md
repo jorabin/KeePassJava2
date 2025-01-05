@@ -22,7 +22,8 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 
 - Jackson implementation supports this interface
 - Other implementations throw exceptions appropriately as unsupported
-- Module restructure to avoid test files, junit being dragged along in deployed JAR (Issue-71)
+- [Issue #70] Improved support for KDBX 4.1 format (Jackson only)
+- [ISSUE #71] Module restructure to avoid test files, junit being pulled in unnecessarily
 
 ### Fixed
 
