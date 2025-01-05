@@ -62,7 +62,6 @@ public class KdbxKeyFile {
      * <p>
      * The following comes from <a href="https://keepass.info/help/base/keys.html#keyfiles">KeePass Help Files</a>:
      * </p>
-     * <cite>
      *   Formats. KeePass supports the following key file formats:
      *   <ul>
      *       <li>XML (recommended, default). There is an XML format for key files. KeePass 2.x uses this format by
@@ -82,7 +81,6 @@ public class KdbxKeyFile {
      *       cryptographic hash function in order to build a key (typically a 256-bit key with SHA-256).
      *       This allows to use arbitrary files as key files.</li>
      *   </ul>
-     * </cite>
      * @param inputStream the input stream holding the key, caller should close
      * @return the key
      */
