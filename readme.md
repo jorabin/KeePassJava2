@@ -3,11 +3,11 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent)
 [![javadoc](https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2/javadoc.svg)](https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2)
 
-![alt text](https://badgen.net/badge/Branch/master/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.2/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
+![alt text](https://badgen.net/badge/Branch/master/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.3/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
 
-![alt text](https://badgen.net/badge/Branch/develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.3-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
+![alt text](https://badgen.net/badge/Branch/develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.4-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
 
-![alt text](https://badgen.net/badge/Branch/v3/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.3-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fe9059ac4d384b929f452149b9246658)](https://app.codacy.com/gh/jorabin/KeePassJava2/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+![alt text](https://badgen.net/badge/Branch/v3/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.0-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fe9059ac4d384b929f452149b9246658)](https://app.codacy.com/gh/jorabin/KeePassJava2/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 
 A Java 11 API for databases compatible with the renowned [KeePass](http://keepass.info) password
@@ -189,16 +189,6 @@ is serializing and deserializing XML. Over time (KeePassJava2 was originally rel
 to Java and XML have been a bit mysterious. However, Jackson has now been chosen as the 
 underlying framework for implementation of KeePassJava2. From 3.0.0 a single KDBX implementation is available.
 
-There are several other database implementations which will be maintained for bug-fix purposes
-only, with a view to being withdrawn, since they perform badly and/or depend on obsolete technology.
-
-- `SimpleXML` - no longer maintained, does not work with Java 17 and up
-- `JAXB` - this causes problems with `javax` and `jakarta` namespaces, it's not worth maintaining
-  as it offers no compelling performance or other advantage
-- `DOM` the was the original implementation and validates the fact that DOM based implementations
-  are slow. That said, if you want to load a database and then save it while maintaining whatever quirks
-  existed in the original database then this is the one.
-
 Aside from dependencies on underlying frameworks, different implementations have varying characteristics, primarily speed. This is assessed
 by [this test](https://github.com/jorabin/KeePassJava2/blob/master/example/src/main/java/org/linguafranca/pwdb/kdbx/OpenDbExample.java) in the module `examples`.
 
@@ -287,7 +277,7 @@ Thanks to other contributors and raisers of issues.
 
 ##  License
 
-Copyright (c) 2024 Jo Rabin
+Copyright (c) 2025 Jo Rabin
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

@@ -11,7 +11,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - remove DOM database
 - remove complicated generics on database classes
 
-## 2024-11-22 [2.2.3-SNAPSHOT]
+## 2025-01-05 [2.2.3]
 
 ### Added
 
