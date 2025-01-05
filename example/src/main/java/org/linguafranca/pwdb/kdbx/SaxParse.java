@@ -92,5 +92,6 @@ public class SaxParse {
             InputSource xmlInputSource = new InputSource(decryptedInputStream);
             xmlReader.parse(xmlInputSource);
         }
+        writer.flush();
     }
 }
