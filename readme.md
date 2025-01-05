@@ -163,7 +163,8 @@ KeePass is in effect defined by the code that Dominik writes to create and maint
 [KDBX File Format Specification](https://keepass.info/help/kb/kdbx.html) describes the file format. There 
 is also a discussion of the [differences between KDBX version 3.1 and version 4](https://keepass.info/help/kb/kdbx_4.html).
 Additionally, there is a discussion of the [enhancements in KDBX 4.1](https://keepass.info/help/kb/kdbx_4.1.html), as well
-as a discussion of [Key Files](https://keepass.info/help/base/keys.html#keyfiles). 
+as a discussion of [Key Files](https://keepass.info/help/base/keys.html#keyfiles). While preparing release 2.2.3 I found [this XSD](https://keepass.info/help/download/KDBX_XML.xsd) at the
+KeePass site.
 
 Massive credit also to the folks over at [KeePassXC](https://keepassxc.org/) who wrote some 
 [documentation](https://github.com/keepassxreboot/keepassxc-specs) about their understanding of various format things. Also, this is a 
@@ -174,9 +175,8 @@ clarification and my own satisfaction I have written about my understanding of
 KeePass formats in the following locations:
 
 1. The Javadoc header to [KdbxSerializer](http://javadoc.io/page/org.linguafranca.pwdb/KeePassJava2-kdbx/latest/org/linguafranca/pwdb/kdbx/stream_3_1/KdbxSerializer.html) describes KDBX stream formatting.
-2. The XSD Schema [KDBX.4.xsd](KDBX.4.xsd) documents my understanding of the Keepass XML, and also my 
-   lack of understanding, in parts. While preparing release 2.2.3 I found [this XSD](https://keepass.info/help/download/KDBX_XML.xsd) at the
-   KeePass site. I have not (so far) attempted to reconcile my documentation with it.
+2. The XSD Schema [KDBX.4.1.xsd](./XSD/KDBX.4.1.xsd) documents my understanding of the Keepass XML, and also my 
+   lack of understanding, in parts. 
 3. The following graphic illustrates KDBX 3.1 and 4 file formats:
 
 
