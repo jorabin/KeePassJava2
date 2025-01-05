@@ -32,6 +32,7 @@ import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
+import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
 import org.linguafranca.pwdb.kdbx.jackson.model.Times;
 
 import java.util.ArrayList;
@@ -51,6 +52,9 @@ import java.util.UUID;
 "enableAutoType",
 "enableSearching",
 "lastTopVisibleEntry",
+"previousParentGroup",
+"tags",
+"customData",
 "entry",
 "group",
 })
@@ -109,6 +113,9 @@ public class KdbxGroup extends AbstractGroup{
 
     @JacksonXmlProperty(localName = "Tags")
     protected String tags;
+
+    @JacksonXmlProperty(localName = "CustomData")
+    protected KeePassFile.CustomData customData;
 
     @JacksonXmlProperty(localName = "Entry") /* Workaround jackson */
     @JacksonXmlElementWrapper(useWrapping = false)

@@ -28,6 +28,8 @@ import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.format.Helpers;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
 
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
@@ -55,11 +57,13 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
     "foregroundColor",
     "backgroundColor",
     "overrideURL",
+    "previousParentGroup",
     "tags",
     "times",
     "string",
     "binary",
     "autoType",
+    "customData",
     "history",
 })
 
@@ -122,7 +126,13 @@ public class KdbxEntry extends AbstractEntry {
 
     @JacksonXmlProperty(localName = "Tags")
     protected String tags;
-   
+
+
+    @JacksonXmlProperty(localName = "QualityCheck")
+    @JsonDeserialize(converter = StringToBooleanConverter.class)
+    @JsonSerialize(converter = BooleanToStringConverter.class)
+    protected Boolean qualityCheck;
+
     @JacksonXmlProperty(localName = "Times")
     protected Times times;
 
@@ -136,6 +146,9 @@ public class KdbxEntry extends AbstractEntry {
 
     @JacksonXmlProperty(localName = "AutoType")
     protected AutoType autoType;
+
+    @JacksonXmlProperty(localName = "CustomData")
+    protected KeePassFile.CustomData customData;
 
     @JacksonXmlProperty(localName = "History") /* Workaround jackson */
     protected KdbxHistory history;

@@ -80,7 +80,6 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
     public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream outputStream) throws IOException {
         Helpers.isV4.set(kdbxHeader.getVersion() == 4);
         if (kdbxHeader.getVersion() == 4) {
-            // TODO this assumes that the indexes start from 0 and are in sequence ...
             for (int a = 0; a < serializableDatabase.getBinaryCount(); a++) {
                 int attachmentLength = serializableDatabase.getBinary(a).length;
                 byte[] binary = new byte[attachmentLength + 1];
@@ -88,6 +87,7 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
                 System.arraycopy(serializableDatabase.getBinary(a),0, binary, 1, attachmentLength);
                 kdbxHeader.addBinary(binary);
             }
+            // TODO the binaries should now be removed so they don't get serialized in XML
         }
 
         try (OutputStream encryptedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, outputStream)) {

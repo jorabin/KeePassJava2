@@ -17,6 +17,7 @@ package org.linguafranca.pwdb.kdbx.jackson;
 
 import com.ctc.wstx.api.WstxInputProperties;
 import com.ctc.wstx.api.WstxOutputProperties;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
@@ -39,6 +40,13 @@ import java.io.OutputStreamWriter;
 import java.util.Objects;
 
 public class KdbxSerializableDatabase implements SerializableDatabase {
+
+    /**
+     * By default, deserialization will fail if an unknown property is found. Historically,
+     * this has been because the file mapping is incomplete, rather than the incoming file being wrong.
+     * So use this feature with caution, if at all.
+     */
+    public static boolean FAIL_ON_UNKNOWN_PROPERTIES = true;
 
     public KeePassFile keePassFile;
     private StreamEncryptor encryptor;
@@ -68,6 +76,9 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
     @Override
     public KdbxSerializableDatabase load(InputStream inputStream) throws IOException {
         XmlMapper mapper = new XmlMapper();
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                KdbxSerializableDatabase.FAIL_ON_UNKNOWN_PROPERTIES);
+
         SimpleModule module = new SimpleModule();
         module.addDeserializer(PropertyValue.class, new ValueDeserializer(encryptor, propertyValueStrategy));
         mapper.registerModule(module);
@@ -141,6 +152,7 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
         keePassFile.meta.binaries.add(newBin);
     }
 
+    // TODO this gets binary at index but does not get binary with ID
     @Override
     public byte[] getBinary(int index) {
         KeePassFile.Binary binary = keePassFile.meta.binaries.get(index);

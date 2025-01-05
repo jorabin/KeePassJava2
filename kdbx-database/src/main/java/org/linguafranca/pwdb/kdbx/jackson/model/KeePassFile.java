@@ -83,6 +83,7 @@ public class KeePassFile {
         "masterKeyChanged",
         "masterKeyChangeRec",
         "masterKeyChangeForce",
+        "masterKeyChangeForceOnce",
         "memoryProtection",
         "customIcons",
         "recycleBinEnabled",
@@ -149,6 +150,11 @@ public class KeePassFile {
 
         @JacksonXmlProperty(localName = "MasterKeyChangeForce")
         protected int masterKeyChangeForce;
+
+        @JacksonXmlProperty(localName = "MasterKeyChangeForceOnce")
+        @JsonDeserialize(converter = StringToBooleanConverter.class)
+        @JsonSerialize(converter = BooleanToStringConverter.class)
+        protected Boolean masterKeyChangeForceOnce;
 
         @JacksonXmlProperty(localName = "MemoryProtection")
         public KeePassFile.MemoryProtection memoryProtection;
