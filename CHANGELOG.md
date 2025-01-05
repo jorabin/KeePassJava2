@@ -13,7 +13,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 
 - Jackson implementation supports this interface
 - Other implementations throw exceptions appropriately as unsupported
-- [Issue #70] Support for KDBX 4.1 format (Jackson)
+- [Issue #70] Improved support for KDBX 4.1 format (Jackson only)
 - [Issue #71] Restructured to avoid pulling in Junit unnecessarily etc.
 
 ## [2.2.2] 2024-09-06

@@ -28,6 +28,8 @@ import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
 
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
@@ -124,6 +126,11 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
 
     @JacksonXmlProperty(localName = "Tags")
     protected String tags;
+
+    @JacksonXmlProperty(localName = "QualityCheck")
+    @JsonDeserialize(converter = StringToBooleanConverter.class)
+    @JsonSerialize(converter = BooleanToStringConverter.class)
+    protected Boolean qualityCheck;
    
     @JacksonXmlProperty(localName = "Times")
     protected Times times;
