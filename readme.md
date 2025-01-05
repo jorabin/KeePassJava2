@@ -39,7 +39,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-The current code is version 2.2.3 - released to Maven December 2024. This is on the main branch. See [Build from Source](#build-from-source)
+The current code is version 2.2.3 - released to Maven January 2025. This is on the main branch. See [Build from Source](#build-from-source)
 
 Key updates relative to 2.1:
 - Java 8 (dependencies no longer support Java 7)
