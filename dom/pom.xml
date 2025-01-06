@@ -19,6 +19,12 @@
         </dependency>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
+            <artifactId>util</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.linguafranca.pwdb</groupId>
             <artifactId>test</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
