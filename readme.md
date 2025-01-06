@@ -110,7 +110,7 @@ Create credentials and an input stream for the password vault in question:
       
 then choose the Jackson based database implementation, and load the database
 
-      Database database = JacksonDatabase.load(credentials, inputStream)
+      Database database = JacksonDatabase.load(creds, inputStream)
 
 See [below](#database-implementations) for discussion of other database implementations. Note that they will not be 
 maintained in the future - and see the following regarding making the storage of
