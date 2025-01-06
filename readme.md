@@ -242,15 +242,15 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 
 <tr><td><a href="database">database</a></td><td>database</td>
 <td>
-<a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/database"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/database.svg" alt="Javadocs"></a>
+<a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/database"><img src="https://www.javadoc.io/badge/org.linguafranca.pwdb/database.svg" alt="Javadocs"></a>
 </td>
 <td>Base definition of the Database APIs.</td></tr>
-<tr><td><a href="">example</a></td><td>example</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/example"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/example.svg" alt="Javadocs"></a></td>
+<tr><td><a href="example">example</a></td><td>example</td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/example"><img src="https://www.javadoc.io/badge/org.linguafranca.pwdb/example.svg" alt="Javadocs"></a></td>
 <td>Worked examples of loading, saving, splicing etc. using the APIs</td></tr>
 
 <tr><td><a href="test">test</a></td><td>test</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/test"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/test.svg" alt="Javadocs"></a></td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/test"><img src="https://www.javadoc.io/badge/org.linguafranca.pwdb/test.svg" alt="Javadocs"></a></td>
 <td>Shared tests to assess the viability of the implementation.</td></tr>
 
 <tr><td><a href="all">all</a></td><td><strong>KeePassJava2</strong></td>
@@ -258,31 +258,31 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 <td>This is the main KeePassJava2 Maven dependency. Provides a route to all artifacts (other than test and examples) via transitive dependency.</td></tr>
 
 <tr><td><a href="kdb">kdb</a></td><td>KeePassJava2-kdb</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdb"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdb.svg" alt="Javadocs"></a></td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdb"><img src="https://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdb.svg" alt="Javadocs"></a></td>
 <td>An implementation of the Database APIs supporting KeePass KDB format.</td></tr>
 
 <tr><td><a href="kdbx">kdbx</a></td><td>KeePassJava2-kdbx</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx.svg" alt="Javadocs"></a></td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="https://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx.svg" alt="Javadocs"></a></td>
 <td>Provides support for KDBX streaming and security.</td></tr>
 
 
 <tr><td><a href="jackson">jackson</a></td><td>KeePassJava2-jackson</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-jackson.svg" alt="Javadocs"></a></td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="https://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-jackson.svg" alt="Javadocs"></a></td>
 <td>A Jackson based implementation of KDBX. Intended to provide the main support going forward, replacing trhe
 modules below.</td></tr>
 
-<tr><td><a href="simple">simple</a></td><td>KeePassJava2-simple</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx.svg" alt="Javadocs"></a></td>
+<tr style="background-color: gray;"><td><a href="simple">simple</a></td><td>KeePassJava2-simple</td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="https://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx.svg" alt="Javadocs"></a></td>
 <td>A Simple XML Platform implementation of KDBX. Could be useful for Android.
 Simple cannot be used with Java versions 17 and up.</td></tr>
 
-<tr><td><a href="jaxb">jaxb</a></td><td>KeePassJava2-jaxb</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jaxb"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-jaxb.svg" alt="Javadocs"></a></td>
+<tr style="background-color: gray;"><td><a href="jaxb">jaxb</a></td><td>KeePassJava2-jaxb</td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jaxb"><img src="https://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-jaxb.svg" alt="Javadocs"></a></td>
 <td>A JAXB implementation of KDBX. Probably not useful for Android. The generated class
 bindings might be useful for building other interfaces.</td></tr>
 
-<tr><td><a href="dom">dom</a></td><td>KeePassJava2-dom</td>
-<td><a href="http://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-dom"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-dom.svg" alt="Javadocs"></a></td>
+<tr style="background-color: gray;"><td><a href="dom">dom</a></td><td>KeePassJava2-dom</td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-dom"><img src="https://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-dom.svg" alt="Javadocs"></a></td>
 <td>A DOM based implementation of KDBX. Being DOM based it is rather slow, but 
 messes less with existing content than the other implementations. Known to work on Android.</td></tr>
 
