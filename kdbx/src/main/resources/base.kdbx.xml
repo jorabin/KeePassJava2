@@ -16,7 +16,7 @@
 
 <KeePassFile>
     <Meta>
-        <Generator>Keepass-Java-2</Generator>
+        <Generator>KeePassJava2</Generator>
         <HeaderHash></HeaderHash>
         <DatabaseName>New Database</DatabaseName>
         <DatabaseNameChanged>${creationDate}</DatabaseNameChanged>
