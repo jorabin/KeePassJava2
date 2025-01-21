@@ -194,6 +194,9 @@ public class JacksonDatabase extends ProtectedDatabase<JacksonDatabase, JacksonG
     }
 
     public List<KeePassFile.Binary> getBinaries() {
+        if (keePassFile.meta.binaries == null) {
+            keePassFile.createBinaries();
+        }
         return keePassFile.meta.binaries;
     }
 
