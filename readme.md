@@ -39,7 +39,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-The current code is version 2.2.3 - released to Maven January 2025. This is on the main branch. See [Build from Source](#build-from-source)
+The current code is version 2.2.4 - released to Maven March 2025. This is on the main branch. See [Build from Source](#build-from-source)
 
 Key updates relative to 2.1:
 - Java 8 (dependencies no longer support Java 7)
@@ -54,11 +54,11 @@ See the [changelog](CHANGELOG.md) for more details.
 
 ### Release
 
-The POM for the last release (2.2.3), Java 8 compatible, is
+The POM for the last release (2.2.4), Java 8 compatible, is
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2-jackson</artifactId>
-        <version>2.2.3</version>
+        <version>2.2.4</version>
 
 at Maven Central. This provides access to the Jackson based implementation, 
 which is now the recommended implementation.  There is also a composite POM that
@@ -66,18 +66,18 @@ provides access to all implementations (see [below](#database-implementations) f
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.2.3</version>
+        <version>2.2.4</version>
 
 Note that the artifactId has become Camel Case from release 2.1.x onwards.
 
 ### Snapshot
 
 Snapshot builds are erratically available at [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/org/linguafranca/pwdb/), next bug-fix release will be
-2.2.4-SNAPSHOT (on branch `develop`) and work-in-progress 3.0.0-SNAPSHOT (on branch `v3`):
+2.2.5-SNAPSHOT (on branch `develop`) and work-in-progress 3.0.0-SNAPSHOT (on branch `v3`):
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.2.4-SNAPSHOT</version>
+        <version>2.2.5-SNAPSHOT</version>
  
 with appropriate `<repositories>` entry, like:
 
@@ -99,7 +99,7 @@ with appropriate `<repositories>` entry, like:
 
 ## Java Version
 
-From release 2.2 it requires Java 1.8. Earlier versions require Java 1.7.
+From release 2.2 it requires Java 1.8. From release 3, Java 11. Earlier versions require Java 1.7.
 
 ## Quick Start
 
