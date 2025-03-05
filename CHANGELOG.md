@@ -2,6 +2,11 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [2.2.4]
+
+- [Issue 76, 78] Resolve incompatibility with KeePassXC (empty elements)
+- [Issue 73] Trying to resolve dependency clashes for Woodstox etc
+
 ## [2.2.3] 2025-01-05
 
 ### Added
