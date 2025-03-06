@@ -27,7 +27,7 @@
 
     <artifactId>KeePassJava2</artifactId>
     <name>KeePassJava2 :: All</name>
-    <description>KDB Database support as well as KDBX 3.1: DOM, JAXB and Simple implementations.</description>
+    <description>Supports KDBX Password Database Versions 3.1, 4 and 4.1.</description>
 
     <dependencies>
         <dependency>
