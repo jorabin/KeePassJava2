@@ -24,53 +24,21 @@ import java.io.InputStream;
 import java.security.MessageDigest;
 
 /**
- * The class implements {@link Credentials} for KDBX files.
+ * Convenience wrapper to convert to KdbxCredentials - for helping with code migration to version 3.
  *
- * @author jo
+ * @deprecated use {@link KdbxCredentials} instead
  */
-public class KdbxCreds implements Credentials {
-
-    private final byte[] key;
-
-    /**
-     * Constructor for password with  KDBX Keyfile
-     * @param password Master Password (<code>new byte[0]</code> if empty, not none)
-     * @param inputStream inputstream of the keyfile
-     */
-    public KdbxCreds(@NotNull byte[] password, @NotNull InputStream inputStream) {
-        MessageDigest md = Encryption.getSha256MessageDigestInstance();
-        byte[] pwKey = md.digest(password);
-        md.update(pwKey);
-
-        byte[] keyFileData = KdbxKeyFile.load(inputStream);
-        if (keyFileData == null) {
-            throw new IllegalStateException("Could not read key file");
-        }
-        this.key = md.digest(keyFileData);
+@Deprecated
+public class KdbxCreds extends KdbxCredentials {
+    public KdbxCreds(byte @NotNull [] password, @NotNull InputStream inputStream) {
+        super(password, inputStream);
     }
 
-    /**
-     * Constructor for KDBX Keyfile with no password
-     * @param inputStream inputstream of the keyfile
-     */
     public KdbxCreds(@NotNull InputStream inputStream) {
-        MessageDigest md = Encryption.getSha256MessageDigestInstance();
-        byte[] keyFileData = KdbxKeyFile.load(inputStream);
-        if (keyFileData == null) {
-            throw new IllegalStateException("Could not read key file");
-        }
-        this.key = md.digest(keyFileData);
+        super(inputStream);
     }
 
-
-    public KdbxCreds(@NotNull byte[] password) {
-        MessageDigest md = Encryption.getSha256MessageDigestInstance();
-        byte[] digest = md.digest(password);
-        key = md.digest(digest);
-    }
-
-    @Override
-    public byte[] getKey() {
-        return key;
+    public KdbxCreds(byte @NotNull [] password) {
+        super(password);
     }
 }

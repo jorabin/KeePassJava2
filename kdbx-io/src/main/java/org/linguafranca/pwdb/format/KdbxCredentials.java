@@ -16,83 +16,61 @@
 
 package org.linguafranca.pwdb.format;
 
+import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.security.Encryption;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
 import java.security.MessageDigest;
 
 /**
- * The class holds subclasses of {@link Credentials} appropriate to KDBX files.
+ * The class implements {@link Credentials} for KDBX files.
  *
  * @author jo
- * @deprecated use KdbxCreds instead
  */
-@Deprecated
-@SuppressWarnings("deprecation")
-public interface KdbxCredentials extends Credentials {
+public class KdbxCredentials implements Credentials {
+
+    private final byte[] key;
 
     /**
-     * Class for KDBX key file with password credentials
+     * Constructor for password with  KDBX Keyfile
+     * @param password Master Password (<code>new byte[0]</code> if empty, not none)
+     * @param inputStream inputStream of the keyfile
      */
-    class KeyFile implements KdbxCredentials {
+    public KdbxCredentials(byte @NotNull [] password, @NotNull InputStream inputStream) {
+        MessageDigest md = Encryption.getSha256MessageDigestInstance();
+        byte[] pwKey = md.digest(password);
+        md.update(pwKey);
 
-        private final byte[] key;
-
-        /**
-         * Constructor for password with  KDBX Keyfile
-         * @param password Master Password (<code>new byte[0]</code> if empty, not none)
-         * @param inputStream inputstream of the keyfile
-         */
-        public KeyFile(@NotNull byte[] password, @NotNull InputStream inputStream) {
-            MessageDigest md = Encryption.getSha256MessageDigestInstance();
-            byte[] pwKey = md.digest(password);
-            md.update(pwKey);
-
-            byte[] keyFileData = KdbxKeyFile.load(inputStream);
-            if (keyFileData == null) {
-                throw new IllegalStateException("Could not read key file");
-            }
-            this.key = md.digest(keyFileData);
+        byte[] keyFileData = KdbxKeyFile.load(inputStream);
+        if (keyFileData == null) {
+            throw new IllegalStateException("Could not read key file");
         }
-
-        /**
-         * Constructor for KDBX Keyfile with no password
-         * @param inputStream inputstream of the keyfile
-         */
-        public KeyFile(@NotNull InputStream inputStream) {
-            MessageDigest md = Encryption.getSha256MessageDigestInstance();
-
-            byte[] keyFileData = KdbxKeyFile.load(inputStream);
-            if (keyFileData == null) {
-                throw new IllegalStateException("Could not read key file");
-            }
-            this.key = md.digest(keyFileData);
-        }
-
-        @Override
-        public byte[] getKey() {
-            return key;
-        }
+        this.key = md.digest(keyFileData);
     }
 
     /**
-     * Class for KDBX password only credentials
+     * Constructor for KDBX Keyfile with no password
+     * @param inputStream inputStream of the keyfile
      */
-    class Password implements KdbxCredentials {
-
-        private final byte[] key;
-
-        public Password(@NotNull byte[] password) {
-            MessageDigest md = Encryption.getSha256MessageDigestInstance();
-            byte[] digest = md.digest(password);
-            key = md.digest(digest);
+    public KdbxCredentials(@NotNull InputStream inputStream) {
+        MessageDigest md = Encryption.getSha256MessageDigestInstance();
+        byte[] keyFileData = KdbxKeyFile.load(inputStream);
+        if (keyFileData == null) {
+            throw new IllegalStateException("Could not read key file");
         }
+        this.key = md.digest(keyFileData);
+    }
 
-        @Override
-        public byte[] getKey() {
-            return key;
-        }
+
+    public KdbxCredentials(byte @NotNull [] password) {
+        MessageDigest md = Encryption.getSha256MessageDigestInstance();
+        byte[] digest = md.digest(password);
+        key = md.digest(digest);
+    }
+
+    @Override
+    public byte[] getKey() {
+        return key;
     }
 }
