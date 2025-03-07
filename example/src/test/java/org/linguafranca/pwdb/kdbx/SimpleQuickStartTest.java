@@ -1,17 +1,18 @@
 /*
- * Copyright 2015 Jo Rabin
+ * Copyright (c) 2025. Jo Rabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
 package org.linguafranca.pwdb.kdbx;
@@ -40,20 +41,6 @@ import static org.junit.Assert.assertEquals;
 public class SimpleQuickStartTest extends QuickStart {
 
 
-    @Override
-    public KdbxDatabase getDatabase() {
-        return new KdbxDatabase();
-    }
-
-    @Override
-    public KdbxDatabase loadDatabase(Credentials credentials, InputStream inputStream){
-        try {
-            return KdbxDatabase.load(credentials, inputStream);
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     @BeforeClass
     public static void ensureOutputDir() throws IOException {
         Files.createDirectories(Paths.get(TEST_OUTPUT_DIR));
@@ -78,7 +65,7 @@ public class SimpleQuickStartTest extends QuickStart {
     public void loadSave() throws IOException {
         Path path = Paths.get("testOutput/CHACHA-AES-CHACHA.kdbx");
 
-        loadKdbx3SaveKdbx4("test123.kdbx","123".getBytes(), Files.newOutputStream(path));
+        loadKdbx3SaveKdbx4("test123.kdbx","123".getBytes(), path);
 
         // load newly created V4 database
         KdbxDatabase db = KdbxDatabase.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
@@ -92,7 +79,7 @@ public class SimpleQuickStartTest extends QuickStart {
     public void loadSave2() throws IOException {
         Path path = Paths.get("testOutput/CHACHA-AES-CHACHA.kdbx");
 
-        loadKdbx4SaveKdbx3("V4-ChaCha20-Argon2-Attachment.kdbx","123".getBytes(), Files.newOutputStream(path));
+        loadKdbx4SaveKdbx3("V4-ChaCha20-Argon2-Attachment.kdbx","123".getBytes(), path);
 
         // load newly created V4 database
         KdbxDatabase db = KdbxDatabase.load(new KdbxCreds("123".getBytes()), Files.newInputStream(path));
