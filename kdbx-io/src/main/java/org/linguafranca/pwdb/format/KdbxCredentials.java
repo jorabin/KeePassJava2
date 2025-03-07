@@ -63,6 +63,10 @@ public class KdbxCredentials implements Credentials {
     }
 
 
+    /**
+     * Constructor for password only
+     * @param password Master Password for database (<code>new byte[0]</code> if empty, not none)
+     */
     public KdbxCredentials(byte @NotNull [] password) {
         MessageDigest md = Encryption.getSha256MessageDigestInstance();
         byte[] digest = md.digest(password);

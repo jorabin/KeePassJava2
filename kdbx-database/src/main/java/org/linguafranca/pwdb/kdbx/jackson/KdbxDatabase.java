@@ -85,9 +85,9 @@ public class KdbxDatabase extends ProtectedDatabase {
     /**
      * Save the database with the same stream format that it was loaded with, or V4
      * default if none
-     * 
+     *
      * @param credentials  credentials to use
-     * @param outputStream where to write to
+     * @param outputStream where to write to - closes stream
      */
     @Override
     public void save(Credentials credentials, OutputStream outputStream) throws IOException {
@@ -99,19 +99,19 @@ public class KdbxDatabase extends ProtectedDatabase {
 
     /**
      * Save the database with a choice of stream format
-     * 
+     *
      * @param streamFormat the format to use
      * @param credentials  credentials to use
-     * @param outputStream where to write to
+     * @param outputStream where to write to - call closes output stream
      */
     @Override
     public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
-            OutputStream outputStream) throws IOException {
-            keePassFile.meta.generator = "KeePassJava2-Jackson";
-            KdbxSerializableDatabase kdbxSerializableDatabase = new KdbxSerializableDatabase(this.keePassFile);
-            kdbxSerializableDatabase.setPropertyValueStrategy(this.getPropertyValueStrategy());
-            streamFormat.save(kdbxSerializableDatabase, credentials, outputStream);
-            setDirty(false);
+                                                     OutputStream outputStream) throws IOException {
+        keePassFile.meta.generator = "KeePassJava2-V3-Jackson";
+        KdbxSerializableDatabase kdbxSerializableDatabase = new KdbxSerializableDatabase(this.keePassFile);
+        kdbxSerializableDatabase.setPropertyValueStrategy(this.getPropertyValueStrategy());
+        streamFormat.save(kdbxSerializableDatabase, credentials, outputStream);
+        setDirty(false);
     }
 
     @Override

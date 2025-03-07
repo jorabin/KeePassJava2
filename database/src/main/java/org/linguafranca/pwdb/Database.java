@@ -237,7 +237,7 @@ public interface Database {
     void save(Credentials credentials, OutputStream outputStream) throws IOException;
 
     /**
-     * Save the database to a stream
+     * Save the database to a stream and closes the stream
      */
     <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) throws IOException;
 
