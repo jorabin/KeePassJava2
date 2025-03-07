@@ -71,9 +71,10 @@ the saved passwords (as per the requirements), hashing does not meet the objecti
 What key should be used for this process? If the key is stored in RAM, we are essentially creating
 the same security vulnerability we are trying to avoid.
 
-While storing data in an encrypted form may seem appealing, keeping it encrypted in the KDBX InnerStream is impractical.
-This approach requires that the encrypted property values appear in the same order for both encryption and decryption, which makes it cumbersome.
-Encrypting and decrypting all protected fields each time we need to access or manipulate just one of them would add significant overhead.
+While storing data in an encrypted form may seem appealing, keeping it encrypted in the KDBX InnerStream 
+is impractical. This approach requires that the encrypted property values appear in the same order for both 
+encryption and decryption, which makes it cumbersome. Encrypting and decrypting all protected fields each 
+time we need to access or manipulate just one of them would add significant overhead.
 
 If the data is to be encrypted, then we need to find some way of storing the encryption key 
 that is not open to simple inspection.

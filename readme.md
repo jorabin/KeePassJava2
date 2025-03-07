@@ -3,27 +3,28 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent)
 [![javadoc](https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2/javadoc.svg)](https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2)
 
-![alt text](https://badgen.net/badge/Branch/master/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.3/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
+![alt text](https://badgen.net/badge/Branch/master/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.4/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
 
-![alt text](https://badgen.net/badge/Branch/develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.4-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
+![alt text](https://badgen.net/badge/Branch/develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.5-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
 
 ![alt text](https://badgen.net/badge/Branch/v3/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.0-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fe9059ac4d384b929f452149b9246658)](https://app.codacy.com/gh/jorabin/KeePassJava2/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 
-A Java 11 API for databases compatible with the renowned [KeePass](http://keepass.info) password
+Java 11 API (from version 3.0.0 upwards) for password databases compatible with the renowned [KeePass](http://keepass.info) password
 safe for Windows. This is a "headless" implementation - if you want something with a UI
 then [KeePassXC](https://keepassxc.org/) and [KeePassDX](https://www.keepassdx.com/) could
 be just the things for you.
 
 Features to date:
 
-- Read and write KeePass 2.x format (KDBX file formats V3 and V4)
+- Read and write KeePass 2.x format (KDBX file formats V3.1, V4 and V4.1)
 - Keepass 2.x Password and Keyfile Credentials
+- Pluggable memory storage and protection strategy
 - Read KeePass 1.x format (KDB format, Rijndael only)
 - *No* requirement for JCE Policy Files
 - Android compatible
 - Interfaces for Database, Group and Entry allow compatible addition of other formats
-- Pluggable memory storage and protection strategy
+
 
 It is licensed under the Apache 2 License and is currently usable.
 
@@ -41,15 +42,18 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-This version is 3.0.0-SNAPSHOT and is not backwards compatible with 2.3 and earlier versions.
+This version is 3.0.0-SNAPSHOT. It is the intention that maintenance will cease
+on version 2 at some point during 2025 once this version is released.
+Upgrade to V3 requires minor changes to V2 code.
 
-The current released code is version 2.2.3 - released to Maven January 2025. This is on the main branch. See [Build from Source](#build-from-source)
+The current released version is version 2.2.4 - released to Maven March 2025. 
+This is on the main branch. See [Build from Source](#build-from-source)
 
 Key updates relative to 2.x
 - Java 11 
+- Pluggable (protected) data storage model
 - File format version 4 support - with Argon2
 - Removal of SimpleXML, JAXB and JAXB database implementations
-- Implemented pluggable (protected) data storage model
 - Removed generics on database classes
 - Refactor modules and packages
 - Updated keyfile support
@@ -61,25 +65,12 @@ See the [changelog](CHANGELOG.md) for more details.
 
 ### Release
 
-The POM for the last release (2.2.3), Java 8 compatible, is
-
-        <groupId>org.linguafranca.pwdb</groupId>
-        <artifactId>KeePassJava2-jackson</artifactId>
-        <version>2.2.3</version>
-
-at Maven Central. This provides access to the Jackson based implementation, 
-which is now the recommended implementation.  There is also a composite POM (deprecated) that
-provides access to all implementations (see [below](#database-implementations) for discussion).
-
-        <groupId>org.linguafranca.pwdb</groupId>
-        <artifactId>KeePassJava2</artifactId>
-        <version>2.2.3</version>
-
-at Maven Central. Note that the artifactId has become Camel Case from release 2.1.x onwards.
+For the POM for the last release, see the [main branch](https://github.com/jorabin/KeePassJava2/tree/master).
+As noted, Version 2.x will no longer be maintained once this version is released.
 
 ### Snapshot
 
-Snapshot builds are erratically available at [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/org/linguafranca/pwdb/) e.g.:
+Snapshot builds, such as this version 3.0.0, are available at [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/org/linguafranca/pwdb/) e.g.:
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
@@ -100,18 +91,18 @@ with appropriate `<repositories>` entry, like:
          </repository>
        </repositories>
  
- There are also separate POMs for the various modules. The module structure is illustrated below
+ The module structure is illustrated below
  under [Build from Source](#build-from-source).
 
 ## Java Version
 
-From release 2.2 it requires Java 1.8. Earlier versions require Java 1.7.
+Versions 3.0.0 onwards require Java 11. From version 2.2 Java 1.8 is required. Earlier versions require Java 1.7.
 
 ## Quick Start
 
 Create credentials and an input stream for the password vault in question:
 
-      KdbxCreds creds = new KdbxCreds("123".getBytes());
+      KdbxCredentials credentials = new KdbxCredentials("123".getBytes());
       InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test1.kdbx");
       
 then load the database:
@@ -126,15 +117,20 @@ and one to support the KeePass V2 KDB format (`KdbDatabase`).
 
 There are numerous well-understood problems
 with storing passwords as Strings in Java. See [this discussion](./PropertyValueProtection.md) about the
-KeePassJava2 approach to storing passwords, which is implemented in this release.
+KeePassJava2 approach to storing passwords.
 
 ### Discussion
 
 Password databases are modelled as a three layer abstraction. 
 
-A *Database* is a collection of records whose physical representation needs only to be capable of rendering as a stream. *Entries* hold the information of value in the database and *Groups* allow the structuring of entries into collections, just like a folder structure. 
+A *Database* is a collection of records whose physical representation needs only to be capable 
+of rendering as a stream. *Entries* hold the information of value in the database and *Groups* 
+allow the structuring of entries into collections, just like a folder structure. 
 
-The Database has a root group and by following subgroups of the root group the tree structure of the database can be navigated. Entries belong to groups. Entries can be moved between groups and groups can also be moved between groups. However, entries and groups created in one database cannot be moved to another database without being converted: 
+The Database has a root group and by following subgroups of the root group the tree structure of 
+the database can be navigated. Entries belong to groups. Entries can be moved between groups and groups 
+can also be moved between groups. However, entries and groups created in one database cannot be moved to 
+another database without being converted: 
 
     database.newEntry(entryToCopy);
     database.newGroup(groupToCopy);
@@ -145,7 +141,7 @@ The class Javadoc on Interface classes
 [Entry](http://javadoc.io/page/org.linguafranca.pwdb/database/latest/org/linguafranca/pwdb/Entry.html) describe
 how to use the methods of those classes to create and modify entries. These classes
 provide the basis of all implementations of the various database formats,
-initially KDB, KDBX 3.1 and KDBX 4 (KeePass 2) file formats, subsequently, potentially, others.
+KDBX 3.1, 4 and 4.1 (KeePass 2) as well as KDB (KeePass 1), file formats.
 
 The class [QuickStart.java](example/src/main/java/org/linguafranca/pwdb/kdbx/QuickStart.java) provides some
 illustrations of operations using the Database, Group and Entry interfaces.
