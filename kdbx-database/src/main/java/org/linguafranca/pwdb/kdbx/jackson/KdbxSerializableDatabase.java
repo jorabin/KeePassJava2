@@ -17,6 +17,7 @@ package org.linguafranca.pwdb.kdbx.jackson;
 
 import com.ctc.wstx.api.WstxInputProperties;
 import com.ctc.wstx.api.WstxOutputProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -104,6 +105,7 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
             mapper.enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION);
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
 
             // set the serializer to Woodstox
             System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");

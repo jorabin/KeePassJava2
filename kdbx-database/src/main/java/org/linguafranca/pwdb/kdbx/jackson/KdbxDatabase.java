@@ -194,6 +194,9 @@ public class KdbxDatabase extends ProtectedDatabase {
     }
 
     public List<KeePassFile.Binary> getBinaries() {
+        if (keePassFile.meta.binaries == null) {
+            keePassFile.createBinaries();
+        }
         return keePassFile.meta.binaries;
     }
 
