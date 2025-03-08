@@ -19,14 +19,12 @@ package org.linguafranca.pwdb.kdbx;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.format.KdbxCreds;
 import org.linguafranca.pwdb.format.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -57,8 +55,8 @@ public class SimpleQuickStartTest extends QuickStart {
     }
 
     @Test
-    public void loadKdbSaveVernacular() throws IOException {
-        super.loadKdb();
+    public void loadKdbSaveKdbx() throws IOException {
+        super.loadKdbSaveKdbx();
     }
 
     @Test

@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 
 /**
  * Interface for a Database Group.
@@ -92,6 +93,14 @@ public interface Group {
      * @return the group added
      */
     Group addGroup(Group group);
+
+    /**
+     * Create a new group in this database with the name provided and add it to the group
+     *
+     * @param name the name of the group to add
+     * @return the group added
+     */
+    Group addGroup(String name);
 
     /**
      * Returns a list of child Groups whose name exactly matches that supplied.

@@ -135,5 +135,30 @@ public abstract class AbstractEntry implements Entry {
         throw new UnsupportedOperationException();
     }
 
+    public Entry addProperty(String name, byte[] value){
+        throw new UnsupportedOperationException();
+    }
+    public Entry addProperty(String name, char[] value){
+        throw new UnsupportedOperationException();
+    }
+    public Entry addProperty(String name, CharSequence value){
+        throw new UnsupportedOperationException();
+    }
+
+    public Entry addEntry(){
+        if (this.getParent()!=null) {
+            return this.getParent().addEntry();
+        }
+        throw new IllegalStateException("Entry has no group parent");
+    }
+
+    public Entry addEntry(String title){
+        if (this.getParent()!=null) {
+            return this.getParent().addEntry(title);
+        }
+        throw new IllegalStateException("Entry has no group parent");
+    }
+
+
     protected abstract void touch();
 }

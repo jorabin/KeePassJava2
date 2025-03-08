@@ -31,13 +31,22 @@ import java.util.Stack;
  */
 public abstract class AbstractGroup implements Group {
 
+    @Override
     public Entry addEntry() {
-        return getDatabase().newEntry();
+        Entry entry = getDatabase().newEntry();
+        return addEntry(entry);
     }
 
     @Override
     public Entry addEntry(String title) {
-        return getDatabase().newEntry(title);
+        Entry entry = getDatabase().newEntry(title);
+        return addEntry(entry);
+    }
+
+    @Override
+    public Group addGroup(String name) {
+        Group group = getDatabase().newGroup(name);
+        return addGroup(group);
     }
 
     @Override

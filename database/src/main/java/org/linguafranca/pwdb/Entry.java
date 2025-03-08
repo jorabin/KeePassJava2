@@ -56,6 +56,15 @@ public interface Entry {
     String STANDARD_PROPERTY_NAME_TITLE = "Title";
     String STANDARD_PROPERTY_NAME_NOTES = "Notes";
 
+    /** allows for static import of name */
+    interface STANDARD_PROPERTY_NAME {
+        String USER_NAME = STANDARD_PROPERTY_NAME_USER_NAME;
+        String PASSWORD = STANDARD_PROPERTY_NAME_PASSWORD;
+        String URL = STANDARD_PROPERTY_NAME_URL;
+        String TITLE = STANDARD_PROPERTY_NAME_TITLE;
+        String NOTES = STANDARD_PROPERTY_NAME_NOTES;
+    }
+
     List<String> STANDARD_PROPERTY_NAMES = List.of(STANDARD_PROPERTY_NAME_USER_NAME,
             STANDARD_PROPERTY_NAME_PASSWORD,
             STANDARD_PROPERTY_NAME_URL,
@@ -119,7 +128,8 @@ public interface Entry {
     PropertyValue getPropertyValue(String name);
 
     /**
-     * Sets the value of a property. Use of this method is not recommended for fields with protected values.
+     * Sets the value of a property as a String in memory.
+     * Use of this method is not recommended for fields with protected values.
      * Use {@link #setPropertyValue(String, PropertyValue)}
      *
      * <p>Other than the {@link #STANDARD_PROPERTY_NAMES} support for this method is optional.
@@ -133,7 +143,7 @@ public interface Entry {
     Entry setProperty(String name, String value);
 
     /**
-     * Sets the value of a property as a property value. The method does not check whether the
+     * Sets the value of a property as a property value in memory. The method does not check whether the
      * passed PropertyValue is protected relative to {@link Database#shouldProtect(String)}
      *
      * <p>Other than the {@link #STANDARD_PROPERTY_NAMES} support for this method is optional.
@@ -147,7 +157,68 @@ public interface Entry {
     Entry setPropertyValue(String name, PropertyValue value);
 
     /**
-     * Removes this non-standard  property, if it exists.
+     * Adds (or modifies) the value of a property as a property value in memory. The method uses the
+     * PropertyValue.Strategy to determine how to determine the storage format in memory.
+     *
+     * <p>Other than the {@link #STANDARD_PROPERTY_NAMES} support for this method is optional.
+     *
+     * @param name the name of the property to set
+     * @param value the value to set it to
+     * @throws UnsupportedOperationException if the name is not one of the standard properties and
+     * non-standard properties are not supported
+     * @see Database#supportsNonStandardPropertyNames()
+     */
+    Entry addProperty(String name, byte[] value);
+
+    /**
+     * Adds (or modifies) the value of a property as a property value in memory. The method uses the
+     * PropertyValue.Strategy to determine how to determine the storage format in memory.
+     *
+     * <p>Other than the {@link #STANDARD_PROPERTY_NAMES} support for this method is optional.
+     *
+     * @param name the name of the property to set
+     * @param value the value to set it to
+     * @throws UnsupportedOperationException if the name is not one of the standard properties and
+     * non-standard properties are not supported
+     * @see Database#supportsNonStandardPropertyNames()
+     */
+    Entry addProperty(String name, char[] value);
+
+    /**
+     * Adds (or modifies) the value of a property as a property value in memory. The method uses the
+     * PropertyValue.Strategy to determine how to determine the storage format in memory.
+     *
+     * <p>Other than the {@link #STANDARD_PROPERTY_NAMES} support for this method is optional.
+     *
+     * @param name the name of the property to set
+     * @param value the value to set it to
+     * @throws UnsupportedOperationException if the name is not one of the standard properties and
+     * non-standard properties are not supported
+     * @see Database#supportsNonStandardPropertyNames()
+     */
+    Entry addProperty(String name, CharSequence value);
+
+    /**
+     * Adds a newly created entry to the Group parent of the current Entry, if there is one. Intended primary for
+     * fluid building of entries within a group.
+     *
+     * @throws IllegalStateException if there is no parent
+     * @param name the title of the entry
+     * @return the newly created entry
+     */
+    Entry addEntry(String name);
+
+    /**
+     * Adds a newly created entry to the Group parent of the current Entry, if there is one. Intended primary for
+     * fluid building of entries within a group.
+     *
+     * @throws IllegalStateException if there is no parent
+     * @return the newly created entry
+     */
+    Entry addEntry();
+
+    /**
+     * Removes this property, if it exists and if it is a non-standard property
      *
      * @return true if the property exists and was removed, false otherwise
      * @param name the value of the property to remove

@@ -27,7 +27,7 @@ import java.util.List;
  * Base class for Databases which support storage using {@link PropertyValue}s.
  * <p>
  * By default {@link Entry#STANDARD_PROPERTY_NAME_PASSWORD} is defined as protected and the property value strategy
- * establishes {@link org.linguafranca.pwdb.PropertyValue.StringStore} storage for unprotected values and
+ * establishes {@link org.linguafranca.pwdb.PropertyValue.BytesStore} storage for unprotected values and
  * {@link org.linguafranca.pwdb.PropertyValue.SealedStore} for protected values.
  */
 public abstract class ProtectedDatabase extends AbstractDatabase {

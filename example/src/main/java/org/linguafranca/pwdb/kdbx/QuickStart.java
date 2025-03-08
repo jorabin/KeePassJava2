@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import static org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME.*;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
@@ -43,6 +44,36 @@ public abstract class QuickStart {
 
     public static final String TEST_OUTPUT_DIR = "testOutput/";
     static PrintStream printStream = getTestPrintStream();
+
+    public void canonicalQuickStart() throws IOException {
+
+        // V3 create a database, no need to specify what kind (e.g. JacksonDatabase)
+        // V3 Database no longer need to be generified
+        Database database = new KdbxDatabase();
+        // V3 the property value strategy is set to PropertyValue.Strategy.Default(), anyway, but the Default property
+        // value strategy being to protect field "Password" and no other, all of which are stored as byte[]
+        database.setPropertyValueStrategy(new PropertyValue.Strategy.Default());
+        // V3 Group is not generified. create a group
+        // V3 add a new group to another group with the name supplied
+        Group main = database.getRootGroup().addGroup("Main");
+        // V3 fluent building of Entry (using PropertyValueStrategy as set in database to determine protection)
+        main.addEntry()
+                // V3 addProperty short-cut for setPropertyValue
+                // V3 abbreviated static import of standard field names
+                .addProperty(TITLE, "first entry")
+                .addProperty(USER_NAME, "Tom")
+                .addProperty(PASSWORD, "123".getBytes())
+                .addProperty(URL, "http://localhost:8080/")
+            .addEntry("2nd Entry") // v3 addEntry on Entry adds Entry to parent Group if exists
+                .addProperty(USER_NAME, "Alice")
+                .addProperty(PASSWORD, "123".getBytes());
+
+        // V3 KdbxCreds now called KdbxCredentials
+        KdbxCredentials credentials = new KdbxCredentials("123".getBytes());
+        try (OutputStream outputStream = Files.newOutputStream(Path.of(TEST_OUTPUT_DIR, "test.kdbx"))) {
+            database.save(credentials, outputStream);
+        }
+    }
 
     /**
      * Load KDBX
@@ -98,7 +129,8 @@ public abstract class QuickStart {
      * Group by title
      */
     public Group groupByTitle(Database database) {
-        List<? extends Entry> entries = database.findEntries(entry -> entry.getProperty(Entry.STANDARD_PROPERTY_NAME_TITLE).toLowerCase().contains("findme!"));
+        List<? extends Entry> entries =
+                database.findEntries(entry -> entry.getProperty(Entry.STANDARD_PROPERTY_NAME_TITLE).toLowerCase().contains("findme!"));
         // create a new group using DB factory method
         Group newParent = database.newGroup("Found entries");
         // iterate over the found entries
@@ -114,7 +146,7 @@ public abstract class QuickStart {
     /**
      * Load KDB and save as KDBX
      */
-    public void loadKdb() throws IOException {
+    public void loadKdbSaveKdbx() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdb");
         // password credentials
         Credentials credentials = new KdbCredentials.Password("123".getBytes());

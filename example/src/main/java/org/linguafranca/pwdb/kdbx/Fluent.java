@@ -18,22 +18,24 @@
 package org.linguafranca.pwdb.kdbx;
 
 import org.linguafranca.pwdb.Database;
+import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 public class Fluent {
 
     public void fluentExample() {
         Database database = new KdbxDatabase();
-        database.newGroup("Group 1")
-                .addEntry()
-                    .setProperty("prop1", "value1")
-                    .setProperty("prop2", "value2")
-                    .setProperty("prop3", "value3")
-                .getParent()
-                .addEntry()
+        database.getRootGroup().addGroup("Group 1")
+                .addEntry("as property values determined by the database property value strategy (preferred)")
+                    .addProperty("prop1", "value1".getBytes())
+                    .addProperty("prop2", "value2")
+                    .addProperty("prop3", "value3")
+                .addEntry("as explicit property values")
+                    .setPropertyValue("prop1", new PropertyValue.BytesStore("value1".getBytes()))
+                    .setPropertyValue("prop2", new PropertyValue.SealedStore("value2"))
+                .addEntry("as strings")
                     .setProperty("prop1", "value1")
                     .setProperty("prop2", "value2")
                     .setProperty("prop3", "value3");
-
     }
 }

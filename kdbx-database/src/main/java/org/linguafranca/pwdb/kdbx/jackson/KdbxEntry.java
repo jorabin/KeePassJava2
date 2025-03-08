@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
+import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.base.AbstractEntry;
@@ -194,6 +195,30 @@ public class KdbxEntry extends AbstractEntry {
         }
         string.add(new StringProperty(name, value));
         touch();
+        return this;
+    }
+
+    @Override
+    @JsonIgnore
+    public Entry addProperty(String name, byte[] value){
+        PropertyValue.Factory<? extends PropertyValue> f = database.getPropertyValueStrategy().getFactoryFor(name);
+        this.setPropertyValue(name, f.of(value));
+        return this;
+    }
+
+    @Override
+    @JsonIgnore
+    public Entry addProperty(String name, char[] value){
+        PropertyValue.Factory<? extends PropertyValue> f = database.getPropertyValueStrategy().getFactoryFor(name);
+        this.setPropertyValue(name, f.of(value));
+        return this;
+    }
+
+    @Override
+    @JsonIgnore
+    public Entry addProperty(String name, CharSequence value){
+        PropertyValue.Factory<? extends PropertyValue> f = database.getPropertyValueStrategy().getFactoryFor(name);
+        this.setPropertyValue(name, f.of(value));
         return this;
     }
 
