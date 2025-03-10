@@ -17,14 +17,10 @@
 
 package org.linguafranca.pwdb.protect;
 
-import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.*;
-import org.linguafranca.pwdb.protect.ProtectedDatabase;
-
-import java.io.IOException;
-import java.io.OutputStream;
+import org.linguafranca.pwdb.basic.BasicDatabase;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,83 +31,7 @@ class ProtectedDatabaseTest {
 
     @BeforeEach
     void setUp() {
-        database = new ProtectedDatabase() {
-            @Override
-            public Group getRootGroup() {
-                return null;
-            }
-
-            @Override
-            public Group newGroup() {
-                return null;
-            }
-
-            @Override
-            public Entry newEntry() {
-                return null;
-            }
-
-            @Override
-            public Icon newIcon() {
-                return null;
-            }
-
-            @Override
-            public Icon newIcon(Integer i) {
-                return null;
-            }
-
-            @Override
-            public boolean isRecycleBinEnabled() {
-                return false;
-            }
-
-            @Override
-            public void enableRecycleBin(boolean enable) {
-
-            }
-
-            @Override
-            public @Nullable Group getRecycleBin() {
-                return null;
-            }
-
-            @Override
-            public String getName() {
-                return "";
-            }
-
-            @Override
-            public void setName(String name) {
-
-            }
-
-            @Override
-            public String getDescription() {
-                return "";
-            }
-
-            @Override
-            public void setDescription(String description) {
-
-            }
-
-            @Override
-            public void save(Credentials credentials, OutputStream outputStream) throws IOException {
-
-            }
-
-            @Override
-            public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
-
-            }
-
-            @Override
-            public <C extends StreamConfiguration> StreamFormat<C> getStreamFormat() {
-                return null;
-            }
-            // Implement abstract methods if necessary for testing
-        };
+        database = new BasicDatabase();
     }
 
     @Test

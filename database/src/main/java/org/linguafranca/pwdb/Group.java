@@ -17,8 +17,6 @@
 
 package org.linguafranca.pwdb;
 
-import org.jetbrains.annotations.NotNull;
-
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
@@ -235,7 +233,7 @@ public interface Group {
     void setIcon(Icon icon);
 
     /**
-     * Get the database this group was created from
+     * Get the database this group is part of, null if the group is not part of a database
      */
-    @NotNull Database getDatabase();
+    Database getDatabase();
 }

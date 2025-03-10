@@ -15,17 +15,27 @@
  *
  */
 
-package org.linguafranca.pwdb.example;
+package org.linguafranca.pwdb.basic;
 
-import org.junit.Test;
+import org.linguafranca.pwdb.Icon;
 
-import static org.linguafranca.pwdb.PropertyValueUtil.genericTest;
+public class BasicIcon implements Icon {
+    private int index;
 
-public class SecureCharBufferPropertyValueTest {
-
-    @Test
-    public void storageTest(){
-        genericTest(new SecureCharBufferPropertyValue.Factory(), false);
+    public BasicIcon() {
     }
 
+    public BasicIcon(Integer i) {
+        this.index = i;
+    }
+
+    @Override
+    public int getIndex() {
+        return index;
+    }
+
+    @Override
+    public void setIndex(int index) {
+        this.index = index;
+    }
 }

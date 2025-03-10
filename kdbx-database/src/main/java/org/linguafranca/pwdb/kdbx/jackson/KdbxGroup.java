@@ -286,7 +286,6 @@ public class KdbxGroup extends AbstractGroup{
         touch();
     }
 
-    @NotNull
     @Override
     public KdbxDatabase getDatabase() {
         return database;

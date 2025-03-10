@@ -17,8 +17,6 @@
 
 package org.linguafranca.pwdb.kdb;
 
-import org.jetbrains.annotations.NotNull;
-import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.abstractdb.AbstractGroup;
@@ -215,7 +213,6 @@ public class KdbGroup extends AbstractGroup {
         return getPath() + String.format(" (%s) %s [%d]", uuid.toString(), time, flags);
     }
 
-    @NotNull
     public KdbDatabase getDatabase() {
         return database;
     }

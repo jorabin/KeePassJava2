@@ -70,7 +70,7 @@ public class BasicGroup extends AbstractGroup {
     }
 
     @Override
-    public List<? extends Group> getGroups() {
+    public List<Group> getGroups() {
         return Collections.unmodifiableList(groups);
     }
 
@@ -92,7 +92,7 @@ public class BasicGroup extends AbstractGroup {
     }
 
     @Override
-    public List<? extends Entry> getEntries() {
+    public List<Entry> getEntries() {
         return Collections.unmodifiableList(entries);
     }
 
@@ -138,7 +138,7 @@ public class BasicGroup extends AbstractGroup {
     }
 
     @Override
-    public @NotNull Database getDatabase() {
+    public Database getDatabase() {
         return this.database;
     }
 }
