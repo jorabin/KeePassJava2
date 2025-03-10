@@ -71,12 +71,12 @@ public abstract class AbstractDatabase implements Database {
     }
 
     @Override
-    public List<? extends Entry> findEntries(Entry.Matcher matcher) {
+    public List<Entry> findEntries(Entry.Matcher matcher) {
         return getRootGroup().findEntries(matcher, true);
     }
 
     @Override
-    public List<? extends Entry> findEntries(String find) {
+    public List<Entry> findEntries(String find) {
         return getRootGroup().findEntries(find, true);
     }
 

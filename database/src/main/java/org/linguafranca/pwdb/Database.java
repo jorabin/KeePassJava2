@@ -193,7 +193,7 @@ public interface Database {
      * @param matcher the matcher to use
      * @return a list of entries
      */
-    List<? extends Entry> findEntries(Entry.Matcher matcher);
+    List<Entry> findEntries(Entry.Matcher matcher);
 
     /**
      * Find all entries that match {@link Entry#match(String)}
@@ -201,7 +201,7 @@ public interface Database {
      * @param find string to find
      * @return a list of entries
      */
-    List<? extends Entry> findEntries(String find);
+    List<Entry> findEntries(String find);
 
     /**
      * Gets the name of the database or null if not supported

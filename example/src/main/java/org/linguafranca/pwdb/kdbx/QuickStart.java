@@ -68,11 +68,39 @@ public abstract class QuickStart {
                 .addProperty(USER_NAME, "Alice")
                 .addProperty(PASSWORD, "123".getBytes());
 
+        // find entries just added, in V3 the findEntries return value is just List<Entry>
+        List<Entry> entries = database.findEntries("entry");
+
         // V3 KdbxCreds now called KdbxCredentials
         KdbxCredentials credentials = new KdbxCredentials("123".getBytes());
         try (OutputStream outputStream = Files.newOutputStream(Path.of(TEST_OUTPUT_DIR, "test.kdbx"))) {
             database.save(credentials, outputStream);
         }
+    }
+
+    /**
+     * Illustrates the fluent API for creating a database, as well as the various ways of setting property values.
+     */
+    public void fluentExample() {
+        Database database = new KdbxDatabase();
+        database.getRootGroup().addGroup("Group 1")
+                .addEntry("as property values determined by the database property value strategy (preferred)")
+                    .addProperty("prop1", "value1".getBytes())
+                    .addProperty("prop2", "value2")
+                    .addProperty("prop3", "value3")
+                .addEntry("as non default storage type (according to PropertyValueStrategy)  property values")
+                    .setPropertyValue("prop1", database.getPropertyValueStrategy().newProtected().of("value1"))
+                    .setPropertyValue("prop2", database.getPropertyValueStrategy().newUnprotected().of("value2"))
+                .addEntry("as explicit storage type property values")
+                    .setPropertyValue("prop1", new PropertyValue.BytesStore("value1".getBytes()))
+                    .setPropertyValue("prop2", new PropertyValue.SealedStore("value2"))
+                .addEntry("as strings")
+                    .setProperty("prop1", "value1")
+                    .setProperty("prop2", "value2")
+                    .setProperty("prop3", "value3");
+
+        // find entries just added, in V3 the findEntries return value is just List<Entry>
+        List<Entry> entries = database.findEntries("prop");
     }
 
     /**
@@ -129,7 +157,7 @@ public abstract class QuickStart {
      * Group by title
      */
     public Group groupByTitle(Database database) {
-        List<? extends Entry> entries =
+        List<Entry> entries =
                 database.findEntries(entry -> entry.getProperty(Entry.STANDARD_PROPERTY_NAME_TITLE).toLowerCase().contains("findme!"));
         // create a new group using DB factory method
         Group newParent = database.newGroup("Found entries");

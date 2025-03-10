@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 /**
  * Interface for a Database Group.
@@ -73,7 +72,7 @@ public interface Group {
      *
      * @return a modifiable list of groups
      */
-    List<? extends Group> getGroups();
+    List<Group> getGroups();
 
     /**
      * Returns the number of groups that are direct children of this group
@@ -110,7 +109,7 @@ public interface Group {
      * @param groupName the name of the groups sought
      * @return a modifiable list
      */
-    List<? extends Group> findGroups(String groupName);
+    List<Group> findGroups(String groupName);
 
     /**
      * Removes the group supplied from this group. The group removed
@@ -129,7 +128,7 @@ public interface Group {
     /**
      * Returns a modifiable by the caller list of entries contained in this group.
      */
-    List<? extends Entry> getEntries();
+    List<Entry> getEntries();
 
     /**
      * Returns the number of entries in this group
@@ -152,7 +151,7 @@ public interface Group {
      * @return a modifiable-by-caller list
      * @see Entry#match(String)
      */
-    List<? extends Entry> findEntries(String match, boolean recursive);
+    List<Entry> findEntries(String match, boolean recursive);
 
     /**
      * Finds all entries in this group that match using the matcher supplied.
@@ -167,7 +166,7 @@ public interface Group {
      * @return a modifiable-by-caller list
      * @see Entry#match(Entry.Matcher)
      */
-    List<? extends Entry> findEntries(Entry.Matcher matcher, boolean recursive);
+    List<Entry> findEntries(Entry.Matcher matcher, boolean recursive);
 
     /**
      * Adds an entry to this group removing it from another group
