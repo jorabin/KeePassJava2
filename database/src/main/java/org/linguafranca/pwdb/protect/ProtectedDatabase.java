@@ -18,7 +18,7 @@
 package org.linguafranca.pwdb.protect;
 
 import org.linguafranca.pwdb.*;
-import org.linguafranca.pwdb.base.AbstractDatabase;
+import org.linguafranca.pwdb.abstractdb.AbstractDatabase;
 
 import java.util.Collections;
 import java.util.List;

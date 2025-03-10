@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
-import org.linguafranca.pwdb.base.AbstractGroup;
+import org.linguafranca.pwdb.abstractdb.AbstractGroup;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;

@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Entry;
 
 import org.linguafranca.pwdb.Icon;
-import org.linguafranca.pwdb.base.AbstractEntry;
+import org.linguafranca.pwdb.abstractdb.AbstractEntry;
 
 import java.util.ArrayList;
 import java.util.Date;

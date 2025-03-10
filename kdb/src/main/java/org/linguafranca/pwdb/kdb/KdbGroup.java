@@ -20,7 +20,7 @@ package org.linguafranca.pwdb.kdb;
 import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
-import org.linguafranca.pwdb.base.AbstractGroup;
+import org.linguafranca.pwdb.abstractdb.AbstractGroup;
 import org.linguafranca.pwdb.Entry;
 
 import java.util.ArrayList;
