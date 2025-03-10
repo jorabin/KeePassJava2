@@ -182,7 +182,7 @@ public class KdbxGroup extends AbstractGroup{
     }
 
     @Override
-    public List<KdbxGroup> getGroups() {
+    public List<Group> getGroups() {
         return new ArrayList<>(groups);
     }
 
@@ -223,7 +223,7 @@ public class KdbxGroup extends AbstractGroup{
     }
 
     @Override
-    public List<KdbxEntry> getEntries() {
+    public List<Entry> getEntries() {
         return new ArrayList<>(this.entries);
     }
 

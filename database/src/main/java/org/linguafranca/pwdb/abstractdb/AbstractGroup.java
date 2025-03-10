@@ -50,7 +50,7 @@ public abstract class AbstractGroup implements Group {
     }
 
     @Override
-    public List<? extends Group> findGroups(String group) {
+    public List<Group> findGroups(String group) {
         ArrayList<Group> result = new ArrayList<>();
         for (Group g: getGroups()) {
             if (g.getName().equals(group)) {
@@ -61,12 +61,12 @@ public abstract class AbstractGroup implements Group {
     }
 
     @Override
-    public List<? extends Entry> findEntries(String find, boolean recursive) {
+    public List<Entry> findEntries(String find, boolean recursive) {
         return findEntries(entry -> entry.match(find), recursive);
     }
 
     @Override
-    public List<? extends Entry> findEntries(Entry.Matcher matcher, boolean recursive) {
+    public List<Entry> findEntries(Entry.Matcher matcher, boolean recursive) {
         List <Entry> result = new ArrayList<>(getEntries().size());
         for (Entry entry: getEntries()){
             if (entry.match(matcher)){

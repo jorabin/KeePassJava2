@@ -106,8 +106,8 @@ public class KdbSerializer {
     }
 
     private static void setDatabase(KdbDatabase kdbDatabase, KdbGroup group) {
-        for (KdbGroup child: group.getGroups()){
-            ((KdbGroup) child).database = kdbDatabase;
+        for (KdbGroup child: group.groups){
+            child.database = kdbDatabase;
             setDatabase(kdbDatabase, child);
         }
     }

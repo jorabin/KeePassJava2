@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
-import org.linguafranca.pwdb.abstractdb.AbstractEntry;
 import org.linguafranca.pwdb.abstractdb.AbstractGroup;
 import org.linguafranca.pwdb.Entry;
 
@@ -41,8 +40,8 @@ public class KdbGroup extends AbstractGroup {
     private UUID uuid = UUID.randomUUID();
     private String name = "";
     private Icon icon = new KdbIcon(0);
-    private List<KdbGroup> groups = new ArrayList<>();
-    private List<KdbEntry> entries = new ArrayList<>();
+    protected List<KdbGroup> groups = new ArrayList<>();
+    protected List<KdbEntry> entries = new ArrayList<>();
     private Date creationTime;
     private Date lastModificationTime;
     private Date lastAccessTime;
@@ -76,7 +75,7 @@ public class KdbGroup extends AbstractGroup {
     }
 
     @Override
-    public List<KdbEntry> getEntries() {
+    public List<Entry> getEntries() {
         return new ArrayList<>(entries);
     }
 
@@ -174,7 +173,7 @@ public class KdbGroup extends AbstractGroup {
     }
 
     @Override
-    public List<KdbGroup> getGroups() {
+    public List<Group> getGroups() {
         return new ArrayList<>(groups);
     }
 
