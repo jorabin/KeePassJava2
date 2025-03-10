@@ -22,7 +22,7 @@ import org.junit.Test;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.*;
-import static org.linguafranca.pwdb.util.PropertyValueUtil.genericTest;
+import static org.linguafranca.pwdb.PropertyValueUtil.genericTest;
 
 public class PropertyValueTest {
 

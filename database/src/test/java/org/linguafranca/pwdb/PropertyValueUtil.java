@@ -15,9 +15,7 @@
  *
  */
 
-package org.linguafranca.pwdb.util;
-
-import org.linguafranca.pwdb.PropertyValue;
+package org.linguafranca.pwdb;
 
 import java.nio.charset.StandardCharsets;
 

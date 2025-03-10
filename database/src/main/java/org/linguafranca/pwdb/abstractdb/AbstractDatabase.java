@@ -15,7 +15,7 @@
  *
  */
 
-package org.linguafranca.pwdb.base;
+package org.linguafranca.pwdb.abstractdb;
 
 import org.linguafranca.pwdb.*;
 

@@ -80,6 +80,9 @@
         <maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
         <versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
         <maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
+
+        <junit.version>5.8.1</junit.version>
+        <junit.platform.version>1.8.2</junit.platform.version>
         <!-- reduce the chattiness of output - see profile of same name below -->
         <inhibitConsoleOutput>false</inhibitConsoleOutput>
     </properties>
@@ -199,9 +202,24 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.vintage</groupId>
+            <artifactId>junit-vintage-engine</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>${junit.platform.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-runner</artifactId>
+            <version>${junit.platform.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
