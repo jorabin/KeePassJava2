@@ -19,6 +19,8 @@ package org.linguafranca.pwdb.basic;
 
 import org.linguafranca.pwdb.Icon;
 
+import java.util.Objects;
+
 public class BasicIcon implements Icon {
     private int index;
 
@@ -37,5 +39,17 @@ public class BasicIcon implements Icon {
     @Override
     public void setIndex(int index) {
         this.index = index;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof BasicIcon)) return false;
+        BasicIcon basicIcon = (BasicIcon) o;
+        return index == basicIcon.index;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(index);
     }
 }

@@ -166,6 +166,11 @@ public class KdbxDatabase extends ProtectedDatabase {
     }
 
     @Override
+    public boolean supportsRecycleBin() {
+        return true;
+    }
+
+    @Override
     public String getName() {
         return keePassFile.meta.databaseName;
     }

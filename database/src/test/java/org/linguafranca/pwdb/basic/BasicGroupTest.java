@@ -90,7 +90,12 @@ class BasicGroupTest {
     void testRemoveGroup() {
         Group subGroup = new BasicGroup(new BasicDatabase());
         group.addGroup(subGroup);
+        assertTrue(group.getGroups().contains(subGroup));
+        assertEquals(1, group.getGroups().size());
+        assertEquals(group, subGroup.getParent());
         group.removeGroup(subGroup);
+        assertEquals(0, group.getGroups().size());
+        assertNull(subGroup.getParent());
         assertFalse(group.getGroups().contains(subGroup));
     }
 
@@ -107,13 +112,12 @@ class BasicGroupTest {
 
     @Test
     void testGetIcon() {
-        assertNull(group.getIcon());
+        assertEquals(0, group.getIcon().getIndex());
     }
 
     @Test
     void testSetIcon() {
-        group.setIcon(new BasicIcon() {
-        });
-        assertNotNull(group.getIcon());
+        group.setIcon(new BasicIcon(1));
+        assertEquals(1, group.getIcon().getIndex());
     }
 }

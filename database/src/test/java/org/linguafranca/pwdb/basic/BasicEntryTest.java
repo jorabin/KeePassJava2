@@ -156,6 +156,6 @@ class BasicEntryTest {
 
     @Test
     void testGetLastModificationTime() {
-        assertNull(entry.getLastModificationTime());
+        assertEquals(entry.getCreationTime(), entry.getLastModificationTime());
     }
 }

@@ -125,8 +125,7 @@ public interface PropertyValue {
 
             @Override
             public List<String> getProtectedProperties() {
-                //noinspection ArraysAsListWithZeroOrOneArgument
-                return new ArrayList<>(Arrays.asList(Entry.STANDARD_PROPERTY_NAME_PASSWORD));
+                return List.of(Entry.STANDARD_PROPERTY_NAME_PASSWORD);
             }
 
             @Override

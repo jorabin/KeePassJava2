@@ -42,6 +42,8 @@ public class BasicGroup extends AbstractGroup {
     BasicGroup(@NotNull BasicDatabase database) {
         this.database = database;
         this.uuid = UUID.randomUUID();
+        this.icon = new BasicIcon();
+        this.name = "";
     }
 
     BasicGroup(@NotNull BasicDatabase database, String name) {
@@ -71,7 +73,7 @@ public class BasicGroup extends AbstractGroup {
 
     @Override
     public List<Group> getGroups() {
-        return Collections.unmodifiableList(groups);
+        return new ArrayList<>(groups);
     }
 
     @Override
@@ -81,13 +83,17 @@ public class BasicGroup extends AbstractGroup {
 
     @Override
     public Group addGroup(Group group) {
-        groups.add((BasicGroup) group);
+        BasicGroup basicGroup = (BasicGroup) group;
+        groups.add(basicGroup);
+        basicGroup.parent = this;
         return group;
     }
 
     @Override
     public Group removeGroup(Group group) {
-        groups.remove((BasicGroup) group);
+        BasicGroup basicGroup = (BasicGroup) group;
+        groups.remove(basicGroup);
+        basicGroup.parent = null;
         return group;
     }
 
@@ -103,12 +109,17 @@ public class BasicGroup extends AbstractGroup {
 
     @Override
     public Entry addEntry(Entry entry) {
-        entries.add((BasicEntry) entry);
+        BasicEntry basicEntry = (BasicEntry) entry;
+        entries.add(basicEntry);
+        basicEntry.parent = this;
         return entry;
     }
 
     @Override
     public Entry removeEntry(Entry entry) {
+        BasicEntry basicEntry = (BasicEntry) entry;
+        entries.remove(basicEntry);
+        (basicEntry).parent = null;
         return entry;
     }
 

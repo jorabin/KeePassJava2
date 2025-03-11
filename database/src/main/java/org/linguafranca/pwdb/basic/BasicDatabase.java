@@ -23,6 +23,7 @@ import org.linguafranca.pwdb.protect.ProtectedDatabase;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.UUID;
 
 public class BasicDatabase extends ProtectedDatabase {
     private final Group root;

@@ -34,7 +34,7 @@ public class BasicEntry extends AbstractEntry {
     private final Map<String, PropertyValue> properties = new HashMap<>();
     private final Map<String, PropertyValue> binaries = new HashMap<>();
     private final Instant creationTime;
-    private Group parent;
+    protected Group parent;
     private Icon icon;
     private Instant expiryTime;
     private Instant accessTime;
@@ -46,6 +46,9 @@ public class BasicEntry extends AbstractEntry {
         this.database = basicDatabase;
         this.uuid = UUID.randomUUID();
         this.creationTime = Instant.now();
+        for (String name : Entry.STANDARD_PROPERTY_NAMES) {
+            properties.put(name, new PropertyValue.StringStore(""));
+        }
     }
 
     @Override
@@ -71,6 +74,12 @@ public class BasicEntry extends AbstractEntry {
 
     @Override
     public boolean removeProperty(String name) throws IllegalArgumentException, UnsupportedOperationException {
+        if (Entry.STANDARD_PROPERTY_NAMES.contains(name)) {
+            throw new IllegalArgumentException("Cannot remove standard property");
+        }
+        if (!database.supportsNonStandardPropertyNames()) {
+            throw new UnsupportedOperationException("Database does not support non-standard properties");
+        }
         boolean exists = properties.containsKey(name);
         if (exists) {
             updateModifiedTime();
@@ -81,7 +90,7 @@ public class BasicEntry extends AbstractEntry {
 
     @Override
     public List<String> getPropertyNames() {
-        return List.of(properties.keySet().toArray(String[]::new));
+        return new ArrayList<>(properties.keySet());
     }
 
     @Override
@@ -167,6 +176,9 @@ public class BasicEntry extends AbstractEntry {
 
     @Override
     public Date getLastModificationTime() {
+        if (modifiedTime == null) {
+            return fromInstant(this.creationTime);
+        }
         return fromInstant(this.modifiedTime);
     }
 

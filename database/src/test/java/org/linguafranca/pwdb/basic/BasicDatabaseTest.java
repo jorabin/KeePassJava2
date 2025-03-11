@@ -17,85 +17,43 @@
 
 package org.linguafranca.pwdb.basic;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Group;
-import org.linguafranca.pwdb.Icon;
+import org.linguafranca.pwdb.Database;
+import org.linguafranca.pwdb.test.CrudDatabaseTest;
+import org.linguafranca.pwdb.test.RecycleBinTest;
+import org.linguafranca.pwdb.test.ProtectedPropertyTest;
+import org.linguafranca.pwdb.test.TrivialDatabaseTest;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class BasicDatabaseTest implements
+        TrivialDatabaseTest,
+        CrudDatabaseTest,
+        RecycleBinTest,
+        ProtectedPropertyTest {
 
-class BasicDatabaseTest {
+    Database database;
 
-    private BasicDatabase database;
-
-    @BeforeEach
-    void setUp() {
-        database = new BasicDatabase();
+    /**
+     * Create a new database
+     */
+    @Override
+    public Database createDatabase() {
+        return new BasicDatabase();
     }
 
-    @Test
-    void testGetRootGroup() {
-        Group root = database.getRootGroup();
-        assertNotNull(root);
-        assertEquals("Root", root.getName());
+    /**
+     * Create a new database for default use in tests
+     */
+    @Override
+    public void newDatabase() {
+        database = createDatabase();
     }
 
-    @Test
-    void testNewGroup() {
-        Group group = database.newGroup();
-        assertNotNull(group);
+    /**
+     * Get the current default database
+     */
+    @Override
+    public Database getDatabase() {
+        return database;
     }
 
-    @Test
-    void testNewEntry() {
-        Entry entry = database.newEntry();
-        assertNotNull(entry);
-    }
 
-    @Test
-    void testNewIcon() {
-        Icon icon = database.newIcon();
-        assertNotNull(icon);
-    }
-
-    @Test
-    void testNewIconWithInteger() {
-        Icon icon = database.newIcon(1);
-        assertNotNull(icon);
-    }
-
-    @Test
-    void testIsRecycleBinEnabled() {
-        assertFalse(database.isRecycleBinEnabled());
-    }
-
-    @Test
-    void testEnableRecycleBin() {
-        assertThrows(UnsupportedOperationException.class, () -> database.enableRecycleBin(true));
-    }
-
-    @Test
-    void testGetRecycleBin() {
-        assertNull(database.getRecycleBin());
-    }
-
-    @Test
-    void testGetName() {
-        assertNull(database.getName());
-    }
-
-    @Test
-    void testGetSetDescription() {
-        assertNull(database.getDescription());
-        database.setName("Test Database");
-        assertEquals("Test Database", database.getName());
-    }
-
-    @Test
-    void testSetDescription() {
-        database.setDescription("Test Description");
-        assertEquals("Test Description", database.getDescription());
-    }
 }

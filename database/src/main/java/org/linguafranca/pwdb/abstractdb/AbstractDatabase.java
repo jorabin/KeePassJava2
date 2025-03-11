@@ -232,7 +232,7 @@ public abstract class AbstractDatabase implements Database {
 
     @Override
     public boolean supportsRecycleBin() {
-        return true;
+        return false;
     }
 
     @Override
