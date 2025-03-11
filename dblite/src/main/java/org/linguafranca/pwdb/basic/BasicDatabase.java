@@ -23,19 +23,15 @@ import org.linguafranca.pwdb.protect.ProtectedDatabase;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Stack;
 
 /**
  * A basic implementation of a Database
  */
 public class BasicDatabase extends ProtectedDatabase {
-    private final Group root;
+    private final BasicGroup root = new BasicGroup(this, "Root");
     private String databaseName;
     private String databaseDescription;
-
-    public BasicDatabase() {
-        root = new BasicGroup(this);
-        root.setName("Root");
-    }
 
     @Override
     public Group getRootGroup() {
@@ -111,4 +107,43 @@ public class BasicDatabase extends ProtectedDatabase {
     public <C extends StreamConfiguration> StreamFormat<C> getStreamFormat() {
         throw new UnsupportedOperationException();
     }
+
+    /**
+     * A visitor that can be used to fix up the parent and database fields of groups and entries
+     * after deserialization of the database
+     */
+    public static class FixupVisitor implements Visitor{
+        final Stack<Group> stack = new Stack<>();
+        BasicDatabase database;
+
+        public FixupVisitor(BasicDatabase database) {
+            this.database = database;
+        }
+
+        @Override
+        public void startVisit(Group group) {
+            ((BasicGroup) group).database = database;
+            if (!stack.isEmpty()) {
+                ((BasicGroup) group).parent = (BasicGroup) stack.peek();
+            }
+            stack.push(group);
+        }
+
+        @Override
+        public void endVisit(Group group) {
+            stack.pop();
+        }
+
+        @Override
+        public void visit(Entry entry) {
+            ((BasicEntry) entry).database = database;
+            ((BasicEntry) entry).parent = stack.peek();
+        }
+
+        @Override
+        public boolean isEntriesFirst() {
+            return false;
+        }
+
+    };
 }

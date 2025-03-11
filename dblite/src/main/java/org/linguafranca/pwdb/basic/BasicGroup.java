@@ -31,19 +31,23 @@ import java.util.List;
 import java.util.UUID;
 
 public class BasicGroup extends AbstractGroup {
-    private BasicGroup parent;
+    BasicGroup parent;
     private final List<BasicGroup> groups = new ArrayList<>();
     private final List<BasicEntry> entries = new ArrayList<>();
     private String name;
-    private Icon icon;
+    private BasicIcon icon;
     private final UUID uuid;
-    private final @NotNull BasicDatabase database;
+    BasicDatabase database;
 
-    BasicGroup(@NotNull BasicDatabase database) {
-        this.database = database;
+    BasicGroup () {
+        this.database = null;
         this.uuid = UUID.randomUUID();
         this.icon = new BasicIcon();
         this.name = "";
+    }
+    BasicGroup(@NotNull BasicDatabase database) {
+        this();
+        this.database = database;
     }
 
     BasicGroup(@NotNull BasicDatabase database, String name) {
@@ -145,7 +149,7 @@ public class BasicGroup extends AbstractGroup {
 
     @Override
     public void setIcon(Icon icon) {
-        this.icon = icon;
+        this.icon = (BasicIcon) icon;
     }
 
     @Override

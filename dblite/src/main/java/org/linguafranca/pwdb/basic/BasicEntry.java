@@ -29,26 +29,30 @@ import java.time.Instant;
 import java.util.*;
 
 public class BasicEntry extends AbstractEntry {
-    private final BasicDatabase database;
+    BasicDatabase database;
     private final UUID uuid;
     private final Map<String, PropertyValue> properties = new HashMap<>();
     private final Map<String, PropertyValue> binaries = new HashMap<>();
     private final Instant creationTime;
     protected Group parent;
-    private Icon icon;
+    private BasicIcon icon;
     private Instant expiryTime;
     private Instant accessTime;
     private Instant modifiedTime;
     private boolean isExpires;
 
 
-    public BasicEntry(BasicDatabase basicDatabase) {
-        this.database = basicDatabase;
+    public BasicEntry() {
         this.uuid = UUID.randomUUID();
         this.creationTime = Instant.now();
         for (String name : Entry.STANDARD_PROPERTY_NAMES) {
             properties.put(name, new PropertyValue.StringStore(""));
         }
+    }
+
+    public BasicEntry(BasicDatabase basicDatabase) {
+        this();
+        this.database = basicDatabase;
     }
 
     @Override
@@ -58,6 +62,9 @@ public class BasicEntry extends AbstractEntry {
 
     @Override
     public String getProperty(String name) {
+        if (!STANDARD_PROPERTY_NAMES.contains(name) && !database.supportsNonStandardPropertyNames()) {
+            throw new IllegalArgumentException("Property " + name + " is not a standard property name");
+        }
         if (!properties.containsKey(name)) {
             return null;
         }
@@ -93,6 +100,30 @@ public class BasicEntry extends AbstractEntry {
         return new ArrayList<>(properties.keySet());
     }
 
+    @Override
+    public PropertyValue getPropertyValue(String name) {
+        return properties.get(name);
+    }
+
+    @Override
+    public Entry setPropertyValue(String name, PropertyValue value) {
+        properties.put(name, value);
+        return this;
+    }
+
+    public Entry addProperty(String name, byte[] value){
+        properties.put(name, database.getPropertyValueStrategy().getFactoryFor(name).of(value));
+        return this;
+    }
+    public Entry addProperty(String name, char[] value) {
+        properties.put(name, database.getPropertyValueStrategy().getFactoryFor(name).of(value));
+        return this;
+    }
+
+    public Entry addProperty(String name, CharSequence value){
+        properties.put(name, database.getPropertyValueStrategy().getFactoryFor(name).of(value));
+        return this;
+    }
     @Override
     public byte[] getBinaryProperty(String name) {
         if (!binaries.containsKey(name)) {
@@ -138,7 +169,7 @@ public class BasicEntry extends AbstractEntry {
 
     @Override
     public void setIcon(Icon icon) {
-        this.icon = icon;
+        this.icon = (BasicIcon) icon;
     }
 
     @Override

@@ -32,6 +32,7 @@
 		<module>kdbx-database</module>
 		<module>all</module>
 		<module>example</module>
+		<module>dblite</module>
 	</modules>
 	<packaging>pom</packaging>
 
