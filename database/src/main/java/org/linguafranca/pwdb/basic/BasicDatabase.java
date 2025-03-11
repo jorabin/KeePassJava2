@@ -23,8 +23,10 @@ import org.linguafranca.pwdb.protect.ProtectedDatabase;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.UUID;
 
+/**
+ * A basic implementation of a Database
+ */
 public class BasicDatabase extends ProtectedDatabase {
     private final Group root;
     private String databaseName;
@@ -93,7 +95,6 @@ public class BasicDatabase extends ProtectedDatabase {
     @Override
     public void setDescription(String description) {
         this.databaseDescription = description;
-
     }
 
     @Override

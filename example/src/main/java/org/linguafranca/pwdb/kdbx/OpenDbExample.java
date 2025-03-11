@@ -29,6 +29,8 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * Example and naive speed test for various implementations.
+ * <p>
+ * This isn't really very interesting in V3 but remains here in case new implementations are added.
  *
  * @author jo
  */

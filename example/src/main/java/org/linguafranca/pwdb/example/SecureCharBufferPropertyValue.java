@@ -25,7 +25,8 @@ import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
- * SecureCharBufferPropertyValue uses {@link SecureCharBuffer}
+ * This is an example of a PropertyValue implementation that uses {@link SecureCharBuffer}
+ * to store the value in memory.
  */
 public class SecureCharBufferPropertyValue implements PropertyValue {
     private final SecureCharBuffer value;

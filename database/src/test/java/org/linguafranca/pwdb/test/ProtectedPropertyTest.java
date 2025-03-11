@@ -31,13 +31,6 @@ import static org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME.USER_NAME;
 
 public interface ProtectedPropertyTest {
 
-    class MutableProtectionStrategy extends PropertyValue.Strategy.Default {
-        List<String> protectedProperties = new ArrayList<>();
-        @Override
-        public List<String> getProtectedProperties() {
-            return protectedProperties;
-        }
-    }
     void newDatabase();
     
     Database getDatabase();
@@ -58,7 +51,7 @@ public interface ProtectedPropertyTest {
 
     @Test
     default void testSetShouldProtect() {
-        getDatabase().setPropertyValueStrategy(new MutableProtectionStrategy());
+        getDatabase().setPropertyValueStrategy(new PropertyValue.Strategy.MutableProtectionStrategy());
         String propertyName = PASSWORD;
         getDatabase().setShouldProtect(propertyName, true);
         assertTrue(getDatabase().shouldProtect(propertyName));
@@ -69,7 +62,7 @@ public interface ProtectedPropertyTest {
 
     @Test
     default void testListShouldProtect() {
-        getDatabase().setPropertyValueStrategy(new MutableProtectionStrategy());
+        getDatabase().setPropertyValueStrategy(new PropertyValue.Strategy.MutableProtectionStrategy());
         String propertyName1 = PASSWORD;
         String propertyName2 = USER_NAME;
         getDatabase().setShouldProtect(propertyName1, true);

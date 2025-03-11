@@ -18,14 +18,14 @@
 package org.linguafranca.pwdb.basic;
 
 import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.test.CrudDatabaseTest;
+import org.linguafranca.pwdb.test.GroupsAndEntriesTest;
 import org.linguafranca.pwdb.test.RecycleBinTest;
 import org.linguafranca.pwdb.test.ProtectedPropertyTest;
 import org.linguafranca.pwdb.test.TrivialDatabaseTest;
 
 public class BasicDatabaseTest implements
         TrivialDatabaseTest,
-        CrudDatabaseTest,
+        GroupsAndEntriesTest,
         RecycleBinTest,
         ProtectedPropertyTest {
 

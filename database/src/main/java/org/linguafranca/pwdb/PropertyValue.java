@@ -17,8 +17,6 @@
 
 package org.linguafranca.pwdb;
 
-import com.google.common.base.Charsets;
-
 import javax.crypto.Cipher;
 import javax.crypto.SealedObject;
 import javax.crypto.SecretKey;
@@ -63,7 +61,7 @@ public interface PropertyValue {
 
     static char[] bytesToChars(byte[] value) {
         ByteBuffer bb = ByteBuffer.wrap(value);
-        CharBuffer cb = Charsets.UTF_8.decode(bb);
+        CharBuffer cb = StandardCharsets.UTF_8.decode(bb);
         char[] chars = new char[cb.limit()];
         cb.get(chars);
         return chars;
@@ -121,6 +119,10 @@ public interface PropertyValue {
                     newUnprotected();
         }
 
+        /**
+         * The default implementation of the Strategy interface in which the only protected property is Password.
+         * It uses SealedStore and BytesStore for protected and unprotected properties. It is immutable.
+         */
         class Default implements Strategy {
 
             @Override
@@ -138,10 +140,23 @@ public interface PropertyValue {
                 return BytesStore.getFactory();
             }
         }
+
+        /**
+         * A mutable implementation of the Strategy interface, which allows the protected properties to be set.
+         * By default, the only protected property is Password.
+         * It uses SealedStore and BytesStore for protected and unprotected properties.
+         */
+        class MutableProtectionStrategy extends PropertyValue.Strategy.Default {
+            List<String> protectedProperties = new ArrayList<>();
+            @Override
+            public List<String> getProtectedProperties() {
+                return protectedProperties;
+            }
+        }
     }
 
     /**
-     * Values are stored as strings.
+     * Property Values are stored as strings.
      */
     class StringStore implements PropertyValue {
         private final String value;
@@ -232,6 +247,7 @@ public interface PropertyValue {
         public static PropertyValue.Factory<BytesStore> getFactory() {
             return factory;
         }
+
         public BytesStore(CharSequence aString) {
             this.value = charSequenceToBytes(aString);
         }
@@ -246,13 +262,13 @@ public interface PropertyValue {
 
         @Override
         public String getValueAsString() {
-            return new String(this.value);
+            return new String(this.value, StandardCharsets.UTF_8);
         }
 
         @Override
         public CharSequence getValue() {
             ByteBuffer bb = ByteBuffer.wrap(this.value);
-            return Charsets.UTF_8.decode(bb);
+            return StandardCharsets.UTF_8.decode(bb);
         }
 
         @Override
@@ -431,7 +447,7 @@ public interface PropertyValue {
 
          @Override
         public String getValueAsString() {
-            return new String(getBytes());
+            return new String(getBytes(), StandardCharsets.UTF_8);
         }
 
         @Override

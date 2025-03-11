@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author Jo
  */
-public interface CrudDatabaseTest {
+public interface GroupsAndEntriesTest {
     void newDatabase();
     Database getDatabase();
     Database createDatabase();

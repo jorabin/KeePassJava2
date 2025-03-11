@@ -54,7 +54,7 @@ public abstract class QuickStart {
         // value strategy being to protect field "Password" and no other, all of which are stored as byte[]
         database.setPropertyValueStrategy(new PropertyValue.Strategy.Default());
         // V3 Group is not generified. create a group
-        // V3 add a new group to another group with the name supplied
+        // V3 short-cut add a new group to another group with the name supplied
         Group main = database.getRootGroup().addGroup("Main");
         // V3 fluent building of Entry (using PropertyValueStrategy as set in database to determine protection)
         main.addEntry()
@@ -104,14 +104,14 @@ public abstract class QuickStart {
     }
 
     /**
-     * Load KDBX
+     * Load KDBX from file
      */
     public void loadKdbx() throws IOException {
         // get an input stream
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx")) {
             // password credentials
             Credentials credentials = new KdbxCredentials("123".getBytes());
-            // Jaxb implementation seems a lot faster than the DOM implementation
+            // load the database from the input stream
             Database database = KdbxDatabase.load(credentials, inputStream);
             // visit all groups and entries and list them to console
             database.visit(new Visitor.Print(printStream));
@@ -119,7 +119,7 @@ public abstract class QuickStart {
     }
 
     /**
-     * Save KDBX
+     * Save KDBX to file
      */
 
     private Entry entryFactory(Database database, String s, int e) {
@@ -180,7 +180,6 @@ public abstract class QuickStart {
         Credentials credentials = new KdbCredentials.Password("123".getBytes());
         // load KdbDatabase
         KdbDatabase database = KdbDatabase.load(credentials, inputStream);
-        // visit all groups and entries and list them to console
 
         // create a KDBX (database
         Database kdbxDatabase = new KdbxDatabase();
@@ -210,16 +209,17 @@ public abstract class QuickStart {
         Database kdbxDatabase = new KdbxDatabase();
         kdbxDatabase.setName("New Database");
         kdbxDatabase.setDescription("Migration of KDBX 3 Database to KDBX 4 Database");
-        // deep copy from group (not including source group, KDB database has simulated root)
+        // deep copy from group (not including source group)
         kdbxDatabase.getRootGroup().copy(database.getRootGroup());
 
         // choose a stream format - V4 Kdbx and choose some algorithms
         KdbxHeader kdbxHeader = new KdbxHeader(KdbxHeader.KdbxHeaderOpts.V4_AES_ARGON_CHA_CHA);
-        KdbxStreamFormat formatV4 = new KdbxStreamFormat(kdbxHeader);
         // change algorithm from those originally selected
         kdbxHeader.setCipherAlgorithm(Encryption.Cipher.CHA_CHA_20);
         kdbxHeader.setKeyDerivationFunction(Encryption.KeyDerivationFunction.ARGON2);
         kdbxHeader.setProtectedStreamAlgorithm(Encryption.ProtectedStreamAlgorithm.CHA_CHA_20);
+
+        KdbxStreamFormat formatV4 = new KdbxStreamFormat(kdbxHeader);
 
         // save it with format options
         try (OutputStream v4OutputStream = Files.newOutputStream(v4Filename)) {
@@ -240,7 +240,7 @@ public abstract class QuickStart {
             database = KdbxDatabase.load(credentials, inputStream);
         }
 
-        // create a KDBX (database)
+        // create a KDBX database
         Database kdbxDatabase = new KdbxDatabase();
         kdbxDatabase.setName("New Database");
         kdbxDatabase.setDescription("Migration of KDBX 4 Database to KDBX 3 Database");
