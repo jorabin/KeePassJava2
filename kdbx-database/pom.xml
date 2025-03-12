@@ -25,7 +25,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>KeePassJava2.kdbx.database</artifactId>
-  <name>KeePassJava2 :: Jackson</name>
+  <name>KeePassJava2 :: KDBX-Database</name>
   <description>Contains a Jackson XML implementation for KDBX.</description>
 
   <dependencies>

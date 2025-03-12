@@ -17,10 +17,7 @@
 
 package org.linguafranca.pwdb.basic;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.*;
@@ -80,7 +77,9 @@ public interface BasicDatabaseSerializer {
         private ObjectMapper init() {
             SimpleModule module = new SimpleModule()
                     .addDeserializer(PropertyValue.class, new PropertyValueDeserializer())
-                    .addSerializer(PropertyValue.class, new PropertyValueSerializer());
+                    .addSerializer(PropertyValue.class, new PropertyValueSerializer())
+                    .addDeserializer(BasicIcon.class, new IconDeserializer())
+                    .addSerializer(BasicIcon.class, new IconSerializer());
             XmlMapper mapper = XmlMapper.builder()
                     // ignore everything except fields
                     .visibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY)
@@ -135,15 +134,29 @@ public interface BasicDatabaseSerializer {
             public void serialize(PropertyValue value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
 
                 final ToXmlGenerator xmlGenerator = (ToXmlGenerator) gen;
+                // find out of we are serializing binaries
+                Object c = xmlGenerator.getOutputContext().getParent().getCurrentName();
+                boolean asBinary = c.equals("binaries");
                 xmlGenerator.writeStartObject();
 
                 if (value.isProtected()) {
                     xmlGenerator.setNextIsAttribute(true);
                     xmlGenerator.writeStringField("protected", "true");
+                    asBinary = true; // write password as binary TODO later we can stream encode it
                 }
+
+                if (asBinary) {
+                    xmlGenerator.setNextIsAttribute(true);
+                    xmlGenerator.writeStringField("binary", "true");
+                }
+
                 xmlGenerator.setNextIsAttribute(false);
                 xmlGenerator.setNextIsUnwrapped(true);
-                xmlGenerator.writeStringField("text", value.getValueAsString());
+                if (asBinary) {
+                    xmlGenerator.writeBinaryField("text", value.getValueAsBytes());
+                } else {
+                    xmlGenerator.writeStringField("text", value.getValueAsString());
+                }
                 xmlGenerator.writeEndObject();
             }
         }
@@ -161,10 +174,45 @@ public interface BasicDatabaseSerializer {
                 if (node.isTextual()) {
                     return strategy.newUnprotected().of(node.textValue());
                 }
-                if (node.has("protected")) {
-                    return strategy.newProtected().of(node.get("").asText());
+                if (node.has("protected") || node.has("binary")) {
+                    return strategy.newProtected().of(node.get("").binaryValue());
                 }
                 throw new IllegalStateException("Unknown property value format " + node);
+            }
+        }
+
+        /**
+         * Configure special treatment for serialization of icons
+         */
+        public static class IconSerializer extends JsonSerializer<BasicIcon> {
+            /**
+             * flatten icon representation
+             */
+            @Override
+            public void serialize(BasicIcon icon, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+
+                final ToXmlGenerator xmlGenerator = (ToXmlGenerator) gen;
+                xmlGenerator.writeStartObject();
+                xmlGenerator.setNextIsAttribute(true);
+                xmlGenerator.writeStringField("index", String.valueOf(icon.getIndex()));
+                xmlGenerator.writeEndObject();
+            }
+        }
+
+        /**
+         * Icon deserialization
+         */
+        public static class IconDeserializer extends JsonDeserializer<BasicIcon> {
+            PropertyValue.Strategy strategy = new PropertyValue.Strategy.Default();
+
+            @Override
+            public BasicIcon deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+                JsonNode node = jsonParser.getCodec().readTree(jsonParser);
+
+                if (node.has("index")) {
+                    return new BasicIcon(node.get("index").asInt());
+                }
+                throw new IllegalStateException("Unknown icon value format " + node);
             }
         }
 
@@ -173,9 +221,17 @@ public interface BasicDatabaseSerializer {
          */
         public abstract static class Configuration {
             // Tell Jackson how to treat lists of Entry and Groups
+            @JsonPropertyOrder({ "uuid", "icon", "properties", "binaries" })
+            protected static class BasicEntry {}
+
             @JacksonXmlProperty(localName = "entry")
             @JacksonXmlElementWrapper(useWrapping = false)
+            @JsonPropertyOrder({ "uuid", "icon", "properties", "binaries" })
             protected List<BasicEntry> entries;
+
+            @JsonPropertyOrder({ "uuid", "name", "icon", "group", "entry" })
+            protected static class BasicGroup {};
+
             @JacksonXmlProperty(localName = "group")
             @JacksonXmlElementWrapper(useWrapping = false)
             protected List<BasicGroup> groups;

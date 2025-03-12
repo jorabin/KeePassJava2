@@ -50,25 +50,26 @@ public interface Entry {
      * dedicated methods, such as getPassword, or by {@link #getProperty(String)}
      */
 
+    String STANDARD_PROPERTY_NAME_TITLE = "Title";
     String STANDARD_PROPERTY_NAME_USER_NAME = "UserName";
     String STANDARD_PROPERTY_NAME_PASSWORD = "Password";
     String STANDARD_PROPERTY_NAME_URL = "URL";
-    String STANDARD_PROPERTY_NAME_TITLE = "Title";
     String STANDARD_PROPERTY_NAME_NOTES = "Notes";
 
     /** allows for static import of name */
     interface STANDARD_PROPERTY_NAME {
+        String TITLE = STANDARD_PROPERTY_NAME_TITLE;
         String USER_NAME = STANDARD_PROPERTY_NAME_USER_NAME;
         String PASSWORD = STANDARD_PROPERTY_NAME_PASSWORD;
         String URL = STANDARD_PROPERTY_NAME_URL;
-        String TITLE = STANDARD_PROPERTY_NAME_TITLE;
         String NOTES = STANDARD_PROPERTY_NAME_NOTES;
     }
 
-    List<String> STANDARD_PROPERTY_NAMES = List.of(STANDARD_PROPERTY_NAME_USER_NAME,
+    List<String> STANDARD_PROPERTY_NAMES = List.of(
+            STANDARD_PROPERTY_NAME_TITLE,
+            STANDARD_PROPERTY_NAME_USER_NAME,
             STANDARD_PROPERTY_NAME_PASSWORD,
             STANDARD_PROPERTY_NAME_URL,
-            STANDARD_PROPERTY_NAME_TITLE,
             STANDARD_PROPERTY_NAME_NOTES);
 
     /**

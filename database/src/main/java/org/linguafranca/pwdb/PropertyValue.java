@@ -148,6 +148,9 @@ public interface PropertyValue {
          */
         class MutableProtectionStrategy extends PropertyValue.Strategy.Default {
             List<String> protectedProperties = new ArrayList<>();
+            {
+                protectedProperties.add(Entry.STANDARD_PROPERTY_NAME_PASSWORD);
+            }
             @Override
             public List<String> getProtectedProperties() {
                 return protectedProperties;

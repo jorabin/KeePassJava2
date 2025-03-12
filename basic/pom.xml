@@ -26,7 +26,8 @@
 		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>dblite</artifactId>
+	<artifactId>basic</artifactId>
+	<name>PWDB :: Basic</name>
 
 	<dependencies>
 		<dependency>
@@ -35,30 +36,30 @@
 			<version>2.18.2</version>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.woodstox</groupId>
-			<artifactId>woodstox-core</artifactId>
-			<version>7.1.0</version>
-		</dependency>
-		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
 			<version>2.18.2</version>
 		</dependency>
 		<dependency>
+			<groupId>com.fasterxml.woodstox</groupId>
+			<artifactId>woodstox-core</artifactId>
+			<version>7.1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.linguafranca.pwdb</groupId>
 			<artifactId>database</artifactId>
-			<version>3.0.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.linguafranca.pwdb</groupId>
-			<artifactId>test</artifactId>
+			<artifactId>database</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>
 		</dependency>
 		<dependency>
 			<groupId>org.linguafranca.pwdb</groupId>
-			<artifactId>database</artifactId>
+			<artifactId>test</artifactId>
 			<version>${project.version}</version>
 			<type>test-jar</type>
 		</dependency>

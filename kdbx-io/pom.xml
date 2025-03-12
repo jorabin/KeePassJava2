@@ -26,7 +26,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>KeePassJava2.kdbx.io</artifactId>
-    <name>KeePassJava2 :: KDBX</name>
+    <name>KeePassJava2 :: KDBX-IO</name>
     <description>Base classes and resources for other KDBX modules.
         KDBX Stream Support.
         Security support.

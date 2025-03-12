@@ -30,21 +30,24 @@ import java.util.*;
 
 public class BasicEntry extends AbstractEntry {
     BasicDatabase database;
+    protected Group parent;
+
     private final UUID uuid;
+    private BasicIcon icon;
     private final Map<String, PropertyValue> properties = new HashMap<>();
     private final Map<String, PropertyValue> binaries = new HashMap<>();
+
     private final Instant creationTime;
-    protected Group parent;
-    private BasicIcon icon;
-    private Instant expiryTime;
     private Instant accessTime;
     private Instant modifiedTime;
+    private Instant expiryTime;
     private boolean isExpires;
 
 
     public BasicEntry() {
         this.uuid = UUID.randomUUID();
         this.creationTime = Instant.now();
+        this.icon = new BasicIcon(1);
         for (String name : Entry.STANDARD_PROPERTY_NAMES) {
             properties.put(name, new PropertyValue.StringStore(""));
         }

@@ -26,6 +26,7 @@ import org.linguafranca.pwdb.Visitor;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -41,15 +42,15 @@ class BasicDatabaseSerializerTest {
         database.setName("My Database");
         database.setDescription("A database of passwords");
         database.getRootGroup().addGroup("Group 1")
-                .addEntry()
-                .addProperty(Entry.STANDARD_PROPERTY_NAME.TITLE, "Entry 1")
-                .addProperty(Entry.STANDARD_PROPERTY_NAME.USER_NAME, "John Doe")
-                .addProperty(Entry.STANDARD_PROPERTY_NAME.PASSWORD, "password123".getBytes())
-                .addEntry()
-                .addProperty(Entry.STANDARD_PROPERTY_NAME.TITLE, "Entry 2")
-                .addProperty(Entry.STANDARD_PROPERTY_NAME.USER_NAME, "Jane Doe")
-                .addProperty(Entry.STANDARD_PROPERTY_NAME.PASSWORD, "password123".getBytes())
-                .addProperty("non-standard", "non-standard value");
+                .addEntry("Entry 1")
+                    .addProperty(Entry.STANDARD_PROPERTY_NAME.USER_NAME, "John Doe")
+                    .addProperty(Entry.STANDARD_PROPERTY_NAME.PASSWORD, "password123".getBytes())
+                .addEntry("Entry 2")
+                    .addProperty(Entry.STANDARD_PROPERTY_NAME.USER_NAME, "Jane Doe")
+                    .addProperty(Entry.STANDARD_PROPERTY_NAME.PASSWORD, "password123".getBytes())
+                    .addProperty("non-standard", "non-standard value")
+                .addEntry("Entry 3")
+                    .setBinaryProperty("gif", new byte[]{1, 2, 3, 4, 5});
     }
 
     Visitor visitor = new Visitor() {
@@ -68,8 +69,11 @@ class BasicDatabaseSerializerTest {
         public void visit(Entry entry) {
             System.out.println("Entry: " + entry.getTitle() + " " + entry.getUuid());
                 for (String propertyName: entry.getPropertyNames()) {
-                    System.out.println("  " + propertyName + ": " + entry.getPropertyValue(propertyName));
+                    System.out.println("  " + propertyName + ": " + entry.getPropertyValue(propertyName).getValueAsString());
                 }
+            for (String propertyName: entry.getBinaryPropertyNames()) {
+                System.out.println("  " + propertyName + ": " + Arrays.toString(entry.getBinaryProperty(propertyName)));
+            }
                 Entry entry1 = database.findEntry(entry.getUuid());
                 assertNotNull(entry1, "Entry not found " + entry.getUuid());
                 assertEquals(entry.getPropertyNames().size(), entry1.getPropertyNames().size());

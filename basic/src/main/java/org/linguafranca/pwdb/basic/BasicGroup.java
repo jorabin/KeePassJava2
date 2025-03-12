@@ -32,12 +32,15 @@ import java.util.UUID;
 
 public class BasicGroup extends AbstractGroup {
     BasicGroup parent;
-    private final List<BasicGroup> groups = new ArrayList<>();
-    private final List<BasicEntry> entries = new ArrayList<>();
+    BasicDatabase database;
+    private final UUID uuid;
     private String name;
     private BasicIcon icon;
-    private final UUID uuid;
-    BasicDatabase database;
+
+    private final List<BasicGroup> groups = new ArrayList<>();
+    private final List<BasicEntry> entries = new ArrayList<>();
+
+
 
     BasicGroup () {
         this.database = null;
