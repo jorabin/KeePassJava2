@@ -18,9 +18,10 @@
 package org.linguafranca.pwdb.kdbx.database.validation;
 
 
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.format.Helpers;
@@ -45,14 +46,14 @@ public class Issue33Test {
 
     InputStream inputStream;
 
-    @BeforeClass
+    @BeforeAll
     public static void listXml() throws IOException {
         Files.createDirectories(Paths.get(TEST_OUTPUT_DIR));
         Util.listXml(TEST_RESOURCE, CREDENTIALS, new PrintWriter(TEST_XML_FILE));
         Helpers.isV4.set(true);
     }
 
-    @Before
+    @BeforeEach
     public void refreshInputStream() {
         inputStream = this.getClass().getClassLoader().getResourceAsStream(TEST_RESOURCE);
     }

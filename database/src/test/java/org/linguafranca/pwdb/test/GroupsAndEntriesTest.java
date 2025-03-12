@@ -130,7 +130,7 @@ public interface GroupsAndEntriesTest {
         assertEquals("this looks a little like Entry 2", e1.getNotes());
         e1.setUsername("jake@window.com");
         assertEquals("jake@window.com", e1.getUsername());
-        e1.setPassword("supercalifragelisticexpialidocious");
+        e1.setProperty(PASSWORD, "supercalifragelisticexpialidocious");
         assertEquals("supercalifragelisticexpialidocious", e1.getProperty(PASSWORD));
         e1.setUrl("https://window.com");
         assertEquals("https://window.com", e1.getUrl());

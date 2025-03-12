@@ -17,7 +17,7 @@
 
 package org.linguafranca.pwdb.kdbx.database.validation;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 

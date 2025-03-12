@@ -19,8 +19,8 @@ package org.linguafranca.pwdb.kdbx;
 
 import com.google.common.io.CharStreams;
 import com.google.common.io.LittleEndianDataInputStream;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.linguafranca.pwdb.format.KdbxHeader;
 import org.linguafranca.pwdb.format.KdbxSerializer;
@@ -32,7 +32,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
@@ -41,7 +41,7 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
 public class KdbxHeaderTest {
     static PrintStream printStream = getTestPrintStream();
 
-    @Test @Ignore // can be used for detailed HMAC debugging
+    @Disabled // can be used for detailed HMAC debugging
     public void getHmacStream() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx");
         KdbxHeader header = KdbxSerializer.readOuterHeader(inputStream, new KdbxHeader());

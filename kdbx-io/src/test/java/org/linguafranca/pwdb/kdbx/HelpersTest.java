@@ -17,7 +17,7 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.format.Helpers;
 
 import java.io.PrintStream;
@@ -26,7 +26,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.linguafranca.pwdb.format.Helpers.dateTimeFormatter;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 

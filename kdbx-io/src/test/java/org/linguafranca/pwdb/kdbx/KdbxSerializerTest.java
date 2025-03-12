@@ -18,7 +18,7 @@
 package org.linguafranca.pwdb.kdbx;
 
 import com.google.common.io.CharStreams;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.linguafranca.pwdb.format.KdbxHeader;
@@ -28,7 +28,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**

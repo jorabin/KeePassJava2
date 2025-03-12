@@ -19,7 +19,7 @@ package org.linguafranca.pwdb.kdbx.database;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.format.KdbxCredentials;

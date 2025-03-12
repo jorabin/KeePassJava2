@@ -17,8 +17,8 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.linguafranca.pwdb.format.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
@@ -29,7 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Simple illustration of hooking a SAX parser up to process a KDBX file
@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 public class SimpleQuickStartTest extends QuickStart {
 
 
-    @BeforeClass
+    @BeforeAll
     public static void ensureOutputDir() throws IOException {
         Files.createDirectories(Paths.get(TEST_OUTPUT_DIR));
     }

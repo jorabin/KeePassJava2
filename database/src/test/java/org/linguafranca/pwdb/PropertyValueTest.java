@@ -17,11 +17,14 @@
 
 package org.linguafranca.pwdb;
 
-import org.junit.Test;
+
+
+import org.junit.jupiter.api.Test;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.Assert.*;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.linguafranca.pwdb.PropertyValueUtil.genericTest;
 
 public class PropertyValueTest {

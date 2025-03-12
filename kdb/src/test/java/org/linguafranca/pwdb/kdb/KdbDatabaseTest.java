@@ -17,11 +17,10 @@
 
 package org.linguafranca.pwdb.kdb;
 
-import org.junit.Test;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.test.GroupsAndEntriesTest;
-
-import static org.junit.Assert.assertFalse;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * @author Jo

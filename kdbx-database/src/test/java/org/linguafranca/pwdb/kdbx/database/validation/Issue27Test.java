@@ -18,8 +18,8 @@
 package org.linguafranca.pwdb.kdbx.database.validation;
 
 import com.google.common.io.CharStreams;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.format.Helpers;
 import org.linguafranca.pwdb.format.KdbxCredentials;
@@ -34,7 +34,7 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 public class Issue27Test {
@@ -71,7 +71,7 @@ public class Issue27Test {
         }
     }
 
-    @Test @Ignore
+@Disabled
     public void testIssue27XML() throws IOException {
 
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx");

@@ -17,12 +17,12 @@
 
 package org.linguafranca.pwdb.hashedblock;
 
-import org.junit.Test;
-
+import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**

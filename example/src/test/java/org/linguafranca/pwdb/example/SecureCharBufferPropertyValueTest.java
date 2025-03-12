@@ -17,7 +17,8 @@
 
 package org.linguafranca.pwdb.example;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import static org.linguafranca.pwdb.PropertyValueUtil.genericTest;
 

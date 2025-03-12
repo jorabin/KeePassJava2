@@ -17,7 +17,8 @@
 
 package org.linguafranca.pwdb.kdbx.database.util;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.format.KdbxCredentials;
 
 import java.io.IOException;
@@ -31,7 +32,8 @@ public class UtilTest {
 
     OutputStream outputStream = getTestPrintStream();
 
-    @Test public void listDatabaseTest() throws IOException {
+    @Test
+    public void listDatabaseTest() throws IOException {
         listDatabase("V3-CustomIcon.kdbx", new KdbxCredentials("123".getBytes()), outputStream);
     }
 

@@ -17,13 +17,13 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.format.Helpers;
 
 import java.io.PrintStream;
 import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
