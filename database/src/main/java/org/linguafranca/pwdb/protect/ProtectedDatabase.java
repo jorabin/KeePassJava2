@@ -17,7 +17,8 @@
 
 package org.linguafranca.pwdb.protect;
 
-import org.linguafranca.pwdb.*;
+import org.linguafranca.pwdb.Entry;
+import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.abstractdb.AbstractDatabase;
 
 import java.util.Collections;
@@ -34,21 +35,23 @@ public abstract class ProtectedDatabase extends AbstractDatabase {
     private PropertyValue.Strategy valueStrategy = new PropertyValue.Strategy.Default();
 
     @Override
-    public boolean shouldProtect(String propertyName){
+    public boolean shouldProtect(String propertyName) {
         return valueStrategy.getProtectedProperties().contains(propertyName);
     }
 
     @Override
-    public void setShouldProtect(String propertyName, boolean protect){
+    public void setShouldProtect(String propertyName, boolean protect) {
         if (protect) {
-            valueStrategy.getProtectedProperties().add(propertyName);
+            if (!valueStrategy.getProtectedProperties().contains(propertyName)) {
+                valueStrategy.getProtectedProperties().add(propertyName);
+            }
         } else {
             valueStrategy.getProtectedProperties().remove(propertyName);
         }
     }
 
     @Override
-    public List<String> listShouldProtect(){
+    public List<String> listShouldProtect() {
         return Collections.unmodifiableList(valueStrategy.getProtectedProperties());
     }
 
@@ -56,20 +59,22 @@ public abstract class ProtectedDatabase extends AbstractDatabase {
      * Get the default means of storage of unprotected and protected property values
      */
     @Override
-    public PropertyValue.Strategy getPropertyValueStrategy(){
+    public PropertyValue.Strategy getPropertyValueStrategy() {
         return this.valueStrategy;
     }
+
     /**
      * Set the default means of storage of unprotected and protected property values
+     *
      * @param strategy a property value strategy
      */
     @Override
-    public void setPropertyValueStrategy(PropertyValue.Strategy strategy){
+    public void setPropertyValueStrategy(PropertyValue.Strategy strategy) {
         this.valueStrategy = strategy;
     }
 
     @Override
-    public boolean supportsPropertyValueStrategy(){
+    public boolean supportsPropertyValueStrategy() {
         return true;
     }
 }

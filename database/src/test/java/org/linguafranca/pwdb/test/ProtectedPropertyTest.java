@@ -44,7 +44,7 @@ public interface ProtectedPropertyTest {
     default void testShouldProtect() {
         String propertyName = PASSWORD;
         assertThrows(UnsupportedOperationException.class,
-                () -> getDatabase().setShouldProtect(propertyName, true),
+                () -> getDatabase().setShouldProtect(propertyName, false),
                 "By default the ProtectionStrategy should be immutable");
         assertTrue(getDatabase().shouldProtect(propertyName));
     }

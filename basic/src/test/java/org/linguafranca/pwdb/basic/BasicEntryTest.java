@@ -110,13 +110,13 @@ class BasicEntryTest {
 
     @Test
     void testGetIcon() {
-        assertNull(entry.getIcon());
+        assertNotNull(entry.getIcon());
     }
 
     @Test
     void testSetIcon() {
-        entry.setIcon(new BasicIcon() {});
-        assertNotNull(entry.getIcon());
+        entry.setIcon(new BasicIcon(1) {});
+        assertEquals(1, entry.getIcon().getIndex());
     }
 
     @Test
