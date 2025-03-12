@@ -20,7 +20,7 @@ package org.linguafranca.pwdb.kdbx;
 import com.google.common.io.CharStreams;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
-import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.linguafranca.pwdb.format.KdbxHeader;
 import org.linguafranca.pwdb.format.KdbxSerializer;
 
@@ -44,7 +44,7 @@ public class KdbxSerializerTest {
     @Test
     public void testGetPlainTextInputStream() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx");
-        Credentials credentials = new KdbxCreds("123".getBytes());
+        Credentials credentials = new KdbxCredentials("123".getBytes());
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         printStream.println(CharStreams.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
     }
@@ -55,7 +55,7 @@ public class KdbxSerializerTest {
     @Test
     public void testGetPlainTextInputStream2() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-ChaCha20-AES.kdbx");
-        Credentials credentials = new KdbxCreds("123".getBytes());
+        Credentials credentials = new KdbxCredentials("123".getBytes());
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         printStream.println(CharStreams.toString(new InputStreamReader(decryptedInputStream, StandardCharsets.UTF_8)));
     }
@@ -69,7 +69,7 @@ public class KdbxSerializerTest {
     public void testCypherTextOutputStream() throws Exception {
         File tempFile = File.createTempFile("test", "test");
         OutputStream testStream = new FileOutputStream(tempFile);
-        Credentials credentials = new KdbxCreds("123".getBytes());
+        Credentials credentials = new KdbxCredentials("123".getBytes());
         OutputStream outputStream = KdbxSerializer.createEncryptedOutputStream(credentials, new KdbxHeader(), testStream);
 
         outputStream.write("Hello World\n".getBytes());
@@ -89,7 +89,7 @@ public class KdbxSerializerTest {
     public void testCypherTextOutputStream2() throws Exception {
         File tempFile = File.createTempFile("test", "test");
         OutputStream testStream = new FileOutputStream(tempFile);
-        Credentials credentials = new KdbxCreds("123".getBytes());
+        Credentials credentials = new KdbxCredentials("123".getBytes());
         KdbxHeader kdbxHeader = new KdbxHeader(4);
         OutputStream outputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, testStream);
 

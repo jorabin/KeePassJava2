@@ -41,7 +41,7 @@ public interface RecycleBinTest {
 
     @Test
     default void recycleBinEntries() {
-        assumeTrue(getDatabase().supportsRecycleBin());
+        assumeTrue(getDatabase().supportsRecycleBin(), "Database does not support recycle bin, skipping test");
         Database database = getDatabase();
         database.enableRecycleBin(false);
         assertFalse(database.isRecycleBinEnabled());
@@ -75,7 +75,7 @@ public interface RecycleBinTest {
     
     @Test
     default void recycleBinGroups() {
-        assumeTrue(getDatabase().supportsRecycleBin());
+        assumeTrue(getDatabase().supportsRecycleBin(), "Database does not support recycle bin, skipping test");
         Database database = getDatabase();
         database.enableRecycleBin(true);
         assertTrue(database.isRecycleBinEnabled());

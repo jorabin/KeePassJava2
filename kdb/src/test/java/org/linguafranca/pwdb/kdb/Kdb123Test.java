@@ -17,26 +17,35 @@
 
 package org.linguafranca.pwdb.kdb;
 
-import org.junit.Test;
+import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.Visitor;
+import org.linguafranca.pwdb.test.Test123Test;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
-
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author jo
  */
-public class KdbSerializerTest {
+public class Kdb123Test implements Test123Test {
 
-    static PrintStream printStream = getTestPrintStream();
+    KdbDatabase kdbDatabase;
 
-    @Test
-    public void testCreateKdbDatabase() throws Exception {
+    Kdb123Test() throws IOException {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdb");
-        Database database = KdbDatabase.load(new KdbCredentials.Password("123".getBytes()), inputStream);
-        database.visit(new Visitor.Print(printStream));
+        // file has password credentials
+        Credentials credentials = new KdbCredentials.Password("123".getBytes());
+        // open database.
+        kdbDatabase = KdbDatabase.load(credentials, inputStream);
+    }
+
+    @Override
+    public Database getDatabase() {
+        return kdbDatabase;
+    }
+
+    @Override
+    public boolean getSkipDateCheck() {
+        return true;
     }
 }

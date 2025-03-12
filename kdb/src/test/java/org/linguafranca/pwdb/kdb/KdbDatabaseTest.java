@@ -18,8 +18,8 @@
 package org.linguafranca.pwdb.kdb;
 
 import org.junit.Test;
-import org.linguafranca.pwdb.checks.BasicDatabaseChecks;
 import org.linguafranca.pwdb.Database;
+import org.linguafranca.pwdb.test.GroupsAndEntriesTest;
 
 import java.io.IOException;
 
@@ -28,20 +28,32 @@ import static org.junit.Assert.assertFalse;
 /**
  * @author Jo
  */
-public class KdbDatabaseTest  extends BasicDatabaseChecks {
+public class KdbDatabaseTest  implements GroupsAndEntriesTest {
+
+    KdbDatabase kdbDatabase;
+
+    {newDatabase();}
+
     @Override
-    public Database createDatabase() throws IOException {
+    public KdbDatabase createDatabase() {
         return new KdbDatabase();
     }
 
-    public KdbDatabaseTest() throws IOException {
-        super();
+    @Override
+    public void newDatabase() {
+        kdbDatabase = createDatabase();
+    }
+
+    @Override
+    public Database getDatabase() {
+        return kdbDatabase;
     }
 
     @Test
     public void supportedFunctionalityTest(){
-        assertFalse(database.supportsBinaryProperties());
-        assertFalse(database.supportsNonStandardPropertyNames());
-        assertFalse(database.supportsRecycleBin());
+        assertFalse(kdbDatabase.supportsBinaryProperties());
+        assertFalse(kdbDatabase.supportsNonStandardPropertyNames());
+        assertFalse(kdbDatabase.supportsRecycleBin());
+        assertFalse(kdbDatabase.supportsPropertyValueStrategy());
     }
 }

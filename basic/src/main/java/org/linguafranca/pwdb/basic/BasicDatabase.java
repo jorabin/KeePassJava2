@@ -23,6 +23,7 @@ import org.linguafranca.pwdb.protect.ProtectedDatabase;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.time.Instant;
 import java.util.Stack;
 
 /**
@@ -30,8 +31,8 @@ import java.util.Stack;
  */
 public class BasicDatabase extends ProtectedDatabase {
     private final BasicGroup root = new BasicGroup(this, "Root");
-    private String databaseName;
-    private String databaseDescription;
+    private String databaseName = "New Database";
+    private String databaseDescription = "Database created on " + Instant.now().toString();
 
     @Override
     public Group getRootGroup() {

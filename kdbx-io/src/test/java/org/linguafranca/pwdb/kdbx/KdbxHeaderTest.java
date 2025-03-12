@@ -21,7 +21,7 @@ import com.google.common.io.CharStreams;
 import com.google.common.io.LittleEndianDataInputStream;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.linguafranca.pwdb.format.KdbxHeader;
 import org.linguafranca.pwdb.format.KdbxSerializer;
 import org.linguafranca.pwdb.hashedblock.HmacBlockInputStream;
@@ -46,7 +46,7 @@ public class KdbxHeaderTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx");
         KdbxHeader header = KdbxSerializer.readOuterHeader(inputStream, new KdbxHeader());
         printStream.println("Version " + header.getVersion());
-        KdbxCreds creds = new KdbxCreds("123".getBytes());
+        KdbxCredentials creds = new KdbxCredentials("123".getBytes());
         assert inputStream != null;
         //noinspection UnstableApiUsage
         KdbxSerializer.readOuterHeaderVerification(header, creds, new LittleEndianDataInputStream(inputStream));

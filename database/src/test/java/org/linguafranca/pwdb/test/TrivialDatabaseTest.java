@@ -73,11 +73,6 @@ public interface TrivialDatabaseTest {
     }
 
     @Test
-    default void testSupportsRecycleBin() {
-        assertFalse(getDatabase().supportsRecycleBin());
-    }
-
-    @Test
     default void testRecycleBin() {
         if (getDatabase().supportsRecycleBin()) {
             assertTrue(getDatabase().isRecycleBinEnabled());
@@ -92,14 +87,14 @@ public interface TrivialDatabaseTest {
 
     @Test
     default void testGetSetName() {
-        assertNull(getDatabase().getName());
+        assertEquals("New Database", getDatabase().getName());
         getDatabase().setName("Test Database");
         assertEquals("Test Database", getDatabase().getName());
     }
 
     @Test
     default void testGetSetDescription() {
-        assertNull(getDatabase().getDescription());
+        assertNotNull(getDatabase().getDescription());
         getDatabase().setDescription("Test Description");
         assertEquals("Test Description", getDatabase().getDescription());
     }

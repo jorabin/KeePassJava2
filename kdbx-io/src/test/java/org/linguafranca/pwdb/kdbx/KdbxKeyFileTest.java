@@ -20,7 +20,7 @@ package org.linguafranca.pwdb.kdbx;
 import com.google.common.io.CharStreams;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
-import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.linguafranca.pwdb.format.KdbxHeader;
 import org.linguafranca.pwdb.format.KdbxKeyFile;
 import org.linguafranca.pwdb.format.KdbxSerializer;
@@ -62,7 +62,7 @@ public class KdbxKeyFileTest {
     @Test
     public void testEmptyPasswordCreds() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("EmptyPassword.kdbx");
-        Credentials credentials = new KdbxCreds(new byte[0]);
+        Credentials credentials = new KdbxCredentials(new byte[0]);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         toConsole(decryptedInputStream);
     }
@@ -75,7 +75,7 @@ public class KdbxKeyFileTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("EmptyPasswordWithKey.kdbx");
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("EmptyPasswordWithKey.key");
         assert inputStreamKeyFile != null;
-        Credentials credentials = new KdbxCreds(new byte[0], inputStreamKeyFile);
+        Credentials credentials = new KdbxCredentials(new byte[0], inputStreamKeyFile);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         toConsole(decryptedInputStream);
     }
@@ -88,7 +88,7 @@ public class KdbxKeyFileTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("NoPasswordWithKey.kdbx");
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("NoPasswordWithKey.key");
         assert inputStreamKeyFile != null;
-        Credentials credentials = new KdbxCreds(inputStreamKeyFile);
+        Credentials credentials = new KdbxCredentials(inputStreamKeyFile);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         toConsole(decryptedInputStream);
     }
@@ -99,7 +99,7 @@ public class KdbxKeyFileTest {
     @Test
     public void testEmptyPassword() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("EmptyPassword.kdbx");
-        Credentials credentials = new KdbxCreds(new byte[0]);
+        Credentials credentials = new KdbxCredentials(new byte[0]);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         toConsole(decryptedInputStream);
     }
@@ -111,7 +111,7 @@ public class KdbxKeyFileTest {
     public void testSignedKeyFile() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("kdbx_hash_test.kdbx");
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("kdbx_hash_test.keyx");
-        Credentials credentials = new KdbxCreds("123".getBytes(), inputStreamKeyFile);
+        Credentials credentials = new KdbxCredentials("123".getBytes(), inputStreamKeyFile);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         toConsole(decryptedInputStream);
     }
@@ -123,7 +123,7 @@ public class KdbxKeyFileTest {
     public void testSignatureFails() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("kdbx_hash_test.kdbx");
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("kdbx_hash_test_wrong_hash.keyx");
-        Credentials credentials = new KdbxCreds("123".getBytes(), inputStreamKeyFile);
+        Credentials credentials = new KdbxCredentials("123".getBytes(), inputStreamKeyFile);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         toConsole(decryptedInputStream);
     }
@@ -135,7 +135,7 @@ public class KdbxKeyFileTest {
     public void testKeyFileRandom() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("kdb_with_random_file.kdbx");
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("random_file");
-        Credentials credentials = new KdbxCreds("123".getBytes(), inputStreamKeyFile);
+        Credentials credentials = new KdbxCredentials("123".getBytes(), inputStreamKeyFile);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         toConsole(decryptedInputStream);
     }
@@ -147,7 +147,7 @@ public class KdbxKeyFileTest {
     public void testKeyFileHex64() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("kdbx_keyfile64.kdbx");
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("keyfile64");
-        Credentials credentials = new KdbxCreds("123".getBytes(), inputStreamKeyFile);
+        Credentials credentials = new KdbxCredentials("123".getBytes(), inputStreamKeyFile);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         toConsole(decryptedInputStream);
     }
@@ -159,7 +159,7 @@ public class KdbxKeyFileTest {
     public void testKeyFile32() throws Exception {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("kdbx_keyfile32.kdbx");
         InputStream inputStreamKeyFile = getClass().getClassLoader().getResourceAsStream("keyfile32");
-        Credentials credentials = new KdbxCreds("123".getBytes(), inputStreamKeyFile);
+        Credentials credentials = new KdbxCredentials("123".getBytes(), inputStreamKeyFile);
         InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, new KdbxHeader(), inputStream);
         toConsole(decryptedInputStream);
     }

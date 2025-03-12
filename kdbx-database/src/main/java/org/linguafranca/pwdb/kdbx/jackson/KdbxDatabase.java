@@ -194,10 +194,10 @@ public class KdbxDatabase extends ProtectedDatabase {
         setDirty(true);
     }
 
-    @Override
+/*    @Override
     public boolean shouldProtect(String s) {
         return keePassFile.meta.memoryProtection.shouldProtect(s);
-    }
+    }*/
 
     public List<KeePassFile.Binary> getBinaries() {
         if (keePassFile.meta.binaries == null) {

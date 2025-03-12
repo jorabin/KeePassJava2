@@ -31,11 +31,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>util</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>

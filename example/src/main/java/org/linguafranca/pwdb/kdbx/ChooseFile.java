@@ -18,7 +18,7 @@
 package org.linguafranca.pwdb.kdbx;
 
 import com.google.common.base.Strings;
-import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.linguafranca.pwdb.format.KdbxHeader;
 import org.linguafranca.pwdb.format.KdbxSerializer;
 import org.slf4j.Logger;
@@ -31,8 +31,8 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import static org.linguafranca.pwdb.kdbx.Util.streamToString;
-import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.pwdb.kdbx.jackson.util.Util.streamToString;
+
 
 /**
  * Utility to allow browsing of database files and listing content to console
@@ -86,7 +86,7 @@ public class ChooseFile {
             }
             logger.info("Opening {}", fc.getSelectedFile().getPath());
             try (InputStream is = Files.newInputStream(Paths.get(fc.getSelectedFile().getPath()))) {
-                InputStream ss = KdbxSerializer.createUnencryptedInputStream(new KdbxCreds(s.getBytes()), new KdbxHeader(), is);
+                InputStream ss = KdbxSerializer.createUnencryptedInputStream(new KdbxCredentials(s.getBytes()), new KdbxHeader(), is);
                 System.out.println(streamToString(ss));
                 System.out.println();
                 System.out.flush();

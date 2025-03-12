@@ -19,7 +19,7 @@ package org.linguafranca.pwdb.kdbx;
 
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Visitor;
-import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 
 import java.io.InputStream;
@@ -39,18 +39,18 @@ public class OpenDbExample {
     static PrintStream printStream = getTestPrintStream();
 
     private interface DbLoader {
-        Database load(KdbxCreds creds, InputStream inputStream) throws Exception;
+        Database load(KdbxCredentials creds, InputStream inputStream) throws Exception;
     }
 
     private static class JacksonDbLoader implements DbLoader {
         @Override
-        public Database load(KdbxCreds creds, InputStream inputStream) throws Exception {
+        public Database load(KdbxCredentials creds, InputStream inputStream) throws Exception {
             return KdbxDatabase.load(creds, inputStream);
         }
     }
 
     private static void testDb (DbLoader loader, String label, int loads, int iterations) throws Exception {
-        KdbxCreds creds = new KdbxCreds("123".getBytes());
+        KdbxCredentials creds = new KdbxCredentials("123".getBytes());
         long start = System.currentTimeMillis();
         for (int i=0; i < loads; i++) {
             try (InputStream inputStream = OpenDbExample.class.getClassLoader().getResourceAsStream("test1.kdbx")) {

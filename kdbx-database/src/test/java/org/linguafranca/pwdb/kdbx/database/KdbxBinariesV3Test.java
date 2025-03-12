@@ -14,32 +14,42 @@
  * limitations under the License.
  *
  */
+package org.linguafranca.pwdb.kdbx.database;
 
-package org.linguafranca.pwdb.basic;
-
+import org.junit.jupiter.api.BeforeAll;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
+import org.linguafranca.pwdb.format.KdbxCredentials;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 import org.linguafranca.pwdb.test.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
-public class BasicDatabaseTest implements
-        TrivialDatabaseTest,
-        GroupsAndEntriesTest,
-        RecycleBinTest,
-        ProtectedPropertyTest,
-        ProtectedPropertyTest2 {
+public class KdbxBinariesV3Test implements
+        BinaryPropertiesTest {
+
+    static String OUTPUT_DIRECTORY_PATH = "testOutput";
+    public String databaseName = "Attachment.kdbx";
+
+    @BeforeAll
+    static void ppt2BeforeAll() throws Exception {
+        Files.createDirectories(Paths.get(OUTPUT_DIRECTORY_PATH));
+    }
 
     Database database;
-
+    {
+        newDatabase();
+    }
     /**
      * Create a new database
      */
     @Override
     public Database createDatabase() {
-        return new BasicDatabase();
+        return new KdbxDatabase();
     }
 
     /**
@@ -47,7 +57,12 @@ public class BasicDatabaseTest implements
      */
     @Override
     public void newDatabase() {
-        database = createDatabase();
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream(databaseName);
+        try {
+            database = KdbxDatabase.load(new KdbxCredentials("123".getBytes()),inputStream);
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
@@ -58,20 +73,18 @@ public class BasicDatabaseTest implements
         return database;
     }
 
-
     @Override
-    public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
-        new BasicDatabaseSerializer.Xml().save((BasicDatabase) database, outputStream);
+    public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException{
+        database.save(credentials, outputStream);
     }
 
     @Override
     public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException{
-        return new BasicDatabaseSerializer.Xml().load(inputStream);
+        return KdbxDatabase.load(credentials, inputStream);
     }
 
     @Override
     public Credentials getCredentials(byte[] credentials){
-        return new Credentials.None();
+        return new KdbxCredentials(credentials);
     }
-
 }

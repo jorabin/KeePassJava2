@@ -45,7 +45,7 @@
 		</dependency>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>test</artifactId>
+            <artifactId>database</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>

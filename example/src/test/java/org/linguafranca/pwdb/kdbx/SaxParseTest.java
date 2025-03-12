@@ -18,7 +18,7 @@
 package org.linguafranca.pwdb.kdbx;
 
 import org.junit.Test;
-import org.linguafranca.pwdb.format.KdbxCreds;
+import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,11 +37,11 @@ public class SaxParseTest extends SaxParse {
     OutputStream outputStream = getTestPrintStream();
     @Test
     public void exampleSaxParsingV3 () throws IOException, SAXException, ParserConfigurationException {
-        super.exampleSaxParsing("test123.kdbx", new KdbxCreds("123".getBytes()), new PrintWriter(outputStream));
+        super.exampleSaxParsing("test123.kdbx", new KdbxCredentials("123".getBytes()), new PrintWriter(outputStream));
     }
     @Test
     public void exampleSaxParsingV4 () throws IOException, SAXException, ParserConfigurationException {
-        super.exampleSaxParsing("V4-AES-AES.kdbx", new KdbxCreds("123".getBytes()), new PrintWriter(outputStream));
+        super.exampleSaxParsing("V4-AES-AES.kdbx", new KdbxCredentials("123".getBytes()), new PrintWriter(outputStream));
     }
 
 }
