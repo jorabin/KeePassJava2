@@ -84,7 +84,7 @@ public class KdbSerializer {
 
         // read the decrypted serialized form of all groups
         KdbDatabase kdbDatabase = new KdbDatabase();
-        KdbGroup lastGroup = (KdbGroup) kdbDatabase.getRootGroup();
+        KdbGroup lastGroup = kdbDatabase.getRootGroup();
         for (long group = 0; group < kdbHeader.getGroupCount(); group++) {
             lastGroup = deserializeGroup(lastGroup, dataInput);
         }
@@ -120,7 +120,7 @@ public class KdbSerializer {
      * Check the signature of a data source
      *
      * @param dataInput the source to check
-     * @throws IOException
+     * @throws IOException if an integer could not be read from buffer
      * @throws IllegalStateException if the signature does not match
      */
     public static void checkSignature(DataInput dataInput) throws IOException {
@@ -134,7 +134,7 @@ public class KdbSerializer {
      *
      * @param kdbHeader a header to populate with relevant values
      * @param dataInput a source of data
-     * @throws IOException
+     * @throws IOException if there is a problem reading from the source
      */
     private static void deserializeHeader(KdbHeader kdbHeader, DataInput dataInput) throws IOException {
         kdbHeader.setFlags(dataInput.readInt());
@@ -168,7 +168,7 @@ public class KdbSerializer {
      * @param lastGroup the last group loaded from this source, or the root group if none
      * @param dataInput a source of data
      * @return a new KdbxGroup
-     * @throws IOException
+     * @throws IOException if there is a problem reading from the source
      */
     private static KdbGroup deserializeGroup(KdbGroup lastGroup, DataInput dataInput) throws IOException {
         int fieldType;
@@ -209,7 +209,7 @@ public class KdbSerializer {
                     group.setFlags(readInt(dataInput));
                     break;
                 default:
-                    throw new IllegalStateException("Unknown field type " + String.valueOf(fieldType));
+                    throw new IllegalStateException("Unknown field type " + fieldType);
             }
         }
         dataInput.readInt();
@@ -221,7 +221,7 @@ public class KdbSerializer {
      *
      * @param database  a database to insert the entry into
      * @param dataInput a source of data
-     * @throws IOException
+     * @throws IOException  if there is a problem reading from the source
      */
     private static void deserializeEntry(KdbDatabase database, DataInput dataInput) throws IOException {
         int fieldType;
@@ -318,10 +318,11 @@ public class KdbSerializer {
             throw new IllegalStateException("Could not determine parent group from level supplied");
         }
         // working variable holding current candidate parent
-        KdbGroup candidateParent = (KdbGroup) lastGroup.getParent();
+        KdbGroup candidateParent = lastGroup.getParent();
         // work our way up through the parents till we find one
+        //noinspection DataFlowIssue - you know - if it's broken it's broken
         while (level <= candidateParent.computedLevel()) {
-            candidateParent = ((KdbGroup) candidateParent.getParent());
+            candidateParent = (candidateParent.getParent());
         }
         return candidateParent;
     }
@@ -421,6 +422,7 @@ public class KdbSerializer {
         return buffer;
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     private static byte[] readExtData(DataInput dataInput) throws IOException {
         int size = dataInput.readInt();
         byte[] buffer = new byte[size];

@@ -21,8 +21,6 @@ import org.junit.Test;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.test.GroupsAndEntriesTest;
 
-import java.io.IOException;
-
 import static org.junit.Assert.assertFalse;
 
 /**

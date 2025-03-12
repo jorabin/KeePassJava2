@@ -42,7 +42,7 @@ public class HelperTest {
         assertEquals(hexString, convertedString.toUpperCase());
 
         UUID uuid = Helpers.uuidFromBase64(inputString);
-        printStream.println("UUID: " + uuid.toString());
+        printStream.println("UUID: " + uuid);
         assertEquals("d2d53c5c-5454-5f64-c293-9b669abb21b9", uuid.toString());
 
         String uuidHex = Helpers.hexStringFromUuid(uuid);

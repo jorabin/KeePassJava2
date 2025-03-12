@@ -93,7 +93,7 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
     public void save(OutputStream outputStream) {
         try {
             SimpleModule module = new SimpleModule();
-            module.addSerializer(PropertyValue.class, new ValueSerializer(encryptor, propertyValueStrategy));
+            module.addSerializer(PropertyValue.class, new ValueSerializer(encryptor));
             // disable auto-detection, only use annotated values
             XmlMapper mapper = XmlMapper.builder()
                     .disable(MapperFeature.AUTO_DETECT_CREATORS,
@@ -117,6 +117,7 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
             
             OutputStreamWriter osw = new OutputStreamWriter(outputStream);
             XMLStreamWriter sw = xmlOutputFactory.createXMLStreamWriter(osw);
+            //noinspection TryFinallyCanBeTryWithResources - doesn't work with XMLStreamWriter
             try {
                 sw.setPrefix("xml", "http://www.w3.org/XML/1998/namespace");
 

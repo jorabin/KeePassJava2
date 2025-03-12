@@ -18,11 +18,8 @@
 package org.linguafranca.pwdb.format;
 
 import org.jetbrains.annotations.NotNull;
-import org.linguafranca.pwdb.Credentials;
-import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.InputStream;
-import java.security.MessageDigest;
 
 /**
  * Convenience wrapper to convert to KdbxCredentials - for helping with code migration to version 3.

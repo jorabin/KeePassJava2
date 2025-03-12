@@ -17,7 +17,6 @@
 
 package org.linguafranca.pwdb.hashedblock;
 
-import static org.linguafranca.pwdb.format.Helpers.toBytes;
 import static org.linguafranca.pwdb.security.Encryption.getHMacSha256Instance;
 import static org.linguafranca.pwdb.security.Encryption.transformHmacKey;
 
@@ -78,7 +77,6 @@ public class HmacBlockOutputStream extends FilterOutputStream {
         this.key = key;
         this.byteOrder = littleEndian ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN;
         if (this.byteOrder.equals(ByteOrder.LITTLE_ENDIAN)) {
-            //noinspection UnstableApiUsage
             this.output = new LittleEndianDataOutputStream(out);
         } else {
             this.output = new DataOutputStream(out);

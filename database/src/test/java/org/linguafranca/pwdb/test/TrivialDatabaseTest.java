@@ -117,17 +117,6 @@ public interface TrivialDatabaseTest {
         assertNull(getDatabase().findGroup(uuid));
     }
 
-/*    @Test
-    default void testSave() throws IOException {
-        OutputStream outputStream = new OutputStream() {
-            @Override
-            public void write(int b) {
-                // no-op
-            }
-        };
-        assertThrows(IOException.class, () -> getDatabase().save(null, outputStream));
-    }*/
-
     @Test
     default void testSupportsNonStandardPropertyNames() {
         // check standard names are there

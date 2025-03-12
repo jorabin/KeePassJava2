@@ -146,5 +146,5 @@ public class BasicDatabase extends ProtectedDatabase {
             return false;
         }
 
-    };
+    }
 }

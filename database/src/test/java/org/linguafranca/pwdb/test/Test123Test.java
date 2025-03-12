@@ -29,6 +29,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME.PASSWORD;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
@@ -61,16 +62,11 @@ public interface Test123Test {
             getTestPrintStream().println(tes.getTitle());
         }
         assertEquals(4, tests.size());
-        if (tests.size() > 0) {
-            // copy the password of the first entry to the clipboard
-            String pass = tests.get(0).getPassword();
-/*
-            StringSelection selection = new StringSelection(pass);
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(selection, selection);
-            printStream.println(pass + " copied to clip board");
-*/
+        if (!tests.isEmpty()) {
+            // copy the password of the first entry
+            String pass = tests.get(0).getProperty(PASSWORD);
             // all the relevant entries should have the password 123
-            String pass2 = tests.get(0).getPassword();
+            String pass2 = tests.get(0).getProperty(PASSWORD);
             assertEquals(pass, pass2);
             assertEquals("123", pass2);
         }
@@ -78,18 +74,14 @@ public interface Test123Test {
         List<? extends Entry> passwords = getDatabase().findEntries("password");
         assertEquals(4, passwords.size());
         for (Entry passwordEntry : passwords) {
-            assertEquals(passwordEntry.getTitle(), passwordEntry.getPassword());
+            assertEquals(passwordEntry.getTitle(), passwordEntry.getProperty(PASSWORD));
             getTestPrintStream().println(passwordEntry.getTitle());
         }
 
-        List<? extends Entry> entries = getDatabase().findEntries(new Entry.Matcher() {
-            @Override
-            public boolean matches(Entry entry) {
-                return entry.getTitle().equals("hello world");
-            }});
+        List<? extends Entry> entries = getDatabase().findEntries(entry -> entry.getTitle().equals("hello world"));
 
         assertEquals(1, entries.size());
-        assertEquals("pass", entries.get(0).getPassword());
+        assertEquals("pass", entries.get(0).getProperty(PASSWORD));
 
         // kdb files don't have a time zone so can't make head or tail of the date - test file seems to have a local time in it
         if (getSkipDateCheck()) {

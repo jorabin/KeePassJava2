@@ -55,8 +55,8 @@ public class HashedBlockOutputStream extends OutputStream {
     private final MessageDigest sha256;
     private int nextSequenceNumber = 0;
     private boolean littleEndian = false;
-    private OutputStream outputStream;
-    private ByteArrayOutputStream blockOutputStream = new ByteArrayOutputStream();
+    private final OutputStream outputStream;
+    private final ByteArrayOutputStream blockOutputStream = new ByteArrayOutputStream();
     private boolean isClosed = false;
 
     /**

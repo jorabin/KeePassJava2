@@ -36,9 +36,6 @@ import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
 
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
 import org.linguafranca.pwdb.kdbx.jackson.model.Times;
-import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses.AutoType;
-import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses.BinaryProperty;
-import org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses.StringProperty;
 
 import static org.linguafranca.pwdb.kdbx.jackson.model.EntryClasses.*;
 

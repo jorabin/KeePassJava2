@@ -44,6 +44,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME.PASSWORD;
 
 /**
  * @author Jo
@@ -130,7 +131,7 @@ public interface GroupsAndEntriesTest {
         e1.setUsername("jake@window.com");
         assertEquals("jake@window.com", e1.getUsername());
         e1.setPassword("supercalifragelisticexpialidocious");
-        assertEquals("supercalifragelisticexpialidocious", e1.getPassword());
+        assertEquals("supercalifragelisticexpialidocious", e1.getProperty(PASSWORD));
         e1.setUrl("https://window.com");
         assertEquals("https://window.com", e1.getUrl());
 
@@ -151,7 +152,7 @@ public interface GroupsAndEntriesTest {
         e1.setProperty(Entry.STANDARD_PROPERTY_NAME_NOTES, "notes");
         assertEquals("notes", e1.getNotes());
         e1.setProperty(Entry.STANDARD_PROPERTY_NAME_PASSWORD, "password");
-        assertEquals("password", e1.getPassword());
+        assertEquals("password", e1.getProperty(PASSWORD));
         e1.setProperty(Entry.STANDARD_PROPERTY_NAME_URL, "url");
         assertEquals("url", e1.getUrl());
 
@@ -230,7 +231,7 @@ public interface GroupsAndEntriesTest {
     default void testNewEntryInit() {
         Entry e2 = getDatabase().newEntry();
         assertNull(e2.getParent());
-        assertEquals("", e2.getPassword());
+        assertEquals("", e2.getProperty(PASSWORD));
         assertNotNull(e2.getUuid());
         assertEquals("", e2.getUrl());
         assertEquals("", e2.getNotes());
@@ -247,7 +248,7 @@ public interface GroupsAndEntriesTest {
         Entry entry1 = getDatabase().newEntry();
         entry1.setTitle("Entry");
         entry1.setUsername("Username");
-        entry1.setPassword("Password");
+        entry1.setProperty(PASSWORD, "Password");
         entry1.setUrl("https://dont.follow.me");
         entry1.setNotes("Notes");
         entry1.setIcon(getDatabase().newIcon(2));
@@ -259,7 +260,7 @@ public interface GroupsAndEntriesTest {
 
         assertEquals(entry1.getTitle(), entry2.getTitle());
         assertEquals(entry1.getUsername(), entry2.getUsername());
-        assertEquals(entry1.getPassword(), entry2.getPassword());
+        assertEquals(entry1.getProperty(PASSWORD), entry2.getProperty(PASSWORD));
         assertEquals(entry1.getUrl(), entry2.getUrl());
         assertEquals(entry1.getNotes(), entry2.getNotes());
         assertEquals(entry1.getIcon(), entry2.getIcon());

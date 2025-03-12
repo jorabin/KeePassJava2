@@ -17,7 +17,6 @@
 
 package org.linguafranca.pwdb.test;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.Credentials;
@@ -26,8 +25,6 @@ import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.PropertyValue;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.function.Consumer;
 

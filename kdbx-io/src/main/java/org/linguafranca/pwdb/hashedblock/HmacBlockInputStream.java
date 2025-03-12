@@ -18,7 +18,6 @@
 package org.linguafranca.pwdb.hashedblock;
 
 import com.google.common.io.LittleEndianDataInputStream;
-import org.jetbrains.annotations.NotNull;
 import org.linguafranca.pwdb.format.Helpers;
 
 import javax.crypto.Mac;
@@ -26,7 +25,6 @@ import java.io.*;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-import static org.linguafranca.pwdb.format.Helpers.toBytes;
 import static org.linguafranca.pwdb.security.Encryption.getHMacSha256Instance;
 import static org.linguafranca.pwdb.security.Encryption.transformHmacKey;
 
@@ -124,28 +122,15 @@ public class HmacBlockInputStream extends FilterInputStream {
         if (!Arrays.equals(mac.doFinal(buffer), hmacSha256)) {
             throw new IllegalStateException("Block HMAC does not match");
         }
-
-/*      // using bouncy castle
-        HMac hmac = new HMac(new SHA256Digest());
-        hmac.init(new KeyParameter(getHmacBlockKey(this.key, blockNumber, byteOrder)));
-        hmac.update(Helpers.toBytes(blockNumber, byteOrder), 0, 8);
-        hmac.update(Helpers.toBytes(buffer.length, byteOrder), 0, 4);
-        hmac.update(buffer, 0, buffer.length);
-        byte[] computedHmacSha256 = new byte[32];
-        hmac.doFinal(computedHmacSha256, 0);
-        if (!Arrays.equals(computedHmacSha256, hmacSha256)) {
-            throw new IllegalStateException("Block HMAC does not match");
-        }
-*/
     }
 
     @Override
-    public int read(@NotNull byte[] b) throws IOException {
+    public int read(byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
     @Override
-    public int read(@NotNull byte[] b, int off, int len) throws IOException {
+    public int read(byte[] b, int off, int len) throws IOException {
         if (finished) {
             return -1;
         }

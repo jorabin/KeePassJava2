@@ -48,7 +48,6 @@ public class KdbxHeaderTest {
         printStream.println("Version " + header.getVersion());
         KdbxCredentials creds = new KdbxCredentials("123".getBytes());
         assert inputStream != null;
-        //noinspection UnstableApiUsage
         KdbxSerializer.readOuterHeaderVerification(header, creds, new LittleEndianDataInputStream(inputStream));
         HmacBlockInputStream hmacBlockInputStream = new HmacBlockInputStream(header.getHmacKey(creds), inputStream, true);
         printStream.println(CharStreams.toString(new InputStreamReader(hmacBlockInputStream, StandardCharsets.UTF_8)));

@@ -53,7 +53,7 @@ public class KdbxKeyFileTest {
         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("KeyFileDatabase.key");
         byte[] key = KdbxKeyFile.load(inputStream);
         assertNotNull(key);
-        assertEquals(32, key.length);;
+        assertEquals(32, key.length);
     }
 
     /**

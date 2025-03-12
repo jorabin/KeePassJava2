@@ -83,7 +83,7 @@ import java.util.zip.GZIPOutputStream;
  * @see <a href="https://github.com/jorabin/KeePassJava2/blob/master/Format%20Diagram.svg">this diagram</a>
  * @author jo
  */
-@SuppressWarnings({"WeakerAccess", "UnstableApiUsage"})
+@SuppressWarnings({"WeakerAccess"})
 public class KdbxSerializer {
 
     // make entirely static
@@ -378,7 +378,6 @@ public class KdbxSerializer {
      * @param kdbxHeader the header to write and update
      * @throws IOException on error
      */
-    @SuppressWarnings("UnstableApiUsage")
     public static void writeKdbxHeader(KdbxHeader kdbxHeader, OutputStream outputStream) throws IOException {
         MessageDigest messageDigest = Encryption.getSha256MessageDigestInstance();
         DigestOutputStream digestOutputStream = new DigestOutputStream(outputStream, messageDigest);

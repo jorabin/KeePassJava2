@@ -42,6 +42,7 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME.*;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 
@@ -87,8 +88,6 @@ public interface KdbxFileSaveAndReloadTest {
         FileInputStream fis = new FileInputStream("testOutput/test1.kdbx");
         Database input = loadDatabase(getCredentials("123".getBytes()), fis);
         verifyContents(input);
-        //input.save(new StreamFormat.None(),  new Credentials.None(), printStream);
-        //getTestPrintStream().format("Test took %d millis", System.currentTimeMillis() - now);
     }
 
     /**
@@ -162,11 +161,11 @@ public interface KdbxFileSaveAndReloadTest {
 
     private Entry entryFactory(Database database, String g, int e) {
         Entry result = database.newEntry();
-        result.setTitle(g + "-" + e);
-        result.setUsername(g + " - un - " + e);
-        result.setPassword(g + "- p -" + e);
-        result.setUrl(g + "- url - " + e);
-        result.setNotes(g + "- n - " + e);
+        result.addProperty(TITLE, g + "-" + e)
+                .addProperty(USER_NAME, g + " - un - " + e)
+                .addProperty(PASSWORD, g + "- p -" + e)
+                .addProperty(URL,g + "- url - " + e)
+                .addProperty(NOTES,g + "- n - " + e);
         return result;
     }
 
@@ -181,7 +180,7 @@ public interface KdbxFileSaveAndReloadTest {
                 Entry entry = group.getEntries().get(e);
                 assertEquals(g + "-" + e, entry.getTitle());
                 assertEquals(g + " - un - " + e, entry.getUsername());
-                assertEquals(g + "- p -" + e, entry.getPassword());
+                assertEquals(g + "- p -" + e, entry.getProperty(PASSWORD));
                 assertEquals(g + "- url - " + e, entry.getUrl());
                 assertEquals(g + "- n - " + e, entry.getNotes());
                 assertEquals(group, entry.getParent());
@@ -286,12 +285,12 @@ public interface KdbxFileSaveAndReloadTest {
         group2.addEntry(entry1);
 
         assertEquals(1, group2.getEntries().size());
-        entry1.setPassword("pass");
-        assertEquals("pass", entry1.getPassword());
+        entry1.addProperty(PASSWORD, "pass");
+        assertEquals("pass", entry1.getProperty(PASSWORD));
 
         Entry entry2 = database.newEntry(entry1);
-        entry2.setPassword("pass2");
-        assertEquals("pass2", entry2.getPassword());
+        entry2.addProperty(PASSWORD,"pass2");
+        assertEquals("pass2", entry2.getProperty(PASSWORD));
         group2.addEntry(entry2);
 
         assertEquals(2, group2.getEntries().size());

@@ -171,6 +171,7 @@ public class KdbDatabase extends AbstractDatabase {
         return false;
     }
 
+    @SuppressWarnings("RedundantMethodOverride")
     @Override
     public boolean supportsRecycleBin() {
         return false;

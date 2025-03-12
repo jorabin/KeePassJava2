@@ -323,7 +323,6 @@ public interface Entry {
      * @return a password
      * @deprecated use {@link #getPropertyValue(String)} with {@link #STANDARD_PROPERTY_NAME_PASSWORD}
      */
-    @SuppressWarnings("DeprecatedIsStillUsed")
     @Deprecated
     String getPassword();
 
@@ -335,7 +334,6 @@ public interface Entry {
      * @param pass a password
      * @deprecated use {@link #setPropertyValue(String, PropertyValue)} with {@link #STANDARD_PROPERTY_NAME_PASSWORD}
      */
-    @SuppressWarnings("DeprecatedIsStillUsed")
     @Deprecated
     void setPassword(String pass);
 

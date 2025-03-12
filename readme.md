@@ -227,9 +227,6 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 <td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/example"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/example.svg" alt="Javadocs"></a></td>
 <td>Worked examples of loading, saving, splicing etc. using the APIs</td></tr>
 
-<tr><td><a href="test">test</a></td><td>test</td>
-<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/test"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/test.svg" alt="Javadocs"></a></td>
-<td>Shared tests to assess the viability of the implementation.</td></tr>
 
 <tr><td><a href="all">all</a></td><td><strong>KeePassJava2</strong></td>
 <td>(no JavaDoc)</td>
@@ -248,14 +245,16 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 <td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx-database.svg" alt="Javadocs"></a></td>
 <td>Provides support for KDBX data access and memory protection.</td></tr>
 
+<tr><td><a href="basic">basic</a></td><td>basic</td>
+<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/basic">
+<img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/basic.svg" alt="Javadocs"></a></td>
+<td>A basic lightweight database implementation. Has memory protection.</td></tr>
 </tbody>
 </table>
 
 ### Gradle
 
-If you prefer Gradle the automatic conversion `gradle init` has been known to convert the POM successfully, however you will 
-need to add something like [gradle-source-sets.txt](jaxb/gradle-source-sets.txt) to the `build.gradle` for the JAXB module, so that the generated sources
- get compiled correctly.
+If you prefer Gradle the automatic conversion `gradle init` has been known to convert the POM successfully.
 
 ## Change Log
 

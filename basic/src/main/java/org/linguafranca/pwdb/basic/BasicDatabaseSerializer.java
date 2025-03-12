@@ -230,7 +230,7 @@ public interface BasicDatabaseSerializer {
             protected List<BasicEntry> entries;
 
             @JsonPropertyOrder({ "uuid", "name", "icon", "group", "entry" })
-            protected static class BasicGroup {};
+            protected static class BasicGroup {}
 
             @JacksonXmlProperty(localName = "group")
             @JacksonXmlElementWrapper(useWrapping = false)

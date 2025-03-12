@@ -30,12 +30,10 @@ import java.io.IOException;
 public class ValueSerializer extends StdSerializer<PropertyValue> {
 
     private final StreamEncryptor encryptor;
-    private final PropertyValue.Strategy propertyValueStrategy;
 
-    public ValueSerializer(StreamEncryptor encryptor, PropertyValue.Strategy propertyValueStrategy) {
+    public ValueSerializer(StreamEncryptor encryptor) {
         super(ValueSerializer.class, false);
         this.encryptor = encryptor;
-        this.propertyValueStrategy = propertyValueStrategy;
     }
 
     private String encrypt(byte[] bytes) {
