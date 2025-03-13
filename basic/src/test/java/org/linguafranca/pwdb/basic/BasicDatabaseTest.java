@@ -17,61 +17,24 @@
 
 package org.linguafranca.pwdb.basic;
 
-import org.linguafranca.pwdb.Credentials;
-import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.test.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+public class BasicDatabaseTest
+        extends
+            DatabaseTestBase
+        implements
+            TrivialDatabaseTest,
+            GroupsAndEntriesTest,
+            RecycleBinTest,
+            ProtectedPropertyTest,
+            ProtectedPropertyTest2 {
 
-public class BasicDatabaseTest implements
-        TrivialDatabaseTest,
-        GroupsAndEntriesTest,
-        RecycleBinTest,
-        ProtectedPropertyTest,
-        ProtectedPropertyTest2 {
-
-    Database database;
-
-    /**
-     * Create a new database
-     */
-    @Override
-    public Database createDatabase() {
-        return new BasicDatabase();
+    BasicDatabaseTest() {
+super(BasicDatabase::new,
+      (credentials, inputStream) ->
+              new BasicDatabaseSerializer.Xml().loadNx(inputStream),
+      (database, credentials, outputStream) ->
+              new BasicDatabaseSerializer.Xml().saveNx((BasicDatabase) database, outputStream),
+      (credentials) -> null);
     }
-
-    /**
-     * Create a new database for default use in tests
-     */
-    @Override
-    public void newDatabase() {
-        database = createDatabase();
-    }
-
-    /**
-     * Get the current default database
-     */
-    @Override
-    public Database getDatabase() {
-        return database;
-    }
-
-
-    @Override
-    public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException {
-        new BasicDatabaseSerializer.Xml().save((BasicDatabase) database, outputStream);
-    }
-
-    @Override
-    public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException{
-        return new BasicDatabaseSerializer.Xml().load(inputStream);
-    }
-
-    @Override
-    public Credentials getCredentials(byte[] credentials){
-        return new Credentials.None();
-    }
-
 }

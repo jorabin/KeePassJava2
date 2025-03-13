@@ -18,6 +18,7 @@
 package org.linguafranca.pwdb.test;
 
 import org.junit.jupiter.api.Test;
+import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Visitor;
@@ -42,22 +43,26 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
 public interface Test123Test {
 
     boolean getSkipDateCheck();
-    Database getDatabase();
+    Database loadDatabase(Credentials credentials, java.io.InputStream inputStream);
+    Credentials getCredentials(byte[] credentials);
+    String getFileName();
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX");
 
     @Test
     default void test123File() throws ParseException {
-
+        Database database = loadDatabase(getCredentials("123".getBytes()),
+                getClass().getClassLoader().getResourceAsStream(getFileName()));
         // visit all groups and entries and list them to console
-        getDatabase().visit(new Visitor.Print(getTestPrintStream()));
+        database.visit(new Visitor.Print(getTestPrintStream()));
 
         // find all entries in the database
         // the kdb version has three additional system related entries
-        List<? extends Entry> anything = getDatabase().findEntries("");
+        List<? extends Entry> anything = database.findEntries("");
         assertTrue(10 <= anything.size());
 
         // find all entries in the database that have the string "test" in them
-        List<? extends Entry> tests = getDatabase().findEntries("test");
+        List<? extends Entry> tests = database.findEntries("test");
         for (Entry tes: tests) {
             getTestPrintStream().println(tes.getTitle());
         }
@@ -71,14 +76,14 @@ public interface Test123Test {
             assertEquals("123", pass2);
         }
 
-        List<? extends Entry> passwords = getDatabase().findEntries("password");
+        List<? extends Entry> passwords = database.findEntries("password");
         assertEquals(4, passwords.size());
         for (Entry passwordEntry : passwords) {
             assertEquals(passwordEntry.getTitle(), passwordEntry.getProperty(PASSWORD));
             getTestPrintStream().println(passwordEntry.getTitle());
         }
 
-        List<? extends Entry> entries = getDatabase().findEntries(entry -> entry.getTitle().equals("hello world"));
+        List<? extends Entry> entries = database.findEntries(entry -> entry.getTitle().equals("hello world"));
 
         assertEquals(1, entries.size());
         assertEquals("pass", entries.get(0).getProperty(PASSWORD));

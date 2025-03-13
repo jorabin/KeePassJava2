@@ -18,39 +18,66 @@
 package org.linguafranca.pwdb.kdb;
 
 import org.linguafranca.pwdb.Database;
+import org.linguafranca.pwdb.Visitor;
+import org.linguafranca.pwdb.test.DatabaseTestBase;
 import org.linguafranca.pwdb.test.GroupsAndEntriesTest;
 import org.junit.jupiter.api.Test;
+import org.linguafranca.pwdb.test.Test123Test;
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
  * @author Jo
  */
-public class KdbDatabaseTest  implements GroupsAndEntriesTest {
+public class KdbDatabaseTest
+        extends
+            DatabaseTestBase
+        implements
+            GroupsAndEntriesTest,
+            Test123Test {
 
-    KdbDatabase kdbDatabase;
-
-    {newDatabase();}
-
-    @Override
-    public KdbDatabase createDatabase() {
-        return new KdbDatabase();
+    KdbDatabaseTest() {
+        super(KdbDatabase::new, KdbDatabase::loadNx, Database::saveNx, KdbCredentials.Password::new);
+        newDatabase();
     }
 
     @Override
-    public void newDatabase() {
-        kdbDatabase = createDatabase();
+    public boolean getSkipDateCheck() {
+        return true;
     }
 
     @Override
-    public Database getDatabase() {
-        return kdbDatabase;
+    public String getFileName(){
+        return "test123.kdb";
     }
 
     @Test
     public void supportedFunctionalityTest(){
-        assertFalse(kdbDatabase.supportsBinaryProperties());
-        assertFalse(kdbDatabase.supportsNonStandardPropertyNames());
-        assertFalse(kdbDatabase.supportsRecycleBin());
-        assertFalse(kdbDatabase.supportsPropertyValueStrategy());
+        assertFalse(getDatabase().supportsBinaryProperties());
+        assertFalse(getDatabase().supportsNonStandardPropertyNames());
+        assertFalse(getDatabase().supportsRecycleBin());
+        assertFalse(getDatabase().supportsPropertyValueStrategy());
+    }
+
+    @Test
+    public void testCreateKdbDatabase() throws Exception {
+        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdb");
+        Database database = KdbDatabase.load(new KdbCredentials.Password("123".getBytes()), inputStream);
+        database.visit(new Visitor.Print(getTestPrintStream()));
+    }
+
+    @Test
+    public void openKdbWithKeyFile() throws IOException {
+        InputStream key = getClass().getClassLoader().getResourceAsStream("kdb.key");
+        KdbCredentials creds = new KdbCredentials.KeyFile("123".getBytes(), key);
+        InputStream is = getClass().getClassLoader().getResourceAsStream("kdbwithkey.kdb");
+        KdbDatabase db = KdbDatabase.load(creds, is);
+        assertEquals(1, db.getRootGroup().getGroupsCount());
+        assertEquals("General", db.getRootGroup().getGroups().get(0).getName());
     }
 }

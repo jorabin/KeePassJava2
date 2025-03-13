@@ -17,7 +17,16 @@
 
 package org.linguafranca.pwdb.kdbx.database;
 
-public class KdbxBinariesV4Test  extends KdbxBinariesV3Test {
-    String databaseName = "V4-ChaCha20-Argon2-Attachment.kdbx";
+import org.linguafranca.pwdb.Database;
+import org.linguafranca.pwdb.format.KdbxCredentials;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
+import org.linguafranca.pwdb.test.*;
 
+public abstract class KdbxTestBase
+        extends
+            DatabaseTestBase {
+
+    KdbxTestBase() {
+        super(KdbxDatabase::new, KdbxDatabase::loadNx, Database::saveNx, KdbxCredentials::new);
+    }
 }

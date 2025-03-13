@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.InputStream;
 
 /**
- * Convenience wrapper to convert to KdbxCredentials - for helping with code migration to version 3.
+ * Convenience wrapper to convert to KdbxCredentials - for helping with code migration to KeePassJava2 version 3.
  *
  * @deprecated use {@link KdbxCredentials} instead
  */

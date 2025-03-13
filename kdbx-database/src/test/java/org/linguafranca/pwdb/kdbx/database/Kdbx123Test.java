@@ -29,25 +29,17 @@ import java.io.InputStream;
 /**
  * @author jo
  */
-public class Kdbx123Test implements Test123Test {
-
-    KdbxDatabase kdbxDatabase;
-
-    Kdbx123Test() throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
-        // file has password credentials
-        Credentials credentials = new KdbxCredentials("123".getBytes());
-        // open database.
-        kdbxDatabase = KdbxDatabase.load(credentials, inputStream);
-    }
-
-    @Override
-    public Database getDatabase() {
-        return kdbxDatabase;
-    }
+public class Kdbx123Test
+        extends KdbxTestBase
+        implements Test123Test {
 
     @Override
     public boolean getSkipDateCheck() {
         return false;
+    }
+
+    @Override
+    public String getFileName() {
+        return "test123.kdbx";
     }
 }

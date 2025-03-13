@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Review Issue-70 https://github.com/jorabin/KeePassJava2/issues/70
+ * Review <a href="https://github.com/jorabin/KeePassJava2/issues/70">Issue-70</a>
  */
 public class Issue70Test {
 

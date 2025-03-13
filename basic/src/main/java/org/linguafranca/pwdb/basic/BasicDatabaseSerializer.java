@@ -57,6 +57,27 @@ public interface BasicDatabaseSerializer {
     BasicDatabase load(InputStream inputStream) throws IOException;
 
     /**
+     * Serialize a BasicDatabase to a stream, with a runtime exception thrown if an IOException occurs
+     */
+    default void saveNx(BasicDatabase database, OutputStream outputStream){
+        try {
+            save(database, outputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Deserialize a BasicDatabase from a stream, with a runtime exception thrown if an IOException occurs
+     */
+    default BasicDatabase loadNx(InputStream inputStream){
+        try {
+            return load(inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    /**
      * XML implementation of containing BasicDatabaseSerializer
      */
     class Xml implements BasicDatabaseSerializer {

@@ -16,73 +16,17 @@
  */
 package org.linguafranca.pwdb.kdbx.database;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.linguafranca.pwdb.Credentials;
-import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.StreamFormat;
-import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.linguafranca.pwdb.format.KdbxHeader;
-import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 import org.linguafranca.pwdb.test.*;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+public class KdbxSaveAndReloadTest
+        extends KdbxTestBase
+        implements KdbxFileSaveAndReloadTest {
 
-public class KdbxSaveAndReloadTest implements
-        KdbxFileSaveAndReloadTest {
-
-    static String OUTPUT_DIRECTORY_PATH = "testOutput";
-    @BeforeAll
-    static void ppt2BeforeAll() throws Exception {
-        Files.createDirectories(Paths.get(OUTPUT_DIRECTORY_PATH));
-    }
-
-    Database database;
-
-    /**
-     * Create a new database
-     */
-    @Override
-    public Database createDatabase() {
-        return new KdbxDatabase();
-    }
-
-    /**
-     * Create a new database for default use in tests
-     */
-    @Override
-    public void newDatabase() {
-        database = createDatabase();
-    }
-
-    /**
-     * Get the current default database
-     */
-    @Override
-    public Database getDatabase() {
-        return database;
-    }
 
     @Override
-    public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream) throws IOException{
-        database.save(credentials, outputStream);
-    }
-
-    @Override
-    public Database loadDatabase(Credentials credentials, InputStream inputStream) throws IOException{
-        return KdbxDatabase.load(credentials, inputStream);
-    }
-
-    @Override
-    public Credentials getCredentials(byte[] credentials){
-        return new KdbxCredentials(credentials);
-    }
-
-    @Override
-    public boolean verifyStreamFormat(StreamFormat s1, StreamFormat s2) {
+    public boolean verifyStreamFormat(StreamFormat<?> s1, StreamFormat<?> s2) {
         KdbxHeader h1 = (KdbxHeader) s1.getStreamConfiguration();
         KdbxHeader h2 = (KdbxHeader) s1.getStreamConfiguration();
         return (h1.getVersion() == h2.getVersion() &&

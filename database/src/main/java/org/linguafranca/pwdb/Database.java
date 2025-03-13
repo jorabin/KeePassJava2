@@ -238,9 +238,19 @@ public interface Database {
     void save(Credentials credentials, OutputStream outputStream) throws IOException;
 
     /**
+     * Save the database to a stream using default format - avoiding checked exception
+     */
+    void saveNx(Credentials credentials, OutputStream outputStream);
+
+    /**
      * Save the database to a stream and closes the stream
      */
     <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) throws IOException;
+
+    /**
+     * Save the database to a stream and closes the stream - avoiding checked exception
+     */
+    <C extends StreamConfiguration> void saveNx(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream);
 
     /**
      * Get the format the database was loaded from

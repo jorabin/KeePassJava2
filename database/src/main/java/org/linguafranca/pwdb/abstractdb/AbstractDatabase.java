@@ -19,6 +19,7 @@ package org.linguafranca.pwdb.abstractdb;
 
 import org.linguafranca.pwdb.*;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -263,4 +264,21 @@ public abstract class AbstractDatabase implements Database {
         return false;
     }
 
+    @Override
+    public void saveNx(Credentials credentials, OutputStream outputStream) {
+        try {
+            save(credentials, outputStream);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public <C extends StreamConfiguration> void saveNx(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) {
+        try {
+            save(streamFormat, credentials, outputStream);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

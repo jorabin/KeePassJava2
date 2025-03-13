@@ -71,7 +71,7 @@ public class Issue27Test {
         }
     }
 
-@Disabled
+    @Test
     public void testIssue27XML() throws IOException {
 
         InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx");

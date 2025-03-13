@@ -84,6 +84,17 @@ public class KdbxDatabase extends ProtectedDatabase {
     }
 
     /**
+     * Load kdbx file - avoiding checked exceptions
+     */
+    public static KdbxDatabase loadNx(Credentials credentials, InputStream inputStream) {
+        try {
+            return load(credentials, inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Save the database with the same stream format that it was loaded with, or V4
      * default if none
      *

@@ -50,6 +50,14 @@ public class KdbDatabase extends AbstractDatabase {
         return KdbSerializer.createKdbDatabase(credentials, new KdbHeader(), inputStream);
     }
 
+    public static KdbDatabase loadNx(Credentials credentials, InputStream inputStream) {
+        try {
+            return KdbDatabase.load(credentials, inputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Primarily intended for finding the parent of an Entry, when deserializing KDB data.
      *
