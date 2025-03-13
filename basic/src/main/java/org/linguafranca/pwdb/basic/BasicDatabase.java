@@ -19,20 +19,25 @@ package org.linguafranca.pwdb.basic;
 
 import org.jetbrains.annotations.Nullable;
 import org.linguafranca.pwdb.*;
+import org.linguafranca.pwdb.format.KdbxHeader;
+import org.linguafranca.pwdb.format.KdbxSerializer;
+import org.linguafranca.pwdb.format.KdbxStreamFormat;
 import org.linguafranca.pwdb.protect.ProtectedDatabase;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
+import java.util.Objects;
 import java.util.Stack;
 
 /**
- * A basic implementation of a Database
+ * A basic implementation of a Database for experimentation and testing
  */
 public class BasicDatabase extends ProtectedDatabase {
     private final BasicGroup root = new BasicGroup(this, "Root");
     private String databaseName = "New Database";
     private String databaseDescription = "Database created on " + Instant.now().toString();
+    private StreamFormat<?> streamFormat;
 
     @Override
     public Group getRootGroup() {
@@ -96,24 +101,33 @@ public class BasicDatabase extends ProtectedDatabase {
 
     @Override
     public void save(Credentials credentials, OutputStream outputStream) throws IOException {
-        throw new UnsupportedOperationException();
+        if (Objects.isNull(streamFormat)) {
+            streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
+        }
+        save(streamFormat, credentials, outputStream);
     }
 
     @Override
-    public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
-        throw new UnsupportedOperationException();
+    public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat,
+                                                     Credentials credentials,
+                                                     OutputStream outputStream) throws IOException {
+        KdbxStreamFormat kdbxStreamFormat = (KdbxStreamFormat) streamFormat;
+        KdbxHeader header = kdbxStreamFormat.getStreamConfiguration();
+        OutputStream encryptedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, header, outputStream);
+        BasicDatabaseSerializer bds = new BasicDatabaseSerializer.Xml(header.getStreamEncryptor());
+        bds.save(this, encryptedOutputStream);
     }
 
     @Override
-    public <C extends StreamConfiguration> StreamFormat<C> getStreamFormat() {
-        throw new UnsupportedOperationException();
+    public StreamFormat<?> getStreamFormat() {
+        return streamFormat;
     }
 
     /**
      * A visitor that can be used to fix up the parent and database fields of groups and entries
      * after deserialization of the database
      */
-    public static class FixupVisitor implements Visitor{
+    public static class FixupVisitor implements Visitor {
         final Stack<Group> stack = new Stack<>();
         BasicDatabase database;
 

@@ -28,7 +28,9 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.linguafranca.pwdb.PropertyValue;
+import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.protect.ProtectedDatabase;
+import org.linguafranca.pwdb.security.StreamEncryptor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -81,7 +83,17 @@ public interface BasicDatabaseSerializer {
      * XML implementation of containing BasicDatabaseSerializer
      */
     class Xml implements BasicDatabaseSerializer {
-        private final ObjectMapper objectMapper = init();
+        private final ObjectMapper objectMapper;
+        private final StreamEncryptor streamEncryptor;
+
+        public Xml() {
+            this(new StreamEncryptor.None());
+        }
+
+        public Xml(StreamEncryptor streamEncryptor) {
+            this.streamEncryptor = streamEncryptor;
+            this.objectMapper = init();
+        }
 
         @Override
         public void save(BasicDatabase database, OutputStream outputStream) throws IOException {
@@ -97,8 +109,8 @@ public interface BasicDatabaseSerializer {
 
         private ObjectMapper init() {
             SimpleModule module = new SimpleModule()
-                    .addDeserializer(PropertyValue.class, new PropertyValueDeserializer())
-                    .addSerializer(PropertyValue.class, new PropertyValueSerializer())
+                    .addDeserializer(PropertyValue.class, new PropertyValueDeserializer(streamEncryptor))
+                    .addSerializer(PropertyValue.class, new PropertyValueSerializer(streamEncryptor))
                     .addDeserializer(BasicIcon.class, new IconDeserializer())
                     .addSerializer(BasicIcon.class, new IconSerializer());
             XmlMapper mapper = XmlMapper.builder()
@@ -135,6 +147,16 @@ public interface BasicDatabaseSerializer {
          * Configure special treatment on serialization of properties
          */
         public static class PropertyValueSerializer extends JsonSerializer<PropertyValue> {
+            StreamEncryptor streamEncryptor;
+
+            public PropertyValueSerializer() {
+                this(new StreamEncryptor.None());
+            }
+
+            public PropertyValueSerializer(StreamEncryptor streamEncryptor) {
+                this.streamEncryptor = streamEncryptor;
+            }
+
             /**
              * Don't serialize empty properties
              * <p>
@@ -163,18 +185,22 @@ public interface BasicDatabaseSerializer {
                 if (value.isProtected()) {
                     xmlGenerator.setNextIsAttribute(true);
                     xmlGenerator.writeStringField("protected", "true");
-                    asBinary = true; // write password as binary TODO later we can stream encode it
+                    asBinary = true; // write password as binary
                 }
 
                 if (asBinary) {
                     xmlGenerator.setNextIsAttribute(true);
                     xmlGenerator.writeStringField("binary", "true");
                 }
-
                 xmlGenerator.setNextIsAttribute(false);
                 xmlGenerator.setNextIsUnwrapped(true);
+
                 if (asBinary) {
-                    xmlGenerator.writeBinaryField("text", value.getValueAsBytes());
+                    byte[] bytes = value.getValueAsBytes();
+                    if (value.isProtected()) {
+                        bytes = streamEncryptor.encrypt(bytes);
+                    }
+                    xmlGenerator.writeBinaryField("text", bytes);
                 } else {
                     xmlGenerator.writeStringField("text", value.getValueAsString());
                 }
@@ -186,7 +212,17 @@ public interface BasicDatabaseSerializer {
          * Property deserialization
          */
         public static class PropertyValueDeserializer extends JsonDeserializer<PropertyValue> {
-            PropertyValue.Strategy strategy = new PropertyValue.Strategy.Default();
+            PropertyValue.Strategy strategy;
+            StreamEncryptor streamEncryptor;
+
+            public PropertyValueDeserializer() {
+                this(new StreamEncryptor.None());
+            }
+
+            public PropertyValueDeserializer(StreamEncryptor streamEncryptor) {
+                this.streamEncryptor = streamEncryptor;
+                this.strategy = new PropertyValue.Strategy.Default();
+            }
 
             @Override
             public PropertyValue deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
@@ -195,8 +231,12 @@ public interface BasicDatabaseSerializer {
                 if (node.isTextual()) {
                     return strategy.newUnprotected().of(node.textValue());
                 }
-                if (node.has("protected") || node.has("binary")) {
-                    return strategy.newProtected().of(node.get("").binaryValue());
+                if (node.has("binary")) {
+                    if (node.has("protected")) {
+                        byte[] bytes = streamEncryptor.decrypt(node.get("").binaryValue());
+                        return strategy.newProtected().of(bytes);
+                    }
+                    return strategy.newUnprotected().of(node.get("").binaryValue());
                 }
                 throw new IllegalStateException("Unknown property value format " + node);
             }
@@ -265,6 +305,8 @@ public interface BasicDatabaseSerializer {
             ProtectedDatabase valueStrategy;
             @JsonIgnore
             boolean isDirty;
+            @JsonIgnore
+            StreamFormat<?> streamFormat;
         }
     }
 }

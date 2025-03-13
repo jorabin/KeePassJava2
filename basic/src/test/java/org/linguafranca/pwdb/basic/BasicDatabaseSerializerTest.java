@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Visitor;
+import org.linguafranca.pwdb.security.StreamEncryptor;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -87,14 +88,8 @@ class BasicDatabaseSerializerTest {
 
     @Test
     void saveAndLoad() throws IOException {
-        new BasicDatabaseSerializer.Xml().save(database, new FileOutputStream(TEST_OUTPUT_DIR + "test.xml"));
-        BasicDatabase loadedDatabase = new BasicDatabaseSerializer.Xml().load(new FileInputStream(TEST_OUTPUT_DIR + "test.xml"));
+        new BasicDatabaseSerializer.Xml(new StreamEncryptor.Salsa20(new byte[0])).save(database, new FileOutputStream(TEST_OUTPUT_DIR + "test.xml"));
+        BasicDatabase loadedDatabase = new BasicDatabaseSerializer.Xml(new StreamEncryptor.Salsa20(new byte[0])).load(new FileInputStream(TEST_OUTPUT_DIR + "test.xml"));
         loadedDatabase.visit(visitor);
-    }
-
-    @Test
-    void load() throws IOException {
-        BasicDatabase loadedDatabase = new BasicDatabaseSerializer.Xml().load(new FileInputStream(TEST_OUTPUT_DIR + "test.xml"));
-        loadedDatabase.visit(new Visitor.Print());
     }
 }
