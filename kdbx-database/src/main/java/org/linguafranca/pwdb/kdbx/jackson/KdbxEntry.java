@@ -316,6 +316,11 @@ public class KdbxEntry extends AbstractEntry {
     }
 
     @Override
+    public KdbxDatabase getDatabase() {
+        return database;
+    }
+
+    @Override
     public KdbxGroup getParent() {
         return parent;
     }

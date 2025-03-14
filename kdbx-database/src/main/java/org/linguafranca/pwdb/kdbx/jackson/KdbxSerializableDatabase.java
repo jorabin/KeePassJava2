@@ -172,24 +172,6 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
         return keePassFile.meta.binaries.size();
     }
 
-    /**
-     * On load add parents
-     * 
-     * @param parent a parent to recurse
-     */
-    static void fixUp(KdbxGroup parent) {
-
-        for (KdbxGroup group : parent.groups) {
-            group.parent = parent;
-            group.database = parent.database;
-            fixUp(group);
-        }
-
-        for (KdbxEntry entry : parent.entries) {
-            entry.database = parent.database;
-            entry.parent = parent;
-        }
-    }
 
     @Override
     public StreamEncryptor getEncryption() {

@@ -226,6 +226,7 @@ public class KdbSerializer {
     private static void deserializeEntry(KdbDatabase database, DataInput dataInput) throws IOException {
         int fieldType;
         KdbEntry entry = new KdbEntry();
+        entry.database = database;
         while ((fieldType = dataInput.readUnsignedShort()) != 0xFFFF) {
             switch (fieldType) {
                 case 0x0000:

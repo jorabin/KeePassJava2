@@ -283,6 +283,12 @@ public interface Entry {
     List<String> getBinaryPropertyNames();
 
     /**
+     * Get the database this entry belongs to
+     * @return a database
+     */
+    Database getDatabase();
+
+    /**
      * Get the parent of this entry
      * @return a parent or null if this entry currently does not have a parent
      */

@@ -103,7 +103,7 @@ public interface BasicDatabaseSerializer {
         @Override
         public BasicDatabase load(InputStream inputStream) throws IOException {
             BasicDatabase database2 = objectMapper.readValue(inputStream, BasicDatabase.class);
-            database2.visit(new BasicDatabase.FixupVisitor(database2));
+            database2.fixUp((BasicGroup) database2.getRootGroup());
             return database2;
         }
 

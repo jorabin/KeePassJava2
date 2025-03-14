@@ -58,7 +58,11 @@ class BasicDatabaseSerializerTest {
         @Override
         public void startVisit(Group group) {
             System.out.println("Group: " + group.getName() + " " + group.getUuid());
-            //assertNotNull(database.findGroup(group.getUuid()));
+            assertNotNull(database.findGroup(group.getUuid()));
+            assertNotNull(group.getDatabase());
+            if (!group.isRootGroup()) {
+                assertNotNull(group.getParent());
+            }
         }
 
         @Override
@@ -78,6 +82,8 @@ class BasicDatabaseSerializerTest {
                 Entry entry1 = database.findEntry(entry.getUuid());
                 assertNotNull(entry1, "Entry not found " + entry.getUuid());
                 assertEquals(entry.getPropertyNames().size(), entry1.getPropertyNames().size());
+                assertNotNull(entry.getDatabase());
+                assertNotNull(entry.getParent());
         }
 
         @Override
@@ -91,5 +97,6 @@ class BasicDatabaseSerializerTest {
         new BasicDatabaseSerializer.Xml(new StreamEncryptor.Salsa20(new byte[0])).save(database, new FileOutputStream(TEST_OUTPUT_DIR + "test.xml"));
         BasicDatabase loadedDatabase = new BasicDatabaseSerializer.Xml(new StreamEncryptor.Salsa20(new byte[0])).load(new FileInputStream(TEST_OUTPUT_DIR + "test.xml"));
         loadedDatabase.visit(visitor);
+        System.out.println(loadedDatabase.getRootGroup().getDatabase().getName());
     }
 }

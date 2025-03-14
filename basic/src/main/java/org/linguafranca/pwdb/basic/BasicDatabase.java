@@ -123,42 +123,25 @@ public class BasicDatabase extends ProtectedDatabase {
         return streamFormat;
     }
 
+
     /**
-     * A visitor that can be used to fix up the parent and database fields of groups and entries
-     * after deserialization of the database
+     * On load add parents
+     *
+     * @param parent a parent to recurse
      */
-    public static class FixupVisitor implements Visitor {
-        final Stack<Group> stack = new Stack<>();
-        BasicDatabase database;
-
-        public FixupVisitor(BasicDatabase database) {
-            this.database = database;
+    void fixUp(BasicGroup parent) {
+        parent.database = this;
+        for (Group group : parent.getGroups()) {
+            BasicGroup basicGroup = (BasicGroup) group;
+            basicGroup.parent = parent;
+            fixUp(basicGroup);
         }
 
-        @Override
-        public void startVisit(Group group) {
-            ((BasicGroup) group).database = database;
-            if (!stack.isEmpty()) {
-                ((BasicGroup) group).parent = (BasicGroup) stack.peek();
-            }
-            stack.push(group);
+        for (Entry entry : parent.getEntries()) {
+            BasicEntry basicEntry = (BasicEntry) entry;
+            basicEntry.database = this;
+            basicEntry.parent = parent;
         }
-
-        @Override
-        public void endVisit(Group group) {
-            stack.pop();
-        }
-
-        @Override
-        public void visit(Entry entry) {
-            ((BasicEntry) entry).database = database;
-            ((BasicEntry) entry).parent = stack.peek();
-        }
-
-        @Override
-        public boolean isEntriesFirst() {
-            return false;
-        }
-
     }
+
 }

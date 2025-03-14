@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class BasicGroup extends AbstractGroup {
-    BasicGroup parent;
-    BasicDatabase database;
+    protected BasicGroup parent;
+    protected BasicDatabase database;
     private final UUID uuid;
     private String name;
     private BasicIcon icon;
@@ -60,7 +60,7 @@ public class BasicGroup extends AbstractGroup {
 
     @Override
     public boolean isRootGroup() {
-        return false;
+        return database.getRootGroup().equals(this);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class BasicGroup extends AbstractGroup {
     }
 
     @Override
-    public @Nullable Group getParent() {
+    public @Nullable BasicGroup getParent() {
         return parent;
     }
 
@@ -115,19 +115,19 @@ public class BasicGroup extends AbstractGroup {
     }
 
     @Override
-    public Entry addEntry(Entry entry) {
+    public BasicEntry addEntry(Entry entry) {
         BasicEntry basicEntry = (BasicEntry) entry;
         entries.add(basicEntry);
         basicEntry.parent = this;
-        return entry;
+        return basicEntry;
     }
 
     @Override
-    public Entry removeEntry(Entry entry) {
+    public BasicEntry removeEntry(Entry entry) {
         BasicEntry basicEntry = (BasicEntry) entry;
         entries.remove(basicEntry);
         (basicEntry).parent = null;
-        return entry;
+        return basicEntry;
     }
 
     @Override

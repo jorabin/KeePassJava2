@@ -49,7 +49,7 @@ public class KdbxDatabase extends ProtectedDatabase {
             keePassFile = file;
             keePassFile.root.group.database = this;
             this.streamFormat = streamFormat;
-            KdbxSerializableDatabase.fixUp(keePassFile.root.group);
+            fixUp(keePassFile.root.group);
         } catch (Exception e) {
             throw new IllegalStateException(e);
         }
@@ -219,5 +219,26 @@ public class KdbxDatabase extends ProtectedDatabase {
     public StreamFormat<?> getStreamFormat() {
         return streamFormat;
     }
+
+
+    /**
+     * On load add parents
+     *
+     * @param parent a parent to recurse
+     */
+    static void fixUp(KdbxGroup parent) {
+
+        for (KdbxGroup group : parent.groups) {
+            group.parent = parent;
+            group.database = parent.database;
+            fixUp(group);
+        }
+
+        for (KdbxEntry entry : parent.entries) {
+            entry.database = parent.database;
+            entry.parent = parent;
+        }
+    }
+
 
 }

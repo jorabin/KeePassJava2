@@ -34,6 +34,7 @@ import java.util.UUID;
  * @author jo
  */
 public class KdbEntry extends AbstractEntry {
+    public KdbDatabase database;
     KdbGroup parent;
     private UUID uuid = UUID.randomUUID();
     private String title = "";
@@ -93,6 +94,11 @@ public class KdbEntry extends AbstractEntry {
     @Override
     public KdbGroup getParent() {
         return parent;
+    }
+
+    @Override
+    public KdbDatabase getDatabase() {
+        return database;
     }
 
     @Override

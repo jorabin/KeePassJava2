@@ -19,18 +19,15 @@ package org.linguafranca.pwdb.basic;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.linguafranca.pwdb.Entry;
-import org.linguafranca.pwdb.Group;
-import org.linguafranca.pwdb.Icon;
-import org.linguafranca.pwdb.PropertyValue;
+import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.abstractdb.AbstractEntry;
 
 import java.time.Instant;
 import java.util.*;
 
 public class BasicEntry extends AbstractEntry {
-    BasicDatabase database;
-    protected Group parent;
+    protected BasicDatabase database;
+    protected BasicGroup parent;
 
     private final UUID uuid;
     private BasicIcon icon;
@@ -76,7 +73,7 @@ public class BasicEntry extends AbstractEntry {
     }
 
     @Override
-    public Entry setProperty(String name, String value) {
+    public BasicEntry setProperty(String name, String value) {
         updateModifiedTime();
         properties.put(name, PropertyValue.StringStore.getFactory().of(value));
         return this;
@@ -109,21 +106,21 @@ public class BasicEntry extends AbstractEntry {
     }
 
     @Override
-    public Entry setPropertyValue(String name, PropertyValue value) {
+    public BasicEntry setPropertyValue(String name, PropertyValue value) {
         properties.put(name, value);
         return this;
     }
 
-    public Entry addProperty(String name, byte[] value){
+    public BasicEntry addProperty(String name, byte[] value){
         properties.put(name, database.getPropertyValueStrategy().getFactoryFor(name).of(value));
         return this;
     }
-    public Entry addProperty(String name, char[] value) {
+    public BasicEntry addProperty(String name, char[] value) {
         properties.put(name, database.getPropertyValueStrategy().getFactoryFor(name).of(value));
         return this;
     }
 
-    public Entry addProperty(String name, CharSequence value){
+    public BasicEntry addProperty(String name, CharSequence value){
         properties.put(name, database.getPropertyValueStrategy().getFactoryFor(name).of(value));
         return this;
     }
@@ -156,7 +153,12 @@ public class BasicEntry extends AbstractEntry {
     }
 
     @Override
-    public @Nullable Group getParent() {
+    public BasicDatabase getDatabase() {
+        return database;
+    }
+
+    @Override
+    public @Nullable BasicGroup getParent() {
         return parent;
     }
 
@@ -166,7 +168,7 @@ public class BasicEntry extends AbstractEntry {
     }
 
     @Override
-    public Icon getIcon() {
+    public BasicIcon getIcon() {
         return icon;
     }
 
