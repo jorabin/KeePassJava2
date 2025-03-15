@@ -104,13 +104,6 @@
 							<logback.configurationFile>${maven.multiModuleProjectDirectory}/logback.xml
 							</logback.configurationFile>
 						</systemPropertyVariables>
-						<properties>
-							<!-- this gives us more detailed logging during build -->
-							<property>
-								<name>listener</name>
-								<value>org.linguafranca.util.MavenRunListener</value>
-							</property>
-						</properties>
 					</configuration>
 				</plugin>
 				<plugin>
