@@ -30,11 +30,11 @@ public class BasicDatabaseTest
             ProtectedPropertyTest2 {
 
     BasicDatabaseTest() {
-super(BasicDatabase::new,
-      (credentials, inputStream) ->
-              new BasicDatabaseSerializer.Xml().loadNx(inputStream),
-      (database, credentials, outputStream) ->
-              new BasicDatabaseSerializer.Xml().saveNx((BasicDatabase) database, outputStream),
-      (credentials) -> null);
+        super(BasicDatabase::new,
+                (credentials, inputStream) ->
+                        new BasicDatabaseSerializer.Xml().loadNx(inputStream),
+                (database, credentials, outputStream) ->
+                        new BasicDatabaseSerializer.Xml().saveNx((BasicDatabase) database, outputStream),
+                (credentials) -> null);
     }
 }

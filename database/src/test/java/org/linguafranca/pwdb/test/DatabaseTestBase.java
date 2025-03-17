@@ -46,7 +46,7 @@ public class DatabaseTestBase {
         }
     }
 
-    static String OUTPUT_DIRECTORY_PATH = "testOutput";
+    public static String OUTPUT_DIRECTORY_PATH = "testOutput";
 
     @BeforeAll
     static void baseBeforeAll() throws Exception {

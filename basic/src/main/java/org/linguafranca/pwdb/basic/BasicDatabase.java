@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.time.Instant;
 import java.util.Objects;
-import java.util.Stack;
 
 /**
  * A basic implementation of a Database for experimentation and testing
@@ -114,7 +113,7 @@ public class BasicDatabase extends ProtectedDatabase {
         KdbxStreamFormat kdbxStreamFormat = (KdbxStreamFormat) streamFormat;
         KdbxHeader header = kdbxStreamFormat.getStreamConfiguration();
         OutputStream encryptedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, header, outputStream);
-        BasicDatabaseSerializer bds = new BasicDatabaseSerializer.Xml(header.getStreamEncryptor());
+        BasicDatabaseSerializer bds = new BasicDatabaseSerializer.Xml(header.getInnerStreamEncryptor());
         bds.save(this, encryptedOutputStream);
     }
 

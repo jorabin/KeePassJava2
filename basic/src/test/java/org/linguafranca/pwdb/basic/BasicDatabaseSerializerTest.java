@@ -31,10 +31,12 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 class BasicDatabaseSerializerTest {
     public static final String TEST_OUTPUT_DIR = "testOutput/";
     static BasicDatabase database;
+    static PrintStream out = getTestPrintStream();
 
     @BeforeAll
     static void setUp() throws IOException {
@@ -57,7 +59,7 @@ class BasicDatabaseSerializerTest {
     Visitor visitor = new Visitor() {
         @Override
         public void startVisit(Group group) {
-            System.out.println("Group: " + group.getName() + " " + group.getUuid());
+            out.println("Group: " + group.getName() + " " + group.getUuid());
             assertNotNull(database.findGroup(group.getUuid()));
             assertNotNull(group.getDatabase());
             if (!group.isRootGroup()) {
@@ -72,12 +74,12 @@ class BasicDatabaseSerializerTest {
 
         @Override
         public void visit(Entry entry) {
-            System.out.println("Entry: " + entry.getTitle() + " " + entry.getUuid());
+            out.println("Entry: " + entry.getTitle() + " " + entry.getUuid());
                 for (String propertyName: entry.getPropertyNames()) {
-                    System.out.println("  " + propertyName + ": " + entry.getPropertyValue(propertyName).getValueAsString());
+                    out.println("  " + propertyName + ": " + entry.getPropertyValue(propertyName).getValueAsString());
                 }
             for (String propertyName: entry.getBinaryPropertyNames()) {
-                System.out.println("  " + propertyName + ": " + Arrays.toString(entry.getBinaryProperty(propertyName)));
+                out.println("  " + propertyName + ": " + Arrays.toString(entry.getBinaryProperty(propertyName)));
             }
                 Entry entry1 = database.findEntry(entry.getUuid());
                 assertNotNull(entry1, "Entry not found " + entry.getUuid());
@@ -97,6 +99,6 @@ class BasicDatabaseSerializerTest {
         new BasicDatabaseSerializer.Xml(new StreamEncryptor.Salsa20(new byte[0])).save(database, new FileOutputStream(TEST_OUTPUT_DIR + "test.xml"));
         BasicDatabase loadedDatabase = new BasicDatabaseSerializer.Xml(new StreamEncryptor.Salsa20(new byte[0])).load(new FileInputStream(TEST_OUTPUT_DIR + "test.xml"));
         loadedDatabase.visit(visitor);
-        System.out.println(loadedDatabase.getRootGroup().getDatabase().getName());
+        out.println(loadedDatabase.getRootGroup().getDatabase().getName());
     }
 }

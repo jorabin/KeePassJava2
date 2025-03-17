@@ -242,9 +242,9 @@ public class KdbxHeader implements StreamConfiguration {
         return ca.getDecryptedInputStream(inputStream, finalKeyDigest, encryptionIv);
     }
 
-    public StreamEncryptor getInnerStreamEncryptor() {
+/*    public StreamEncryptor getInnerStreamEncryptor() {
         return Encryption.ProtectedStreamAlgorithm.getStreamEncryptor(getProtectedStreamAlgorithm(), getInnerRandomStreamKey());
-    }
+    }*/
 
     /**
      * Takes the composite credentials and transforms them according to the underlying KDF algorithm.
@@ -340,7 +340,7 @@ public class KdbxHeader implements StreamConfiguration {
         return kdfParameters;
     }
 
-    public StreamEncryptor getStreamEncryptor() {
+    public StreamEncryptor getInnerStreamEncryptor() {
         return Encryption.ProtectedStreamAlgorithm.getStreamEncryptor(getProtectedStreamAlgorithm(), this.innerRandomStreamKey);
     }
 

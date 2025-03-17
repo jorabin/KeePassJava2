@@ -62,7 +62,7 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
     @Override
     public void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream encryptedInputStream) throws IOException {
         try (InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, encryptedInputStream)) {
-            serializableDatabase.setEncryption(kdbxHeader.getStreamEncryptor());
+            serializableDatabase.setEncryption(kdbxHeader.getInnerStreamEncryptor());
             serializableDatabase.load(decryptedInputStream);
             if (kdbxHeader.getVersion() == 3 && !Arrays.equals(serializableDatabase.getHeaderHash(), kdbxHeader.getHeaderHash())) {
                 throw new IllegalStateException("Header hash does not match");
@@ -95,7 +95,7 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
             if (kdbxHeader.getVersion() == 3) {
                 serializableDatabase.setHeaderHash(kdbxHeader.getHeaderHash());
             }
-            serializableDatabase.setEncryption(kdbxHeader.getStreamEncryptor());
+            serializableDatabase.setEncryption(kdbxHeader.getInnerStreamEncryptor());
             serializableDatabase.save(encryptedOutputStream);
             encryptedOutputStream.flush();
         }
