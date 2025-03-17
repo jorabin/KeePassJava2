@@ -33,6 +33,12 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 
 /**
+ * NB if you want to examine the XML of a KeePass file it's easiest to use<br>
+ * <code>
+ * database.save(new KdbxFormat.None(), new Credentials.None(), new PrintWriter(System.out));
+ * </code>
+ * <p>
+ * See {@link QuickStart#loadKdbx4SaveToConsole}
  * @author jo
  */
 public class SaxParse {

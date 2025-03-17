@@ -30,7 +30,8 @@ import static org.linguafranca.util.TestUtil.getTestPrintStream;
 /**
  * Example and naive speed test for various implementations.
  * <p>
- * This isn't really very interesting in V3 but remains here in case new implementations are added.
+ * It was used to compare the various implementations of KDBX in V2. It isn't really very interesting in V3 but
+ * remains here in case new implementations are added.
  *
  * @author jo
  */
@@ -42,7 +43,7 @@ public class OpenDbExample {
         Database load(KdbxCredentials creds, InputStream inputStream) throws Exception;
     }
 
-    private static class JacksonDbLoader implements DbLoader {
+    private static class KdbxLoader implements DbLoader {
         @Override
         public Database load(KdbxCredentials creds, InputStream inputStream) throws Exception {
             return KdbxDatabase.load(creds, inputStream);
@@ -67,24 +68,24 @@ public class OpenDbExample {
 
     public static void main(String[] args) throws Exception {
         printStream.println("Warming up JVM");
-        testDb(new JacksonDbLoader(), "Jackson", 5, 20);
+        testDb(new KdbxLoader(), "Jackson", 5, 20);
 
         printStream.println("Sleeping");
         System.gc();
         Thread.sleep(2000);
 
-        testDb(new JacksonDbLoader(), "Jackson", 5, 20);
+        testDb(new KdbxLoader(), "Jackson", 5, 20);
 
         printStream.println("Sleeping");
         System.gc();
         Thread.sleep(2000);
 
-        testDb(new JacksonDbLoader(), "Jackson", 10, 1);
+        testDb(new KdbxLoader(), "Jackson", 10, 1);
 
         printStream.println("Sleeping");
         System.gc();
         Thread.sleep(2000);
 
-        testDb(new JacksonDbLoader(), "Jackson", 1, 50);
+        testDb(new KdbxLoader(), "Jackson", 1, 50);
     }
 }

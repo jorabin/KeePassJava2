@@ -45,6 +45,16 @@ public class SimpleQuickStartTest extends QuickStart {
     }
 
     @Test
+    public void canonicalQuickstartTest() throws IOException {
+        super.canonicalQuickStart();
+    }
+
+    @Test
+    public void fluentExampleTest() throws IOException {
+        super.fluentExample();
+    }
+
+    @Test
     public void saveTest() throws IOException {
         super.saveKdbx();
     }

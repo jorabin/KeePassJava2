@@ -25,6 +25,7 @@ import org.linguafranca.pwdb.kdb.KdbCredentials;
 import org.linguafranca.pwdb.kdb.KdbDatabase;
 import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 import org.linguafranca.pwdb.security.Encryption;
+import org.linguafranca.util.TestUtil;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -255,5 +256,20 @@ public abstract class QuickStart {
         try (OutputStream v3OutputStream = Files.newOutputStream(v3Filename)) {
             kdbxDatabase.save(formatV3, credentials, v3OutputStream);
         }
+    }
+
+    /**
+     * Load KDBX V3 save as KDBX V4
+     */
+    public void loadKdbx4SaveToConsole(String resourceName, byte[] password, Path path) throws IOException {
+        KdbxDatabase database;
+        // password credentials
+        KdbxCredentials credentials = new KdbxCredentials(password);
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
+            // load KdbDatabase
+            database = KdbxDatabase.load(credentials, inputStream);
+        }
+
+        database.save(new StreamFormat.None(), new Credentials.None(), TestUtil.getTestPrintStream());
     }
 }

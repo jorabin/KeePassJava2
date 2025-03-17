@@ -24,7 +24,7 @@ import org.slf4j.*;
 
 public class ExecutionListener implements TestExecutionListener {
 
-    static Logger logger = LoggerFactory.getLogger("MavenRunListener");
+    static Logger logger = LoggerFactory.getLogger("Test Execution Listener");
     static Marker marker = MarkerFactory.getMarker("Starting");
     static Marker endMarker = MarkerFactory.getMarker("Finished");
     static Marker failMarker = MarkerFactory.getMarker("Failed");
@@ -39,7 +39,7 @@ public class ExecutionListener implements TestExecutionListener {
 
     @Override
     public void executionStarted(TestIdentifier testIdentifier) {
-        logger.info(marker, "{}", testIdentifier.getDisplayName());
+        logger.info(marker, "{} {}", testIdentifier.getType(), testIdentifier.getDisplayName());
     }
 
     @Override
