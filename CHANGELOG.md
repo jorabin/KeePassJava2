@@ -19,7 +19,6 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
   - remove JAXB database
   - remove DOM database
   - remove `test` and `util` modules
-  - remove `all` module
 - refactor tests
   - restructure
   - create a test-jar for dependencies
