@@ -2,16 +2,36 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-## 2024-11-22 [3.0.0-SNAPSHOT]
+## [3.0.0-SNAPSHOT] (ongoing)
 
 ### Changed
 
-- remove Simple database
-- remove JAXB database
-- remove DOM database
-- remove complicated generics on database classes
+- update to Java 11
+- refactor API
+  - remove complicated generics
+  - fluent element builder
+  - additional convenience methods
+- refactor examples
+- refactor modules
+  - rename Jackson database to KDBX database
+  - add experimental `basic` database support
+  - remove Simple database
+  - remove JAXB database
+  - remove DOM database
+  - remove `test` and `util` modules
+  - remove `all` module
+- refactor tests
+  - restructure
+  - create a test-jar for dependencies
+  - "upgrade" to JUnit 5
 
-## 2025-01-05 [2.2.3]
+
+## [2.2.4] 2025-03-05
+
+- [Issue 76, 78] Resolve incompatibility with KeePassXC (empty elements)
+- [Issue 73] Trying to resolve dependency clashes for Woodstox etc
+
+## [2.2.3] 2025-01-05
 
 ### Added
 
