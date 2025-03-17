@@ -35,8 +35,7 @@
 	<packaging>pom</packaging>
 
 	<name>KeePassJava2</name>
-	<description>A Java 11 API for databases compatible with the renowned KeePass password safe for Windows
-	</description>
+	<description>A Java 11 API for databases compatible with the renowned KeePass password safe for Windows</description>
 	<url>https://github.com/jorabin/KeePassJava2</url>
 
 	<licenses>
@@ -99,10 +98,9 @@
 							<!-- set Java system property to maven property, set in eponymous profile, below -->
 							<inhibitConsoleOutput>${inhibitConsoleOutput}</inhibitConsoleOutput>
 							<!-- this tells all tests run via surefire to pick their logback config up from the root -->
-							<!-- fwiw does not affect those run via main() which need to find their config by other means -->
+							<!-- fwiw does not affect those run  by other means which need to find their config somehow else-->
 							<!--suppress UnresolvedMavenProperty -->
-							<logback.configurationFile>${maven.multiModuleProjectDirectory}/logback.xml
-							</logback.configurationFile>
+							<logback.configurationFile>${maven.multiModuleProjectDirectory}/logback.xml</logback.configurationFile>
 						</systemPropertyVariables>
 					</configuration>
 				</plugin>
@@ -263,12 +261,15 @@
 
 	<profiles>
 		<profile>
+			<!-- this is a profile that can be activated to inhibit console output from tests -->
 			<id>inhibitConsoleOutput</id>
 			<properties>
 				<inhibitConsoleOutput>true</inhibitConsoleOutput>
 			</properties>
 		</profile>
 		<profile>
+			<!-- used for the actual release - mvn clean deploy -P releaseToMaven,inhibitConsoleOutput
+			see https://central.sonatype.org/publish/publish-maven/ -->
 			<id>releaseToMaven</id>
 			<build>
 				<plugins>

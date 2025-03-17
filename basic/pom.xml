@@ -28,8 +28,24 @@
 
 	<artifactId>basic</artifactId>
 	<name>PWDB :: Basic</name>
+	<description>Experimental database implementation to explore serialization.</description>
+	<properties>
+		<maven.deploy.skip>true</maven.deploy.skip>
+	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.linguafranca.pwdb</groupId>
+			<artifactId>database</artifactId>
+			<version>${project.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.linguafranca.pwdb</groupId>
+			<artifactId>KeePassJava2.kdbx.io</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+			<scope>compile</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
@@ -49,20 +65,8 @@
 			<groupId>org.linguafranca.pwdb</groupId>
 			<artifactId>database</artifactId>
 			<version>${project.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.linguafranca.pwdb</groupId>
-			<artifactId>database</artifactId>
-			<version>${project.version}</version>
 			<type>test-jar</type>
-		</dependency>
-		<dependency>
-			<groupId>org.linguafranca.pwdb</groupId>
-			<artifactId>KeePassJava2.kdbx.io</artifactId>
-			<version>3.0.0-SNAPSHOT</version>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 </project>

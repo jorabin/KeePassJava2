@@ -26,7 +26,7 @@
 
   <artifactId>KeePassJava2.kdbx.database</artifactId>
   <name>KeePassJava2 :: KDBX-Database</name>
-  <description>Contains a Jackson XML implementation for KDBX.</description>
+  <description>KeePass KDBX file support</description>
 
   <dependencies>
     <dependency>

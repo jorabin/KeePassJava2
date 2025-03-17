@@ -27,7 +27,7 @@
 
     <artifactId>KeePassJava2.kdb</artifactId>
     <name>KeePassJava2 :: KDB</name>
-    <description>Contains an implementation that can load KDB files.</description>
+    <description>KeePass KDB file support</description>
 
     <dependencies>
         <dependency>

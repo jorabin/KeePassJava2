@@ -27,10 +27,7 @@
 
     <artifactId>KeePassJava2.kdbx.io</artifactId>
     <name>KeePassJava2 :: KDBX-IO</name>
-    <description>Base classes and resources for other KDBX modules.
-        KDBX Stream Support.
-        Security support.
-    </description>
+    <description>KeePass KDBX File format support</description>
 
 
     <dependencies>
