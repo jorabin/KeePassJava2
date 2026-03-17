@@ -56,5 +56,11 @@
             <artifactId>aalto-xml</artifactId>
             <version>1.3.3</version>
         </dependency>
+        <dependency>
+            <groupId>org.linguafranca.pwdb</groupId>
+            <artifactId>util</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>
