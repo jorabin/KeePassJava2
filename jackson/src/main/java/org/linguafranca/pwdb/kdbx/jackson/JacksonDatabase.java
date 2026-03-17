@@ -36,7 +36,9 @@ import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.cre
 
 public class JacksonDatabase extends ProtectedDatabase<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
 
-    KeePassFile keePassFile;
+
+
+    protected KeePassFile keePassFile;
     StreamFormat<?> streamFormat;
 
     public JacksonDatabase() throws IOException {
