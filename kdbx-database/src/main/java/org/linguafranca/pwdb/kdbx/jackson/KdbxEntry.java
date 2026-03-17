@@ -340,6 +340,29 @@ public class KdbxEntry extends AbstractEntry {
         iconID = icon.getIndex();
     }
 
+    @JsonIgnore
+    public UUID getCustomIconUuid() {
+        return customIconUUID;
+    }
+
+    @JsonIgnore
+    public void setCustomIconUUID(UUID uuid) {
+        customIconUUID = uuid;
+    }
+
+    @JsonIgnore
+    public KeePassFile.Icon getCustomIcon() {
+        if (customIconUUID == null) {
+            throw new IllegalStateException("Custom icon has not been set");
+        }
+        for (KeePassFile.Icon icon : database.keePassFile.meta.customIcons) {
+            if (icon.uuid.equals(customIconUUID)) {
+                return icon;
+            }
+        }
+        throw new IllegalStateException("Custom icon was not found in database for uuid: " + customIconUUID);
+    }
+
     @Override
     @JsonIgnore
     public Date getLastAccessTime() {

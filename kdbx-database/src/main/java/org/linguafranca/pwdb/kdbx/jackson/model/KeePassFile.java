@@ -72,6 +72,7 @@ public class KeePassFile {
 
     @JsonPropertyOrder({
         "generator",
+        "settingsChanged",
         "headerHash",
         "databaseName",
         "databaseNameChanged",
@@ -96,7 +97,7 @@ public class KeePassFile {
         "lastTopVisibleGroup",
         "historyMaxItems",
         "historyMaxSize",
-        "binaries",
+        "customData",
     })
     public static class Meta {
 
@@ -161,7 +162,8 @@ public class KeePassFile {
         public KeePassFile.MemoryProtection memoryProtection;
 
         @JacksonXmlElementWrapper(localName = "CustomIcons")
-        protected ArrayList<Icon> customIcons;
+        @JacksonXmlProperty(localName = "Icon")
+        public ArrayList<Icon> customIcons;
 
         @JacksonXmlProperty(localName = "RecycleBinEnabled")
         @JsonDeserialize(converter = StringToBooleanConverter.class)
@@ -317,6 +319,12 @@ public class KeePassFile {
         }
     }
 
+    @JsonPropertyOrder({
+            "uuid",
+            "data",
+            "name",
+            "lastModificationTime",
+    })
     public static class Icon {
         public Icon() {
         }
@@ -324,24 +332,20 @@ public class KeePassFile {
         @JacksonXmlProperty(localName = "UUID")
         @JsonDeserialize(converter = Base64ToUUIDConverter.class)
         @JsonSerialize(converter = UUIDToBase64Converter.class)
-        protected UUID uuid;
+        public UUID uuid;
 
         @JacksonXmlProperty(localName = "Name")
-        protected String name;
+        public String name;
         
         @JacksonXmlProperty(localName = "LastModificationTime")
         @JsonDeserialize(converter = StringToDateConverter.class)
         @JsonSerialize(converter = DateToStringConverter.class)
-        protected Date lastModificationTime;
+        public Date lastModificationTime;
         
         @JacksonXmlProperty(localName = "Data")
         @JsonDeserialize(converter = Base64ToByteConverter.class)
         @JsonSerialize(converter = ByteToBase64Converter.class)
-        protected byte[] data;
-
-        public String getName() {
-            return uuid.toString();
-        }
+        public byte[] data;
     }
 
     public static class CustomData {
