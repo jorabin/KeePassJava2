@@ -80,16 +80,16 @@ with appropriate `<repositories>` entry, like:
 
       <repositories>
          <repository>
-           <id>oss.sonatype.org-snapshot</id>
-           <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-           <releases>
-             <enabled>false</enabled>
-           </releases>
-           <snapshots>
-             <enabled>true</enabled>
-           </snapshots>
+            <id>oss.sonatype.org-snapshot</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <releases>
+                 <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
          </repository>
-       </repositories>
+      </repositories>
  
  The module structure is illustrated below
  under [Build from Source](#build-from-source).
