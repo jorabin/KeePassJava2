@@ -2,6 +2,13 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+# [2.2.5] 2026-03-17
+
+- [Issue 81, 83] Remove junit dependency from main code and resolve test failure from UTF-8 encoding in test resources
+- [Issue 87] Problem with incorrect serialization of CustomIcons in Jackson implementation
+- [Issue 88] Incompatibility to KeePass due t missing empty element in autotype field in Jackson implementation
+- [Issue 90] Update dependencies to resolve security vulnerabilities
+
 ## [2.2.4] 2025-03-05
 
 - [Issue 76, 78] Resolve incompatibility with KeePassXC (empty elements)
