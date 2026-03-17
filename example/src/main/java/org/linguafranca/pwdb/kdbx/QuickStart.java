@@ -84,6 +84,7 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
         }
 
         // save to a file with password "123"
+        new File("testOutput").mkdirs();
         try (FileOutputStream outputStream = new FileOutputStream("testOutput/test.kdbx")) {
             database.save(new KdbxCreds("123".getBytes()), outputStream);
         }
