@@ -70,6 +70,9 @@ public class SimpleEntry extends AbstractEntry<SimpleDatabase, SimpleGroup, Simp
     protected EntryClasses.AutoType autoType;
     @ElementList(name = "History", required = false)
     protected List<SimpleEntry> history;
+    @Element(name = "PreviousParentGroup", type=UUID.class, required = false)
+    @Convert(UuidConverter.class)
+    protected UUID previousParentGroup;
 
     @Transient
     SimpleDatabase database;
