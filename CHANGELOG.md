@@ -12,6 +12,8 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - [Issue 90] Update dependencies to resolve security vulnerabilities
 - [Issue 97] KDBX 4 attachments were written twice, in the inner header and in Meta/Binaries, and the inner header gained another copy of every attachment on each save of a loaded database
 - [Issue 98] Meta/Binaries was written as `<Binaries><Binaries>` instead of `<Binaries><Binary>`, so KeePassXC dropped KDBX 3.1 attachments
+- [Issue 104] With a default encoding other than UTF-8, the database XML was written in that encoding, so non-ASCII content could not be loaded back
+- [Issue 68] Update Maven plugins; publish with central-publishing-maven-plugin, as OSSRH is shut down
 - update to Java 11
 - refactor API
   - remove complicated generics
