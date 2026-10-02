@@ -8,6 +8,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - [Issue 87] Problem with incorrect serialization of CustomIcons in Jackson implementation
 - [Issue 88] Incompatibility to KeePass due t missing empty element in autotype field in Jackson implementation
 - [Issue 90] Update dependencies to resolve security vulnerabilities
+- [Issue 96] Load XML into the Jackson implementation: new `JacksonDatabase.load(StreamFormat, Credentials, InputStream)`, KeePass XML export `ProtectInMemory` values kept protected, and `loadXml()` no longer fails on `Protected` values
 
 ## [2.2.4] 2025-03-05
 
