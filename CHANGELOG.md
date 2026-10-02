@@ -2,7 +2,7 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-# [2.2.5] 2026-03-17
+# [2.2.5] 2026-10-02
 
 - [Issue 68] Update the Maven build and release plugins, and publish with the Central Publishing plugin only (the OSSRH Nexus staging plugin is removed)
 - [Issue 81, 83] Remove junit dependency from main code and resolve test failure from UTF-8 encoding in test resources
