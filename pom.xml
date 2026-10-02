@@ -67,19 +67,21 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
+		<!-- javadoc checks in the releaseToMaven profile -->
+		<javadoc.doclint>html,syntax</javadoc.doclint>
 
-		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-		<maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
-		<nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
-		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-		<maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
-		<maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
-		<maven-release-plugin.version>3.1.1</maven-release-plugin.version>
-		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-		<maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
-		<maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
-		<versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
-		<maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
+		<maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+		<central-publishing-maven-plugin.version>0.11.0</central-publishing-maven-plugin.version>
+		<maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+		<maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+		<maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+		<maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+		<maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
+		<maven-dependency-plugin.version>3.11.0</maven-dependency-plugin.version>
+		<maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+		<versions-maven-plugin.version>2.22.0</versions-maven-plugin.version>
+		<maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
 
 		<!-- reduce the chattiness of output - see profile of same name below -->
 		<inhibitConsoleOutput>false</inhibitConsoleOutput>
@@ -160,6 +162,20 @@
 							<followSymlinks>false</followSymlinks>
 						</fileset>
 					</filesets>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>${central-publishing-maven-plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+					<!-- only needed to build and test this project; the plugin ignores maven.deploy.skip -->
+					<excludeArtifacts>
+						<artifact>example</artifact>
+						<artifact>basic</artifact>
+					</excludeArtifacts>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -287,17 +303,6 @@
 						</executions>
 					</plugin>
 					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>${nexus-staging-maven-plugin.version}</version>
-						<extensions>true</extensions>
-						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
-						</configuration>
-					</plugin>
-					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
 						<version>${maven-source-plugin.version}</version>
@@ -321,7 +326,7 @@
 									<goal>jar</goal>
 								</goals>
 								<configuration>
-									<doclint>html, syntax</doclint>
+									<doclint>${javadoc.doclint}</doclint>
 								</configuration>
 							</execution>
 						</executions>
