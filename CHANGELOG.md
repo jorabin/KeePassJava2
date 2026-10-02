@@ -4,6 +4,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 
 # [2.2.5] 2026-03-17
 
+- [Issue 68] Update the Maven build and release plugins, and publish with the Central Publishing plugin only (the OSSRH Nexus staging plugin is removed)
 - [Issue 81, 83] Remove junit dependency from main code and resolve test failure from UTF-8 encoding in test resources
 - [Issue 87] Problem with incorrect serialization of CustomIcons in Jackson implementation
 - [Issue 89] Incompatibility to KeePass due to missing empty element in autotype field in Jackson implementation

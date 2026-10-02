@@ -28,6 +28,11 @@
     <name>KeePassJava2 :: JAXB</name>
     <description>Contains a JAXB implementation for KDBX.</description>
 
+    <properties>
+        <!-- the generated bindings' Javadoc does not pass doclint -->
+        <javadoc.doclint>none</javadoc.doclint>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
