@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 public class KdbxSerializableDatabase implements SerializableDatabase {
@@ -115,7 +116,7 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
             xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
             xmlOutputFactory.setProperty(WstxInputProperties.P_RETURN_NULL_FOR_DEFAULT_NAMESPACE, true);
             
-            OutputStreamWriter osw = new OutputStreamWriter(outputStream);
+            OutputStreamWriter osw = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
             XMLStreamWriter sw = xmlOutputFactory.createXMLStreamWriter(osw);
             //noinspection TryFinallyCanBeTryWithResources - doesn't work with XMLStreamWriter
             try {
