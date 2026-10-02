@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.util.List;
 import java.util.Objects;
 
 public class JacksonSerializableDatabase implements SerializableDatabase {
@@ -110,6 +111,11 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
             
             OutputStreamWriter osw = new OutputStreamWriter(outputStream);
             XMLStreamWriter sw = xmlOutputFactory.createXMLStreamWriter(osw);
+            // in V4 the binaries are in the inner header, so leave them out of the XML
+            List<KeePassFile.Binary> binaries = keePassFile.meta.binaries;
+            if (Helpers.isV4.get()) {
+                keePassFile.meta.binaries = null;
+            }
             try {
                 sw.setPrefix("xml", "http://www.w3.org/XML/1998/namespace");
 
@@ -117,6 +123,7 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
 
                 sw.writeEndDocument();
             } finally {
+                keePassFile.meta.binaries = binaries;
                 sw.close();
                 osw.close();
             }

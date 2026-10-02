@@ -10,6 +10,8 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - [Issue 90] Update dependencies to resolve security vulnerabilities
 - [Issue 93] Restore valid Automatic-Module-Name entries (as at 2.1.4, plus `org.linguafranca.pwdb.kdbx.jackson`); since 2.2.1 the names contained dashes, so the jars could not be used on the module path
 - [Issue 96] Load XML into the Jackson implementation: new `JacksonDatabase.load(StreamFormat, Credentials, InputStream)`, KeePass XML export `ProtectInMemory` values kept protected, and `loadXml()` no longer fails on `Protected` values
+- [Issue 97] KDBX 4 attachments were written twice, in the inner header and in Meta/Binaries, and the inner header gained another copy of every attachment on each save of a loaded database
+- [Issue 98] Jackson wrote Meta/Binaries as `<Binaries><Binaries>` instead of `<Binaries><Binary>`, so KeePassXC dropped KDBX 3.1 attachments
 - [Issue 102] Deprecate the DOM, JAXB and Simple database implementations, which are no longer maintained; use the Jackson implementation instead
 
 ## [2.2.4] 2025-03-05
