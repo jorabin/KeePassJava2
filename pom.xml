@@ -154,6 +154,12 @@
                 <extensions>true</extensions>
                 <configuration>
                     <publishingServerId>central</publishingServerId>
+                    <!-- only needed to build and test this project; the plugin ignores maven.deploy.skip -->
+                    <excludeArtifacts>
+                        <artifact>example</artifact>
+                        <artifact>test</artifact>
+                        <artifact>util</artifact>
+                    </excludeArtifacts>
                 </configuration>
             </plugin>
             <plugin>

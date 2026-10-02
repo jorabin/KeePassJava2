@@ -15,6 +15,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - [Issue 97] KDBX 4 attachments were written twice, in the inner header and in Meta/Binaries, and the inner header gained another copy of every attachment on each save of a loaded database
 - [Issue 98] Jackson wrote Meta/Binaries as `<Binaries><Binaries>` instead of `<Binaries><Binary>`, so KeePassXC dropped KDBX 3.1 attachments
 - [Issue 102] Deprecate the DOM, JAXB and Simple database implementations, which are no longer maintained; use the Jackson implementation instead
+- The `util`, `test` and `example` modules are no longer published to Maven Central (the last published version is 2.2.4). They are only needed to build and test KeePassJava2, and no published module depends on them outside test scope
 
 ## [2.2.4] 2025-03-05
 
