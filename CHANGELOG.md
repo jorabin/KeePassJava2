@@ -9,6 +9,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - [Issue 89] Incompatibility to KeePass due to missing empty element in autotype field in Jackson implementation
 - [Issue 88, 90] Update dependencies to resolve security vulnerabilities, and to current versions of Jackson, Woodstox, Guava, Bouncy Castle and Commons Codec
 - [Issue 93] Restore valid Automatic-Module-Name entries (as at 2.1.4, plus `org.linguafranca.pwdb.kdbx.jackson`); since 2.2.1 the names contained dashes, so the jars could not be used on the module path
+- [Issue 93] **Moved class:** `org.linguafranca.pwdb.kdbx.dom.DomHelper` is now in `KeePassJava2-dom`, not `KeePassJava2-kdbx`. Its package was split between the two jars, which stops them being used together on the module path. Its package name is unchanged, so code that uses `DomHelper` only needs a dependency on `KeePassJava2-dom`
 - [Issue 96] Load XML into the Jackson implementation: new `JacksonDatabase.load(StreamFormat, Credentials, InputStream)`, KeePass XML export `ProtectInMemory` values kept protected, and `loadXml()` no longer fails on `Protected` values
 - [Issue 97] KDBX 4 attachments were written twice, in the inner header and in Meta/Binaries, and the inner header gained another copy of every attachment on each save of a loaded database
 - [Issue 98] Jackson wrote Meta/Binaries as `<Binaries><Binaries>` instead of `<Binaries><Binary>`, so KeePassXC dropped KDBX 3.1 attachments
