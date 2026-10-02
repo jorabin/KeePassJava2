@@ -29,6 +29,10 @@
     <name>KeePassJava2 :: KDB</name>
     <description>KeePass KDB file support</description>
 
+    <properties>
+        <automatic-module-name>org.linguafranca.pwdb.kdb</automatic-module-name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>

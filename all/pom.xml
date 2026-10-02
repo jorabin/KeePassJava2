@@ -30,6 +30,10 @@
     <name>KeePassJava2 :: All</name>
     <description>Composite containing KDBX and KDB Database support</description>
 
+    <properties>
+        <automatic-module-name>org.linguafranca.pwdb.all</automatic-module-name>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>

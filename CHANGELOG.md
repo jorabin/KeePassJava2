@@ -15,6 +15,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - [Issue 98] Meta/Binaries was written as `<Binaries><Binaries>` instead of `<Binaries><Binary>`, so KeePassXC dropped KDBX 3.1 attachments
 - [Issue 104] With a default encoding other than UTF-8, the database XML was written in that encoding, so non-ASCII content could not be loaded back
 - [Issue 99] Add creation, modification, access and expiry times to the `Group` interface, as on `Entry`
+- [Issue 93] Automatic-Module-Names are set explicitly, following the v3 modules, and differ from 2.x: `org.linguafranca.pwdb.database`, `org.linguafranca.pwdb.kdb`, `org.linguafranca.pwdb.kdbx.io`, `org.linguafranca.pwdb.kdbx.database` and `org.linguafranca.pwdb.all`
 - [Issue 68] Update Maven plugins; publish with central-publishing-maven-plugin, as OSSRH is shut down
 - update to Java 11
 - refactor API

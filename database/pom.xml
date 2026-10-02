@@ -30,6 +30,10 @@
 	<name>PWDB :: Database</name>
 	<description>Contains root definitions of PWDB Databases etc.</description>
 
+	<properties>
+		<automatic-module-name>org.linguafranca.pwdb.database</automatic-module-name>
+	</properties>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.google.guava</groupId>

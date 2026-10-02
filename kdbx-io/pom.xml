@@ -29,6 +29,10 @@
     <name>KeePassJava2 :: KDBX-IO</name>
     <description>KeePass KDBX File format support</description>
 
+    <properties>
+        <automatic-module-name>org.linguafranca.pwdb.kdbx.io</automatic-module-name>
+    </properties>
+
 
     <dependencies>
         <dependency>

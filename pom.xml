@@ -67,6 +67,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
+		<!-- modules that are published set their own, see #93 -->
+		<automatic-module-name>${project.groupId}.${project.artifactId}</automatic-module-name>
 		<!-- javadoc checks in the releaseToMaven profile -->
 		<javadoc.doclint>html,syntax</javadoc.doclint>
 
@@ -113,7 +115,7 @@
 					<configuration>
 						<archive>
 							<manifestEntries>
-								<Automatic-Module-Name>${project.groupId}.${project.artifactId}</Automatic-Module-Name>
+								<Automatic-Module-Name>${automatic-module-name}</Automatic-Module-Name>
 							</manifestEntries>
 						</archive>
 					</configuration>

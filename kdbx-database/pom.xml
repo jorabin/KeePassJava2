@@ -28,6 +28,10 @@
   <name>KeePassJava2 :: KDBX-Database</name>
   <description>KeePass KDBX file support</description>
 
+  <properties>
+    <automatic-module-name>org.linguafranca.pwdb.kdbx.database</automatic-module-name>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.linguafranca.pwdb</groupId>
