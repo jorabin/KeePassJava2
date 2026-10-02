@@ -186,8 +186,9 @@ is serializing and deserializing XML. Over time (KeePassJava2 was originally rel
 to Java and XML have been a bit mysterious. However, Jackson has now been chosen as the 
 underlying framework for implementation of KeePassJava2.
 
-There are several other database implementations which will be maintained for bug-fix purposes
-only, with a view to being withdrawn, since they perform badly and/or depend on obsolete technology.
+There are several other database implementations which are deprecated and no longer maintained
+([issue 102](https://github.com/jorabin/KeePassJava2/issues/102)). They will be withdrawn in a future release,
+since they perform badly and/or depend on obsolete technology.
 
 - `SimpleXML` - no longer maintained, does not work with Java 17 and up
 - `JAXB` - this causes problems with `javax` and `jakarta` namespaces, it's not worth maintaining
