@@ -199,6 +199,26 @@ public interface GroupsAndEntriesTest {
     }
 
     @Test
+    default void testGroupTimes() {
+        long beforeSecond = Instant.now().toEpochMilli()/1000;
+        Group group = getDatabase().newGroup();
+        long afterSecond = Instant.now().toEpochMilli()/1000;
+        long createdSecond = group.getCreationTime().getTime()/1000;
+
+        assertTrue(createdSecond >= beforeSecond && createdSecond <= afterSecond);
+        assertFalse(group.getExpires());
+        assertTrue(group.getLastAccessTime().getTime()/1000 <= createdSecond);
+        assertTrue(group.getLastModificationTime().getTime()/1000 <= createdSecond);
+
+        group.setExpires(true);
+        group.setExpiryTime(new Date(createdSecond*1000));
+
+        assertTrue(group.getExpires());
+        assertEquals(createdSecond, group.getExpiryTime().getTime()/1000);
+        assertThrows(IllegalArgumentException.class, () -> group.setExpiryTime(null));
+    }
+
+    @Test
     default void checkAddChangeRemoveProperty() {
         // only applies to databases that support arbitrary properties
         Entry entry = getDatabase().newEntry();

@@ -44,6 +44,7 @@ public class KdbGroup extends AbstractGroup {
     private Date lastModificationTime;
     private Date lastAccessTime;
     private Date expiryTime;
+    private boolean expires = false;
     private int flags;
 
     KdbGroup() {
@@ -200,8 +201,40 @@ public class KdbGroup extends AbstractGroup {
         this.lastAccessTime = lastAccessTime;
     }
 
-    void setExpiryTime(Date expiryTime) {
+    @Override
+    public void setExpiryTime(Date expiryTime) {
+        if (expiryTime == null) throw new IllegalArgumentException("expiryTime may not be null");
         this.expiryTime = expiryTime;
+    }
+
+    @Override
+    public Date getExpiryTime() {
+        return expiryTime;
+    }
+
+    @Override
+    public void setExpires(boolean expires) {
+        this.expires = expires;
+    }
+
+    @Override
+    public boolean getExpires() {
+        return expires;
+    }
+
+    @Override
+    public Date getCreationTime() {
+        return creationTime;
+    }
+
+    @Override
+    public Date getLastModificationTime() {
+        return lastModificationTime;
+    }
+
+    @Override
+    public Date getLastAccessTime() {
+        return lastAccessTime;
     }
 
     void setRoot(boolean root) {
