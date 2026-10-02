@@ -120,6 +120,28 @@ public class KdbxMetaBinariesTest {
         assertAttachments(expected, KdbxDatabase.load(CREDENTIALS, new ByteArrayInputStream(v3)));
     }
 
+    /**
+     * Before issue 98 Jackson wrote each Meta binary as a Binaries element
+     */
+    @Test
+    public void loadsBinariesWrittenBefore98() throws Exception {
+        KdbxDatabase original = load("Attachment.kdbx");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        original.save(new StreamFormat.None(), new Credentials.None(), outputStream);
+        String xml = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
+
+        Matcher matcher = META_BINARIES.matcher(xml);
+        assertTrue(matcher.find());
+        String oldStyle = matcher.group()
+                .replace("<Binary ID=", "<Binaries ID=")
+                .replace("</Binary>", "</Binaries>");
+        xml = xml.substring(0, matcher.start()) + oldStyle + xml.substring(matcher.end());
+
+        KdbxDatabase database = KdbxDatabase.load(new StreamFormat.None(), new Credentials.None(),
+                new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
+        assertAttachments(attachments(original), database);
+    }
+
     private KdbxDatabase load(String resource) throws IOException {
         return KdbxDatabase.load(CREDENTIALS, getClass().getClassLoader().getResourceAsStream(resource));
     }

@@ -24,6 +24,7 @@ import org.linguafranca.pwdb.format.KdbxHeader;
 import org.linguafranca.pwdb.format.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
 import org.linguafranca.pwdb.protect.ProtectedDatabase;
+import org.linguafranca.pwdb.security.StreamEncryptor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,8 +64,9 @@ public class KdbxDatabase extends ProtectedDatabase {
      * @throws Exception on load failure
      */
     public static KdbxDatabase loadXml(InputStream inputStream) throws Exception {
-
-        KeePassFile keePassFile = new KdbxSerializableDatabase().load(inputStream).keePassFile;
+        KdbxSerializableDatabase jsd = new KdbxSerializableDatabase();
+        jsd.setEncryption(new StreamEncryptor.None());
+        KeePassFile keePassFile = jsd.load(inputStream).keePassFile;
         keePassFile.root.group.uuid = UUID.randomUUID();
         return new KdbxDatabase(keePassFile, null);
     }
@@ -77,8 +79,20 @@ public class KdbxDatabase extends ProtectedDatabase {
      * @return a new database
      */
     public static KdbxDatabase load(Credentials credentials, InputStream inputStream) throws IOException {
+        return load(new KdbxStreamFormat(), credentials, inputStream);
+    }
+
+    /**
+     * Load a database using the stream format supplied, e.g. {@link StreamFormat.None}
+     * to load XML written by {@link #save(StreamFormat, Credentials, OutputStream)} with that format
+     *
+     * @param streamFormat the format of the input
+     * @param credentials credentials to use
+     * @param inputStream where to load from
+     * @return a new database
+     */
+    public static KdbxDatabase load(StreamFormat<?> streamFormat, Credentials credentials, InputStream inputStream) throws IOException {
         KdbxSerializableDatabase jsd = new KdbxSerializableDatabase();
-        StreamFormat<?> streamFormat = new KdbxStreamFormat();
         streamFormat.load(jsd, credentials, inputStream);
         return new KdbxDatabase(jsd.keePassFile, streamFormat);
     }

@@ -61,6 +61,10 @@ public class ValueDeserializer extends StdDeserializer<PropertyValue> {
                     byte[] decrypted = encryptor.decrypt(encrypted);
                     return strategy.newProtected().of(decrypted);
             }
+            // KeePass XML export marks protected values this way, in plaintext
+            if (node.has("ProtectInMemory") && Boolean.TRUE.equals(Helpers.toBoolean(node.get("ProtectInMemory").asText()))) {
+                return strategy.newProtected().of(cipherText);
+            }
             return strategy.newUnprotected().of(cipherText);
         }
 

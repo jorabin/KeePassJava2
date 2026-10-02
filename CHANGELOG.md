@@ -10,6 +10,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - [Issue 87] Problem with incorrect serialization of CustomIcons in Jackson implementation
 - [Issue 88] Incompatibility to KeePass due t missing empty element in autotype field in Jackson implementation
 - [Issue 90] Update dependencies to resolve security vulnerabilities
+- [Issue 96] Load XML into the KDBX database: new `KdbxDatabase.load(StreamFormat, Credentials, InputStream)`, KeePass XML export `ProtectInMemory` values kept protected, and `loadXml()` no longer fails on `Protected` values
 - [Issue 97] KDBX 4 attachments were written twice, in the inner header and in Meta/Binaries, and the inner header gained another copy of every attachment on each save of a loaded database
 - [Issue 98] Meta/Binaries was written as `<Binaries><Binaries>` instead of `<Binaries><Binary>`, so KeePassXC dropped KDBX 3.1 attachments
 - [Issue 104] With a default encoding other than UTF-8, the database XML was written in that encoding, so non-ASCII content could not be loaded back
