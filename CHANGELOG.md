@@ -2,6 +2,21 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+# [2.2.5] 2026-10-02
+
+- [Issue 68] Update the Maven build and release plugins, and publish with the Central Publishing plugin only (the OSSRH Nexus staging plugin is removed)
+- [Issue 81, 83] Remove junit dependency from main code and resolve test failure from UTF-8 encoding in test resources
+- [Issue 87] Problem with incorrect serialization of CustomIcons in Jackson implementation
+- [Issue 89] Incompatibility to KeePass due to missing empty element in autotype field in Jackson implementation
+- [Issue 88, 90] Update dependencies to resolve security vulnerabilities, and to current versions of Jackson, Woodstox, Guava, Bouncy Castle and Commons Codec
+- [Issue 93] Restore valid Automatic-Module-Name entries (as at 2.1.4, plus `org.linguafranca.pwdb.kdbx.jackson`); since 2.2.1 the names contained dashes, so the jars could not be used on the module path
+- [Issue 93] **Moved class:** `org.linguafranca.pwdb.kdbx.dom.DomHelper` is now in `KeePassJava2-dom`, not `KeePassJava2-kdbx`. Its package was split between the two jars, which stops them being used together on the module path. Its package name is unchanged, so code that uses `DomHelper` only needs a dependency on `KeePassJava2-dom`
+- [Issue 96] Load XML into the Jackson implementation: new `JacksonDatabase.load(StreamFormat, Credentials, InputStream)`, KeePass XML export `ProtectInMemory` values kept protected, and `loadXml()` no longer fails on `Protected` values
+- [Issue 97] KDBX 4 attachments were written twice, in the inner header and in Meta/Binaries, and the inner header gained another copy of every attachment on each save of a loaded database
+- [Issue 98] Jackson wrote Meta/Binaries as `<Binaries><Binaries>` instead of `<Binaries><Binary>`, so KeePassXC dropped KDBX 3.1 attachments
+- [Issue 102] Deprecate the DOM, JAXB and Simple database implementations, which are no longer maintained; use the Jackson implementation instead
+- The `util`, `test` and `example` modules are no longer published to Maven Central (the last published version is 2.2.4). They are only needed to build and test KeePassJava2, and no published module depends on them outside test scope
+
 ## [2.2.4] 2025-03-05
 
 - [Issue 76, 78] Resolve incompatibility with KeePassXC (empty elements)

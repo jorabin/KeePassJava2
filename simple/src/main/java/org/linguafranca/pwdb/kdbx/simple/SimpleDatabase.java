@@ -41,7 +41,11 @@ import static org.linguafranca.pwdb.kdbx.simple.SimpleSerializableDatabase.getSe
  * Implementation of {@link org.linguafranca.pwdb.Database} using the Simple XML framework.
  *
  * @author jo
+ * @deprecated The Simple XML implementation is no longer maintained and will be removed in a future release.
+ * Use {@code org.linguafranca.pwdb.kdbx.jackson.JacksonDatabase} from {@code KeePassJava2-jackson} instead.
+ * See <a href="https://github.com/jorabin/KeePassJava2/issues/102">issue 102</a>.
  */
+@Deprecated
 @SuppressWarnings("WeakerAccess")
 public class SimpleDatabase extends AbstractDatabase<SimpleDatabase, SimpleGroup, SimpleEntry, SimpleIcon>{
 

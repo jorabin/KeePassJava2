@@ -230,7 +230,7 @@ public interface PropertyValue {
 
         @Override
         public String getValueAsString() {
-            return new String(this.value);
+            return new String(this.value, StandardCharsets.UTF_8);
         }
 
         @Override
@@ -415,7 +415,7 @@ public interface PropertyValue {
 
          @Override
         public String getValueAsString() {
-            return new String(getBytes());
+            return new String(getBytes(), StandardCharsets.UTF_8);
         }
 
         @Override

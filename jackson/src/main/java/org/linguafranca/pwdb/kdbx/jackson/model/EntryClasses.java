@@ -19,6 +19,7 @@ package org.linguafranca.pwdb.kdbx.jackson.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.kdbx.jackson.JacksonEntry;
 import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
@@ -72,6 +73,7 @@ public abstract class EntryClasses {
             @JacksonXmlProperty(localName = "Window")
             protected String window;
             @JacksonXmlProperty(localName = "KeystrokeSequence")
+            @JsonInclude(JsonInclude.Include.ALWAYS)
             protected String keystrokeSequence;
 
             protected List<Object> windowAndKeystrokeSequence;

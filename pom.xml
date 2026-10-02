@@ -20,7 +20,7 @@
 
     <groupId>org.linguafranca.pwdb</groupId>
     <artifactId>KeePassJava2-parent</artifactId>
-    <version>2.2.4</version>
+    <version>2.2.5</version>
     <modules>
         <module>database</module>
         <module>test</module>
@@ -52,7 +52,7 @@
         <connection>scm:git:git://github.com/jorabin/KeePassJava2.git</connection>
         <developerConnection>scm:git:git@github.com:jorabin/KeePassJava2.git</developerConnection>
         <url>https://github.com/jorabin/KeePassJava2</url>
-        <tag>KeePassJava2-2.2.4</tag>
+        <tag>KeePassJava2-2.2.5</tag>
     </scm>
 
     <developers>
@@ -68,16 +68,17 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
+        <java.version>8</java.version>
+        <!-- javadoc checks in the releaseToMaven profile -->
+        <javadoc.doclint>html,syntax</javadoc.doclint>
 
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-surefire-plugin.version>3.0.0</maven-surefire-plugin.version>
-        <nexus-staging-maven-plugin.version>1.6.13</nexus-staging-maven-plugin.version>
-        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
-        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
-        <maven-gpg-plugin.version>3.0.1</maven-gpg-plugin.version>
-        <maven-release-plugin.version>3.0.0</maven-release-plugin.version>
-        <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
+        <maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+        <maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+        <maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+        <maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
         <!-- reduce the chattiness of output - see profile of same name below -->
         <inhibitConsoleOutput>false</inhibitConsoleOutput>
     </properties>
@@ -112,13 +113,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
                     <version>${maven-jar-plugin.version}</version>
-                    <configuration>
-                        <archive>
-                            <manifestEntries>
-                                <Automatic-Module-Name>${project.groupId}.${project.artifactId}</Automatic-Module-Name>
-                            </manifestEntries>
-                        </archive>
-                    </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -126,11 +120,46 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.6.3</version>
+                <executions>
+                    <execution>
+                        <id>enforce-java</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>[11,17)</version>
+                                    <message>Build with JDK 11 (see .sdkmanrc). The build produces Java 8 byte code checked against the Java 8 API, which needs JDK 9 or later, and the Simple module's tests fail on JDK 17 and later.</message>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${maven-compiler-plugin.version}</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <release>${java.version}</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.11.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <!-- only needed to build and test this project; the plugin ignores maven.deploy.skip -->
+                    <excludeArtifacts>
+                        <artifact>example</artifact>
+                        <artifact>test</artifact>
+                        <artifact>util</artifact>
+                    </excludeArtifacts>
                 </configuration>
             </plugin>
             <plugin>
@@ -147,7 +176,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.11.0</version>
             </plugin>
         </plugins>
     </build>
@@ -178,35 +207,35 @@
             <dependency>
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
-                <version>24.1.0</version>
+                <version>26.1.0</version>
             </dependency>
             <!-- for android and Java7 apparently -->
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>32.1.2-android</version>
+                <version>33.7.2-android</version>
             </dependency>
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
-                <version>1.78.1</version>
+                <version>1.86</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
-                <version>2.0.16</version>
+                <version>2.0.17</version>
             </dependency>
             <!-- if you want to use logback versions from 1.2 on you need to use
                 SLF4J > 2.0, this was kind of hard to find out. -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
-                <version>1.3.15</version>
+                <version>1.3.16</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
-                <version>1.15</version>
+                <version>1.22.1</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -242,17 +271,6 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <groupId>org.sonatype.plugins</groupId>
-                        <artifactId>nexus-staging-maven-plugin</artifactId>
-                        <version>${nexus-staging-maven-plugin.version}</version>
-                        <extensions>true</extensions>
-                        <configuration>
-                            <serverId>ossrh</serverId>
-                            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-                            <autoReleaseAfterClose>true</autoReleaseAfterClose>
-                        </configuration>
-                    </plugin>
-                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
                         <version>${maven-source-plugin.version}</version>
@@ -276,7 +294,7 @@
                                     <goal>jar</goal>
                                 </goals>
                                 <configuration>
-                                    <doclint>html, syntax</doclint>
+                                    <doclint>${javadoc.doclint}</doclint>
                                 </configuration>
                             </execution>
                         </executions>
@@ -288,8 +306,10 @@
 
     <distributionManagement>
         <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <!--<id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>-->
+            <id>central</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 

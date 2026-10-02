@@ -23,6 +23,7 @@ import org.linguafranca.pwdb.kdbx.KdbxHeader;
 import org.linguafranca.pwdb.kdbx.KdbxStreamFormat;
 import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
 import org.linguafranca.pwdb.protect.ProtectedDatabase;
+import org.linguafranca.pwdb.security.StreamEncryptor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,7 +37,9 @@ import static org.linguafranca.pwdb.kdbx.jackson.JacksonSerializableDatabase.cre
 
 public class JacksonDatabase extends ProtectedDatabase<JacksonDatabase, JacksonGroup, JacksonEntry, JacksonIcon> {
 
-    KeePassFile keePassFile;
+
+
+    protected KeePassFile keePassFile;
     StreamFormat<?> streamFormat;
 
     public JacksonDatabase() throws IOException {
@@ -62,8 +65,9 @@ public class JacksonDatabase extends ProtectedDatabase<JacksonDatabase, JacksonG
      * @throws Exception on load failure
      */
     public static JacksonDatabase loadXml(InputStream inputStream) throws Exception {
-
-        KeePassFile keePassFile = new JacksonSerializableDatabase().load(inputStream).keePassFile;
+        JacksonSerializableDatabase jsd = new JacksonSerializableDatabase();
+        jsd.setEncryption(new StreamEncryptor.None());
+        KeePassFile keePassFile = jsd.load(inputStream).keePassFile;
         keePassFile.root.group.uuid = UUID.randomUUID();
         return new JacksonDatabase(keePassFile, null);
     }
@@ -76,8 +80,20 @@ public class JacksonDatabase extends ProtectedDatabase<JacksonDatabase, JacksonG
      * @return a new database
      */
     public static JacksonDatabase load(Credentials credentials, InputStream inputStream) throws IOException {
+        return load(new KdbxStreamFormat(), credentials, inputStream);
+    }
+
+    /**
+     * Load a database using the stream format supplied, e.g. {@link StreamFormat.None}
+     * to load XML written by {@link #save(StreamFormat, Credentials, OutputStream)} with that format
+     *
+     * @param streamFormat the format of the input
+     * @param credentials credentials to use
+     * @param inputStream where to load from
+     * @return a new database
+     */
+    public static JacksonDatabase load(StreamFormat<?> streamFormat, Credentials credentials, InputStream inputStream) throws IOException {
         JacksonSerializableDatabase jsd = new JacksonSerializableDatabase();
-        StreamFormat<?> streamFormat = new KdbxStreamFormat();
         streamFormat.load(jsd, credentials, inputStream);
         return new JacksonDatabase(jsd.keePassFile, streamFormat);
     }

@@ -23,7 +23,7 @@ import java.util.UUID;
 
 import org.jetbrains.annotations.NotNull;
 
-import org.linguafranca.pwdb.Icon;
+import org.jetbrains.annotations.Nullable;
 import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.base.AbstractEntry;
 import org.linguafranca.pwdb.kdbx.Helpers;
@@ -307,6 +307,29 @@ public class JacksonEntry extends AbstractEntry<JacksonDatabase, JacksonGroup, J
     @Override
     public void setIcon(JacksonIcon icon) {
         iconID = icon.getIndex();
+    }
+
+    @JsonIgnore
+    public UUID getCustomIconUuid() {
+        return customIconUUID;
+    }
+
+    @JsonIgnore
+    public void setCustomIconUUID(UUID uuid) {
+        customIconUUID = uuid;
+    }
+
+    @JsonIgnore
+    public KeePassFile.Icon getCustomIcon() {
+        if (customIconUUID == null) {
+            throw new IllegalStateException("Custom icon has not been set");
+        }
+        for (KeePassFile.Icon icon : database.keePassFile.meta.customIcons) {
+            if (icon.uuid.equals(customIconUUID)) {
+                return icon;
+            }
+        }
+        throw new IllegalStateException("Custom icon was not found in database for uuid: " + customIconUUID);
     }
 
     @Override
