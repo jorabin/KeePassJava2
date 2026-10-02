@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 
@@ -109,7 +110,7 @@ public class JacksonSerializableDatabase implements SerializableDatabase {
             xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
             xmlOutputFactory.setProperty(WstxInputProperties.P_RETURN_NULL_FOR_DEFAULT_NAMESPACE, true);
             
-            OutputStreamWriter osw = new OutputStreamWriter(outputStream);
+            OutputStreamWriter osw = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
             XMLStreamWriter sw = xmlOutputFactory.createXMLStreamWriter(osw);
             // in V4 the binaries are in the inner header, so leave them out of the XML
             List<KeePassFile.Binary> binaries = keePassFile.meta.binaries;

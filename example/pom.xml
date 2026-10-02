@@ -55,4 +55,31 @@
             <version>${project.version}</version>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <!-- Issue 104: databases must be written as UTF-8 whatever the default encoding -->
+                    <execution>
+                        <id>non-utf8-default-encoding</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <argLine>-Dfile.encoding=ISO-8859-1</argLine>
+                            <includes>
+                                <include>**/Issue104Test.java</include>
+                            </includes>
+                            <systemPropertyVariables>
+                                <test.defaultEncoding>ISO-8859-1</test.defaultEncoding>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

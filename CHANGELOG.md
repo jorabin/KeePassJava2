@@ -4,6 +4,8 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 
 # [2.2.6] Unreleased
 
+- [Issue 104] With a default encoding other than UTF-8, the Jackson implementation wrote the database XML in that encoding, so non-ASCII content could not be loaded back
+
 # [2.2.5] 2026-10-02
 
 - [Issue 68] Update the Maven build and release plugins, and publish with the Central Publishing plugin only (the OSSRH Nexus staging plugin is removed)
