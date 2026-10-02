@@ -80,24 +80,30 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
     @Override
     public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream outputStream) throws IOException {
         Helpers.isV4.set(kdbxHeader.getVersion() == 4);
-        if (kdbxHeader.getVersion() == 4) {
-            for (int a = 0; a < serializableDatabase.getBinaryCount(); a++) {
-                int attachmentLength = serializableDatabase.getBinary(a).length;
-                byte[] binary = new byte[attachmentLength + 1];
-                binary[0] = 0;
-                System.arraycopy(serializableDatabase.getBinary(a),0, binary, 1, attachmentLength);
-                kdbxHeader.addBinary(binary);
+        try {
+            if (kdbxHeader.getVersion() == 4) {
+                // the header may already hold binaries, from loading or an earlier save
+                kdbxHeader.getBinaries().clear();
+                for (int a = 0; a < serializableDatabase.getBinaryCount(); a++) {
+                    int attachmentLength = serializableDatabase.getBinary(a).length;
+                    byte[] binary = new byte[attachmentLength + 1];
+                    binary[0] = 0;
+                    System.arraycopy(serializableDatabase.getBinary(a),0, binary, 1, attachmentLength);
+                    kdbxHeader.addBinary(binary);
+                }
+                // the serializer leaves the binaries out of the XML when Helpers.isV4 is set
             }
-            // TODO the binaries should now be removed so they don't get serialized in XML
-        }
 
-        try (OutputStream encryptedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, outputStream)) {
-            if (kdbxHeader.getVersion() == 3) {
-                serializableDatabase.setHeaderHash(kdbxHeader.getHeaderHash());
+            try (OutputStream encryptedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, outputStream)) {
+                if (kdbxHeader.getVersion() == 3) {
+                    serializableDatabase.setHeaderHash(kdbxHeader.getHeaderHash());
+                }
+                serializableDatabase.setEncryption(kdbxHeader.getInnerStreamEncryptor());
+                serializableDatabase.save(encryptedOutputStream);
+                encryptedOutputStream.flush();
             }
-            serializableDatabase.setEncryption(kdbxHeader.getInnerStreamEncryptor());
-            serializableDatabase.save(encryptedOutputStream);
-            encryptedOutputStream.flush();
+        } finally {
+            Helpers.isV4.set(false);
         }
     }
 

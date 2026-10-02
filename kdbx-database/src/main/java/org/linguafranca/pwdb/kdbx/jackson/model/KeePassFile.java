@@ -206,7 +206,8 @@ public class KeePassFile {
         @JacksonXmlProperty(localName = "HistoryMaxSize")
         protected int historyMaxSize;
 
-        @JacksonXmlProperty(localName = "Binaries")
+        @JacksonXmlElementWrapper(localName = "Binaries")
+        @JacksonXmlProperty(localName = "Binary")
         public List<Binary> binaries;
         
         @JacksonXmlProperty(localName = "CustomData")

@@ -10,6 +10,8 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - [Issue 87] Problem with incorrect serialization of CustomIcons in Jackson implementation
 - [Issue 88] Incompatibility to KeePass due t missing empty element in autotype field in Jackson implementation
 - [Issue 90] Update dependencies to resolve security vulnerabilities
+- [Issue 97] KDBX 4 attachments were written twice, in the inner header and in Meta/Binaries, and the inner header gained another copy of every attachment on each save of a loaded database
+- [Issue 98] Meta/Binaries was written as `<Binaries><Binaries>` instead of `<Binaries><Binary>`, so KeePassXC dropped KDBX 3.1 attachments
 - update to Java 11
 - refactor API
   - remove complicated generics

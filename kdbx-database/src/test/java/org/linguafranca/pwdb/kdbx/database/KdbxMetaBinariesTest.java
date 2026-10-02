@@ -1,0 +1,160 @@
+/*
+ * Copyright (c) 2026. Jo Rabin
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+package org.linguafranca.pwdb.kdbx.database;
+
+import org.junit.jupiter.api.Test;
+import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.Entry;
+import org.linguafranca.pwdb.StreamFormat;
+import org.linguafranca.pwdb.Visitor;
+import org.linguafranca.pwdb.format.KdbxCredentials;
+import org.linguafranca.pwdb.format.KdbxHeader;
+import org.linguafranca.pwdb.format.KdbxSerializer;
+import org.linguafranca.pwdb.format.KdbxStreamFormat;
+import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Attachments in the XML Meta/Binaries and the V4 inner header, issues 97 and 98
+ */
+public class KdbxMetaBinariesTest {
+
+    private static final Credentials CREDENTIALS = new KdbxCredentials("123".getBytes());
+    private static final Pattern META_BINARIES = Pattern.compile("<Binaries>.*?</Binaries>", Pattern.DOTALL);
+
+    /**
+     * the inner header and decrypted XML of a KDBX file
+     */
+    private static class Contents {
+        final KdbxHeader header = new KdbxHeader();
+        final String xml;
+
+        Contents(byte[] file) throws IOException {
+            try (InputStream inputStream = KdbxSerializer.createUnencryptedInputStream(CREDENTIALS, header, new ByteArrayInputStream(file))) {
+                xml = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+            }
+        }
+
+        boolean hasMetaBinaries() {
+            return xml.contains("<Binaries>");
+        }
+    }
+
+    @Test
+    public void v3WritesBinaryElements() throws Exception {
+        KdbxDatabase database = load("V4-ChaCha20-Argon2-Attachment.kdbx");
+        Contents contents = new Contents(save(database, new KdbxStreamFormat(new KdbxHeader(3))));
+
+        Matcher matcher = META_BINARIES.matcher(contents.xml);
+        assertTrue(matcher.find());
+        assertTrue(matcher.group().contains("<Binary ID=\"0\""));
+        assertFalse(matcher.group().contains("<Binaries ID="));
+    }
+
+    @Test
+    public void v4LeavesBinariesOutOfXml() throws Exception {
+        KdbxDatabase database = load("Attachment.kdbx");
+        Contents contents = new Contents(save(database, new KdbxStreamFormat(new KdbxHeader(4))));
+
+        assertFalse(contents.hasMetaBinaries());
+        assertEquals(2, contents.header.getBinaries().size());
+    }
+
+    @Test
+    public void v4SavedTwiceKeepsInnerHeaderSize() throws Exception {
+        KdbxDatabase database = load("V4-ChaCha20-Argon2-Attachment.kdbx");
+        save(database);
+        Contents contents = new Contents(save(database));
+
+        assertEquals(2, contents.header.getBinaries().size());
+    }
+
+    @Test
+    public void streamFormatNoneAfterV4KeepsBinaries() throws Exception {
+        KdbxDatabase database = load("V4-ChaCha20-Argon2-Attachment.kdbx");
+        save(database);
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        database.save(new StreamFormat.None(), new Credentials.None(), outputStream);
+
+        assertTrue(new String(outputStream.toByteArray(), StandardCharsets.UTF_8).contains("<Binary ID=\"0\""));
+    }
+
+    @Test
+    public void attachmentsSurviveV3V4V3() throws Exception {
+        KdbxDatabase original = load("Attachment.kdbx");
+        Map<String, byte[]> expected = attachments(original);
+
+        byte[] v4 = save(original, new KdbxStreamFormat(new KdbxHeader(4)));
+        KdbxDatabase fromV4 = KdbxDatabase.load(CREDENTIALS, new ByteArrayInputStream(v4));
+        assertAttachments(expected, fromV4);
+
+        byte[] v3 = save(fromV4, new KdbxStreamFormat(new KdbxHeader(3)));
+        assertAttachments(expected, KdbxDatabase.load(CREDENTIALS, new ByteArrayInputStream(v3)));
+    }
+
+    private KdbxDatabase load(String resource) throws IOException {
+        return KdbxDatabase.load(CREDENTIALS, getClass().getClassLoader().getResourceAsStream(resource));
+    }
+
+    private static byte[] save(KdbxDatabase database, StreamFormat<?> streamFormat) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        database.save(streamFormat, CREDENTIALS, outputStream);
+        return outputStream.toByteArray();
+    }
+
+    private static byte[] save(KdbxDatabase database) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        database.save(CREDENTIALS, outputStream);
+        return outputStream.toByteArray();
+    }
+
+    private static Map<String, byte[]> attachments(KdbxDatabase database) {
+        final Map<String, byte[]> result = new TreeMap<>();
+        database.visit(new Visitor.Default() {
+            @Override
+            public void visit(Entry entry) {
+                for (String name : entry.getBinaryPropertyNames()) {
+                    result.put(entry.getUuid() + "/" + name, entry.getBinaryProperty(name));
+                }
+            }
+        });
+        return result;
+    }
+
+    private static void assertAttachments(Map<String, byte[]> expected, KdbxDatabase database) {
+        Map<String, byte[]> actual = attachments(database);
+        assertEquals(expected.keySet(), actual.keySet());
+        assertFalse(expected.isEmpty());
+        for (String key : expected.keySet()) {
+            assertTrue(Arrays.equals(expected.get(key), actual.get(key)), key);
+        }
+    }
+}
