@@ -72,7 +72,7 @@ Note that the artifactId has become Camel Case from release 2.1.x onwards.
 
 ### Snapshot
 
-Snapshot builds are erratically available at [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/org/linguafranca/pwdb/), next bug-fix release will be
+Snapshot builds are erratically available from the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. Next bug-fix release will be
 2.2.7-SNAPSHOT (on branch `develop`) and work-in-progress 3.0.0-SNAPSHOT (on branch `v3`):
 
         <groupId>org.linguafranca.pwdb</groupId>
@@ -83,7 +83,7 @@ with appropriate `<repositories>` entry, like:
 
       <repositories>
          <repository>
-           <id>oss.sonatype.org-snapshot</id>
+           <id>central-portal-snapshots</id>
            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
            <releases>
              <enabled>false</enabled>
