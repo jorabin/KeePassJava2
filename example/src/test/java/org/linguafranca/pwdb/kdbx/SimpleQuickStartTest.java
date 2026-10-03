@@ -16,7 +16,6 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
@@ -29,9 +28,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.Assert.assertEquals;
+import static org.linguafranca.test.util.TestUtil.testOutputPath;
 
 /**
  * Simple illustration of hooking a SAX parser up to process a KDBX file
@@ -39,11 +38,6 @@ import static org.junit.Assert.assertEquals;
  * @author jo
  */
 public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper> {
-
-    @BeforeClass
-    public static void createOutputDir() throws IOException {
-        ensureOutputDir();
-    }
 
 
     @Override
@@ -77,7 +71,7 @@ public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGrou
 
     @Test
     public void loadSave() throws IOException {
-        Path path = Paths.get("testOutput/CHACHA-AES-CHACHA.kdbx");
+        Path path = testOutputPath("CHACHA-AES-CHACHA.kdbx");
 
         loadKdbx3SaveKdbx4("test123.kdbx","123".getBytes(), Files.newOutputStream(path));
 
@@ -91,7 +85,7 @@ public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGrou
     }
     @Test
     public void loadSave2() throws IOException {
-        Path path = Paths.get("testOutput/CHACHA-AES-CHACHA.kdbx");
+        Path path = testOutputPath("CHACHA-AES-CHACHA.kdbx");
 
         loadKdbx4SaveKdbx3("V4-ChaCha20-Argon2-Attachment.kdbx","123".getBytes(), Files.newOutputStream(path));
 

@@ -17,18 +17,17 @@
 package org.linguafranca.pwdb.checks;
 
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.linguafranca.pwdb.*;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.junit.Assert.*;
 import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.test.util.TestUtil.testOutputPath;
 
 /**
  * @author jo
@@ -45,10 +44,6 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
     public abstract Credentials getCreds(byte[] creds);
     public abstract boolean verifyStreamFormat (StreamFormat<?> s1, StreamFormat<?> s2);
 
-    @BeforeClass
-    public static void ensureOutputDir() throws IOException {
-        Files.createDirectories(Paths.get("testOutput"));
-    }
 
     /**
      * Test verifies that entries contain the same content on reload as they did on save,
@@ -64,7 +59,7 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         verifyContents(output);
         //output.save(new StreamFormat.None(), new Credentials.None(), printStream);
 
-        FileOutputStream fos = new FileOutputStream("testOutput/test1.kdbx");
+        FileOutputStream fos = new FileOutputStream(testOutputPath("test1.kdbx").toFile());
         saveDatabase(output, getCreds("123".getBytes()), fos);
         Assert.assertFalse(output.isDirty());
         fos.flush();
@@ -74,7 +69,7 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         //output.save(new StreamFormat.None(), new Credentials.None(), printStream);
 
 
-        FileInputStream fis = new FileInputStream("testOutput/test1.kdbx");
+        FileInputStream fis = new FileInputStream(testOutputPath("test1.kdbx").toFile());
         D input = loadDatabase(getCreds("123".getBytes()), fis);
         verifyContents(input);
         //input.save(new StreamFormat.None(),  new Credentials.None(), printStream);
@@ -98,12 +93,12 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
         entry.setBinaryProperty("letter L.jpeg", content);
         assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
 
-        FileOutputStream fos = new FileOutputStream("testOutput/test2.kdbx");
+        FileOutputStream fos = new FileOutputStream(testOutputPath("test2.kdbx").toFile());
         saveDatabase(attachment, getCreds("123".getBytes()), fos);
         fos.flush();
         fos.close();
 
-        FileInputStream fis = new FileInputStream("testOutput/test2.kdbx");
+        FileInputStream fis = new FileInputStream(testOutputPath("test2.kdbx").toFile());
         D input = loadDatabase(getCreds("123".getBytes()), fis);
 
         entry = input.findEntries("Test attachment").get(0);
@@ -126,9 +121,9 @@ public abstract class SaveAndReloadChecks <D extends Database<D, G, E, I>, G ext
             D database = getDatabase(resource, this.getCreds("123".getBytes()));
             StreamFormat<?> format1 = database.getStreamFormat();
 
-            database.save(getCreds("123".getBytes()), Files.newOutputStream(Paths.get("testOutput/test3.kdbx")));
+            database.save(getCreds("123".getBytes()), Files.newOutputStream(testOutputPath("test3.kdbx")));
 
-            FileInputStream fis = new FileInputStream("testOutput/test3.kdbx");
+            FileInputStream fis = new FileInputStream(testOutputPath("test3.kdbx").toFile());
             D input = loadDatabase(getCreds("123".getBytes()), fis);
             StreamFormat<?> format2 = input.getStreamFormat();
             assertTrue(verifyStreamFormat(format1, format2));

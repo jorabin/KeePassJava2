@@ -16,18 +16,16 @@
 
 package org.linguafranca.pwdb.checks;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.linguafranca.pwdb.*;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
 import static org.junit.Assert.*;
+import static org.linguafranca.test.util.TestUtil.testOutputPath;
 
 /**
  * Testing the operation of PropertyValue mechanisms
@@ -42,10 +40,6 @@ public abstract class PropertyValueChecks<D extends Database<D, G, E, I>, G exte
     private final boolean propertyValueSupported;
     protected D database;
 
-    @BeforeClass
-    public static void ensureOutputDir() throws IOException {
-        Files.createDirectories(Paths.get("testOutput"));
-    }
 
     public PropertyValueChecks(boolean propertyValueSupported) throws IOException {
         this.database = createDatabase();
@@ -156,13 +150,13 @@ public abstract class PropertyValueChecks<D extends Database<D, G, E, I>, G exte
 
         // Save database
 
-        FileOutputStream fos = new FileOutputStream("testOutput/test9.kdbx");
+        FileOutputStream fos = new FileOutputStream(testOutputPath("test9.kdbx").toFile());
         saveDatabase(database, getCreds("123".getBytes()), fos);
         fos.flush();
         fos.close();
 
         // reload database, "random" is still protected even though it's not protected by default
-        FileInputStream fis = new FileInputStream("testOutput/test9.kdbx");
+        FileInputStream fis = new FileInputStream(testOutputPath("test9.kdbx").toFile());
         D input = loadDatabase(getCreds("123".getBytes()), fis);
 
         List<? extends E> entries = input.findEntries("random");

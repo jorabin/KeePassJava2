@@ -23,8 +23,6 @@ import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
 import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 
 import static org.linguafranca.test.util.TestUtil.getTestPrintStream;
@@ -42,10 +40,6 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
 
     public abstract D getDatabase();
     public abstract D loadDatabase(Credentials creds, InputStream inputStream);
-
-    public static void ensureOutputDir() throws IOException {
-        Files.createDirectories(Paths.get("testOutput"));
-    }
 
     /**
      * Load KDBX
@@ -133,6 +127,7 @@ public abstract class QuickStart<D extends Database<D, G, E, I>, G extends Group
         // deep copy from group (not including source group, KDB database has simulated root)
         kdbxDatabase.getRootGroup().copy(database.getRootGroup());
         // save it
+        new File("testOutput").mkdirs();
         try (FileOutputStream f = new FileOutputStream("testOutput/migration.kdbx")) {
             kdbxDatabase.save(new KdbxCreds("123".getBytes()), f);
         }
