@@ -13,8 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # builds with any JDK from 11 up; it compiles with --release 11
-        java: [ '11', '17', '21' ]
+        # builds with any JDK from 17 up; it compiles with --release 17
+        java: [ '17', '21' ]
     name: Build (JDK ${{ matrix.java }})
     steps:
       - uses: actions/checkout@v7

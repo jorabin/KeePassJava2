@@ -6,6 +6,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 
 ### Changed
 
+- **Breaking:** requires Java 17 (3.0.0 required Java 11)
 - [Issue 109] `write` and `read` leave the caller's stream open: `Database.write`, `KdbxDatabase.read`, `KdbxDatabase.readXml`, `KdbDatabase.read`, and `write`/`read` on `StreamFormat`, `SerializableDatabase` and `BasicDatabaseSerializer`. Existing implementations of those interfaces get them as default methods
 - [Issue 109] Deprecated `save` and `load`, which close the stream they are given, and the `saveNx`/`loadNx` methods. `readXml` throws `IOException` where `loadXml` threw `Exception`
 - [Issue 109] `Util.listDatabase` no longer closes the output stream

@@ -11,7 +11,7 @@
 
 [![Branch develop](https://badgen.net/badge/Branch/develop/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/develop) [![Version 2.2.7-SNAPSHOT](https://badgen.net/badge/Build/2.2.7-SNAPSHOT/blue?icon=github)](#snapshot) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
 
-Java 11 API (from version 3.0.0 upwards) for password databases compatible with the renowned [KeePass](http://keepass.info) password
+Java 17 API (from version 3.1.0 upwards) for password databases compatible with the renowned [KeePass](http://keepass.info) password
 safe for Windows. This is a "headless" implementation - if you want something with a UI
 then [KeePassXC](https://keepassxc.org/) and [KeePassDX](https://www.keepassdx.com/) could
 be just the things for you.
@@ -51,7 +51,7 @@ Version 2 is still maintained for now, with bug and security fixes. Its current 
 on branch `master`, with development on branch `develop`.
 
 Key updates relative to 2.x
-- Java 11 
+- Java 11 (Java 17 from 3.1.0)
 - Pluggable (protected) data storage model
 - File format version 4 support - with Argon2
 - Removal of SimpleXML, JAXB and DOM database implementations
@@ -109,7 +109,7 @@ with appropriate `<repositories>` entry, like:
 
 ## Java Version
 
-Versions 3.0.0 onwards require Java 11. From version 2.2 Java 1.8 is required. Earlier versions require Java 1.7.
+Versions 3.1.0 onwards require Java 17. Version 3.0.0 requires Java 11. From version 2.2 Java 1.8 is required. Earlier versions require Java 1.7.
 
 ## Quick Start
 
@@ -226,7 +226,7 @@ It also depends on SLF4J, logback and JUnit 5 for tests.
 
 Included POM is for Maven 3.
 
-It must be built using Java 11 or later (JDK 11+). It compiles with `--release 11`, so the jars it builds run on Java 11 whichever JDK builds them.
+It must be built using Java 17 or later (JDK 17+). It compiles with `--release 17`, so the jars it builds run on Java 17 whichever JDK builds them.
 
 ### Module Structure
 
