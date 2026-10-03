@@ -69,6 +69,9 @@
 		<java.version>11</java.version>
 		<!-- modules that are published set their own, see #93 -->
 		<automatic-module-name>${project.groupId}.${project.artifactId}</automatic-module-name>
+		<!-- used by the modules that depend on Jackson -->
+		<jackson.version>2.22.3</jackson.version>
+		<woodstox.version>7.3.0</woodstox.version>
 		<!-- javadoc checks in the releaseToMaven profile -->
 		<javadoc.doclint>html,syntax</javadoc.doclint>
 
@@ -242,12 +245,12 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>33.5.0-jre</version>
+				<version>33.7.2-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcpkix-jdk18on</artifactId>
-				<version>1.83</version>
+				<version>1.86</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -259,17 +262,17 @@
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
-				<version>1.5.32</version>
+				<version>1.6.5</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.21.0</version>
+				<version>1.22.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.junit</groupId>
 				<artifactId>junit-bom</artifactId>
-				<version>5.12.0</version>
+				<version>5.14.4</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
