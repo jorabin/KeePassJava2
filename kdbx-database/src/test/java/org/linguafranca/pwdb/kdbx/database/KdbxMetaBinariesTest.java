@@ -102,7 +102,7 @@ public class KdbxMetaBinariesTest {
         KdbxDatabase database = load("V4-ChaCha20-Argon2-Attachment.kdbx");
         save(database);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        database.save(new StreamFormat.None(), new Credentials.None(), outputStream);
+        database.write(new StreamFormat.None(), new Credentials.None(), outputStream);
 
         assertTrue(new String(outputStream.toByteArray(), StandardCharsets.UTF_8).contains("<Binary ID=\"0\""));
     }
@@ -113,11 +113,11 @@ public class KdbxMetaBinariesTest {
         Map<String, byte[]> expected = attachments(original);
 
         byte[] v4 = save(original, new KdbxStreamFormat(new KdbxHeader(4)));
-        KdbxDatabase fromV4 = KdbxDatabase.load(CREDENTIALS, new ByteArrayInputStream(v4));
+        KdbxDatabase fromV4 = KdbxDatabase.read(CREDENTIALS, new ByteArrayInputStream(v4));
         assertAttachments(expected, fromV4);
 
         byte[] v3 = save(fromV4, new KdbxStreamFormat(new KdbxHeader(3)));
-        assertAttachments(expected, KdbxDatabase.load(CREDENTIALS, new ByteArrayInputStream(v3)));
+        assertAttachments(expected, KdbxDatabase.read(CREDENTIALS, new ByteArrayInputStream(v3)));
     }
 
     /**
@@ -127,7 +127,7 @@ public class KdbxMetaBinariesTest {
     public void loadsBinariesWrittenBefore98() throws Exception {
         KdbxDatabase original = load("Attachment.kdbx");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        original.save(new StreamFormat.None(), new Credentials.None(), outputStream);
+        original.write(new StreamFormat.None(), new Credentials.None(), outputStream);
         String xml = new String(outputStream.toByteArray(), StandardCharsets.UTF_8);
 
         Matcher matcher = META_BINARIES.matcher(xml);
@@ -137,24 +137,26 @@ public class KdbxMetaBinariesTest {
                 .replace("</Binary>", "</Binaries>");
         xml = xml.substring(0, matcher.start()) + oldStyle + xml.substring(matcher.end());
 
-        KdbxDatabase database = KdbxDatabase.load(new StreamFormat.None(), new Credentials.None(),
+        KdbxDatabase database = KdbxDatabase.read(new StreamFormat.None(), new Credentials.None(),
                 new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)));
         assertAttachments(attachments(original), database);
     }
 
     private KdbxDatabase load(String resource) throws IOException {
-        return KdbxDatabase.load(CREDENTIALS, getClass().getClassLoader().getResourceAsStream(resource));
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resource)) {
+            return KdbxDatabase.read(CREDENTIALS, inputStream);
+        }
     }
 
     private static byte[] save(KdbxDatabase database, StreamFormat<?> streamFormat) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        database.save(streamFormat, CREDENTIALS, outputStream);
+        database.write(streamFormat, CREDENTIALS, outputStream);
         return outputStream.toByteArray();
     }
 
     private static byte[] save(KdbxDatabase database) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        database.save(CREDENTIALS, outputStream);
+        database.write(CREDENTIALS, outputStream);
         return outputStream.toByteArray();
     }
 

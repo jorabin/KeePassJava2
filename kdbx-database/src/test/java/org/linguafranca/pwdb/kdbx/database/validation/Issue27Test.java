@@ -44,9 +44,11 @@ public class Issue27Test {
      */
     @Test
     public void testIssue27() throws IOException {
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx");
         KdbxCredentials creds = new KdbxCredentials("passwordless".getBytes());
-        KdbxDatabase db = KdbxDatabase.load(creds, is);
+        KdbxDatabase db;
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx")) {
+            db = KdbxDatabase.read(creds, is);
+        }
         List<? extends Entry> entries = db.findEntries("testtitle");
 
         for (Entry entry: entries) {
@@ -60,9 +62,11 @@ public class Issue27Test {
      */
     @Test
     public void testV4Date() throws IOException {
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream("V4-AES-AES.kdbx");
         KdbxCredentials creds = new KdbxCredentials("123".getBytes());
-        KdbxDatabase db = KdbxDatabase.load(creds, is);
+        KdbxDatabase db;
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("V4-AES-AES.kdbx")) {
+            db = KdbxDatabase.read(creds, is);
+        }
         List<? extends Entry> entries = db.findEntries("Sample Entry #2 - Copy");
 
         for (Entry entry: entries) {

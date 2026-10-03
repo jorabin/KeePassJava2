@@ -37,12 +37,14 @@ public class Issue38Test {
     static PrintStream printStream = getTestPrintStream();
     @Test
     public void testV2Keyfile() throws IOException {
-        InputStream databaseStream = Issue38Test.class.getClassLoader().getResourceAsStream("issue-38/Database.kdbx");
-        InputStream keyStream = Issue38Test.class.getClassLoader().getResourceAsStream("issue-38/Database.keyx");
-        assert keyStream != null;
-        KdbxCredentials creds = new KdbxCredentials("MyPassword".getBytes(), keyStream);
-        assert databaseStream != null;
-        KdbxDatabase database = KdbxDatabase.load(creds, databaseStream);
+        KdbxDatabase database;
+        try (InputStream databaseStream = Issue38Test.class.getClassLoader().getResourceAsStream("issue-38/Database.kdbx");
+             InputStream keyStream = Issue38Test.class.getClassLoader().getResourceAsStream("issue-38/Database.keyx")) {
+            assert keyStream != null;
+            KdbxCredentials creds = new KdbxCredentials("MyPassword".getBytes(), keyStream);
+            assert databaseStream != null;
+            database = KdbxDatabase.read(creds, databaseStream);
+        }
         List<? extends Entry> entries = database.findEntries("Sample Entry");
         Entry entry = entries.get(0);
         printStream.println(entry.getTitle());

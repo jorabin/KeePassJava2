@@ -39,7 +39,7 @@ public class Util {
         Database load(Credentials c, InputStream i) throws IOException;
     }
 
-    List<DatabaseLoader> dbLoader = List.of(KdbxDatabase::load);
+    List<DatabaseLoader> dbLoader = List.of(KdbxDatabase::read);
 
     public static InputStream getDecryptedInputStream (String resourceName, Credentials credentials) throws IOException {
         return getDecryptedInputStream(resourceName, credentials, new KdbxHeader());
@@ -58,16 +58,18 @@ public class Util {
      * Example shows how to list XML from a database (but not decrypted passwords)
      */
     public static void listDatabase(String resourceName, Credentials creds, OutputStream outputStream) throws IOException {
-        KdbxDatabase database = KdbxDatabase.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
-        database.save(new StreamFormat.None(), new KdbxCredentials.None(), outputStream);
+        listDatabase(KdbxDatabase::read, resourceName, creds, outputStream);
     }
 
     /**
      * Example shows how to list XML from a database using specified loader
      */
     public static void listDatabase(DatabaseLoader loader, String resourceName, Credentials creds, OutputStream outputStream) throws IOException {
-        Database database = loader.load(creds, Util.class.getClassLoader().getResourceAsStream(resourceName));
-        database.save(new StreamFormat.None(), new KdbxCredentials.None(), outputStream);
+        Database database;
+        try (InputStream inputStream = Util.class.getClassLoader().getResourceAsStream(resourceName)) {
+            database = loader.load(creds, inputStream);
+        }
+        database.write(new StreamFormat.None(), new KdbxCredentials.None(), outputStream);
         outputStream.flush();
     }
 

@@ -27,6 +27,6 @@ public abstract class KdbxTestBase
             DatabaseTestBase {
 
     KdbxTestBase() {
-        super(KdbxDatabase::new, KdbxDatabase::loadNx, Database::saveNx, KdbxCredentials::new);
+        super(KdbxDatabase::new, KdbxDatabase::read, Database::write, KdbxCredentials::new);
     }
 }

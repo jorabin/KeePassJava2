@@ -23,6 +23,8 @@ import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Visitor;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -50,9 +52,11 @@ public interface Test123Test {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX");
 
     @Test
-    default void test123File() throws ParseException {
-        Database database = loadDatabase(getCredentials("123".getBytes()),
-                getClass().getClassLoader().getResourceAsStream(getFileName()));
+    default void test123File() throws ParseException, IOException {
+        Database database;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(getFileName())) {
+            database = loadDatabase(getCredentials("123".getBytes()), inputStream);
+        }
         // visit all groups and entries and list them to console
         database.visit(new Visitor.Print(getTestPrintStream()));
 
