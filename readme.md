@@ -204,6 +204,8 @@ It also depends on SLF4J, logback and Junit 4 for tests.
 
 Included POM is for Maven 3.
 
+It must be built using Java 11 (JDK 11).
+
 ### Module Structure
 
 There are rather a lot of modules, this is in order to allow loading of minimal necessary functionality. The module dependencies are illustrated below.
