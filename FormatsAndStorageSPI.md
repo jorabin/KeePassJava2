@@ -333,18 +333,26 @@ As in the issue:
 - Tests that each database's `supports(Feature)` answers match what its getters and setters do, and that no
   attribute getter returns `null`.
 
-## Open points
+## Decisions
 
-1. **Colours.** Entry foreground and background colours are in the KeePass state (group 2). Are they content
-   (group 1)?
-2. **CustomData.** Kept as an extension, or exposed generically, for example as `getCustomData()`, since it's
-   just keys and values?
-3. **Descriptors.** Start with `name`, `required` and `protectedByDefault`, or also a kind (text, multi-line,
-   URL, secret, date) that a user interface could use? Proposed: the three, until a format needs a kind.
-4. **Reporting what is dropped.** Proposed: an optional `Consumer<String>` callback on writers and sinks.
-5. **`Instant` or `Date`.** The move from `Date` to `Instant` in `Entry` and `Group` (already made on the
-   branch) is kept, as a breaking change in 3.1.0. Confirm, or revert to `Date`.
-6. **Scope for 3.1.0.** Proposed: first `supports(Feature)` and the presence and absence fixes to the existing interfaces,
-   which need no SPI; then the experimental SPI, property descriptors, the group 1 API
-   additions, the KDBX and KDB extensions, `KdbxDatabase` as source and sink, Basic as storage, the KDB
-   reader as a source, and the tests above. SQL storage, the opaque codec and a streaming reader later.
+Agreed on 2026-10-03:
+
+1. **Colours** are KeePass application state (group 2).
+2. **CustomData** stays an extension.
+3. **Property descriptors** have `name`, `required` and `protectedByDefault`, until a format needs a kind
+   (typed items in LastPass or Bitwarden exports may be the first).
+4. **Dropped data** is reported through an optional `Consumer<String>` callback on writers and sinks.
+5. **`Instant`** replaces `Date` in `Entry` and `Group`.
+6. **Order:** first `supports(Feature)` and the presence and absence fixes to the existing interfaces; then the
+   experimental SPI, property descriptors, the group 1 API additions, the KDBX and KDB extensions,
+   `KdbxDatabase` as source and sink, Basic as storage, the KDB reader as a source, and the tests. SQL
+   storage, the opaque codec and a streaming reader later.
+7. **The opaque codec** for keeping extensions in non-memory storage is deferred.
+8. **Ad hoc properties in KDB** are dropped and reported; appending them to the notes could be an option later.
+9. **`setExtension`** replaces the extension of that type; it throws `UnsupportedOperationException` where
+   extensions aren't kept.
+10. **History in the API** is read only; storage adds history when an entry changes, if the database's policy
+    says so.
+
+The release that carries the SPI is open: possibly 3.2, with prototype releases for comment, and 3.1.0 limited
+to Java 17 and `read`/`write`.
