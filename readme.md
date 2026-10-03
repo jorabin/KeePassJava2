@@ -48,7 +48,7 @@ with development on branch `v3-develop`. See [Build from Source](#build-from-sou
 Upgrade to V3 requires minor changes to V2 code.
 
 Version 2 is still maintained for now, with bug and security fixes. Its current release is 2.2.6,
-on the main branch, with development on branch `develop`.
+on branch `master`, with development on branch `develop`.
 
 Key updates relative to 2.x
 - Java 11 
@@ -79,7 +79,7 @@ composite POM that provides access to the KDBX and KDB implementations:
         <artifactId>KeePassJava2</artifactId>
         <version>3.0.0</version>
 
-For the last 2.x release, see the [main branch](https://github.com/jorabin/KeePassJava2/tree/master).
+For the last 2.x release, see branch [`master`](https://github.com/jorabin/KeePassJava2/tree/master).
 
 ### Snapshot
 
