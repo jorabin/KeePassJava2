@@ -107,24 +107,18 @@ public abstract class AbstractDatabase implements Database {
     public Entry newEntry(Entry entry) {
         Entry result = newEntry();
         for (String propertyName: entry.getPropertyNames()) {
-            try {
-                // all implementations must support setting of STANDARD_PROPERTY_NAMES
+            // all implementations support the standard properties
+            if (Entry.STANDARD_PROPERTY_NAMES.contains(propertyName) || supports(Feature.AD_HOC_PROPERTIES)) {
                 result.setProperty(propertyName, entry.getProperty(propertyName));
-            } catch (UnsupportedOperationException e) {
-                // oh well, we tried
             }
         }
-        try {
-            for (String propertyName: (entry.getBinaryPropertyNames())) {
-                try {
-                    // all implementations must support setting of STANDARD_PROPERTY_NAMES
-                    result.setBinaryProperty(propertyName, entry.getBinaryProperty(propertyName));
-                } catch (UnsupportedOperationException e) {
-                    // oh well, we tried
+        if (supports(Feature.BINARY_PROPERTIES)) {
+            for (String propertyName: entry.getBinaryPropertyNames()) {
+                result.setBinaryProperty(propertyName, entry.getBinaryProperty(propertyName));
+                if (!supports(Feature.MULTIPLE_BINARY_PROPERTIES)) {
+                    break;
                 }
             }
-        } catch (UnsupportedOperationException e) {
-            // never mind
         }
         result.setIcon(this.newIcon(entry.getIcon().getIndex()));
         // everything else should have been copied via properties
@@ -236,28 +230,48 @@ public abstract class AbstractDatabase implements Database {
         return false;
     }
 
+    /**
+     * Without a property value strategy no property is protected
+     */
     @Override
     public boolean shouldProtect(String propertyName){
-        throw new UnsupportedOperationException();
+        return false;
     }
 
+    /**
+     * Without a property value strategy properties can only be set not to be protected
+     * @throws UnsupportedOperationException if protect is true
+     */
     @Override
     public void setShouldProtect(String propertyName, boolean protect){
-        throw new UnsupportedOperationException();
+        if (protect) {
+            throw new UnsupportedOperationException("Property protection is not supported");
+        }
     }
 
+    /**
+     * Without a property value strategy no property is protected
+     */
     @Override
     public List<String> listShouldProtect(){
-        throw new UnsupportedOperationException();
+        return new ArrayList<>();
     }
 
+    /**
+     * There is no strategy to return
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public PropertyValue.Strategy getPropertyValueStrategy(){
-            throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Property value strategy is not supported");
     }
+
+    /**
+     * @throws UnsupportedOperationException always
+     */
     @Override
     public void setPropertyValueStrategy(PropertyValue.Strategy strategy){
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Property value strategy is not supported");
     }
     @Override
     public boolean supportsPropertyValueStrategy(){

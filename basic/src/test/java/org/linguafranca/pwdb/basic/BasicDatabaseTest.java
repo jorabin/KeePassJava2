@@ -27,7 +27,8 @@ public class BasicDatabaseTest
             GroupsAndEntriesTest,
             RecycleBinTest,
             ProtectedPropertyTest,
-            ProtectedPropertyTest2 {
+            ProtectedPropertyTest2,
+            FeatureSupportTest {
 
     BasicDatabaseTest() {
         super(BasicDatabase::new,

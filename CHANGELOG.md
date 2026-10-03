@@ -8,6 +8,11 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 
 - **Breaking:** requires Java 17 (3.0.0 required Java 11)
 - **Breaking:** `Entry` and `Group` times are `java.time.Instant` instead of `java.util.Date`; to upgrade, convert where a `Date` is needed, e.g. `Date.from(entry.getCreationTime())` and `entry.setExpiryTime(date.toInstant())`. `Helpers.toDate`/`fromDate` are now `toInstant`/`fromInstant`, and the KDBX model uses `Instant` throughout
+- `Database.supports(Feature)` says which optional features a database has (`DATABASE_NAME`, `AD_HOC_PROPERTIES`, `BINARY_PROPERTIES`, `MULTIPLE_BINARY_PROPERTIES`, `RECYCLE_BIN`, `PROPERTY_VALUE_STRATEGY`); the existing `supports…()` methods still work
+- Consistent handling of unsupported features and missing values: getters no longer throw for an unsupported feature but answer as if nothing were there, setters throw `UnsupportedOperationException` except when setting "nothing", attribute getters never return null (database name and description are `""` when there is none, expiry times are never null), and the interfaces are annotated `@NotNull` or `@Nullable`
+- KDB entries' attachment is available as a binary property (KDB allows one per entry); KDB property values can be read and set as `PropertyValue`s (unprotected)
+- Removing a property or binary property that isn't there returns false rather than throwing, whether or not the database supports it
+- `getDatabase()` on KDB groups and entries is never null (the root group and new groups and entries had none)
 - [Issue 109] `write` and `read` leave the caller's stream open: `Database.write`, `KdbxDatabase.read`, `KdbxDatabase.readXml`, `KdbDatabase.read`, and `write`/`read` on `StreamFormat`, `SerializableDatabase` and `BasicDatabaseSerializer`. Existing implementations of those interfaces get them as default methods
 - [Issue 109] Deprecated `save` and `load`, which close the stream they are given, and the `saveNx`/`loadNx` methods. `readXml` throws `IOException` where `loadXml` threw `Exception`
 - [Issue 109] `Util.listDatabase` no longer closes the output stream

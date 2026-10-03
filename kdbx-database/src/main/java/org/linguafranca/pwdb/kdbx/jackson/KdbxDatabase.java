@@ -283,24 +283,24 @@ public class KdbxDatabase extends ProtectedDatabase {
 
     @Override
     public String getName() {
-        return keePassFile.meta.databaseName;
+        return Objects.requireNonNullElse(keePassFile.meta.databaseName, "");
     }
 
     @Override
     public void setName(String s) {
-        keePassFile.meta.databaseName = s;
+        keePassFile.meta.databaseName = Objects.requireNonNullElse(s, "");
         keePassFile.meta.databaseNameChanged = Instant.now();
         setDirty(true);
     }
 
     @Override
     public String getDescription() {
-        return keePassFile.meta.databaseDescription;
+        return Objects.requireNonNullElse(keePassFile.meta.databaseDescription, "");
     }
 
     @Override
     public void setDescription(String s) {
-        keePassFile.meta.databaseDescription = s;
+        keePassFile.meta.databaseDescription = Objects.requireNonNullElse(s, "");
         keePassFile.meta.databaseDescriptionChanged = Instant.now();
         setDirty(true);
     }

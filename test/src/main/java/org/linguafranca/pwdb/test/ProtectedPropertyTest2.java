@@ -69,15 +69,16 @@ public interface ProtectedPropertyTest2 {
             if (getDatabase().supportsPropertyValueStrategy()) return;
 
             assertFalse(getDatabase().supportsPropertyValueStrategy());
-            // test a sample of the methods that are supposed to thrown if used here
+            // setters and the strategy getter throw, other getters answer "not protected"
             catchException((z) -> getDatabase().setPropertyValueStrategy(null), UnsupportedOperationException.class);
             catchException((z) -> getDatabase().getPropertyValueStrategy(), UnsupportedOperationException.class);
-            catchException((z) -> getDatabase().setShouldProtect(null, true), UnsupportedOperationException.class);
-            catchException((z) -> getDatabase().listShouldProtect(), UnsupportedOperationException.class);
+            catchException((z) -> getDatabase().setShouldProtect(Entry.STANDARD_PROPERTY_NAME_PASSWORD, true), UnsupportedOperationException.class);
+            assertTrue(getDatabase().listShouldProtect().isEmpty());
 
             Entry entry = getDatabase().newEntry();
-            catchException((z) -> entry.getPropertyValue(null), UnsupportedOperationException.class);
-            catchException((z) -> entry.setPropertyValue(null, (PropertyValue) null), UnsupportedOperationException.class);
+            entry.setPropertyValue(Entry.STANDARD_PROPERTY_NAME_PASSWORD, new PropertyValue.StringStore("secret"));
+            assertEquals("secret", entry.getPropertyValue(Entry.STANDARD_PROPERTY_NAME_PASSWORD).getValueAsString());
+            assertFalse(entry.getPropertyValue(Entry.STANDARD_PROPERTY_NAME_PASSWORD).isProtected());
 
         }
 

@@ -77,13 +77,22 @@ public class KdbEntry extends AbstractEntry {
     }
 
     @Override
-    public boolean removeProperty(String name) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Cannot remove non-standard properties in KDB format");
+    public boolean removeProperty(String name) throws IllegalArgumentException {
+        if (STANDARD_PROPERTY_NAMES.contains(name)) {
+            throw new IllegalArgumentException("may not remove property: " + name);
+        }
+        // KDB entries only have the standard properties
+        return false;
     }
 
     @Override
-    public boolean removeBinaryProperty(String name) throws UnsupportedOperationException {
-        throw new UnsupportedOperationException("Cannot remove binary properties in KDB format");
+    public boolean removeBinaryProperty(String name) {
+        if (hasBinary() && binaryDescription.equals(name)) {
+            binaryDescription = "";
+            binaryData = new byte[0];
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -237,19 +246,37 @@ public class KdbEntry extends AbstractEntry {
         return super.match(text) || this.getBinaryDescription().toLowerCase().contains(text.toLowerCase());
     }
 
+    /**
+     * A KDB entry has at most one attachment, named by its description
+     */
     @Override
     public byte[] getBinaryProperty(String name) {
-        throw new UnsupportedOperationException();
+        if (hasBinary() && binaryDescription.equals(name)) {
+            return binaryData;
+        }
+        return null;
     }
 
+    /**
+     * A KDB entry has at most one attachment, named by its description
+     * @throws UnsupportedOperationException if the entry already has an attachment with another name
+     */
     @Override
     public void setBinaryProperty(String name, byte[] value) {
-        throw new UnsupportedOperationException();
+        if (hasBinary() && !binaryDescription.equals(name)) {
+            throw new UnsupportedOperationException("KDB entries have only one attachment");
+        }
+        this.binaryDescription = name;
+        this.binaryData = value;
     }
 
     @Override
     public List<String> getBinaryPropertyNames() {
-        throw new UnsupportedOperationException();
+        return hasBinary() ? new ArrayList<>(List.of(binaryDescription)) : new ArrayList<>();
+    }
+
+    private boolean hasBinary() {
+        return !binaryDescription.isEmpty() || binaryData.length > 0;
     }
 
     @Override

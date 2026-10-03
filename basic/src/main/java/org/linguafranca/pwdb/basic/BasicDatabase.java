@@ -71,7 +71,9 @@ public class BasicDatabase extends ProtectedDatabase {
 
     @Override
     public void enableRecycleBin(boolean enable) {
-        throw new UnsupportedOperationException();
+        if (enable) {
+            throw new UnsupportedOperationException("Basic databases don't have a recycle bin");
+        }
     }
 
     @Override
@@ -86,7 +88,7 @@ public class BasicDatabase extends ProtectedDatabase {
 
     @Override
     public void setName(String name) {
-        this.databaseName = name;
+        this.databaseName = Objects.requireNonNullElse(name, "");
     }
 
     @Override
@@ -96,7 +98,7 @@ public class BasicDatabase extends ProtectedDatabase {
 
     @Override
     public void setDescription(String description) {
-        this.databaseDescription = description;
+        this.databaseDescription = Objects.requireNonNullElse(description, "");
     }
 
     @Override

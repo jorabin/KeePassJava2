@@ -104,7 +104,7 @@ public interface Entry {
      * Returns an XPath-like representation of this
      * entry's ancestor groups and the title of this entry.
      */
-    String getPath();
+    @NotNull String getPath();
 
     /**
      * Gets the value of a property as a String. Use of this method is not recommended for fields with protected values.
@@ -113,10 +113,11 @@ public interface Entry {
      * <p>All implementations of Entry are required to support reading and writing of
      * {@link #STANDARD_PROPERTY_NAMES}.
      * @param name the name of the property to get
-     * @return a value or null if the property is not known, or if setting of arbitrary properties is not supported
-     * @see Database#supportsNonStandardPropertyNames()
+     * @return the value, "" if the property is present and empty, or null if it is not present
+     * (including when the database doesn't support a property of that name)
+     * @see Feature#AD_HOC_PROPERTIES
      */
-    String getProperty(String name);
+    @Nullable String getProperty(String name);
 
     /**
      * Gets the value of a property as a PropertyValue.
@@ -124,10 +125,11 @@ public interface Entry {
      * <p>All implementations of Entry are required to support reading and writing of
      * {@link #STANDARD_PROPERTY_NAMES}.
      * @param name the name of the property to get
-     * @return a value or null if the property is not known, or if setting of arbitrary properties is not supported
-     * @see Database#supportsNonStandardPropertyNames()
+     * @return the value, or null if the property is not present
+     * (including when the database doesn't support a property of that name)
+     * @see Feature#AD_HOC_PROPERTIES
      */
-    PropertyValue getPropertyValue(String name);
+    @Nullable PropertyValue getPropertyValue(String name);
 
     /**
      * Sets the value of a property as a String in memory.
@@ -140,9 +142,9 @@ public interface Entry {
      * @param value the value to set it to
      * @throws UnsupportedOperationException if the name is not one of the standard properties and
      * non-standard properties are not supported
-     * @see Database#supportsNonStandardPropertyNames()
+     * @see Feature#AD_HOC_PROPERTIES
      */
-    Entry setProperty(String name, String value);
+    @NotNull Entry setProperty(String name, String value);
 
     /**
      * Sets the value of a property as a property value in memory. The method does not check whether the
@@ -154,9 +156,9 @@ public interface Entry {
      * @param value the value to set it to
      * @throws UnsupportedOperationException if the name is not one of the standard properties and
      * non-standard properties are not supported
-     * @see Database#supportsNonStandardPropertyNames()
+     * @see Feature#AD_HOC_PROPERTIES
      */
-    Entry setPropertyValue(String name, PropertyValue value);
+    @NotNull Entry setPropertyValue(String name, PropertyValue value);
 
     /**
      * Adds (or modifies) the value of a property as a property value in memory. The method uses the
@@ -168,9 +170,9 @@ public interface Entry {
      * @param value the value to set it to
      * @throws UnsupportedOperationException if the name is not one of the standard properties and
      * non-standard properties are not supported
-     * @see Database#supportsNonStandardPropertyNames()
+     * @see Feature#AD_HOC_PROPERTIES
      */
-    Entry addProperty(String name, byte[] value);
+    @NotNull Entry addProperty(String name, byte[] value);
 
     /**
      * Adds (or modifies) the value of a property as a property value in memory. The method uses the
@@ -182,9 +184,9 @@ public interface Entry {
      * @param value the value to set it to
      * @throws UnsupportedOperationException if the name is not one of the standard properties and
      * non-standard properties are not supported
-     * @see Database#supportsNonStandardPropertyNames()
+     * @see Feature#AD_HOC_PROPERTIES
      */
-    Entry addProperty(String name, char[] value);
+    @NotNull Entry addProperty(String name, char[] value);
 
     /**
      * Adds (or modifies) the value of a property as a property value in memory. The method uses the
@@ -196,9 +198,9 @@ public interface Entry {
      * @param value the value to set it to
      * @throws UnsupportedOperationException if the name is not one of the standard properties and
      * non-standard properties are not supported
-     * @see Database#supportsNonStandardPropertyNames()
+     * @see Feature#AD_HOC_PROPERTIES
      */
-    Entry addProperty(String name, CharSequence value);
+    @NotNull Entry addProperty(String name, CharSequence value);
 
     /**
      * Adds a newly created entry to the Group parent of the current Entry, if there is one. Intended primary for
@@ -208,7 +210,7 @@ public interface Entry {
      * @param name the title of the entry
      * @return the newly created entry
      */
-    Entry addEntry(String name);
+    @NotNull Entry addEntry(String name);
 
     /**
      * Adds a newly created entry to the Group parent of the current Entry, if there is one. Intended primary for
@@ -217,18 +219,18 @@ public interface Entry {
      * @throws IllegalStateException if there is no parent
      * @return the newly created entry
      */
-    Entry addEntry();
+    @NotNull Entry addEntry();
 
     /**
      * Removes this property, if it exists and if it is a non-standard property
      *
      * @return true if the property exists and was removed, false otherwise
+     * (including when the database doesn't support a property of that name)
      * @param name the value of the property to remove
-     * @throws UnsupportedOperationException if non-standard properties are not supported
      * @throws IllegalArgumentException if <i>name</i> is a standard property
-     * @see Database#supportsNonStandardPropertyNames()
+     * @see Feature#AD_HOC_PROPERTIES
      */
-    boolean removeProperty(String name) throws IllegalArgumentException, UnsupportedOperationException;
+    boolean removeProperty(String name) throws IllegalArgumentException;
 
     /**
      * Returns a list of property names known to the entry.
@@ -237,7 +239,7 @@ public interface Entry {
      * {@link #STANDARD_PROPERTY_NAMES}.
      * @return a list that is modifiable by the caller without affecting the Entry.
      */
-    List<String> getPropertyNames();
+    @NotNull List<String> getPropertyNames();
 
     /**
      * Gets the value of a binary property.
@@ -245,10 +247,11 @@ public interface Entry {
      * <p>Support for this method is optional.
      *
      * @param name the name of the property to get
-     * @return a value or null if the property is not known, or if setting of arbitrary properties is not supported
-     * @see Database#supportsBinaryProperties
+     * @return the value, or null if the property is not present (including when binary properties are
+     * not supported)
+     * @see Feature#BINARY_PROPERTIES
      */
-    byte[] getBinaryProperty(String name);
+    @Nullable byte[] getBinaryProperty(String name);
 
     /**
      * Sets the value of a binary property.
@@ -257,37 +260,39 @@ public interface Entry {
      *
      * @param name the name of the property to set
      * @param value the value to set it to
-     * @throws UnsupportedOperationException if binary properties are not supported
-     * @see Database#supportsBinaryProperties()
+     * @throws UnsupportedOperationException if binary properties are not supported, or if the entry
+     * can have only one and already has one with a different name
+     * @see Feature#BINARY_PROPERTIES
+     * @see Feature#MULTIPLE_BINARY_PROPERTIES
      */
     void setBinaryProperty(String name, byte[] value);
 
     /**
      * Removes this binary property, if it exists.
      *
-     * @return true if the property was removed, false otherwise
+     * @return true if the property was removed, false otherwise (including when binary properties are
+     * not supported)
      * @param name the value of the property to remove
-     * @throws UnsupportedOperationException if binary properties are not supported
-     * @see Database#supportsBinaryProperties()
+     * @see Feature#BINARY_PROPERTIES
      */
-    boolean removeBinaryProperty(String name) throws UnsupportedOperationException;
+    boolean removeBinaryProperty(String name);
 
     /**
      * Returns a list of binary property names known to the entry.
      *
      * <p>All implementations of Entry are required to support reading and writing of
      * {@link #STANDARD_PROPERTY_NAMES}.
-     * @return a list that is modifiable by the caller without affecting the Entry.
-     * @throws UnsupportedOperationException if binary properties are not supported
-     * @see Database#supportsBinaryProperties()
+     * @return a list that is modifiable by the caller without affecting the Entry, empty if there are none
+     * (including when binary properties are not supported)
+     * @see Feature#BINARY_PROPERTIES
      */
-    List<String> getBinaryPropertyNames();
+    @NotNull List<String> getBinaryPropertyNames();
 
     /**
      * Get the database this entry belongs to
      * @return a database
      */
-    Database getDatabase();
+    @NotNull Database getDatabase();
 
     /**
      * Get the parent of this entry
@@ -307,7 +312,7 @@ public interface Entry {
      * Get the username field of this entry
      * @return a username
      */
-    String getUsername();
+    @NotNull String getUsername();
 
     /**
      * set the username
@@ -331,7 +336,7 @@ public interface Entry {
      * @deprecated use {@link #getPropertyValue(String)} with {@link #STANDARD_PROPERTY_NAME_PASSWORD}
      */
     @Deprecated
-    String getPassword();
+    @NotNull String getPassword();
 
     /**
      * Sets the plaintext password for this Entry.
@@ -351,7 +356,7 @@ public interface Entry {
      *
      * @return a string representation of a URL
      */
-    String getUrl();
+    @NotNull String getUrl();
 
     /**
      * Sets the url for this Entry.
@@ -376,7 +381,7 @@ public interface Entry {
      *
      * @return a title
      */
-    String getTitle();
+    @NotNull String getTitle();
 
     /**
      * Sets the title for this Entry.
@@ -401,7 +406,7 @@ public interface Entry {
      *
      * @return the notes field
      */
-    String getNotes();
+    @NotNull String getNotes();
 
     /**
      * Sets the notes for this Entry.
@@ -423,7 +428,7 @@ public interface Entry {
      * Returns the {@link Icon} associated with this entry.
      * @return an Icon
      */
-    Icon getIcon();
+    @NotNull Icon getIcon();
 
     /**
      * Sets the {@link Icon} associated with this entry.
@@ -436,12 +441,12 @@ public interface Entry {
      * <p>
      * Implementations SHOULD set this to the creation date or earlier if the entry has never been used.
      */
-    Instant getLastAccessTime();
+    @NotNull Instant getLastAccessTime();
 
     /**
      * Returns the date at which this entry was created
      */
-    Instant getCreationTime();
+    @NotNull Instant getCreationTime();
 
     /**
      * Returns true if this entry is to be considered as expired at some point
@@ -458,7 +463,7 @@ public interface Entry {
      * Returns a date at which the entry should be considered to have expired, if {@link #getExpires()} is true -
      * otherwise returns an arbitrary date.
      */
-    Instant getExpiryTime();
+    @NotNull Instant getExpiryTime();
 
     /**
      * Sets the expiry date of this element.
@@ -472,5 +477,5 @@ public interface Entry {
      * <p>
      * Implementations SHOULD set this to the creation date or earlier if the entry has never been used.
      */
-    Instant getLastModificationTime();
+    @NotNull Instant getLastModificationTime();
 }

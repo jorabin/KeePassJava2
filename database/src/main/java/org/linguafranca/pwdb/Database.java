@@ -17,6 +17,7 @@
 
 package org.linguafranca.pwdb;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.linguafranca.pwdb.io.NonClosingOutputStream;
 
@@ -57,20 +58,20 @@ public interface Database {
      * get the root group for the database
      * @return the root group
      */
-    Group getRootGroup();
+    @NotNull Group getRootGroup();
 
     /**
      * Create a new Group
      * @return the group created
      */
-    Group newGroup();
+    @NotNull Group newGroup();
 
     /**
      * Create a new named Group
      * @param name the name of the group
      * @return the group created
      */
-    Group newGroup(String name);
+    @NotNull Group newGroup(String name);
 
     /**
      * Create a new Group copying the details of the supplied group, but not copying its children
@@ -79,19 +80,19 @@ public interface Database {
      * @param group the group to copy
      * @return the group created
      */
-    Group newGroup(Group group);
+    @NotNull Group newGroup(Group group);
 
     /**
      * Create a new Entry
      * @return the entry created
      */
-    Entry newEntry();
+    @NotNull Entry newEntry();
 
     /**
      * Create a new Entry with a title
      * @return the entry created
      */
-    Entry newEntry(String title);
+    @NotNull Entry newEntry(String title);
 
     /**
      * Create a new Entry copying the details of the supplied entry
@@ -100,20 +101,20 @@ public interface Database {
      * @param entry the entry to copy
      * @return the entry created
      */
-    Entry newEntry(Entry entry);
+    @NotNull Entry newEntry(Entry entry);
 
     /**
      * Create a new default icon
      * @return the created icon
      */
-    Icon newIcon();
+    @NotNull Icon newIcon();
 
     /**
      * Create a new icon with a specified index
      * @param i the index of the icon to create
      * @return the created icon
      */
-    Icon newIcon(Integer i);
+    @NotNull Icon newIcon(Integer i);
 
     /**
      * Find an entry with this UUID anywhere in the database except the recycle bin
@@ -163,7 +164,7 @@ public interface Database {
      * recycle bin), then return the recycle bin, creating one if necessary.
      * If the recycle bin is disabled and there is no pre-existing recycle bin
      * or if recycle bin is not supported then return null.
-     * @see #supportsRecycleBin()
+     * @see Feature#RECYCLE_BIN
      */
     @Nullable Group getRecycleBin();
 
@@ -194,7 +195,7 @@ public interface Database {
      * @param matcher the matcher to use
      * @return a list of entries
      */
-    List<Entry> findEntries(Entry.Matcher matcher);
+    @NotNull List<Entry> findEntries(Entry.Matcher matcher);
 
     /**
      * Find all entries that match {@link Entry#match(String)}
@@ -202,29 +203,32 @@ public interface Database {
      * @param find string to find
      * @return a list of entries
      */
-    List<Entry> findEntries(String find);
+    @NotNull List<Entry> findEntries(String find);
 
     /**
-     * Gets the name of the database or null if not supported
-     * @return a database name
+     * Gets the name of the database
+     * @return a database name, or "" if there is none or names are not supported
+     * @see Feature#DATABASE_NAME
      */
-    String getName();
+    @NotNull String getName();
 
     /**
-     * Set the name of the database if this is supported
-     * @param name the name
+     * Set the name of the database
+     * @param name the name, null is treated as ""
+     * @throws UnsupportedOperationException if names are not supported and the name is not empty
+     * @see Feature#DATABASE_NAME
      */
     void setName(String name);
 
     /**
-     * Gets the database description, if there is one
-     * @return the description or null if not supported
+     * Gets the database description
+     * @return the description, or "" if there is none
      */
-    String getDescription();
+    @NotNull String getDescription();
 
     /**
-     * Sets the database description if it is supported
-     * @param description a description of the database
+     * Sets the database description
+     * @param description a description of the database, null is treated as ""
      */
     void setDescription(String description);
 
@@ -293,7 +297,7 @@ public interface Database {
     /**
      * Get the format the database was loaded from
      */
-    <C extends StreamConfiguration> StreamFormat<C> getStreamFormat();
+    @Nullable <C extends StreamConfiguration> StreamFormat<C> getStreamFormat();
 
     /**
      * Property to protect in memory
@@ -314,12 +318,12 @@ public interface Database {
      * @return a list of property names
      */
     @SuppressWarnings("UnusedReturnValue")
-    List<String> listShouldProtect();
+    @NotNull List<String> listShouldProtect();
 
     /**
      * Get the default means of storage of unprotected and protected property values
      */
-    PropertyValue.Strategy getPropertyValueStrategy();
+    @NotNull PropertyValue.Strategy getPropertyValueStrategy();
 
     /**
      * Set the default means of storage of unprotected and protected property values
@@ -328,22 +332,47 @@ public interface Database {
     void setPropertyValueStrategy(PropertyValue.Strategy propertyValueStrategy);
 
     /**
+     * Whether the database supports a feature. When it doesn't, getters answer as if there were nothing
+     * there, and setters throw {@link UnsupportedOperationException}, see {@link Feature}.
+     * <p>
+     * The default answers from the {@code supports…()} methods below; databases with features those
+     * don't cover override it.
+     *
+     * @param feature the feature
+     * @return true if the database supports it
+     * @since 3.1.0
+     */
+    default boolean supports(Feature feature) {
+        return switch (feature) {
+            case DATABASE_NAME -> true;
+            case AD_HOC_PROPERTIES -> supportsNonStandardPropertyNames();
+            case BINARY_PROPERTIES, MULTIPLE_BINARY_PROPERTIES -> supportsBinaryProperties();
+            case RECYCLE_BIN -> supportsRecycleBin();
+            case PROPERTY_VALUE_STRATEGY -> supportsPropertyValueStrategy();
+        };
+    }
+
+    /**
      * returns true if the database supports non-standard property names
+     * @see Feature#AD_HOC_PROPERTIES
      */
     boolean supportsNonStandardPropertyNames();
 
     /**
      * returns true if the database supports binary properties
+     * @see Feature#BINARY_PROPERTIES
      */
     boolean supportsBinaryProperties();
 
     /**
      * returns true if the database supports recycle bin
+     * @see Feature#RECYCLE_BIN
      */
     boolean supportsRecycleBin();
 
     /**
      * returns true if the implementation supports a PropertyValueStrategy
+     * @see Feature#PROPERTY_VALUE_STRATEGY
      */
     boolean supportsPropertyValueStrategy();
 

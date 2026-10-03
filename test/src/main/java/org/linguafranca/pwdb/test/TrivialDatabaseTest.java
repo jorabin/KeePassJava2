@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Entry;
+import org.linguafranca.pwdb.Feature;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 
@@ -87,6 +88,10 @@ public interface TrivialDatabaseTest {
 
     @Test
     default void testGetSetName() {
+        if (!getDatabase().supports(Feature.DATABASE_NAME)) {
+            assertEquals("", getDatabase().getName());
+            return;
+        }
         assertEquals("New Database", getDatabase().getName());
         getDatabase().setName("Test Database");
         assertEquals("Test Database", getDatabase().getName());
