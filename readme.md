@@ -113,14 +113,23 @@ Versions 3.0.0 onwards require Java 11. From version 2.2 Java 1.8 is required. E
 
 ## Quick Start
 
-Create credentials and an input stream for the password vault in question:
+Create credentials for the password vault in question, then read the database from an input stream:
 
       KdbxCredentials credentials = new KdbxCredentials("123".getBytes());
-      InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test1.kdbx");
-      
-then load the database:
+      Database database;
+      try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test1.kdbx")) {
+          database = KdbxDatabase.read(credentials, inputStream);
+      }
 
-      Database database = KdbxDatabase.load(credentials, inputStream)
+and write it to an output stream:
+
+      try (OutputStream outputStream = Files.newOutputStream(Path.of("test1.kdbx"))) {
+          database.write(credentials, outputStream);
+      }
+
+> From 3.1.0 `read` and `write` leave the stream open, so whoever opens a stream closes it, as above.
+`load` and `save`, which close the stream they are given, are deprecated
+(see [issue 109](https://github.com/jorabin/KeePassJava2/issues/109)).
 
 > In the past there were a number of different database implementations, at present there
 are two, one for KDBX (`KdbxDatabase` - previously called `JacksonDatabase`, because it uses Jackson for XML serialization)

@@ -25,7 +25,6 @@ import org.linguafranca.pwdb.kdb.KdbCredentials;
 import org.linguafranca.pwdb.kdb.KdbDatabase;
 import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 import org.linguafranca.pwdb.security.Encryption;
-import org.linguafranca.util.TestUtil;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -76,7 +75,8 @@ public abstract class QuickStart {
         KdbxCredentials credentials = new KdbxCredentials("123".getBytes());
         Files.createDirectories(Path.of(TEST_OUTPUT_DIR));
         try (OutputStream outputStream = Files.newOutputStream(Path.of(TEST_OUTPUT_DIR, "test.kdbx"))) {
-            database.save(credentials, outputStream);
+            // write leaves the stream open, try-with-resources closes it
+            database.write(credentials, outputStream);
         }
     }
 
@@ -113,8 +113,8 @@ public abstract class QuickStart {
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx")) {
             // password credentials
             Credentials credentials = new KdbxCredentials("123".getBytes());
-            // load the database from the input stream
-            Database database = KdbxDatabase.load(credentials, inputStream);
+            // read the database from the input stream
+            Database database = KdbxDatabase.read(credentials, inputStream);
             // visit all groups and entries and list them to console
             database.visit(new Visitor.Print(printStream));
         }
@@ -144,7 +144,7 @@ public abstract class QuickStart {
         // save to a file with password "123"
         Files.createDirectories(Path.of(TEST_OUTPUT_DIR));
         try (FileOutputStream outputStream = new FileOutputStream(TEST_OUTPUT_DIR + "test.kdbx")) {
-            database.save(new KdbxCredentials("123".getBytes()), outputStream);
+            database.write(new KdbxCredentials("123".getBytes()), outputStream);
         }
     }
 
@@ -178,11 +178,13 @@ public abstract class QuickStart {
      * Load KDB and save as KDBX
      */
     public void loadKdbSaveKdbx() throws IOException {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdb");
         // password credentials
         Credentials credentials = new KdbCredentials.Password("123".getBytes());
-        // load KdbDatabase
-        KdbDatabase database = KdbDatabase.load(credentials, inputStream);
+        KdbDatabase database;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdb")) {
+            // read KdbDatabase
+            database = KdbDatabase.read(credentials, inputStream);
+        }
 
         // create a KDBX (database
         Database kdbxDatabase = new KdbxDatabase();
@@ -193,7 +195,7 @@ public abstract class QuickStart {
         // save it
         Files.createDirectories(Path.of(TEST_OUTPUT_DIR));
         try (FileOutputStream f = new FileOutputStream(TEST_OUTPUT_DIR + "migration.kdbx")) {
-            kdbxDatabase.save(new KdbxCredentials("123".getBytes()), f);
+            kdbxDatabase.write(new KdbxCredentials("123".getBytes()), f);
         }
     }
 
@@ -205,8 +207,8 @@ public abstract class QuickStart {
         // password credentials
         KdbxCredentials credentials = new KdbxCredentials(password);
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(v3ResourceName)) {
-            // load KdbDatabase
-            database = KdbxDatabase.load(credentials, inputStream);
+            // read KdbxDatabase
+            database = KdbxDatabase.read(credentials, inputStream);
         }
 
         // create a KDBX (database
@@ -227,21 +229,21 @@ public abstract class QuickStart {
 
         // save it with format options
         try (OutputStream v4OutputStream = Files.newOutputStream(v4Filename)) {
-            kdbxDatabase.save(formatV4, credentials, v4OutputStream);
+            kdbxDatabase.write(formatV4, credentials, v4OutputStream);
         }
     }
 
 
     /**
-     * Load KDBX V3 save as KDBX V4
+     * Load KDBX V4 save as KDBX V3
      */
     public void loadKdbx4SaveKdbx3(String resourceName, byte[] password, Path v3Filename) throws IOException {
         KdbxDatabase database;
         // password credentials
         KdbxCredentials credentials = new KdbxCredentials(password);
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
-            // load KdbDatabase
-            database = KdbxDatabase.load(credentials, inputStream);
+            // read KdbxDatabase
+            database = KdbxDatabase.read(credentials, inputStream);
         }
 
         // create a KDBX database
@@ -257,22 +259,24 @@ public abstract class QuickStart {
 
         // save it with format options
         try (OutputStream v3OutputStream = Files.newOutputStream(v3Filename)) {
-            kdbxDatabase.save(formatV3, credentials, v3OutputStream);
+            kdbxDatabase.write(formatV3, credentials, v3OutputStream);
         }
     }
 
     /**
-     * Load KDBX V3 save as KDBX V4
+     * Load KDBX V4 and print its XML
      */
     public void loadKdbx4SaveToConsole(String resourceName, byte[] password, Path path) throws IOException {
         KdbxDatabase database;
         // password credentials
         KdbxCredentials credentials = new KdbxCredentials(password);
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
-            // load KdbDatabase
-            database = KdbxDatabase.load(credentials, inputStream);
+            // read KdbxDatabase
+            database = KdbxDatabase.read(credentials, inputStream);
         }
 
-        database.save(new StreamFormat.None(), new Credentials.None(), TestUtil.getTestPrintStream());
+        // write leaves the print stream open, so it can still be used
+        database.write(new StreamFormat.None(), new Credentials.None(), printStream);
+        printStream.flush();
     }
 }

@@ -40,13 +40,13 @@ public class OpenDbExample {
     static PrintStream printStream = getTestPrintStream();
 
     private interface DbLoader {
-        Database load(KdbxCredentials creds, InputStream inputStream) throws Exception;
+        Database read(KdbxCredentials creds, InputStream inputStream) throws Exception;
     }
 
     private static class KdbxLoader implements DbLoader {
         @Override
-        public Database load(KdbxCredentials creds, InputStream inputStream) throws Exception {
-            return KdbxDatabase.load(creds, inputStream);
+        public Database read(KdbxCredentials creds, InputStream inputStream) throws Exception {
+            return KdbxDatabase.read(creds, inputStream);
         }
     }
 
@@ -55,7 +55,7 @@ public class OpenDbExample {
         long start = System.currentTimeMillis();
         for (int i=0; i < loads; i++) {
             try (InputStream inputStream = OpenDbExample.class.getClassLoader().getResourceAsStream("test1.kdbx")) {
-                Database database = loader.load(creds, inputStream);
+                Database database = loader.read(creds, inputStream);
                 for (int j = 0; j < iterations; j++) {
                     database.visit(new Visitor.Default() {
                     });
