@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2025. Jo Rabin
+  ~ Copyright (c) 2026. Jo Rabin
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -26,27 +26,35 @@
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>database</artifactId>
-	<name>PWDB :: Database</name>
-	<description>Contains root definitions of PWDB Databases etc.</description>
+	<artifactId>test</artifactId>
+	<name>PWDB :: Test</name>
+	<description>Tests shared by the database implementations. Only needed to build and test KeePassJava2, so not published.</description>
 
 	<properties>
-		<automatic-module-name>org.linguafranca.pwdb.database</automatic-module-name>
+		<maven.deploy.skip>true</maven.deploy.skip>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
+			<groupId>org.linguafranca.pwdb</groupId>
+			<artifactId>database</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<!-- the shared tests are main code here, so these are compile scope -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcpkix-jdk18on</artifactId>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-launcher</artifactId>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.google.code.findbugs</groupId>
-			<artifactId>jsr305</artifactId>
-			<version>3.0.2</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>

@@ -20,7 +20,7 @@ package org.linguafranca.pwdb.example;
 
 import org.junit.jupiter.api.Test;
 
-import static org.linguafranca.pwdb.PropertyValueUtil.genericTest;
+import static org.linguafranca.pwdb.test.PropertyValueUtil.genericTest;
 
 public class SecureCharBufferPropertyValueTest {
 

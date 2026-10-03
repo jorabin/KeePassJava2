@@ -42,9 +42,8 @@
 
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>database</artifactId>
+            <artifactId>test</artifactId>
             <version>${project.version}</version>
-            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>
