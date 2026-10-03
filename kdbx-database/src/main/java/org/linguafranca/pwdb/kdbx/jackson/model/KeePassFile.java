@@ -211,14 +211,14 @@ public class KeePassFile {
         public List<Binary> binaries;
         
         @JacksonXmlProperty(localName = "CustomData")
-        protected KeePassFile.CustomData customData;
+        public KeePassFile.CustomData customData;
 
         /* version 4  */
 
         @JacksonXmlProperty(localName = "SettingsChanged")
         @JsonDeserialize(converter = StringToInstantConverter.class)
         @JsonSerialize(converter = InstantToStringConverter.class)
-        protected Instant settingsChanged;
+        public Instant settingsChanged;
     }
 
     @JsonPropertyOrder({

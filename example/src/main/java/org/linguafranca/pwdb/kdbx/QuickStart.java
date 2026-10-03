@@ -219,7 +219,7 @@ public abstract class QuickStart {
         kdbxDatabase.getRootGroup().copy(database.getRootGroup());
 
         // choose a stream format - V4 Kdbx and choose some algorithms
-        KdbxHeader kdbxHeader = new KdbxHeader(KdbxHeader.KdbxHeaderOpts.V4_1_AES_ARGON_CHA_CHA);
+        KdbxHeader kdbxHeader = new KdbxHeader(KdbxHeader.KdbxHeaderOpts.V4_AES_ARGON_CHA_CHA);
         // change algorithm from those originally selected
         kdbxHeader.setCipherAlgorithm(Encryption.Cipher.CHA_CHA_20);
         kdbxHeader.setKeyDerivationFunction(Encryption.KeyDerivationFunction.ARGON2);

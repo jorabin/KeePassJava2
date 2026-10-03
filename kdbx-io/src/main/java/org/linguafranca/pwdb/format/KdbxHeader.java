@@ -63,6 +63,8 @@ public class KdbxHeader implements StreamConfiguration {
     private int version;
     /* minor version of the file - least significant 2 bytes of the file version, e.g. 1 in 0x00030001 */
     private int minorVersion;
+    /* for version 4, whether the minor version is chosen when writing, as the lowest that holds the content */
+    private boolean minorVersionAutomatic;
 
     protected UUID cipherUuid;
     private byte[] masterSeed;
@@ -188,11 +190,13 @@ public class KdbxHeader implements StreamConfiguration {
     }
 
     /**
-     * Construct a default KDBX header for the latest minor version of the major version given:
-     * 3.1 with AES/AES/SALSA_20, or 4.1 with AES/ARGON2/CHA_CHA_20
+     * Construct a default KDBX header for the major version given: 3.1 with AES/AES/SALSA_20, or 4 with
+     * AES/ARGON2/CHA_CHA_20, written as 4.1 if the content needs it and otherwise as 4.0, as KeePass does
+     * @see #isMinorVersionAutomatic()
      */
     public KdbxHeader(int version) {
-        this(version ==3 ? KdbxHeaderOpts.V3_AES_SALSA_20 : KdbxHeaderOpts.V4_1_AES_ARGON_CHA_CHA);
+        this(version ==3 ? KdbxHeaderOpts.V3_AES_SALSA_20 : KdbxHeaderOpts.V4_AES_ARGON_CHA_CHA);
+        this.minorVersionAutomatic = version != 3;
     }
 
 
@@ -440,7 +444,8 @@ public class KdbxHeader implements StreamConfiguration {
     }
 
     /**
-     * Sets the major version, and the minor version to the latest for it (3.1 or 4.1)
+     * Sets the major version. For 3 the minor version is 1, for 4 it is chosen when writing
+     * (see {@link #isMinorVersionAutomatic()})
      * @param version 3 or 4
      */
     public void setVersion(int version) {
@@ -448,15 +453,34 @@ public class KdbxHeader implements StreamConfiguration {
             throw new IllegalStateException("File version must be in " + allowableVersions);
         }
         this.version = version;
-        this.minorVersion = 1;
+        this.minorVersion = version == 3 ? 1 : 0;
+        this.minorVersionAutomatic = version != 3;
     }
 
     /**
-     * Sets the minor version, e.g. 0 for KDBX 4.0
+     * Sets the minor version, e.g. 0 for KDBX 4.0, which is then written whatever the content
      * @param minorVersion the minor version
      * @since 3.1.0
      */
     public void setMinorVersion(int minorVersion) {
+        this.minorVersion = minorVersion;
+        this.minorVersionAutomatic = false;
+    }
+
+    /**
+     * Whether the minor version is chosen when writing, as the lowest that holds the content
+     * (4.1 if any 4.1 features are used, otherwise 4.0), as KeePass does. True for headers made with
+     * {@link #KdbxHeader(int)} or {@link #setVersion(int)} for version 4; false after
+     * {@link #setMinorVersion(int)}, for headers made from {@link KdbxHeaderOpts}, and for headers that
+     * were read, so that a database keeps its version.
+     * @since 3.1.0
+     */
+    public boolean isMinorVersionAutomatic() {
+        return minorVersionAutomatic;
+    }
+
+    /* choose the minor version when writing, leaving it automatic */
+    void chooseMinorVersion(int minorVersion) {
         this.minorVersion = minorVersion;
     }
 

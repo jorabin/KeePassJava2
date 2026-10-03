@@ -49,7 +49,7 @@ public class KdbxDatabase extends ProtectedDatabase {
         try {
             keePassFile = file;
             keePassFile.root.group.database = this;
-            // a new database is written as KDBX 4.1 unless told otherwise
+            // a new database is written as KDBX 4 (4.1 if the content needs it) unless told otherwise
             this.streamFormat = Objects.requireNonNullElseGet(streamFormat, () -> new KdbxStreamFormat(new KdbxHeader(4)));
             fixUp(keePassFile.root.group);
         } catch (Exception e) {
@@ -162,7 +162,7 @@ public class KdbxDatabase extends ProtectedDatabase {
 
     /**
      * Write the database with its stream format ({@link #getStreamFormat()}): the format it was read with,
-     * or KDBX 4.1 for a new database, leaving the stream open
+     * or KDBX 4 for a new database (4.1 if the content needs it), leaving the stream open
      *
      * @param credentials  credentials to use
      * @param outputStream where to write to - the caller closes it

@@ -37,7 +37,7 @@ public class BasicDatabase extends ProtectedDatabase {
     private final BasicGroup root = new BasicGroup(this, "Root");
     private String databaseName = "New Database";
     private String databaseDescription = "Database created on " + Instant.now().toString();
-    // written as KDBX 4.1
+    // written as KDBX 4
     private StreamFormat<?> streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
 
     @Override

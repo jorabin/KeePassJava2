@@ -104,6 +104,12 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
                 // the serializer leaves the binaries out of the XML when Helpers.isV4 is set
             }
 
+            // choose the version, and tell the database, so it can leave out what the version can't hold
+            if (kdbxHeader.isMinorVersionAutomatic()) {
+                kdbxHeader.chooseMinorVersion(serializableDatabase.getMinimumMinorVersion(kdbxHeader.getVersion()));
+            }
+            serializableDatabase.setFormatVersion(kdbxHeader.getVersion(), kdbxHeader.getMinorVersion());
+
             // the encryption chain must be closed to finish, and closing it closes the stream under it,
             // so shield the caller's stream
             try (OutputStream encryptedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader,

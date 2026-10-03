@@ -296,7 +296,7 @@ public interface Database {
 
     /**
      * Get the format the database was read from, or for a new database the format it is written in by
-     * {@link #write(Credentials, OutputStream)} (KDBX 4.1 for KDBX databases)
+     * {@link #write(Credentials, OutputStream)} (KDBX 4 for KDBX databases, 4.1 if the content needs it)
      */
     @NotNull <C extends StreamConfiguration> StreamFormat<C> getStreamFormat();
 

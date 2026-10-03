@@ -78,6 +78,29 @@ public interface SerializableDatabase {
     @Deprecated
     void save(OutputStream outputStream) throws IOException;
 
+    /**
+     * The lowest minor version of the format's major version given that can hold all of this database's
+     * content, for formats such as KDBX 4 whose minor versions add content
+     *
+     * @param majorVersion the major version
+     * @return the minor version, 0 by default
+     * @since 3.1.0
+     */
+    default int getMinimumMinorVersion(int majorVersion) {
+        return 0;
+    }
+
+    /**
+     * Tells the database the version of the format it is about to be written in, so that it can leave out
+     * content that version can't hold. By default this is ignored.
+     *
+     * @param majorVersion the major version
+     * @param minorVersion the minor version
+     * @since 3.1.0
+     */
+    default void setFormatVersion(int majorVersion, int minorVersion) {
+    }
+
     StreamEncryptor getEncryption();
 
     void setEncryption(StreamEncryptor encryption);

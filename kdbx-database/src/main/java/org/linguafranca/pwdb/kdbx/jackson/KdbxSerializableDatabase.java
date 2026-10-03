@@ -58,6 +58,10 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
     private StreamEncryptor encryptor;
 
     private PropertyValue.Strategy propertyValueStrategy = new PropertyValue.Strategy.Default();
+    /* the version about to be written, 0 if not known, in which case everything is written */
+    private int formatMajorVersion;
+    private int formatMinorVersion;
+    private static final System.Logger logger = System.getLogger(KdbxSerializableDatabase.class.getName());
 
     public static KeePassFile createEmptyDatabase()  {
 
@@ -147,6 +151,15 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
             if (Helpers.isV4.get()) {
                 keePassFile.meta.binaries = null;
             }
+            // leave out what the version being written can't hold
+            KdbxVersionContent removed = null;
+            if (formatMajorVersion != 0) {
+                removed = KdbxVersionContent.remove(keePassFile, formatMajorVersion, formatMinorVersion);
+                if (!removed.removed().isEmpty()) {
+                    logger.log(System.Logger.Level.WARNING, "KDBX " + formatMajorVersion + "." + formatMinorVersion +
+                            " can't hold, so not written: " + String.join(", ", removed.removed()));
+                }
+            }
             //noinspection TryFinallyCanBeTryWithResources - doesn't work with XMLStreamWriter
             try {
                 sw.setPrefix("xml", "http://www.w3.org/XML/1998/namespace");
@@ -156,6 +169,9 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
                 sw.writeEndDocument();
             } finally {
                 keePassFile.meta.binaries = binaries;
+                if (removed != null) {
+                    removed.restore();
+                }
                 sw.close();
                 osw.close();
             }
@@ -176,6 +192,17 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
         try (outputStream) {
             write(outputStream);
         }
+    }
+
+    @Override
+    public int getMinimumMinorVersion(int majorVersion) {
+        return KdbxVersionContent.minimumMinorVersion(keePassFile, majorVersion);
+    }
+
+    @Override
+    public void setFormatVersion(int majorVersion, int minorVersion) {
+        this.formatMajorVersion = majorVersion;
+        this.formatMinorVersion = minorVersion;
     }
 
     @Override
