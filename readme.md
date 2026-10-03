@@ -41,7 +41,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-The current code is version 2.2.6 - released to Maven October 2026. This is on the main branch. See [Build from Source](#build-from-source)
+The current code is version 2.2.6 - released to Maven October 2026. This is on branch `master`. See [Build from Source](#build-from-source)
 
 Version 3 is released as 3.0.0, which needs Java 11. See branch [`v3-master`](https://github.com/jorabin/KeePassJava2/tree/v3-master) and the [release notes](https://github.com/jorabin/KeePassJava2/releases/tag/KeePassJava2-3.0.0). Version 2 is still maintained for now, with bug and security fixes.
 
