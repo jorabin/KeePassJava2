@@ -1,0 +1,22 @@
+name: Build
+
+on:
+  push:
+    branches: [ develop, master ]
+  pull_request:
+    branches: [ develop, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # 2.x must be built with JDK 11: the enforcer refuses JDK 17 and later, see the readme
+      - uses: actions/setup-java@v6
+        with:
+          distribution: zulu
+          java-version: '11'
+          cache: maven
+      - name: Build and test
+        run: mvn -B -P inhibitConsoleOutput verify
