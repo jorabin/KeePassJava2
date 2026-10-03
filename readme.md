@@ -3,7 +3,7 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent)
 [![javadoc](https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2/javadoc.svg)](https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2)
 
-![alt text](https://badgen.net/badge/Build/2.2.5/blue?icon=github)
+![alt text](https://badgen.net/badge/Build/2.2.6/blue?icon=github)
 master [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
 develop [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
 
@@ -39,7 +39,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-The current code is version 2.2.5 - released to Maven October 2026. This is on the main branch. See [Build from Source](#build-from-source)
+The current code is version 2.2.6 - released to Maven October 2026. This is on the main branch. See [Build from Source](#build-from-source)
 
 Key updates relative to 2.1:
 - Java 8 (dependencies no longer support Java 7)
@@ -54,11 +54,11 @@ See the [changelog](CHANGELOG.md) for more details.
 
 ### Release
 
-The POM for the last release (2.2.5), Java 8 compatible, is
+The POM for the last release (2.2.6), Java 8 compatible, is
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2-jackson</artifactId>
-        <version>2.2.5</version>
+        <version>2.2.6</version>
 
 at Maven Central. This provides access to the Jackson based implementation, 
 which is now the recommended implementation.  There is also a composite POM that
@@ -66,18 +66,18 @@ provides access to all implementations (see [below](#database-implementations) f
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.2.5</version>
+        <version>2.2.6</version>
 
 Note that the artifactId has become Camel Case from release 2.1.x onwards.
 
 ### Snapshot
 
 Snapshot builds are erratically available at [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/org/linguafranca/pwdb/), next bug-fix release will be
-2.2.6-SNAPSHOT (on branch `develop`) and work-in-progress 3.0.0-SNAPSHOT (on branch `v3`):
+2.2.7-SNAPSHOT (on branch `develop`) and work-in-progress 3.0.0-SNAPSHOT (on branch `v3`):
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>2.2.6-SNAPSHOT</version>
+        <version>2.2.7-SNAPSHOT</version>
  
 with appropriate `<repositories>` entry, like:
 
