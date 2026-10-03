@@ -290,6 +290,52 @@ public class KdbxGroup extends AbstractGroup{
         return database;
     }
 
+    @Override
+    @JsonIgnore
+    public Date getLastAccessTime() {
+        return times.getLastAccessTime();
+    }
+
+    @Override
+    @JsonIgnore
+    public Date getCreationTime() {
+        return times.getCreationTime();
+    }
+
+    @Override
+    @JsonIgnore
+    public boolean getExpires() {
+        return Boolean.TRUE.equals(times.getExpires());
+    }
+
+    @Override
+    @JsonIgnore
+    public void setExpires(boolean expires) {
+        times.setExpires(expires);
+        touch();
+    }
+
+    @Override
+    @JsonIgnore
+    public Date getExpiryTime() {
+        return times.getExpiryTime();
+    }
+
+    @Override
+    @JsonIgnore
+    public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
+        if (expiryTime == null)
+            throw new IllegalArgumentException("expiryTime may not be null");
+        times.setExpiryTime(expiryTime);
+        touch();
+    }
+
+    @Override
+    @JsonIgnore
+    public Date getLastModificationTime() {
+        return times.getLastModificationTime();
+    }
+
     private void touch() {
         if (this.times != null) {
             this.times.setLastModificationTime(new Date());

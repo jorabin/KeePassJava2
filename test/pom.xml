@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2025. Jo Rabin
+  ~ Copyright (c) 2026. Jo Rabin
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -16,19 +16,20 @@
   ~
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.linguafranca.pwdb</groupId>
 		<artifactId>KeePassJava2.parent</artifactId>
+		<groupId>org.linguafranca.pwdb</groupId>
 		<version>3.0.1-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
+	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>basic</artifactId>
-	<name>PWDB :: Basic</name>
-	<description>Experimental database implementation to explore serialization.</description>
+	<artifactId>test</artifactId>
+	<name>PWDB :: Test</name>
+	<description>Tests shared by the database implementations. Only needed to build and test KeePassJava2, so not published.</description>
+
 	<properties>
 		<maven.deploy.skip>true</maven.deploy.skip>
 	</properties>
@@ -38,34 +39,22 @@
 			<groupId>org.linguafranca.pwdb</groupId>
 			<artifactId>database</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+		<!-- the shared tests are main code here, so these are compile scope -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.linguafranca.pwdb</groupId>
-			<artifactId>KeePassJava2.kdbx.io</artifactId>
-			<version>3.0.1-SNAPSHOT</version>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-launcher</artifactId>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.fasterxml.jackson.dataformat</groupId>
-			<artifactId>jackson-dataformat-xml</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.jackson.datatype</groupId>
-			<artifactId>jackson-datatype-jsr310</artifactId>
-			<version>${jackson.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.fasterxml.woodstox</groupId>
-			<artifactId>woodstox-core</artifactId>
-			<version>${woodstox.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.linguafranca.pwdb</groupId>
-			<artifactId>test</artifactId>
-			<version>${project.version}</version>
-			<scope>test</scope>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>

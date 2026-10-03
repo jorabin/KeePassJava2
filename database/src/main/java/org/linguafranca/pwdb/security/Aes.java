@@ -39,10 +39,9 @@ import static org.linguafranca.pwdb.security.Encryption.getSha256MessageDigestIn
  * AES may be used for Key Derivation and also as the underlying stream cipher
  * <p>
  * The class is a singleton
- *
- * {@implNote This class is a singleton}
- * {@implNote Warnings for the use of AES CBC etc. noted, however their continuing use is required for
- * compatibility / interoperability with existing databases}
+ * <p>
+ * Warnings for the use of AES CBC etc. noted, however their continuing use is required for
+ * compatibility / interoperability with existing databases
  */
 @SuppressWarnings({"deprecation"})
 public class Aes implements CipherAlgorithm, KeyDerivationFunction {

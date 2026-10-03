@@ -74,6 +74,7 @@ public abstract class QuickStart {
 
         // V3 KdbxCreds now called KdbxCredentials
         KdbxCredentials credentials = new KdbxCredentials("123".getBytes());
+        Files.createDirectories(Path.of(TEST_OUTPUT_DIR));
         try (OutputStream outputStream = Files.newOutputStream(Path.of(TEST_OUTPUT_DIR, "test.kdbx"))) {
             database.save(credentials, outputStream);
         }
@@ -141,6 +142,7 @@ public abstract class QuickStart {
         }
 
         // save to a file with password "123"
+        Files.createDirectories(Path.of(TEST_OUTPUT_DIR));
         try (FileOutputStream outputStream = new FileOutputStream(TEST_OUTPUT_DIR + "test.kdbx")) {
             database.save(new KdbxCredentials("123".getBytes()), outputStream);
         }
@@ -189,6 +191,7 @@ public abstract class QuickStart {
         // deep copy from group (not including source group, KDB database has simulated root)
         kdbxDatabase.getRootGroup().copy(database.getRootGroup());
         // save it
+        Files.createDirectories(Path.of(TEST_OUTPUT_DIR));
         try (FileOutputStream f = new FileOutputStream(TEST_OUTPUT_DIR + "migration.kdbx")) {
             kdbxDatabase.save(new KdbxCredentials("123".getBytes()), f);
         }

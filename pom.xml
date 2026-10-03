@@ -22,9 +22,10 @@
 
 	<groupId>org.linguafranca.pwdb</groupId>
 	<artifactId>KeePassJava2.parent</artifactId>
-	<version>3.0.0-SNAPSHOT</version>
+	<version>3.0.1-SNAPSHOT</version>
 	<modules>
 		<module>database</module>
+		<module>test</module>
 		<module>kdb</module>
 		<module>kdbx-io</module>
 		<module>kdbx-database</module>
@@ -50,7 +51,7 @@
 		<connection>scm:git:git://github.com/jorabin/KeePassJava2.git</connection>
 		<developerConnection>scm:git:git@github.com:jorabin/KeePassJava2.git</developerConnection>
 		<url>https://github.com/jorabin/KeePassJava2</url>
-		<tag>KeePassJava2-3.0.0</tag>
+		<tag>KeePassJava2-3.0.1</tag>
 	</scm>
 
 	<developers>
@@ -67,19 +68,26 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>11</java.version>
+		<!-- modules that are published set their own, see #93 -->
+		<automatic-module-name>${project.groupId}.${project.artifactId}</automatic-module-name>
+		<!-- used by the modules that depend on Jackson -->
+		<jackson.version>2.22.3</jackson.version>
+		<woodstox.version>7.3.0</woodstox.version>
+		<!-- javadoc checks in the releaseToMaven profile -->
+		<javadoc.doclint>html,syntax</javadoc.doclint>
 
-		<maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
-		<maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
-		<nexus-staging-maven-plugin.version>1.7.0</nexus-staging-maven-plugin.version>
-		<maven-source-plugin.version>3.3.1</maven-source-plugin.version>
-		<maven-javadoc-plugin.version>3.11.2</maven-javadoc-plugin.version>
-		<maven-gpg-plugin.version>3.2.7</maven-gpg-plugin.version>
-		<maven-release-plugin.version>3.1.1</maven-release-plugin.version>
-		<maven-jar-plugin.version>3.4.2</maven-jar-plugin.version>
-		<maven-dependency-plugin.version>3.8.1</maven-dependency-plugin.version>
-		<maven-clean-plugin.version>3.4.0</maven-clean-plugin.version>
-		<versions-maven-plugin.version>2.18.0</versions-maven-plugin.version>
-		<maven-enforcer-plugin.version>3.5.0</maven-enforcer-plugin.version>
+		<maven-compiler-plugin.version>3.16.0</maven-compiler-plugin.version>
+		<maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+		<central-publishing-maven-plugin.version>0.11.0</central-publishing-maven-plugin.version>
+		<maven-source-plugin.version>3.4.0</maven-source-plugin.version>
+		<maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+		<maven-gpg-plugin.version>3.2.8</maven-gpg-plugin.version>
+		<maven-release-plugin.version>3.3.1</maven-release-plugin.version>
+		<maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
+		<maven-dependency-plugin.version>3.11.0</maven-dependency-plugin.version>
+		<maven-clean-plugin.version>3.5.0</maven-clean-plugin.version>
+		<versions-maven-plugin.version>2.22.0</versions-maven-plugin.version>
+		<maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
 
 		<!-- reduce the chattiness of output - see profile of same name below -->
 		<inhibitConsoleOutput>false</inhibitConsoleOutput>
@@ -111,7 +119,7 @@
 					<configuration>
 						<archive>
 							<manifestEntries>
-								<Automatic-Module-Name>${project.groupId}.${project.artifactId}</Automatic-Module-Name>
+								<Automatic-Module-Name>${automatic-module-name}</Automatic-Module-Name>
 							</manifestEntries>
 						</archive>
 					</configuration>
@@ -130,8 +138,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
+					<!-- checks against the Java 11 API, so the jars run on Java 11 whichever JDK builds them -->
+					<release>${java.version}</release>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -163,6 +171,21 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>${central-publishing-maven-plugin.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+					<!-- only needed to build and test this project; the plugin ignores maven.deploy.skip -->
+					<excludeArtifacts>
+						<artifact>example</artifact>
+						<artifact>basic</artifact>
+						<artifact>test</artifact>
+					</excludeArtifacts>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
 				<version>${maven-enforcer-plugin.version}</version>
@@ -178,6 +201,10 @@
 								<requireMavenVersion>
 									<version>3.6.3</version>
 								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>[11,)</version>
+									<message>Build with JDK 11 or later.</message>
+								</requireJavaVersion>
 							</rules>
 						</configuration>
 					</execution>
@@ -224,12 +251,12 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>33.5.0-jre</version>
+				<version>33.7.2-jre</version>
 			</dependency>
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcpkix-jdk18on</artifactId>
-				<version>1.83</version>
+				<version>1.86</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -241,17 +268,17 @@
 			<dependency>
 				<groupId>ch.qos.logback</groupId>
 				<artifactId>logback-classic</artifactId>
-				<version>1.5.32</version>
+				<version>1.6.5</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-codec</groupId>
 				<artifactId>commons-codec</artifactId>
-				<version>1.21.0</version>
+				<version>1.22.1</version>
 			</dependency>
 			<dependency>
 				<groupId>org.junit</groupId>
 				<artifactId>junit-bom</artifactId>
-				<version>5.12.0</version>
+				<version>5.14.4</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -287,17 +314,6 @@
 						</executions>
 					</plugin>
 					<plugin>
-						<groupId>org.sonatype.plugins</groupId>
-						<artifactId>nexus-staging-maven-plugin</artifactId>
-						<version>${nexus-staging-maven-plugin.version}</version>
-						<extensions>true</extensions>
-						<configuration>
-							<serverId>ossrh</serverId>
-							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
-						</configuration>
-					</plugin>
-					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
 						<version>${maven-source-plugin.version}</version>
@@ -321,7 +337,7 @@
 									<goal>jar</goal>
 								</goals>
 								<configuration>
-									<doclint>html, syntax</doclint>
+									<doclint>${javadoc.doclint}</doclint>
 								</configuration>
 							</execution>
 						</executions>

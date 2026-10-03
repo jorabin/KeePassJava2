@@ -20,7 +20,7 @@
     <parent>
         <artifactId>KeePassJava2.parent</artifactId>
         <groupId>org.linguafranca.pwdb</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -29,6 +29,10 @@
     <artifactId>KeePassJava2</artifactId>
     <name>KeePassJava2 :: All</name>
     <description>Composite containing KDBX and KDB Database support</description>
+
+    <properties>
+        <automatic-module-name>org.linguafranca.pwdb.all</automatic-module-name>
+    </properties>
 
     <dependencies>
         <dependency>

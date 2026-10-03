@@ -18,6 +18,7 @@
 package org.linguafranca.pwdb;
 
 import javax.annotation.Nullable;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -236,4 +237,47 @@ public interface Group {
      * Get the database this group is part of, null if the group is not part of a database
      */
     Database getDatabase();
+
+    /**
+     * Returns the date at which this group was last accessed.
+     * <p>
+     * Implementations SHOULD set this to the creation date or earlier if the group has never been used.
+     */
+    Date getLastAccessTime();
+
+    /**
+     * Returns the date at which this group was created
+     */
+    Date getCreationTime();
+
+    /**
+     * Returns true if this group is to be considered as expired at some point
+     */
+    boolean getExpires();
+
+    /**
+     * Set true for the date returned by {@link #getExpiryTime()} to be considered an expiry time
+     * @see #setExpiryTime(Date)
+     */
+    void setExpires(boolean expires);
+
+    /**
+     * Returns a date at which the group should be considered to have expired, if {@link #getExpires()} is true -
+     * otherwise returns an arbitrary date.
+     */
+    Date getExpiryTime();
+
+    /**
+     * Sets the expiry date of this group.
+     * @throws IllegalArgumentException if expiryTime is null.
+     * @see #setExpires(boolean)
+     */
+    void setExpiryTime(Date expiryTime) throws IllegalArgumentException;
+
+    /**
+     * Returns the date that the group was last modified
+     * <p>
+     * Implementations SHOULD set this to the creation date or earlier if the group has never been modified.
+     */
+    Date getLastModificationTime();
 }

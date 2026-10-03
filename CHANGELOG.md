@@ -2,14 +2,23 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-## [3.0.0-SNAPSHOT] (ongoing)
+## [3.0.1] Unreleased
+
+## [3.0.0] 2026-10-03
 
 ### Changed
 
 - [Issue 81, 83] Remove junit dependency from main code and resolve test failure from UTF-8 encoding in test resources
 - [Issue 87] Problem with incorrect serialization of CustomIcons in Jackson implementation
-- [Issue 88] Incompatibility to KeePass due t missing empty element in autotype field in Jackson implementation
-- [Issue 90] Update dependencies to resolve security vulnerabilities
+- [Issue 89] Incompatibility to KeePass due to missing empty element in autotype field in Jackson implementation
+- [Issue 88, 90] Update dependencies to resolve security vulnerabilities, and to current versions of Jackson, Woodstox, Guava, Bouncy Castle and Commons Codec (as 2.2.5)
+- [Issue 96] Load XML into the KDBX database: new `KdbxDatabase.load(StreamFormat, Credentials, InputStream)`, KeePass XML export `ProtectInMemory` values kept protected, and `loadXml()` no longer fails on `Protected` values
+- [Issue 97] KDBX 4 attachments were written twice, in the inner header and in Meta/Binaries, and the inner header gained another copy of every attachment on each save of a loaded database
+- [Issue 98] Meta/Binaries was written as `<Binaries><Binaries>` instead of `<Binaries><Binary>`, so KeePassXC dropped KDBX 3.1 attachments
+- [Issue 104] With a default encoding other than UTF-8, the database XML was written in that encoding, so non-ASCII content could not be loaded back
+- [Issue 99] Add creation, modification, access and expiry times to the `Group` interface, as on `Entry`
+- [Issue 93] Automatic-Module-Names are set explicitly, following the v3 modules, and differ from 2.x: `org.linguafranca.pwdb.database`, `org.linguafranca.pwdb.kdb`, `org.linguafranca.pwdb.kdbx.io`, `org.linguafranca.pwdb.kdbx.database` and `org.linguafranca.pwdb.all`
+- [Issue 68] Update Maven plugins; publish with central-publishing-maven-plugin, as OSSRH is shut down
 - update to Java 11
 - refactor API
   - remove complicated generics
@@ -22,10 +31,10 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
   - remove Simple database
   - remove JAXB database
   - remove DOM database
-  - remove `test` and `util` modules
+  - remove `util` module; `test` module now holds the test code shared by the database implementations, and is not published
 - refactor tests
   - restructure
-  - create a test-jar for dependencies
+  - shared test code is in the `test` module rather than a `database` test-jar, so it is not published with `database`
   - "upgrade" to JUnit 5
 
 

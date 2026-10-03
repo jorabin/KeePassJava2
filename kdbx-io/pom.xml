@@ -20,7 +20,7 @@
     <parent>
         <artifactId>KeePassJava2.parent</artifactId>
         <groupId>org.linguafranca.pwdb</groupId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -28,6 +28,10 @@
     <artifactId>KeePassJava2.kdbx.io</artifactId>
     <name>KeePassJava2 :: KDBX-IO</name>
     <description>KeePass KDBX File format support</description>
+
+    <properties>
+        <automatic-module-name>org.linguafranca.pwdb.kdbx.io</automatic-module-name>
+    </properties>
 
 
     <dependencies>
@@ -42,9 +46,8 @@
 		</dependency>
         <dependency>
             <groupId>org.linguafranca.pwdb</groupId>
-            <artifactId>database</artifactId>
+            <artifactId>test</artifactId>
             <version>${project.version}</version>
-            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
     </dependencies>

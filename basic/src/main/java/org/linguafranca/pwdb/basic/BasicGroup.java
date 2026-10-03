@@ -25,8 +25,10 @@ import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.abstractdb.AbstractGroup;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,6 +39,12 @@ public class BasicGroup extends AbstractGroup {
     private String name;
     private BasicIcon icon;
 
+    private final Instant creationTime;
+    private Instant accessTime;
+    private Instant modifiedTime;
+    private Instant expiryTime;
+    private boolean isExpires;
+
     private final List<BasicGroup> groups = new ArrayList<>();
     private final List<BasicEntry> entries = new ArrayList<>();
 
@@ -45,6 +53,7 @@ public class BasicGroup extends AbstractGroup {
     BasicGroup () {
         this.database = null;
         this.uuid = UUID.randomUUID();
+        this.creationTime = Instant.now();
         this.icon = new BasicIcon();
         this.name = "";
     }
@@ -93,6 +102,7 @@ public class BasicGroup extends AbstractGroup {
         BasicGroup basicGroup = (BasicGroup) group;
         groups.add(basicGroup);
         basicGroup.parent = this;
+        touch();
         return group;
     }
 
@@ -101,6 +111,7 @@ public class BasicGroup extends AbstractGroup {
         BasicGroup basicGroup = (BasicGroup) group;
         groups.remove(basicGroup);
         basicGroup.parent = null;
+        touch();
         return group;
     }
 
@@ -119,6 +130,7 @@ public class BasicGroup extends AbstractGroup {
         BasicEntry basicEntry = (BasicEntry) entry;
         entries.add(basicEntry);
         basicEntry.parent = this;
+        touch();
         return basicEntry;
     }
 
@@ -127,6 +139,7 @@ public class BasicGroup extends AbstractGroup {
         BasicEntry basicEntry = (BasicEntry) entry;
         entries.remove(basicEntry);
         (basicEntry).parent = null;
+        touch();
         return basicEntry;
     }
 
@@ -138,6 +151,7 @@ public class BasicGroup extends AbstractGroup {
     @Override
     public void setName(String name) {
         this.name=name;
+        touch();
     }
 
     @Override
@@ -153,10 +167,68 @@ public class BasicGroup extends AbstractGroup {
     @Override
     public void setIcon(Icon icon) {
         this.icon = (BasicIcon) icon;
+        touch();
     }
 
     @Override
     public Database getDatabase() {
         return this.database;
+    }
+
+    @Override
+    public Date getLastAccessTime() {
+        if (accessTime == null) {
+            return fromInstant(this.creationTime);
+        }
+        return fromInstant(this.accessTime);
+    }
+
+    @Override
+    public Date getCreationTime() {
+        return fromInstant(creationTime);
+    }
+
+    @Override
+    public boolean getExpires() {
+        return this.isExpires;
+    }
+
+    @Override
+    public void setExpires(boolean expires) {
+        this.isExpires = expires;
+        touch();
+    }
+
+    @Override
+    public Date getExpiryTime() {
+        return fromInstant(this.expiryTime);
+    }
+
+    @Override
+    public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
+        if (expiryTime == null) {
+            throw new IllegalArgumentException("expiryTime may not be null");
+        }
+        this.expiryTime = expiryTime.toInstant();
+        touch();
+    }
+
+    @Override
+    public Date getLastModificationTime() {
+        if (modifiedTime == null) {
+            return fromInstant(this.creationTime);
+        }
+        return fromInstant(this.modifiedTime);
+    }
+
+    private void touch() {
+        modifiedTime = Instant.now();
+    }
+
+    private Date fromInstant(Instant instant) {
+        if (instant == null) {
+            return null;
+        }
+        return Date.from(instant);
     }
 }
