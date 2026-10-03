@@ -41,6 +41,8 @@ It is licensed under the Apache 2 License and is currently usable.
 
 The current code is version 2.2.6 - released to Maven October 2026. This is on the main branch. See [Build from Source](#build-from-source)
 
+Version 3 is released as 3.0.0, which needs Java 11. See branch [`v3-master`](https://github.com/jorabin/KeePassJava2/tree/v3-master) and the [release notes](https://github.com/jorabin/KeePassJava2/releases/tag/KeePassJava2-3.0.0). Version 2 is still maintained for now, with bug and security fixes.
+
 Key updates relative to 2.1:
 - Java 8 (dependencies no longer support Java 7)
 - File format version 4 support - with Argon2
@@ -73,7 +75,7 @@ Note that the artifactId has become Camel Case from release 2.1.x onwards.
 ### Snapshot
 
 Snapshot builds are erratically available from the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. Next bug-fix release will be
-2.2.7-SNAPSHOT (on branch `develop`) and work-in-progress 3.0.0-SNAPSHOT (on branch `v3-develop`):
+2.2.7-SNAPSHOT (on branch `develop`) and 3.0.1-SNAPSHOT (on branch `v3-develop`):
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
