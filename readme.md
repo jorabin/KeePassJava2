@@ -5,7 +5,7 @@
 
 [![Branch v3-master](https://badgen.net/badge/Branch/v3-master/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/v3-master) [![Version 3.0.0](https://badgen.net/badge/Build/3.0.0/blue?icon=github)](https://github.com/jorabin/KeePassJava2/releases/tag/KeePassJava2-3.0.0) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-master)
 
-[![Branch v3-develop](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/v3-develop) [![Version 3.0.1-SNAPSHOT](https://badgen.net/badge/Build/3.0.1-SNAPSHOT/blue?icon=github)](#snapshot) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop)
+[![Branch v3-develop](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/v3-develop) [![Version 3.1.0-SNAPSHOT](https://badgen.net/badge/Build/3.1.0-SNAPSHOT/blue?icon=github)](#snapshot) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop)
 
 [![Branch master](https://badgen.net/badge/Branch/master/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/master) [![Version 2.2.6](https://badgen.net/badge/Build/2.2.6/blue?icon=github)](https://github.com/jorabin/KeePassJava2/releases/tag/KeePassJava2-2.2.6) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
 
@@ -83,11 +83,11 @@ For the last 2.x release, see branch [`master`](https://github.com/jorabin/KeePa
 
 ### Snapshot
 
-Snapshot builds are published to the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. The next bug-fix release will be 3.0.1-SNAPSHOT (on branch `v3-develop`), last published October 2026:
+Snapshot builds are published to the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. The next release will be 3.1.0-SNAPSHOT (on branch `v3-develop`), not yet published:
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
  
 with appropriate `<repositories>` entry, like:
 
