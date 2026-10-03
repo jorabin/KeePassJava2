@@ -34,6 +34,7 @@ public class Issue88Test {
         }
 
         Path path = Paths.get(TEST_OUTPUT_ISSUE_88_KDBX);
+        Files.createDirectories(path.getParent());
         try (OutputStream outputStream = Files.newOutputStream(path)) {
             database.save(CREDENTIALS1, outputStream);
         }

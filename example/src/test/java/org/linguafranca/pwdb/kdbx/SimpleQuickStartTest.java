@@ -16,6 +16,7 @@
 
 package org.linguafranca.pwdb.kdbx;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.kdbx.dom.DomDatabaseWrapper;
@@ -38,6 +39,11 @@ import static org.junit.Assert.assertEquals;
  * @author jo
  */
 public class SimpleQuickStartTest extends QuickStart<DomDatabaseWrapper, DomGroupWrapper, DomEntryWrapper, DomIconWrapper> {
+
+    @BeforeClass
+    public static void createOutputDir() throws IOException {
+        ensureOutputDir();
+    }
 
 
     @Override

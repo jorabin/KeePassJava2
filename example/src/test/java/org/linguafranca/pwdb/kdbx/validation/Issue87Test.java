@@ -47,6 +47,7 @@ public class Issue87Test {
         KeePassFile.Icon icon = entries.get(0).getCustomIcon();
 
         Path path = Paths.get(TEST_OUTPUT_ISSUE_87_KDBX);
+        Files.createDirectories(path.getParent());
         try (OutputStream outputStream = Files.newOutputStream(path)) {
             database.save(CREDENTIALS1, outputStream);
         }
