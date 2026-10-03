@@ -227,6 +227,8 @@ It also depends on SLF4J and Junit 4 for tests.
 
 Included POM is for Maven 3.
 
+It must be built using Java 11 (JDK 11), as pinned in `.sdkmanrc`. It compiles with `--release 8`, so the jars it builds still run on Java 8. The build stops with JDK 17 or later, where some of the Simple implementation's tests fail.
+
 ### Module Structure
 
 There are rather a lot of modules, this is in order to allow loading of minimal necessary functionality. The module dependencies are illustrated below.
