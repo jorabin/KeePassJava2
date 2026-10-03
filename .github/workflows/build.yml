@@ -1,0 +1,27 @@
+name: Build
+
+on:
+  push:
+    branches: [ v3-develop, v3-master ]
+  pull_request:
+    branches: [ v3-develop, v3-master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # builds with any JDK from 11 up; it compiles with --release 11
+        java: [ '11', '17', '21' ]
+    name: Build (JDK ${{ matrix.java }})
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
+        with:
+          distribution: zulu
+          java-version: ${{ matrix.java }}
+          cache: maven
+      - name: Build and test
+        run: mvn -B -P inhibitConsoleOutput verify
