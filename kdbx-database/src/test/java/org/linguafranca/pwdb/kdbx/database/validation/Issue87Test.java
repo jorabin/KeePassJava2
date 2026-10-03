@@ -14,12 +14,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.linguafranca.pwdb.kdbx.jackson.util.Util.streamToString;
+import static org.linguafranca.util.TestUtil.testOutputPath;
 
 /**
  * Review Issue-87 <a href="https://github.com/jorabin/KeePassJava2/issues/87">...</a>
@@ -29,7 +29,6 @@ public class Issue87Test {
 
     public static final String TEST_RESOURCE1 = "issue-87/customIcon-123.kdbx";
     public static final KdbxCredentials CREDENTIALS1 = new KdbxCredentials("123".getBytes());
-    public static final String TEST_OUTPUT_ISSUE_87_KDBX = "testOutput/Issue87.kdbx";
 
 
     @Test
@@ -48,7 +47,7 @@ public class Issue87Test {
         System.out.println("Custom icon id: " + customIcon);
         KeePassFile.Icon icon = entry.getCustomIcon();
 
-        Path path = Paths.get(TEST_OUTPUT_ISSUE_87_KDBX);
+        Path path = testOutputPath("Issue87.kdbx");
         try (OutputStream outputStream = Files.newOutputStream(path)) {
             database.save(CREDENTIALS1, outputStream);
         }

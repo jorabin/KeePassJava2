@@ -28,6 +28,7 @@ import java.util.Objects;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.linguafranca.util.TestUtil;
 
 public class DatabaseTestBase {
 
@@ -46,7 +47,7 @@ public class DatabaseTestBase {
         }
     }
 
-    public static String OUTPUT_DIRECTORY_PATH = "testOutput";
+    public static String OUTPUT_DIRECTORY_PATH = TestUtil.TEST_OUTPUT_DIR;
 
     @BeforeAll
     static void baseBeforeAll() throws Exception {

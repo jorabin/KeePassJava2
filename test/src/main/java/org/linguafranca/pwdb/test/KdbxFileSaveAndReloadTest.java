@@ -38,12 +38,12 @@ import org.linguafranca.pwdb.*;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.linguafranca.pwdb.Entry.STANDARD_PROPERTY_NAME.*;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
+import static org.linguafranca.util.TestUtil.testOutputPath;
 
 
 /**
@@ -75,7 +75,7 @@ public interface KdbxFileSaveAndReloadTest {
         verifyContents(output);
         //output.save(new StreamFormat.None(), new Credentials.None(), printStream);
 
-        FileOutputStream fos = new FileOutputStream("testOutput/test1.kdbx");
+        FileOutputStream fos = new FileOutputStream(testOutputPath("test1.kdbx").toFile());
         saveDatabase(output, getCredentials("123".getBytes()), fos);
         assertFalse(output.isDirty());
         fos.flush();
@@ -85,7 +85,7 @@ public interface KdbxFileSaveAndReloadTest {
         //output.save(new StreamFormat.None(), new Credentials.None(), printStream);
 
 
-        FileInputStream fis = new FileInputStream("testOutput/test1.kdbx");
+        FileInputStream fis = new FileInputStream(testOutputPath("test1.kdbx").toFile());
         Database input = loadDatabase(getCredentials("123".getBytes()), fis);
         verifyContents(input);
     }
@@ -108,12 +108,12 @@ public interface KdbxFileSaveAndReloadTest {
         entry.setBinaryProperty("letter L.jpeg", content);
         assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
 
-        FileOutputStream fos = new FileOutputStream("testOutput/test2.kdbx");
+        FileOutputStream fos = new FileOutputStream(testOutputPath("test2.kdbx").toFile());
         saveDatabase(attachment, getCredentials("123".getBytes()), fos);
         fos.flush();
         fos.close();
 
-        FileInputStream fis = new FileInputStream("testOutput/test2.kdbx");
+        FileInputStream fis = new FileInputStream(testOutputPath("test2.kdbx").toFile());
         Database input = loadDatabase(getCredentials("123".getBytes()), fis);
 
         entry = input.findEntries("Test attachment").get(0);
@@ -137,9 +137,9 @@ public interface KdbxFileSaveAndReloadTest {
                     getClass().getClassLoader().getResourceAsStream(resource));
             StreamFormat<?> format1 = database.getStreamFormat();
 
-            database.save(getCredentials("123".getBytes()), Files.newOutputStream(Paths.get("testOutput/test3.kdbx")));
+            database.save(getCredentials("123".getBytes()), Files.newOutputStream(testOutputPath("test3.kdbx")));
 
-            FileInputStream fis = new FileInputStream("testOutput/test3.kdbx");
+            FileInputStream fis = new FileInputStream(testOutputPath("test3.kdbx").toFile());
             Database input = loadDatabase(getCredentials("123".getBytes()), fis);
             StreamFormat<?> format2 = input.getStreamFormat();
             assertTrue(verifyStreamFormat(format1, format2));

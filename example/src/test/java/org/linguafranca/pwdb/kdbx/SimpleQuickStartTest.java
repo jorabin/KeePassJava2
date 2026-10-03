@@ -17,7 +17,6 @@
 
 package org.linguafranca.pwdb.kdbx;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.format.KdbxCredentials;
 import org.linguafranca.pwdb.format.KdbxStreamFormat;
@@ -27,9 +26,9 @@ import org.linguafranca.pwdb.security.Encryption;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.linguafranca.util.TestUtil.testOutputPath;
 
 /**
  * Simple illustration of hooking a SAX parser up to process a KDBX file
@@ -38,11 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class SimpleQuickStartTest extends QuickStart {
 
-
-    @BeforeAll
-    public static void ensureOutputDir() throws IOException {
-        Files.createDirectories(Paths.get(TEST_OUTPUT_DIR));
-    }
 
     @Test
     public void canonicalQuickstartTest() throws IOException {
@@ -71,7 +65,7 @@ public class SimpleQuickStartTest extends QuickStart {
 
     @Test
     public void loadSave() throws IOException {
-        Path path = Paths.get("testOutput/CHACHA-AES-CHACHA.kdbx");
+        Path path = testOutputPath("CHACHA-AES-CHACHA.kdbx");
 
         loadKdbx3SaveKdbx4("test123.kdbx","123".getBytes(), path);
 
@@ -85,7 +79,7 @@ public class SimpleQuickStartTest extends QuickStart {
     }
     @Test
     public void loadSave2() throws IOException {
-        Path path = Paths.get("testOutput/CHACHA-AES-CHACHA.kdbx");
+        Path path = testOutputPath("CHACHA-AES-CHACHA.kdbx");
 
         loadKdbx4SaveKdbx3("V4-ChaCha20-Argon2-Attachment.kdbx","123".getBytes(), path);
 

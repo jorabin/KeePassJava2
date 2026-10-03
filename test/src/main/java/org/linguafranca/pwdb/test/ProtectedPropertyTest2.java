@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.linguafranca.util.TestUtil.testOutputPath;
 
 public interface ProtectedPropertyTest2 {
     
@@ -129,13 +130,13 @@ public interface ProtectedPropertyTest2 {
 
             // Save database
 
-            FileOutputStream fos = new FileOutputStream("testOutput/test9.kdbx");
+            FileOutputStream fos = new FileOutputStream(testOutputPath("test9.kdbx").toFile());
             saveDatabase(getDatabase(), getCredentials("123".getBytes()), fos);
             fos.flush();
             fos.close();
 
             // reload database, "random" is still protected even though it's not protected by default
-            FileInputStream fis = new FileInputStream("testOutput/test9.kdbx");
+            FileInputStream fis = new FileInputStream(testOutputPath("test9.kdbx").toFile());
             Database input = loadDatabase(getCredentials("123".getBytes()), fis);
 
             List<? extends Entry> entries = input.findEntries("random");
