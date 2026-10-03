@@ -20,7 +20,7 @@
     <parent>
         <artifactId>KeePassJava2.parent</artifactId>
         <groupId>org.linguafranca.pwdb</groupId>
-        <version>3.0.0</version>
+        <version>3.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 

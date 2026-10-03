@@ -9,7 +9,7 @@
 
 ![alt text](https://badgen.net/badge/Branch/v3-master/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.0/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-master)
 
-![alt text](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.0/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fe9059ac4d384b929f452149b9246658)](https://app.codacy.com/gh/jorabin/KeePassJava2/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+![alt text](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.1-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fe9059ac4d384b929f452149b9246658)](https://app.codacy.com/gh/jorabin/KeePassJava2/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 
 Java 11 API (from version 3.0.0 upwards) for password databases compatible with the renowned [KeePass](http://keepass.info) password
