@@ -70,7 +70,7 @@ As noted, Version 2.x will no longer be maintained once this version is released
 
 ### Snapshot
 
-Snapshot builds, such as this version 3.0.0, are available at [Sonatype](https://oss.sonatype.org/content/repositories/snapshots/org/linguafranca/pwdb/) e.g.:
+Snapshot builds, such as this version 3.0.0, are published to the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days, e.g.:
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
@@ -80,7 +80,7 @@ with appropriate `<repositories>` entry, like:
 
       <repositories>
          <repository>
-            <id>oss.sonatype.org-snapshot</id>
+            <id>central-portal-snapshots</id>
             <url>https://central.sonatype.com/repository/maven-snapshots/</url>
             <releases>
                  <enabled>false</enabled>
