@@ -130,7 +130,7 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
             mapper.enable(ToXmlGenerator.Feature.WRITE_XML_DECLARATION);
             mapper.enable(SerializationFeature.INDENT_OUTPUT);
             mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+            mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
 
             // set the serializer to Woodstox
             System.setProperty("javax.xml.stream.XMLOutputFactory", "com.ctc.wstx.stax.WstxOutputFactory");

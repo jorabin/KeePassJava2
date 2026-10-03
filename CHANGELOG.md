@@ -10,6 +10,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - [Issue 109] Deprecated `save` and `load`, which close the stream they are given, and the `saveNx`/`loadNx` methods. `readXml` throws `IOException` where `loadXml` threw `Exception`
 - [Issue 109] `Util.listDatabase` no longer closes the output stream
 - [Issue 109] Examples, tests and readme use `read`/`write` with try-with-resources
+- Replace Jackson's deprecated `setSerializationInclusion` with `setDefaultPropertyInclusion`, which does the same
 
 ## [3.0.0] 2026-10-03
 

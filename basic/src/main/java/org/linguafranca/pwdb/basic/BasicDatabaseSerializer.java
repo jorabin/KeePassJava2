@@ -190,7 +190,7 @@ public interface BasicDatabaseSerializer {
                     // pretty print
                     .enable(SerializationFeature.INDENT_OUTPUT)
                     // suppress empty fields
-                    .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+                    .setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
 
             return mapper;
         }
