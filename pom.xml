@@ -138,8 +138,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler-plugin.version}</version>
 				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
+					<!-- checks against the Java 11 API, so the jars run on Java 11 whichever JDK builds them -->
+					<release>${java.version}</release>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -201,6 +201,10 @@
 								<requireMavenVersion>
 									<version>3.6.3</version>
 								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>[11,)</version>
+									<message>Build with JDK 11 or later.</message>
+								</requireJavaVersion>
 							</rules>
 						</configuration>
 					</execution>

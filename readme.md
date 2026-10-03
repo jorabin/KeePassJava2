@@ -204,7 +204,7 @@ It also depends on SLF4J, logback and Junit 4 for tests.
 
 Included POM is for Maven 3.
 
-It must be built using Java 11 (JDK 11).
+It must be built using Java 11 or later (JDK 11+). It compiles with `--release 11`, so the jars it builds run on Java 11 whichever JDK builds them.
 
 ### Module Structure
 
