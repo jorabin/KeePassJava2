@@ -57,49 +57,100 @@ public class KdbxDatabase extends ProtectedDatabase {
     }
 
     /**
-     * Load plaintext XML
+     * Read plaintext XML, leaving the stream open
      *
-     * @param inputStream contains the XML
+     * @param inputStream contains the XML - the caller closes it
      * @return a new Database
-     * @throws Exception on load failure
+     * @throws IOException on read failure
+     * @since 3.1.0
      */
-    public static KdbxDatabase loadXml(InputStream inputStream) throws Exception {
+    public static KdbxDatabase readXml(InputStream inputStream) throws IOException {
         KdbxSerializableDatabase jsd = new KdbxSerializableDatabase();
         jsd.setEncryption(new StreamEncryptor.None());
-        KeePassFile keePassFile = jsd.load(inputStream).keePassFile;
+        KeePassFile keePassFile = jsd.read(inputStream).keePassFile;
         keePassFile.root.group.uuid = UUID.randomUUID();
         return new KdbxDatabase(keePassFile, null);
     }
 
     /**
-     * Load kdbx file
+     * Read a kdbx file, leaving the stream open
+     *
+     * @param credentials credentials to use
+     * @param inputStream where to read from - the caller closes it
+     * @return a new database
+     * @since 3.1.0
+     */
+    public static KdbxDatabase read(Credentials credentials, InputStream inputStream) throws IOException {
+        return read(new KdbxStreamFormat(), credentials, inputStream);
+    }
+
+    /**
+     * Read a database using the stream format supplied, leaving the stream open,
+     * e.g. {@link StreamFormat.None} to read XML written by
+     * {@link #write(StreamFormat, Credentials, OutputStream)} with that format
+     *
+     * @param streamFormat the format of the input
+     * @param credentials credentials to use
+     * @param inputStream where to read from - the caller closes it
+     * @return a new database
+     * @since 3.1.0
+     */
+    public static KdbxDatabase read(StreamFormat<?> streamFormat, Credentials credentials, InputStream inputStream) throws IOException {
+        KdbxSerializableDatabase jsd = new KdbxSerializableDatabase();
+        streamFormat.read(jsd, credentials, inputStream);
+        return new KdbxDatabase(jsd.keePassFile, streamFormat);
+    }
+
+    /**
+     * Load plaintext XML and close the stream
+     *
+     * @param inputStream contains the XML
+     * @return a new Database
+     * @throws Exception on load failure
+     * @deprecated use {@link #readXml(InputStream)} (issue #109)
+     */
+    @Deprecated
+    public static KdbxDatabase loadXml(InputStream inputStream) throws Exception {
+        try (inputStream) {
+            return readXml(inputStream);
+        }
+    }
+
+    /**
+     * Load kdbx file and close the stream
      *
      * @param credentials credentials to use
      * @param inputStream where to load from
      * @return a new database
+     * @deprecated use {@link #read(Credentials, InputStream)} (issue #109)
      */
+    @Deprecated
     public static KdbxDatabase load(Credentials credentials, InputStream inputStream) throws IOException {
         return load(new KdbxStreamFormat(), credentials, inputStream);
     }
 
     /**
-     * Load a database using the stream format supplied, e.g. {@link StreamFormat.None}
-     * to load XML written by {@link #save(StreamFormat, Credentials, OutputStream)} with that format
+     * Load a database using the stream format supplied and close the stream
      *
      * @param streamFormat the format of the input
      * @param credentials credentials to use
      * @param inputStream where to load from
      * @return a new database
+     * @deprecated use {@link #read(StreamFormat, Credentials, InputStream)} (issue #109)
      */
+    @Deprecated
     public static KdbxDatabase load(StreamFormat<?> streamFormat, Credentials credentials, InputStream inputStream) throws IOException {
-        KdbxSerializableDatabase jsd = new KdbxSerializableDatabase();
-        streamFormat.load(jsd, credentials, inputStream);
-        return new KdbxDatabase(jsd.keePassFile, streamFormat);
+        try (inputStream) {
+            return read(streamFormat, credentials, inputStream);
+        }
     }
 
     /**
      * Load kdbx file - avoiding checked exceptions
+     *
+     * @deprecated use {@link #read(Credentials, InputStream)} (issue #109)
      */
+    @Deprecated
     public static KdbxDatabase loadNx(Credentials credentials, InputStream inputStream) {
         try {
             return load(credentials, inputStream);
@@ -109,35 +160,70 @@ public class KdbxDatabase extends ProtectedDatabase {
     }
 
     /**
-     * Save the database with the same stream format that it was loaded with, or V4
-     * default if none
+     * Write the database with the same stream format that it was loaded with, or V4
+     * default if none, leaving the stream open
      *
      * @param credentials  credentials to use
-     * @param outputStream where to write to - closes stream
+     * @param outputStream where to write to - the caller closes it
+     * @since 3.1.0
      */
     @Override
-    public void save(Credentials credentials, OutputStream outputStream) throws IOException {
+    public void write(Credentials credentials, OutputStream outputStream) throws IOException {
         if (Objects.isNull(streamFormat)) {
             streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
         }
-        save(streamFormat, credentials, outputStream);
+        write(streamFormat, credentials, outputStream);
     }
 
     /**
-     * Save the database with a choice of stream format
+     * Write the database with a choice of stream format, leaving the stream open
+     *
+     * @param streamFormat the format to use
+     * @param credentials  credentials to use
+     * @param outputStream where to write to - the caller closes it
+     * @since 3.1.0
+     */
+    @Override
+    public <C extends StreamConfiguration> void write(StreamFormat<C> streamFormat, Credentials credentials,
+                                                      OutputStream outputStream) throws IOException {
+        keePassFile.meta.generator = "KeePassJava2-V3-Jackson";
+        KdbxSerializableDatabase kdbxSerializableDatabase = new KdbxSerializableDatabase(this.keePassFile);
+        kdbxSerializableDatabase.setPropertyValueStrategy(this.getPropertyValueStrategy());
+        streamFormat.write(kdbxSerializableDatabase, credentials, outputStream);
+        setDirty(false);
+    }
+
+    /**
+     * Save the database with the same stream format that it was loaded with, or V4
+     * default if none, and close the stream
+     *
+     * @param credentials  credentials to use
+     * @param outputStream where to write to - closes stream
+     * @deprecated use {@link #write(Credentials, OutputStream)} (issue #109)
+     */
+    @Override
+    @Deprecated
+    public void save(Credentials credentials, OutputStream outputStream) throws IOException {
+        try (outputStream) {
+            write(credentials, outputStream);
+        }
+    }
+
+    /**
+     * Save the database with a choice of stream format and close the stream
      *
      * @param streamFormat the format to use
      * @param credentials  credentials to use
      * @param outputStream where to write to - call closes output stream
+     * @deprecated use {@link #write(StreamFormat, Credentials, OutputStream)} (issue #109)
      */
     @Override
+    @Deprecated
     public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
                                                      OutputStream outputStream) throws IOException {
-        keePassFile.meta.generator = "KeePassJava2-V3-Jackson";
-        KdbxSerializableDatabase kdbxSerializableDatabase = new KdbxSerializableDatabase(this.keePassFile);
-        kdbxSerializableDatabase.setPropertyValueStrategy(this.getPropertyValueStrategy());
-        streamFormat.save(kdbxSerializableDatabase, credentials, outputStream);
-        setDirty(false);
+        try (outputStream) {
+            write(streamFormat, credentials, outputStream);
+        }
     }
 
     @Override

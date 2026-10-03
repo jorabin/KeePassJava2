@@ -26,6 +26,8 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import org.linguafranca.pwdb.PropertyValue;
+import org.linguafranca.pwdb.io.NonClosingInputStream;
+import org.linguafranca.pwdb.io.NonClosingOutputStream;
 import org.linguafranca.pwdb.SerializableDatabase;
 import org.linguafranca.pwdb.format.Helpers;
 import org.linguafranca.pwdb.kdbx.jackson.converter.ValueDeserializer;
@@ -77,8 +79,11 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
         this.keePassFile = keePassFile;
     }
 
+    /**
+     * Read the database XML, leaving the stream open
+     */
     @Override
-    public KdbxSerializableDatabase load(InputStream inputStream) throws IOException {
+    public KdbxSerializableDatabase read(InputStream inputStream) throws IOException {
         XmlMapper mapper = new XmlMapper();
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
                 KdbxSerializableDatabase.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -86,13 +91,30 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
         SimpleModule module = new SimpleModule();
         module.addDeserializer(PropertyValue.class, new ValueDeserializer(encryptor, propertyValueStrategy));
         mapper.registerModule(module);
-        keePassFile = mapper.readValue(inputStream, KeePassFile.class);
+        // Jackson closes the stream it reads from
+        keePassFile = mapper.readValue(new NonClosingInputStream(inputStream), KeePassFile.class);
         return this;
     }
 
-
+    /**
+     * Load the database XML and close the stream
+     *
+     * @deprecated use {@link #read(InputStream)} (issue #109)
+     */
     @Override
-    public void save(OutputStream outputStream) {
+    @Deprecated
+    public KdbxSerializableDatabase load(InputStream inputStream) throws IOException {
+        try (inputStream) {
+            return read(inputStream);
+        }
+    }
+
+
+    /**
+     * Write the database XML, leaving the stream open
+     */
+    @Override
+    public void write(OutputStream outputStream) {
         try {
             SimpleModule module = new SimpleModule();
             module.addSerializer(PropertyValue.class, new ValueSerializer(encryptor));
@@ -117,7 +139,8 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
             xmlOutputFactory.setProperty(XMLOutputFactory.IS_REPAIRING_NAMESPACES, false);
             xmlOutputFactory.setProperty(WstxInputProperties.P_RETURN_NULL_FOR_DEFAULT_NAMESPACE, true);
             
-            OutputStreamWriter osw = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+            // closing the writer closes the stream under it, so shield the caller's stream
+            OutputStreamWriter osw = new OutputStreamWriter(new NonClosingOutputStream(outputStream), StandardCharsets.UTF_8);
             XMLStreamWriter sw = xmlOutputFactory.createXMLStreamWriter(osw);
             // in V4 the binaries are in the inner header, so leave them out of the XML
             List<KeePassFile.Binary> binaries = keePassFile.meta.binaries;
@@ -139,6 +162,19 @@ public class KdbxSerializableDatabase implements SerializableDatabase {
 
         } catch(Exception e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    /**
+     * Save the database XML and close the stream
+     *
+     * @deprecated use {@link #write(OutputStream)} (issue #109)
+     */
+    @Override
+    @Deprecated
+    public void save(OutputStream outputStream) throws IOException {
+        try (outputStream) {
+            write(outputStream);
         }
     }
 

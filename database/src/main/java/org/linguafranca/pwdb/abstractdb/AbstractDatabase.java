@@ -265,6 +265,7 @@ public abstract class AbstractDatabase implements Database {
     }
 
     @Override
+    @Deprecated
     public void saveNx(Credentials credentials, OutputStream outputStream) {
         try {
             save(credentials, outputStream);
@@ -274,6 +275,7 @@ public abstract class AbstractDatabase implements Database {
     }
 
     @Override
+    @Deprecated
     public <C extends StreamConfiguration> void saveNx(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) {
         try {
             save(streamFormat, credentials, outputStream);

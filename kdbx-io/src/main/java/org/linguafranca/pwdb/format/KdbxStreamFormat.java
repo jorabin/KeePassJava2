@@ -20,6 +20,8 @@ package org.linguafranca.pwdb.format;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.SerializableDatabase;
 import org.linguafranca.pwdb.StreamFormat;
+import org.linguafranca.pwdb.io.NonClosingInputStream;
+import org.linguafranca.pwdb.io.NonClosingOutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,11 +61,16 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
         this.kdbxHeader = kdbxHeader;
     }
 
+    /**
+     * Read a database, leaving the stream open
+     */
     @Override
-    public void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream encryptedInputStream) throws IOException {
-        try (InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader, encryptedInputStream)) {
+    public void read(SerializableDatabase serializableDatabase, Credentials credentials, InputStream encryptedInputStream) throws IOException {
+        // closing the decryption chain closes the stream under it, so shield the caller's stream
+        try (InputStream decryptedInputStream = KdbxSerializer.createUnencryptedInputStream(credentials, kdbxHeader,
+                new NonClosingInputStream(encryptedInputStream))) {
             serializableDatabase.setEncryption(kdbxHeader.getInnerStreamEncryptor());
-            serializableDatabase.load(decryptedInputStream);
+            serializableDatabase.read(decryptedInputStream);
             if (kdbxHeader.getVersion() == 3 && !Arrays.equals(serializableDatabase.getHeaderHash(), kdbxHeader.getHeaderHash())) {
                 throw new IllegalStateException("Header hash does not match");
             }
@@ -77,8 +84,11 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
         }
     }
 
+    /**
+     * Write a database, leaving the stream open
+     */
     @Override
-    public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream outputStream) throws IOException {
+    public void write(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream outputStream) throws IOException {
         Helpers.isV4.set(kdbxHeader.getVersion() == 4);
         try {
             if (kdbxHeader.getVersion() == 4) {
@@ -94,16 +104,45 @@ public class KdbxStreamFormat implements StreamFormat<KdbxHeader> {
                 // the serializer leaves the binaries out of the XML when Helpers.isV4 is set
             }
 
-            try (OutputStream encryptedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader, outputStream)) {
+            // the encryption chain must be closed to finish, and closing it closes the stream under it,
+            // so shield the caller's stream
+            try (OutputStream encryptedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, kdbxHeader,
+                    new NonClosingOutputStream(outputStream))) {
                 if (kdbxHeader.getVersion() == 3) {
                     serializableDatabase.setHeaderHash(kdbxHeader.getHeaderHash());
                 }
                 serializableDatabase.setEncryption(kdbxHeader.getInnerStreamEncryptor());
-                serializableDatabase.save(encryptedOutputStream);
+                serializableDatabase.write(encryptedOutputStream);
                 encryptedOutputStream.flush();
             }
         } finally {
             Helpers.isV4.set(false);
+        }
+    }
+
+    /**
+     * Load a database and close the stream
+     *
+     * @deprecated use {@link #read(SerializableDatabase, Credentials, InputStream)} (issue #109)
+     */
+    @Override
+    @Deprecated
+    public void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream encryptedInputStream) throws IOException {
+        try (encryptedInputStream) {
+            read(serializableDatabase, credentials, encryptedInputStream);
+        }
+    }
+
+    /**
+     * Save a database and close the stream
+     *
+     * @deprecated use {@link #write(SerializableDatabase, Credentials, OutputStream)} (issue #109)
+     */
+    @Override
+    @Deprecated
+    public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream outputStream) throws IOException {
+        try (outputStream) {
+            write(serializableDatabase, credentials, outputStream);
         }
     }
 
