@@ -70,7 +70,7 @@ As noted, Version 2.x will no longer be maintained once this version is released
 
 ### Snapshot
 
-Snapshot builds, such as this version 3.0.0, are published to the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days, e.g.:
+Snapshot builds, such as this version 3.0.0, are published to the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. 3.0.0-SNAPSHOT was last published October 2026, e.g.:
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
