@@ -18,6 +18,7 @@
 package org.linguafranca.pwdb;
 
 import org.jetbrains.annotations.Nullable;
+import org.linguafranca.pwdb.io.NonClosingOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -233,23 +234,60 @@ public interface Database {
     boolean isDirty();
 
     /**
-     * Save the database to a stream using default format
+     * Write the database to a stream using the default format, leaving the stream open
+     *
+     * @param credentials credentials to use
+     * @param outputStream where to write to - the caller closes it
+     * @since 3.1.0
      */
+    default void write(Credentials credentials, OutputStream outputStream) throws IOException {
+        save(credentials, new NonClosingOutputStream(outputStream));
+    }
+
+    /**
+     * Write the database to a stream using the format supplied, leaving the stream open
+     *
+     * @param streamFormat the format to use
+     * @param credentials credentials to use
+     * @param outputStream where to write to - the caller closes it
+     * @since 3.1.0
+     */
+    default <C extends StreamConfiguration> void write(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) throws IOException {
+        save(streamFormat, credentials, new NonClosingOutputStream(outputStream));
+    }
+
+    /**
+     * Save the database to a stream using default format and close the stream
+     *
+     * @deprecated closes a stream the caller opened; use {@link #write(Credentials, OutputStream)}
+     * and close the stream yourself (issue #109)
+     */
+    @Deprecated
     void save(Credentials credentials, OutputStream outputStream) throws IOException;
 
     /**
      * Save the database to a stream using default format - avoiding checked exception
+     *
+     * @deprecated use {@link #write(Credentials, OutputStream)} (issue #109)
      */
+    @Deprecated
     void saveNx(Credentials credentials, OutputStream outputStream);
 
     /**
      * Save the database to a stream and closes the stream
+     *
+     * @deprecated closes a stream the caller opened; use {@link #write(StreamFormat, Credentials, OutputStream)}
+     * and close the stream yourself (issue #109)
      */
+    @Deprecated
     <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream) throws IOException;
 
     /**
      * Save the database to a stream and closes the stream - avoiding checked exception
+     *
+     * @deprecated use {@link #write(StreamFormat, Credentials, OutputStream)} (issue #109)
      */
+    @Deprecated
     <C extends StreamConfiguration> void saveNx(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream);
 
     /**
