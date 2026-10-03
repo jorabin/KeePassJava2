@@ -55,7 +55,7 @@ public class KdbEntry extends AbstractEntry {
     public String getProperty(String name) {
         switch (name) {
             case STANDARD_PROPERTY_NAME_USER_NAME: return getUsername();
-            case STANDARD_PROPERTY_NAME_PASSWORD: return getPassword();
+            case STANDARD_PROPERTY_NAME_PASSWORD: return password;
             case STANDARD_PROPERTY_NAME_URL: return getUrl();
             case STANDARD_PROPERTY_NAME_TITLE: return getTitle();
             case STANDARD_PROPERTY_NAME_NOTES: return getNotes();
@@ -67,7 +67,7 @@ public class KdbEntry extends AbstractEntry {
     public Entry setProperty(String name, String value) {
         switch (name) {
             case STANDARD_PROPERTY_NAME_USER_NAME: setUsername(value); break;
-            case STANDARD_PROPERTY_NAME_PASSWORD: setPassword(value); break;
+            case STANDARD_PROPERTY_NAME_PASSWORD: password = value; break;
             case STANDARD_PROPERTY_NAME_URL: setUrl(value); break;
             case STANDARD_PROPERTY_NAME_TITLE: setTitle(value); break;
             case STANDARD_PROPERTY_NAME_NOTES: setNotes(value); break;
@@ -120,12 +120,20 @@ public class KdbEntry extends AbstractEntry {
         this.username = username;
     }
 
+    /**
+     * @deprecated use {@link #getProperty(String)} with {@link #STANDARD_PROPERTY_NAME_PASSWORD}
+     */
     @Override
+    @Deprecated
     public String getPassword() {
         return password;
     }
 
+    /**
+     * @deprecated use {@link #setProperty(String, String)} with {@link #STANDARD_PROPERTY_NAME_PASSWORD}
+     */
     @Override
+    @Deprecated
     public void setPassword(String pass) {
         this.password = pass;
     }

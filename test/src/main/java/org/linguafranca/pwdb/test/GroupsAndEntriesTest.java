@@ -123,6 +123,21 @@ public interface GroupsAndEntriesTest {
         assertEquals(1, getDatabase().findEntries("entry1").size());
     }
 
+    /**
+     * The deprecated password accessors still work, and agree with the password property
+     */
+    @Test
+    @SuppressWarnings("deprecation")
+    default void testDeprecatedPasswordAccessors() {
+        Entry e1 = getDatabase().newEntry("Entry 1");
+        e1.setPassword("first password");
+        assertEquals("first password", e1.getPassword());
+        assertEquals("first password", e1.getProperty(PASSWORD));
+
+        e1.setProperty(PASSWORD, "second password");
+        assertEquals("second password", e1.getPassword());
+    }
+
     @Test
     default void testSetFields () {
         Entry e1 = getDatabase().newEntry("Entry 1");

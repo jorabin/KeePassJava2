@@ -19,6 +19,7 @@ package org.linguafranca.pwdb.kdb;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.security.Encryption;
 
@@ -258,7 +259,7 @@ public class KdbSerializer {
                     entry.setUsername(readString(dataInput));
                     break;
                 case 0x0007:
-                    entry.setPassword(readString(dataInput));
+                    entry.setProperty(Entry.STANDARD_PROPERTY_NAME_PASSWORD, readString(dataInput));
                     break;
                 case 0x0008:
                     // these are not really notes, they are things like properties from KDBX databases

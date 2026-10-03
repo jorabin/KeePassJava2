@@ -11,6 +11,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - [Issue 109] `Util.listDatabase` no longer closes the output stream
 - [Issue 109] Examples, tests and readme use `read`/`write` with try-with-resources
 - Replace Jackson's deprecated `setSerializationInclusion` with `setDefaultPropertyInclusion`, which does the same
+- Implementations of the deprecated `Entry.getPassword`/`setPassword` are marked deprecated too, the KDB reader no longer uses them, and they are tested
 
 ## [3.0.0] 2026-10-03
 
