@@ -1,6 +1,6 @@
 # KeePassJava2
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.linguafranca.pwdb/KeePassJava2-parent)
+![Maven Central Version](https://img.shields.io/maven-central/v/org.linguafranca.pwdb/KeePassJava2.parent)
 [![javadoc](https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2/javadoc.svg)](https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2)
 
 ![alt text](https://badgen.net/badge/Build/2.2.6/blue?icon=github)
