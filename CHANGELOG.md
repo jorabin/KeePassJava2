@@ -2,8 +2,6 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-# [2.2.7] Unreleased
-
 # [2.2.6] 2026-10-03
 
 - [Issue 104] With a default encoding other than UTF-8, the Jackson implementation wrote the database XML in that encoding, so non-ASCII content could not be loaded back
