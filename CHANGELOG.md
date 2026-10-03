@@ -29,10 +29,10 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
   - remove Simple database
   - remove JAXB database
   - remove DOM database
-  - remove `test` and `util` modules
+  - remove `util` module; `test` module now holds the test code shared by the database implementations, and is not published
 - refactor tests
   - restructure
-  - create a test-jar for dependencies
+  - shared test code is in the `test` module rather than a `database` test-jar, so it is not published with `database`
   - "upgrade" to JUnit 5
 
 
