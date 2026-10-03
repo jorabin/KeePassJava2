@@ -7,7 +7,9 @@
 
 ![alt text](https://badgen.net/badge/Branch/develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.7-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
 
-![alt text](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.0-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fe9059ac4d384b929f452149b9246658)](https://app.codacy.com/gh/jorabin/KeePassJava2/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+![alt text](https://badgen.net/badge/Branch/v3-master/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.0/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-master)
+
+![alt text](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.0/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fe9059ac4d384b929f452149b9246658)](https://app.codacy.com/gh/jorabin/KeePassJava2/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 
 Java 11 API (from version 3.0.0 upwards) for password databases compatible with the renowned [KeePass](http://keepass.info) password
@@ -42,18 +44,18 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-This version is 3.0.0-SNAPSHOT. It is the intention that maintenance will cease
-on version 2 at some point during 2025 once this version is released.
+The current code is version 3.0.0 - released to Maven October 2026. This is on branch `v3-master`,
+with development on branch `v3-develop`. See [Build from Source](#build-from-source)
 Upgrade to V3 requires minor changes to V2 code.
 
-The current released version is version 2.2.4 - released to Maven March 2025. 
-This is on the main branch. See [Build from Source](#build-from-source)
+Version 2 is still maintained for now, with bug and security fixes. Its current release is 2.2.6,
+on the main branch, with development on branch `develop`.
 
 Key updates relative to 2.x
 - Java 11 
 - Pluggable (protected) data storage model
 - File format version 4 support - with Argon2
-- Removal of SimpleXML, JAXB and JAXB database implementations
+- Removal of SimpleXML, JAXB and DOM database implementations
 - Removed generics on database classes
 - Refactor modules and packages
 - Updated keyfile support
@@ -65,16 +67,28 @@ See the [changelog](CHANGELOG.md) for more details.
 
 ### Release
 
-For the POM for the last release, see the [main branch](https://github.com/jorabin/KeePassJava2/tree/master).
-As noted, Version 2.x will no longer be maintained once this version is released.
+The POM for the last release (3.0.0), Java 11 compatible, is
 
-### Snapshot
+        <groupId>org.linguafranca.pwdb</groupId>
+        <artifactId>KeePassJava2.kdbx.database</artifactId>
+        <version>3.0.0</version>
 
-Snapshot builds, such as this version 3.0.0, are published to the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. 3.0.0-SNAPSHOT was last published October 2026, e.g.:
+at Maven Central. This provides access to the KDBX database implementation. There is also a
+composite POM that provides access to the KDBX and KDB implementations:
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>3.0.0-SNAPSHOT</version>
+        <version>3.0.0</version>
+
+For the last 2.x release, see the [main branch](https://github.com/jorabin/KeePassJava2/tree/master).
+
+### Snapshot
+
+Snapshot builds are published to the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. The next bug-fix release will be 3.0.1-SNAPSHOT (on branch `v3-develop`), last published October 2026:
+
+        <groupId>org.linguafranca.pwdb</groupId>
+        <artifactId>KeePassJava2</artifactId>
+        <version>3.0.1-SNAPSHOT</version>
  
 with appropriate `<repositories>` entry, like:
 
