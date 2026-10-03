@@ -36,6 +36,7 @@ import java.util.UUID;
  */
 public class KdbDatabase extends AbstractDatabase {
     private String description = "";
+    private KdbStreamFormat streamFormat = new KdbStreamFormat();
     private final KdbGroup rootGroup;
 
     // local time, as KDB files are thought to hold local times
@@ -61,7 +62,10 @@ public class KdbDatabase extends AbstractDatabase {
      */
     public static KdbDatabase read(Credentials credentials, InputStream inputStream) throws IOException {
         // the serializer closes its decryption chain, which closes the stream under it
-        return KdbSerializer.createKdbDatabase(credentials, new KdbHeader(), new NonClosingInputStream(inputStream));
+        KdbHeader kdbHeader = new KdbHeader();
+        KdbDatabase database = KdbSerializer.createKdbDatabase(credentials, kdbHeader, new NonClosingInputStream(inputStream));
+        database.streamFormat = new KdbStreamFormat(kdbHeader);
+        return database;
     }
 
     /**
@@ -249,7 +253,8 @@ public class KdbDatabase extends AbstractDatabase {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <C extends StreamConfiguration> StreamFormat<C> getStreamFormat(){
-        return null;
+        return (StreamFormat<C>) streamFormat;
     }
 }

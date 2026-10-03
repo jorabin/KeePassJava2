@@ -49,7 +49,8 @@ public class KdbxDatabase extends ProtectedDatabase {
         try {
             keePassFile = file;
             keePassFile.root.group.database = this;
-            this.streamFormat = streamFormat;
+            // a new database is written as KDBX 4.1 unless told otherwise
+            this.streamFormat = Objects.requireNonNullElseGet(streamFormat, () -> new KdbxStreamFormat(new KdbxHeader(4)));
             fixUp(keePassFile.root.group);
         } catch (Exception e) {
             throw new IllegalStateException(e);
@@ -160,8 +161,8 @@ public class KdbxDatabase extends ProtectedDatabase {
     }
 
     /**
-     * Write the database with the same stream format that it was loaded with, or V4
-     * default if none, leaving the stream open
+     * Write the database with its stream format ({@link #getStreamFormat()}): the format it was read with,
+     * or KDBX 4.1 for a new database, leaving the stream open
      *
      * @param credentials  credentials to use
      * @param outputStream where to write to - the caller closes it
@@ -169,9 +170,6 @@ public class KdbxDatabase extends ProtectedDatabase {
      */
     @Override
     public void write(Credentials credentials, OutputStream outputStream) throws IOException {
-        if (Objects.isNull(streamFormat)) {
-            streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
-        }
         write(streamFormat, credentials, outputStream);
     }
 
@@ -194,8 +192,7 @@ public class KdbxDatabase extends ProtectedDatabase {
     }
 
     /**
-     * Save the database with the same stream format that it was loaded with, or V4
-     * default if none, and close the stream
+     * Save the database with its stream format ({@link #getStreamFormat()}), and close the stream
      *
      * @param credentials  credentials to use
      * @param outputStream where to write to - closes stream
@@ -318,6 +315,14 @@ public class KdbxDatabase extends ProtectedDatabase {
 
     public StreamFormat<?> getStreamFormat() {
         return streamFormat;
+    }
+
+    @Override
+    public <C extends StreamConfiguration> void setStreamFormat(StreamFormat<C> streamFormat) {
+        if (streamFormat == null) {
+            throw new IllegalArgumentException("streamFormat may not be null");
+        }
+        this.streamFormat = streamFormat;
     }
 
 

@@ -19,6 +19,7 @@ package org.linguafranca.pwdb.kdb;
 
 import org.linguafranca.pwdb.Database;
 import org.linguafranca.pwdb.Feature;
+import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.test.DatabaseTestBase;
 import org.linguafranca.pwdb.test.GroupsAndEntriesTest;
@@ -80,6 +81,10 @@ public class KdbDatabaseTest
             database = KdbDatabase.read(new KdbCredentials.Password("123".getBytes()), inputStream);
         }
         database.visit(new Visitor.Print(getTestPrintStream()));
+        // the stream format holds the header that was read
+        StreamFormat<?> streamFormat = database.getStreamFormat();
+        KdbHeader header = ((KdbStreamFormat) streamFormat).getStreamConfiguration();
+        assertTrue(header.getGroupCount() > 0);
     }
 
     /**

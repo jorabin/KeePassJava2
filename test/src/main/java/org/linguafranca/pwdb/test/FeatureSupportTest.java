@@ -54,6 +54,12 @@ public interface FeatureSupportTest {
     }
 
     @Test
+    default void streamFormatIsNotNull() {
+        assertNotNull(getDatabase().getStreamFormat());
+        assertNotNull(getDatabase().getStreamFormat().getStreamConfiguration());
+    }
+
+    @Test
     default void nameAndDescription() {
         Database database = getDatabase();
         assertNotNull(database.getName());

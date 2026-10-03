@@ -202,8 +202,6 @@ public class KdbxSerializer {
 
     private static final int SIG1 = 0x9AA2D903;
     private static final int SIG2 = 0xB54BFB67;
-    private static final int FILE_VERSION_32 = 0x00030001;
-    private static final int FILE_VERSION_4 = 0x00040000;
 
     private static class HeaderType {
         static final byte END = 0;
@@ -246,6 +244,7 @@ public class KdbxSerializer {
         // followed by a file version number
         int fullVersion = ledis.readInt();
         kdbxHeader.setVersion(fullVersion >> 16);
+        kdbxHeader.setMinorVersion(fullVersion & 0xFFFF);
 
         // read header fields
         getOuterHeaderFields(kdbxHeader, ledis);
@@ -401,7 +400,7 @@ public class KdbxSerializer {
         ledos.writeInt(SIG1);
         ledos.writeInt(SIG2);
         // write a file version
-        ledos.writeInt(kdbxHeader.getVersion() == 3?FILE_VERSION_32:FILE_VERSION_4);
+        ledos.writeInt(kdbxHeader.getVersion() << 16 | kdbxHeader.getMinorVersion());
 
         ledos.writeByte(HeaderType.CIPHER_ID);
         lengthWriter.accept(16);

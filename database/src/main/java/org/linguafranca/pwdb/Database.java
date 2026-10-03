@@ -295,9 +295,22 @@ public interface Database {
     <C extends StreamConfiguration> void saveNx(StreamFormat<C> streamFormat, Credentials credentials, OutputStream outputStream);
 
     /**
-     * Get the format the database was loaded from
+     * Get the format the database was read from, or for a new database the format it is written in by
+     * {@link #write(Credentials, OutputStream)} (KDBX 4.1 for KDBX databases)
      */
-    @Nullable <C extends StreamConfiguration> StreamFormat<C> getStreamFormat();
+    @NotNull <C extends StreamConfiguration> StreamFormat<C> getStreamFormat();
+
+    /**
+     * Set the format the database is written in by {@link #write(Credentials, OutputStream)}
+     *
+     * @param streamFormat the format
+     * @throws IllegalArgumentException if the format is null or not one this database can be written in
+     * @throws UnsupportedOperationException if the database can't be written
+     * @since 3.1.0
+     */
+    default <C extends StreamConfiguration> void setStreamFormat(StreamFormat<C> streamFormat) {
+        throw new UnsupportedOperationException("Setting the stream format is not supported");
+    }
 
     /**
      * Property to protect in memory
