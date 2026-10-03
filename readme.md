@@ -73,7 +73,7 @@ Note that the artifactId has become Camel Case from release 2.1.x onwards.
 ### Snapshot
 
 Snapshot builds are erratically available from the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. Next bug-fix release will be
-2.2.7-SNAPSHOT (on branch `develop`) and work-in-progress 3.0.0-SNAPSHOT (on branch `v3`):
+2.2.7-SNAPSHOT (on branch `develop`) and work-in-progress 3.0.0-SNAPSHOT (on branch `v3-develop`):
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
