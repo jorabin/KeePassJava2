@@ -44,8 +44,9 @@ It is licensed under the Apache 2 License and is currently usable.
 ## Current Status
 
 The current code is version 3.0.0 - released to Maven October 2026. This is on branch `v3-master`,
-with development on branch `v3-develop`. See [Build from Source](#build-from-source)
-Upgrade to V3 requires minor changes to V2 code.
+with development on branch `v3-develop`. See [Build from Source](#build-from-source).
+Upgrade to V3 requires minor changes to V2 code, see [Upgrading from 2.x to 3.0](#upgrading-from-2x-to-30)
+and [Upgrading from 3.0 to 3.1](#upgrading-from-30-to-31).
 
 Version 2 is still maintained for now, with bug and security fixes. Its current release is 2.2.6,
 on branch `master`, with development on branch `develop`.
@@ -61,6 +62,45 @@ Key updates relative to 2.x
 - Updated dependencies
 
 See the [changelog](CHANGELOG.md) for more details.
+
+### Upgrading from 2.x to 3.0
+
+Upgrading from 2.x needs some, mostly minor, changes to your code and build:
+
+- **Java 11** is required (Java 17 from 3.1).
+- **One KDBX implementation.** The Jackson implementation is now *the* KDBX database, `KdbxDatabase` (was `JacksonDatabase`). The Simple, JAXB and DOM implementations are removed.
+- **No generics on the database classes.** `Database`, `Group`, `Entry` and so on are no longer generic, so declarations such as `Database<?,?,?,?>` become plain `Database`.
+- **Renamed classes,** for example `KdbxCreds` is now `KdbxCredentials`.
+- **New artifacts** (group `org.linguafranca.pwdb`):
+
+  | 2.x | 3.x |
+  |---|---|
+  | `KeePassJava2-jackson` | `KeePassJava2.kdbx.database` |
+  | `KeePassJava2-kdbx` | `KeePassJava2.kdbx.io` |
+  | `KeePassJava2-kdb` | `KeePassJava2.kdb` |
+  | `database` | `database` |
+  | `KeePassJava2` (all) | `KeePassJava2` (KDBX and KDB) |
+  | `KeePassJava2-simple`, `-jaxb`, `-dom` | removed |
+
+- **New Java module names** ([issue 93](https://github.com/jorabin/KeePassJava2/issues/93)), deliberately different from 2.x:
+  `org.linguafranca.pwdb.database`, `org.linguafranca.pwdb.kdb`, `org.linguafranca.pwdb.kdbx.io`,
+  `org.linguafranca.pwdb.kdbx.database` and `org.linguafranca.pwdb.all`. Update your `requires` clauses.
+
+See the [Quick Start](#quick-start) for a worked example in the version 3 API.
+
+### Upgrading from 3.0 to 3.1
+
+- Java 17 or later is required.
+- Times on `Entry` and `Group` are `java.time.Instant` rather than `java.util.Date`. Where code needs a `Date`, convert at the call:
+
+      Date created = Date.from(entry.getCreationTime());
+      entry.setExpiryTime(expiryDate.toInstant());
+
+- `load` and `save` are deprecated in favour of `read` and `write`, which leave the stream open, so close it yourself:
+
+      try (InputStream inputStream = Files.newInputStream(path)) {
+          database = KdbxDatabase.read(credentials, inputStream);
+      }
 
 ## Maven Coordinates
 

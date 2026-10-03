@@ -30,7 +30,6 @@ import java.nio.ByteOrder;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -96,43 +95,49 @@ public class Helpers {
     V4 dates are base64 encoded seconds since midnight 0001-01-01
     --- */
 
-    // we use this for formatting a Date which doesn't have a time zone, and we are assuming
-    // that date is in fact GMT
-    //public static final SimpleDateFormat inFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     public static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssz");
-    public static final Date baseDate = Date.from(ZonedDateTime.parse("0001-01-01T00:00:00Z", dateTimeFormatter).toInstant());
+    /** The base of V4 times, 0001-01-01T00:00:00Z */
+    public static final Instant baseInstant = ZonedDateTime.parse("0001-01-01T00:00:00Z", dateTimeFormatter).toInstant();
 
-    // in V3 this is just a date, in V4 it's a base64 encoded serial number of seconds after the base date above
-    public static Date toDate(String value) {
+    /**
+     * Parses a time, in V3 an ISO 8601 date and time, in V4 a base64 encoded count of seconds after {@link #baseInstant}
+     * @param value a formatted time
+     * @return the time
+     */
+    public static Instant toInstant(String value) {
         try {
-            ZonedDateTime zdt = ZonedDateTime.parse(value);
-            Instant instant = zdt.toInstant();
-            return Date.from(instant);
+            return ZonedDateTime.parse(value).toInstant();
         } catch (DateTimeParseException e) {
                // let's see if it is a V4 date
         }
-        // V4 dates are base 64 encoded seconds since baseDate
+        // V4 dates are base 64 encoded seconds since baseInstant
         byte [] b = decodeBase64Content(value.getBytes());
-        long secondsSinceBaseDate = ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getLong();
-        Instant instant = Instant.ofEpochSecond(secondsSinceBaseDate + baseDate.getTime()/1000);
-        return Date.from(instant);
+        long secondsSinceBaseInstant = ByteBuffer.wrap(b).order(ByteOrder.LITTLE_ENDIAN).getLong();
+        return baseInstant.plusSeconds(secondsSinceBaseInstant);
     }
 
     /**
      * Formats the value according to the value of {@link Helpers#isV4}
-     * @param value a date
-     * @return a formatted date
+     * @param value a time
+     * @return a formatted time
      */
-    public static String fromDate(Date value) {
-        return isV4.get() ? fromDateV4(value) : fromDateV3(value);
+    public static String fromInstant(Instant value) {
+        return isV4.get() ? fromInstantV4(value) : fromInstantV3(value);
     }
-    public static String fromDateV3(Date value) {
-        return dateTimeFormatter.format(value.toInstant().atZone(ZoneId.of("Z")));
+
+    /**
+     * Formats the value as ISO 8601 in UTC, to the second
+     */
+    public static String fromInstantV3(Instant value) {
+        return dateTimeFormatter.format(value.atZone(ZoneId.of("Z")));
     }
-    public static String fromDateV4(Date value) {
-        long keepassInstant = value.toInstant().toEpochMilli() - baseDate.getTime();
-        long secondsSinceBaseDate = keepassInstant / 1000;
-        byte []  asBytes = toBytes(secondsSinceBaseDate, ByteOrder.LITTLE_ENDIAN);
+
+    /**
+     * Formats the value as a base64 encoded count of seconds after {@link #baseInstant}
+     */
+    public static String fromInstantV4(Instant value) {
+        long secondsSinceBaseInstant = value.getEpochSecond() - baseInstant.getEpochSecond();
+        byte []  asBytes = toBytes(secondsSinceBaseInstant, ByteOrder.LITTLE_ENDIAN);
         return encodeBase64Content(asBytes);
     }
 

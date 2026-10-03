@@ -36,7 +36,7 @@ import org.linguafranca.pwdb.kdbx.jackson.model.KeePassFile;
 import org.linguafranca.pwdb.kdbx.jackson.model.Times;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -292,13 +292,13 @@ public class KdbxGroup extends AbstractGroup{
 
     @Override
     @JsonIgnore
-    public Date getLastAccessTime() {
+    public Instant getLastAccessTime() {
         return times.getLastAccessTime();
     }
 
     @Override
     @JsonIgnore
-    public Date getCreationTime() {
+    public Instant getCreationTime() {
         return times.getCreationTime();
     }
 
@@ -317,13 +317,13 @@ public class KdbxGroup extends AbstractGroup{
 
     @Override
     @JsonIgnore
-    public Date getExpiryTime() {
+    public Instant getExpiryTime() {
         return times.getExpiryTime();
     }
 
     @Override
     @JsonIgnore
-    public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
+    public void setExpiryTime(Instant expiryTime) throws IllegalArgumentException {
         if (expiryTime == null)
             throw new IllegalArgumentException("expiryTime may not be null");
         times.setExpiryTime(expiryTime);
@@ -332,13 +332,13 @@ public class KdbxGroup extends AbstractGroup{
 
     @Override
     @JsonIgnore
-    public Date getLastModificationTime() {
+    public Instant getLastModificationTime() {
         return times.getLastModificationTime();
     }
 
     private void touch() {
         if (this.times != null) {
-            this.times.setLastModificationTime(new Date());
+            this.times.setLastModificationTime(Instant.now());
         }
 
         if (this.database != null) {

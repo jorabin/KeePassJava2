@@ -178,16 +178,16 @@ public class BasicEntry extends AbstractEntry {
     }
 
     @Override
-    public Date getLastAccessTime() {
+    public Instant getLastAccessTime() {
         if (accessTime == null) {
-            return fromInstant(this.creationTime);
+            return this.creationTime;
         }
-        return fromInstant(this.accessTime);
+        return this.accessTime;
     }
 
     @Override
-    public Date getCreationTime() {
-        return fromInstant(creationTime);
+    public Instant getCreationTime() {
+        return creationTime;
     }
 
     @Override
@@ -201,21 +201,24 @@ public class BasicEntry extends AbstractEntry {
     }
 
     @Override
-    public Date getExpiryTime() {
-        return fromInstant(this.expiryTime);
+    public Instant getExpiryTime() {
+        return this.expiryTime;
     }
 
     @Override
-    public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
-        this.expiryTime = expiryTime.toInstant();
-    }
-
-    @Override
-    public Date getLastModificationTime() {
-        if (modifiedTime == null) {
-            return fromInstant(this.creationTime);
+    public void setExpiryTime(Instant expiryTime) throws IllegalArgumentException {
+        if (expiryTime == null) {
+            throw new IllegalArgumentException("expiryTime may not be null");
         }
-        return fromInstant(this.modifiedTime);
+        this.expiryTime = expiryTime;
+    }
+
+    @Override
+    public Instant getLastModificationTime() {
+        if (modifiedTime == null) {
+            return this.creationTime;
+        }
+        return this.modifiedTime;
     }
 
     private void updateAccessTime() {
@@ -228,10 +231,4 @@ public class BasicEntry extends AbstractEntry {
         touch();
     }
 
-    private Date fromInstant(Instant instant) {
-        if (instant == null) {
-            return null;
-        }
-        return Date.from(instant);
-    }
 }

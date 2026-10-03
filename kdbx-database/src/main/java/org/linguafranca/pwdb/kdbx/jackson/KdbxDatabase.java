@@ -29,7 +29,7 @@ import org.linguafranca.pwdb.security.StreamEncryptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -271,7 +271,7 @@ public class KdbxDatabase extends ProtectedDatabase {
             g = (KdbxGroup) newGroup("Recycle Bin");
             getRootGroup().addGroup(g);
             this.keePassFile.meta.recycleBinUUID = g.getUuid();
-            this.keePassFile.meta.recycleBinChanged = new Date();
+            this.keePassFile.meta.recycleBinChanged = Instant.now();
         }
         return g;
     }
@@ -289,7 +289,7 @@ public class KdbxDatabase extends ProtectedDatabase {
     @Override
     public void setName(String s) {
         keePassFile.meta.databaseName = s;
-        keePassFile.meta.databaseNameChanged = new Date();
+        keePassFile.meta.databaseNameChanged = Instant.now();
         setDirty(true);
     }
 
@@ -301,7 +301,7 @@ public class KdbxDatabase extends ProtectedDatabase {
     @Override
     public void setDescription(String s) {
         keePassFile.meta.databaseDescription = s;
-        keePassFile.meta.databaseDescriptionChanged = new Date();
+        keePassFile.meta.databaseDescriptionChanged = Instant.now();
         setDirty(true);
     }
 

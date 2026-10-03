@@ -52,8 +52,8 @@ public class Issue27Test {
         List<? extends Entry> entries = db.findEntries("testtitle");
 
         for (Entry entry: entries) {
-            printStream.println(Helpers.fromDateV3(entry.getCreationTime()));
-            assertEquals("2021-01-11T09:18:56Z", Helpers.fromDateV3(entry.getCreationTime()));
+            printStream.println(Helpers.fromInstantV3(entry.getCreationTime()));
+            assertEquals("2021-01-11T09:18:56Z", Helpers.fromInstantV3(entry.getCreationTime()));
         }
     }
 
@@ -70,8 +70,8 @@ public class Issue27Test {
         List<? extends Entry> entries = db.findEntries("Sample Entry #2 - Copy");
 
         for (Entry entry: entries) {
-            printStream.println(Helpers.fromDate(entry.getCreationTime()));
-            assertEquals("2018-01-26T13:20:58Z", Helpers.fromDateV3(entry.getCreationTime()));
+            printStream.println(Helpers.fromInstant(entry.getCreationTime()));
+            assertEquals("2018-01-26T13:20:58Z", Helpers.fromInstantV3(entry.getCreationTime()));
         }
     }
 

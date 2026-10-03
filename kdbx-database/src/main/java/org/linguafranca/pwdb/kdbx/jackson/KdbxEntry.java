@@ -18,7 +18,7 @@
 package org.linguafranca.pwdb.kdbx.jackson;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -365,13 +365,13 @@ public class KdbxEntry extends AbstractEntry {
 
     @Override
     @JsonIgnore
-    public Date getLastAccessTime() {
+    public Instant getLastAccessTime() {
         return times.getLastAccessTime();
     }
 
     @Override
     @JsonIgnore
-    public Date getCreationTime() {
+    public Instant getCreationTime() {
         return times.getCreationTime();
     }
 
@@ -389,13 +389,13 @@ public class KdbxEntry extends AbstractEntry {
 
     @Override
     @JsonIgnore
-    public Date getExpiryTime() {
+    public Instant getExpiryTime() {
         return times.getExpiryTime();
     }
 
     @Override
     @JsonIgnore
-    public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
+    public void setExpiryTime(Instant expiryTime) throws IllegalArgumentException {
         if (expiryTime == null)
             throw new IllegalArgumentException("expiryTime may not be null");
         times.setExpiryTime(expiryTime);
@@ -403,14 +403,14 @@ public class KdbxEntry extends AbstractEntry {
 
     @Override
     @JsonIgnore
-    public Date getLastModificationTime() {
+    public Instant getLastModificationTime() {
         return times.getLastModificationTime();
     }
 
     @Override
     @JsonIgnore
     protected void touch() {
-        this.times.setLastModificationTime(new Date());
+        this.times.setLastModificationTime(Instant.now());
         this.database.setDirty(true);
     }
 }

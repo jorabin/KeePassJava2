@@ -23,7 +23,7 @@ import org.linguafranca.pwdb.abstractdb.AbstractGroup;
 import org.linguafranca.pwdb.Entry;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,18 +40,18 @@ public class KdbGroup extends AbstractGroup {
     private Icon icon = new KdbIcon(0);
     protected List<KdbGroup> groups = new ArrayList<>();
     protected List<KdbEntry> entries = new ArrayList<>();
-    private Date creationTime;
-    private Date lastModificationTime;
-    private Date lastAccessTime;
-    private Date expiryTime;
+    private Instant creationTime;
+    private Instant lastModificationTime;
+    private Instant lastAccessTime;
+    private Instant expiryTime;
     private boolean expires = false;
     private int flags;
 
     KdbGroup() {
-        creationTime = new Date();
+        creationTime = Instant.now();
         lastModificationTime = creationTime;
-        lastAccessTime = new Date(Long.MIN_VALUE);
-        expiryTime = new Date(Long.MAX_VALUE);
+        lastAccessTime = Instant.ofEpochMilli(Long.MIN_VALUE);
+        expiryTime = Instant.ofEpochMilli(Long.MAX_VALUE);
     }
 
     @Override
@@ -189,26 +189,26 @@ public class KdbGroup extends AbstractGroup {
         this.flags = flags;
     }
 
-    void setCreationTime(Date creationTime) {
+    void setCreationTime(Instant creationTime) {
         this.creationTime = creationTime;
     }
 
-    void setLastModificationTime(Date lastModificationTime) {
+    void setLastModificationTime(Instant lastModificationTime) {
         this.lastModificationTime = lastModificationTime;
     }
 
-    void setLastAccessTime(Date lastAccessTime) {
+    void setLastAccessTime(Instant lastAccessTime) {
         this.lastAccessTime = lastAccessTime;
     }
 
     @Override
-    public void setExpiryTime(Date expiryTime) {
+    public void setExpiryTime(Instant expiryTime) {
         if (expiryTime == null) throw new IllegalArgumentException("expiryTime may not be null");
         this.expiryTime = expiryTime;
     }
 
     @Override
-    public Date getExpiryTime() {
+    public Instant getExpiryTime() {
         return expiryTime;
     }
 
@@ -223,17 +223,17 @@ public class KdbGroup extends AbstractGroup {
     }
 
     @Override
-    public Date getCreationTime() {
+    public Instant getCreationTime() {
         return creationTime;
     }
 
     @Override
-    public Date getLastModificationTime() {
+    public Instant getLastModificationTime() {
         return lastModificationTime;
     }
 
     @Override
-    public Date getLastAccessTime() {
+    public Instant getLastAccessTime() {
         return lastAccessTime;
     }
 

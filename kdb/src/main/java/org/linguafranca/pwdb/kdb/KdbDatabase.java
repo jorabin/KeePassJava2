@@ -24,7 +24,8 @@ import org.linguafranca.pwdb.io.NonClosingInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 /**
@@ -36,7 +37,8 @@ public class KdbDatabase extends AbstractDatabase {
     private String description;
     private final KdbGroup rootGroup;
 
-    static SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    // local time, as KDB files are thought to hold local times
+    static final DateTimeFormatter isoDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(ZoneId.systemDefault());
 
     public KdbDatabase() {
         // KDB files don't have a single root group, this is a synthetic surrogate

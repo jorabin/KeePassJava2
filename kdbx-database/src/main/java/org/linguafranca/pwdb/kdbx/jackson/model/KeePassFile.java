@@ -18,7 +18,7 @@
 package org.linguafranca.pwdb.kdbx.jackson.model;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,9 +28,9 @@ import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToByteConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.Base64ToUUIDConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.BooleanToStringConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.ByteToBase64Converter;
-import org.linguafranca.pwdb.kdbx.jackson.converter.DateToStringConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.InstantToStringConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.StringToBooleanConverter;
-import org.linguafranca.pwdb.kdbx.jackson.converter.StringToDateConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.StringToInstantConverter;
 import org.linguafranca.pwdb.kdbx.jackson.converter.UUIDToBase64Converter;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
@@ -116,25 +116,25 @@ public class KeePassFile {
         public String databaseName;
 
         @JacksonXmlProperty(localName = "DatabaseNameChanged")
-        @JsonDeserialize(converter = StringToDateConverter.class)
-        @JsonSerialize(converter = DateToStringConverter.class)
-        public Date databaseNameChanged;
+        @JsonDeserialize(converter = StringToInstantConverter.class)
+        @JsonSerialize(converter = InstantToStringConverter.class)
+        public Instant databaseNameChanged;
 
         @JacksonXmlProperty(localName = "DatabaseDescription")
         public String databaseDescription;
 
         @JacksonXmlProperty(localName = "DatabaseDescriptionChanged")
-        @JsonDeserialize(converter = StringToDateConverter.class)
-        @JsonSerialize(converter = DateToStringConverter.class)
-        public Date databaseDescriptionChanged;
+        @JsonDeserialize(converter = StringToInstantConverter.class)
+        @JsonSerialize(converter = InstantToStringConverter.class)
+        public Instant databaseDescriptionChanged;
 
         @JacksonXmlProperty(localName = "DefaultUserName")
         protected String defaultUserName;
 
         @JacksonXmlProperty(localName = "DefaultUserNameChanged")
-        @JsonDeserialize(converter = StringToDateConverter.class)
-        @JsonSerialize(converter = DateToStringConverter.class)
-        protected Date defaultUserNameChanged;
+        @JsonDeserialize(converter = StringToInstantConverter.class)
+        @JsonSerialize(converter = InstantToStringConverter.class)
+        protected Instant defaultUserNameChanged;
 
         @JacksonXmlProperty(localName = "MaintenanceHistoryDays")
         protected int maintenanceHistoryDays;
@@ -143,9 +143,9 @@ public class KeePassFile {
         protected String color;
 
         @JacksonXmlProperty(localName = "MasterKeyChanged")
-        @JsonDeserialize(converter = StringToDateConverter.class)
-        @JsonSerialize(converter = DateToStringConverter.class)
-        protected Date masterKeyChanged;
+        @JsonDeserialize(converter = StringToInstantConverter.class)
+        @JsonSerialize(converter = InstantToStringConverter.class)
+        protected Instant masterKeyChanged;
 
         @JacksonXmlProperty(localName = "MasterKeyChangeRec")
         protected int masterKeyChangeRec;
@@ -176,9 +176,9 @@ public class KeePassFile {
         public UUID recycleBinUUID;
 
         @JacksonXmlProperty(localName = "RecycleBinChanged")
-        @JsonDeserialize(converter = StringToDateConverter.class)
-        @JsonSerialize(converter = DateToStringConverter.class)
-        public Date recycleBinChanged;
+        @JsonDeserialize(converter = StringToInstantConverter.class)
+        @JsonSerialize(converter = InstantToStringConverter.class)
+        public Instant recycleBinChanged;
 
         @JacksonXmlProperty(localName = "EntryTemplatesGroup")
         @JsonDeserialize(converter = Base64ToUUIDConverter.class)
@@ -186,9 +186,9 @@ public class KeePassFile {
         protected UUID entryTemplatesGroup;
 
         @JacksonXmlProperty(localName = "EntryTemplatesGroupChanged")
-        @JsonDeserialize(converter = StringToDateConverter.class)
-        @JsonSerialize(converter = DateToStringConverter.class)
-        protected Date entryTemplatesGroupChanged;
+        @JsonDeserialize(converter = StringToInstantConverter.class)
+        @JsonSerialize(converter = InstantToStringConverter.class)
+        protected Instant entryTemplatesGroupChanged;
 
         @JacksonXmlProperty(localName = "LastSelectedGroup")
         @JsonDeserialize(converter = Base64ToUUIDConverter.class)
@@ -216,9 +216,9 @@ public class KeePassFile {
         /* version 4  */
 
         @JacksonXmlProperty(localName = "SettingsChanged")
-        @JsonDeserialize(converter = StringToDateConverter.class)
-        @JsonSerialize(converter = DateToStringConverter.class)
-        protected Date settingsChanged;
+        @JsonDeserialize(converter = StringToInstantConverter.class)
+        @JsonSerialize(converter = InstantToStringConverter.class)
+        protected Instant settingsChanged;
     }
 
     @JsonPropertyOrder({
@@ -339,9 +339,9 @@ public class KeePassFile {
         public String name;
         
         @JacksonXmlProperty(localName = "LastModificationTime")
-        @JsonDeserialize(converter = StringToDateConverter.class)
-        @JsonSerialize(converter = DateToStringConverter.class)
-        public Date lastModificationTime;
+        @JsonDeserialize(converter = StringToInstantConverter.class)
+        @JsonSerialize(converter = InstantToStringConverter.class)
+        public Instant lastModificationTime;
         
         @JacksonXmlProperty(localName = "Data")
         @JsonDeserialize(converter = Base64ToByteConverter.class)
@@ -357,9 +357,9 @@ public class KeePassFile {
             @JacksonXmlProperty(localName = "Value")
             public String value;
             @JacksonXmlProperty(localName = "LastModificationTime")
-            @JsonDeserialize(converter = StringToDateConverter.class)
-            @JsonSerialize(converter = DateToStringConverter.class)
-            public Date lastModificationTime;
+            @JsonDeserialize(converter = StringToInstantConverter.class)
+            @JsonSerialize(converter = InstantToStringConverter.class)
+            public Instant lastModificationTime;
         }
 
         @JacksonXmlProperty(localName = "Item")

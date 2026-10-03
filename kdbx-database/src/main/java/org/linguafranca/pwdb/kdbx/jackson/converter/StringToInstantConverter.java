@@ -16,24 +16,24 @@
  */
 package org.linguafranca.pwdb.kdbx.jackson.converter;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Objects;
 
 import org.linguafranca.pwdb.format.Helpers;
 
 import com.fasterxml.jackson.databind.util.StdConverter;
 
-public class StringToDateConverter extends StdConverter<String, Date> {
+public class StringToInstantConverter extends StdConverter<String, Instant> {
 
     @Override
-    public Date convert(String value) {
+    public Instant convert(String value) {
         // TODO: It would really be better if we could inhibit deserialize date elements that are not present
         if (Objects.isNull(value) || value.isEmpty()) {
             return null;
         }
         if(value.equals("${creationDate}")) {
-            return new Date();
+            return Instant.now();
         }
-        return Helpers.toDate(value);
+        return Helpers.toInstant(value);
     }
 }

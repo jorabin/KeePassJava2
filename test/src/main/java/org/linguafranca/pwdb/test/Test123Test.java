@@ -25,9 +25,7 @@ import org.linguafranca.pwdb.Visitor;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,10 +47,8 @@ public interface Test123Test {
     Credentials getCredentials(byte[] credentials);
     String getFileName();
 
-    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ssX");
-
     @Test
-    default void test123File() throws ParseException, IOException {
+    default void test123File() throws IOException {
         Database database;
         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(getFileName())) {
             database = loadDatabase(getCredentials("123".getBytes()), inputStream);
@@ -97,8 +93,8 @@ public interface Test123Test {
             return;
         }
 
-        Date c = entries.get(0).getCreationTime();
-        Date expected = sdf.parse("2015-10-24T17:20:41Z");
+        Instant c = entries.get(0).getCreationTime();
+        Instant expected = Instant.parse("2015-10-24T17:20:41Z");
         assertEquals(expected, c);
     }
 }

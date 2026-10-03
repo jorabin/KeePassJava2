@@ -17,17 +17,17 @@
 
 package org.linguafranca.pwdb.kdbx.jackson.converter;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.linguafranca.pwdb.format.Helpers;
 
 import com.fasterxml.jackson.databind.util.StdConverter;
 
-public class DateToStringConverter extends StdConverter<Date, String> {
+public class InstantToStringConverter extends StdConverter<Instant, String> {
 
     @Override
-    public String convert(Date date) {
-       return Helpers.fromDate(date);
+    public String convert(Instant instant) {
+       return Helpers.fromInstant(instant);
     }
     
 }

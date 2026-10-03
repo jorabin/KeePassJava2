@@ -120,7 +120,7 @@ public class KdbxDatabaseLoadTest {
                 assertNotNull(group.getLastModificationTime(), group.getPath());
                 assertNotNull(group.getLastAccessTime(), group.getPath());
                 assertNotNull(group.getExpiryTime(), group.getPath());
-                assertFalse(group.getLastModificationTime().before(group.getCreationTime()), group.getPath());
+                assertFalse(group.getLastModificationTime().isBefore(group.getCreationTime()), group.getPath());
                 assertFalse(group.getExpires(), group.getPath());
             }
         });

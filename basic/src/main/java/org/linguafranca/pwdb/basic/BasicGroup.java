@@ -28,7 +28,6 @@ import org.linguafranca.pwdb.abstractdb.AbstractGroup;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -176,16 +175,16 @@ public class BasicGroup extends AbstractGroup {
     }
 
     @Override
-    public Date getLastAccessTime() {
+    public Instant getLastAccessTime() {
         if (accessTime == null) {
-            return fromInstant(this.creationTime);
+            return this.creationTime;
         }
-        return fromInstant(this.accessTime);
+        return this.accessTime;
     }
 
     @Override
-    public Date getCreationTime() {
-        return fromInstant(creationTime);
+    public Instant getCreationTime() {
+        return creationTime;
     }
 
     @Override
@@ -200,35 +199,29 @@ public class BasicGroup extends AbstractGroup {
     }
 
     @Override
-    public Date getExpiryTime() {
-        return fromInstant(this.expiryTime);
+    public Instant getExpiryTime() {
+        return this.expiryTime;
     }
 
     @Override
-    public void setExpiryTime(Date expiryTime) throws IllegalArgumentException {
+    public void setExpiryTime(Instant expiryTime) throws IllegalArgumentException {
         if (expiryTime == null) {
             throw new IllegalArgumentException("expiryTime may not be null");
         }
-        this.expiryTime = expiryTime.toInstant();
+        this.expiryTime = expiryTime;
         touch();
     }
 
     @Override
-    public Date getLastModificationTime() {
+    public Instant getLastModificationTime() {
         if (modifiedTime == null) {
-            return fromInstant(this.creationTime);
+            return this.creationTime;
         }
-        return fromInstant(this.modifiedTime);
+        return this.modifiedTime;
     }
 
     private void touch() {
         modifiedTime = Instant.now();
     }
 
-    private Date fromInstant(Instant instant) {
-        if (instant == null) {
-            return null;
-        }
-        return Date.from(instant);
-    }
 }

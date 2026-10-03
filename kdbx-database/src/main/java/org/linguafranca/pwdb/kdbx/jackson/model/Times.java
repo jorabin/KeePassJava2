@@ -17,10 +17,11 @@
 
 package org.linguafranca.pwdb.kdbx.jackson.model;
 
-import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
-import org.linguafranca.pwdb.kdbx.jackson.converter.DateToStringConverter;
-import org.linguafranca.pwdb.kdbx.jackson.converter.StringToDateConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.InstantToStringConverter;
+import org.linguafranca.pwdb.kdbx.jackson.converter.StringToInstantConverter;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -28,24 +29,24 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 public class Times {
     @JacksonXmlProperty(localName = "LastModificationTime")
-    @JsonDeserialize(converter = StringToDateConverter.class)
-    @JsonSerialize(converter = DateToStringConverter.class)
-    protected Date lastModificationTime;
+    @JsonDeserialize(converter = StringToInstantConverter.class)
+    @JsonSerialize(converter = InstantToStringConverter.class)
+    protected Instant lastModificationTime;
 
     @JacksonXmlProperty(localName = "CreationTime")
-    @JsonDeserialize(converter = StringToDateConverter.class)
-    @JsonSerialize(converter = DateToStringConverter.class)
-    protected Date creationTime;
+    @JsonDeserialize(converter = StringToInstantConverter.class)
+    @JsonSerialize(converter = InstantToStringConverter.class)
+    protected Instant creationTime;
 
     @JacksonXmlProperty(localName = "LastAccessTime")
-    @JsonDeserialize(converter = StringToDateConverter.class)
-    @JsonSerialize(converter = DateToStringConverter.class)
-    protected Date lastAccessTime;
+    @JsonDeserialize(converter = StringToInstantConverter.class)
+    @JsonSerialize(converter = InstantToStringConverter.class)
+    protected Instant lastAccessTime;
 
     @JacksonXmlProperty(localName = "ExpiryTime")
-    @JsonSerialize(converter = DateToStringConverter.class)
-    @JsonDeserialize(converter = StringToDateConverter.class)
-    protected Date expiryTime;
+    @JsonSerialize(converter = InstantToStringConverter.class)
+    @JsonDeserialize(converter = StringToInstantConverter.class)
+    protected Instant expiryTime;
 
     @JacksonXmlProperty(localName = "Expires")
     protected Boolean expires;
@@ -54,39 +55,39 @@ public class Times {
     protected int usageCount;
 
     @JacksonXmlProperty(localName = "LocationChanged")
-    @JsonDeserialize(converter = StringToDateConverter.class)
-    @JsonSerialize(converter = DateToStringConverter.class)
-    protected Date locationChanged;
+    @JsonDeserialize(converter = StringToInstantConverter.class)
+    @JsonSerialize(converter = InstantToStringConverter.class)
+    protected Instant locationChanged;
 
-    public Date getLastModificationTime() {
+    public Instant getLastModificationTime() {
         return lastModificationTime;
     }
 
-    public void setLastModificationTime(Date lastModificationTime) {
+    public void setLastModificationTime(Instant lastModificationTime) {
         this.lastModificationTime = lastModificationTime;
     }
 
-    public Date getCreationTime() {
+    public Instant getCreationTime() {
         return creationTime;
     }
 
-    public void setCreationTime(Date creationTime) {
+    public void setCreationTime(Instant creationTime) {
         this.creationTime = creationTime;
     }
 
-    public Date getLastAccessTime() {
+    public Instant getLastAccessTime() {
         return lastAccessTime;
     }
 
-    public void setLastAccessTime(Date lastAccessTime) {
+    public void setLastAccessTime(Instant lastAccessTime) {
         this.lastAccessTime = lastAccessTime;
     }
 
-    public Date getExpiryTime() {
+    public Instant getExpiryTime() {
         return expiryTime;
     }
 
-    public void setExpiryTime(Date expiryTime) {
+    public void setExpiryTime(Instant expiryTime) {
         this.expiryTime = expiryTime;
     }
 
@@ -106,24 +107,25 @@ public class Times {
         this.usageCount = usageCount;
     }
 
-    public Date getLocationChanged() {
+    public Instant getLocationChanged() {
         return locationChanged;
     }
 
-    public void setLocationChanged(Date locationChanged) {
+    public void setLocationChanged(Instant locationChanged) {
         this.locationChanged = locationChanged;
     }
 
     public Times() {
-        this(new Date(System.currentTimeMillis() / 1000 * 1000));
+        // KDBX times are whole seconds
+        this(Instant.now().truncatedTo(ChronoUnit.SECONDS));
     }
 
-    public Times(Date date) {
-        lastModificationTime = date;
-        lastAccessTime = date;
-        locationChanged = date;
-        creationTime = date;
-        expiryTime = date;
+    public Times(Instant instant) {
+        lastModificationTime = instant;
+        lastAccessTime = instant;
+        locationChanged = instant;
+        creationTime = instant;
+        expiryTime = instant;
         expires = false;
         usageCount = 0;
     }
