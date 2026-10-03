@@ -3,14 +3,13 @@
 ![Maven Central Version](https://img.shields.io/maven-central/v/org.linguafranca.pwdb/KeePassJava2.parent)
 [![javadoc](https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2/javadoc.svg)](https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2)
 
+![alt text](https://badgen.net/badge/Branch/v3-master/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.0/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-master)
+
+![alt text](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.1-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop)
+
 ![alt text](https://badgen.net/badge/Branch/master/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.6/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
 
 ![alt text](https://badgen.net/badge/Branch/develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/2.2.7-SNAPSHOT/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
-
-![alt text](https://badgen.net/badge/Branch/v3-master/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.0/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-master)
-
-![alt text](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github) ![alt text](https://badgen.net/badge/Build/3.0.0/blue?icon=github) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop)
-
 
 Java 11 API (from version 3.0.0 upwards) for password databases compatible with the renowned [KeePass](http://keepass.info) password
 safe for Windows. This is a "headless" implementation - if you want something with a UI
@@ -212,7 +211,7 @@ Aside from the JRE, at release 3.0.0, the API depends on:
 - [Jackson XML](https://github.com/FasterXML/jackson-dataformat-xml) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0))
 - [Woodstox](https://github.com/FasterXML/woodstox) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0))
 
-It also depends on SLF4J, logback and Junit 4 for tests.
+It also depends on SLF4J, logback and JUnit 5 for tests.
 
 ## Build from Source
 
@@ -288,7 +287,7 @@ Thanks to other contributors and raisers of issues.
 
 ##  License
 
-Copyright (c) 2025 Jo Rabin
+Copyright (c) 2026 Jo Rabin
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
