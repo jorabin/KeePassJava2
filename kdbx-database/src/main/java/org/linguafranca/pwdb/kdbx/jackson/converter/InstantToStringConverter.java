@@ -15,18 +15,19 @@
  *
  */
 
-package org.linguafranca.pwdb.kdbx.database;
+package org.linguafranca.pwdb.kdbx.jackson.converter;
 
-import org.linguafranca.pwdb.Database;
-import org.linguafranca.pwdb.format.KdbxCredentials;
-import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
-import org.linguafranca.pwdb.test.*;
+import java.time.Instant;
 
-public abstract class KdbxTestBase
-        extends
-            DatabaseTestBase {
+import org.linguafranca.pwdb.format.Helpers;
 
-    KdbxTestBase() {
-        super(KdbxDatabase::new, KdbxDatabase::read, Database::write, KdbxCredentials::new);
+import com.fasterxml.jackson.databind.util.StdConverter;
+
+public class InstantToStringConverter extends StdConverter<Instant, String> {
+
+    @Override
+    public String convert(Instant instant) {
+       return Helpers.fromInstant(instant);
     }
+    
 }

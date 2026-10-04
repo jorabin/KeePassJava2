@@ -20,31 +20,32 @@ import org.junit.jupiter.api.BeforeAll;
 import org.linguafranca.pwdb.Credentials;
 import org.linguafranca.pwdb.Database;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Objects;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.linguafranca.util.TestUtil;
 
 public class DatabaseTestBase {
 
+    /**
+     * Reads a database, e.g. {@code KdbxDatabase::read}, leaving the stream open
+     */
     @FunctionalInterface
-    public interface TriConsumer<A,B,C> {
+    public interface Reader {
+        Database read(Credentials credentials, InputStream inputStream) throws IOException;
+    }
 
-        void accept(A a, B b, C c);
-
-        default TriConsumer<A, B, C> andThen(TriConsumer<? super A, ? super B, ? super C> after) {
-            Objects.requireNonNull(after);
-
-            return (l, r,c) -> {
-                accept(l, r, c);
-                after.accept(l, r, c);
-            };
-        }
+    /**
+     * Writes a database, e.g. {@code Database::write}, leaving the stream open
+     */
+    @FunctionalInterface
+    public interface Writer {
+        void write(Database database, Credentials credentials, OutputStream outputStream) throws IOException;
     }
 
     public static String OUTPUT_DIRECTORY_PATH = TestUtil.TEST_OUTPUT_DIR;
@@ -57,17 +58,17 @@ public class DatabaseTestBase {
     protected Database database;
 
     Supplier<Database> creator;
-    BiFunction<Credentials, InputStream, Database> loader;
-    TriConsumer<Database, Credentials, OutputStream> saver;
+    Reader reader;
+    Writer writer;
     Function<byte[], Credentials> credentials;
 
     public DatabaseTestBase(Supplier<Database> creator,
-                            BiFunction<Credentials, InputStream, Database> loader,
-                            TriConsumer<Database, Credentials, OutputStream> saver,
+                            Reader reader,
+                            Writer writer,
                             Function<byte[], Credentials> credentials) {
         this.creator = creator;
-        this.loader = loader;
-        this.saver = saver;
+        this.reader = reader;
+        this.writer = writer;
         this.credentials = credentials;
     }
     /**
@@ -91,16 +92,37 @@ public class DatabaseTestBase {
         return database;
     }
 
+    /**
+     * Read a database from a resource, closing the resource stream
+     */
     public Database loadDatabase(byte[] credentials, String resourceName) {
-        return loader.apply(getCredentials(credentials), getClass().getClassLoader().getResourceAsStream(resourceName));
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resourceName)) {
+            return loadDatabase(getCredentials(credentials), inputStream);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
+    /**
+     * Read a database, leaving the stream open
+     */
     public Database loadDatabase(Credentials credentials, InputStream inputStream) {
-        return loader.apply(credentials, inputStream);
+        try {
+            return reader.read(credentials, inputStream);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
+    /**
+     * Write a database, leaving the stream open
+     */
     public void saveDatabase(Database database, Credentials credentials, OutputStream outputStream){
-        saver.accept(database, credentials, outputStream);
+        try {
+            writer.write(database, credentials, outputStream);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public Credentials getCredentials(byte[] credentials){

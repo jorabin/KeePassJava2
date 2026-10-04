@@ -2,7 +2,19 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
-## [3.0.1] Unreleased
+## [3.1.0] Unreleased
+
+### Changed
+
+- **Breaking:** requires Java 17 (3.0.0 required Java 11)
+- **Breaking:** `Entry` and `Group` times are `java.time.Instant` instead of `java.util.Date`; to upgrade, convert where a `Date` is needed, e.g. `Date.from(entry.getCreationTime())` and `entry.setExpiryTime(date.toInstant())`. `Helpers.toDate`/`fromDate` are now `toInstant`/`fromInstant`, and the KDBX model uses `Instant` throughout
+- [Issue 109] `write` and `read` leave the caller's stream open: `Database.write`, `KdbxDatabase.read`, `KdbxDatabase.readXml`, `KdbDatabase.read`, and `write`/`read` on `StreamFormat`, `SerializableDatabase` and `BasicDatabaseSerializer`. Existing implementations of those interfaces get them as default methods
+- [Issue 109] Deprecated `save` and `load`, which close the stream they are given, and the `saveNx`/`loadNx` methods. `readXml` throws `IOException` where `loadXml` threw `Exception`
+- [Issue 109] `Util.listDatabase` no longer closes the output stream
+- [Issue 109] Examples, tests and readme use `read`/`write` with try-with-resources
+- Replace Jackson's deprecated `setSerializationInclusion` with `setDefaultPropertyInclusion`, which does the same
+- Implementations of the deprecated `Entry.getPassword`/`setPassword` are marked deprecated too, the KDB reader no longer uses them, and they are tested
+- The readme has upgrade notes, from 2.x to 3.0 (as in the 3.0.0 release note) and from 3.0 to 3.1
 
 ## [3.0.0] 2026-10-03
 

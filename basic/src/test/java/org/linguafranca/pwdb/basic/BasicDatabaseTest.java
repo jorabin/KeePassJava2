@@ -32,9 +32,9 @@ public class BasicDatabaseTest
     BasicDatabaseTest() {
         super(BasicDatabase::new,
                 (credentials, inputStream) ->
-                        new BasicDatabaseSerializer.Xml().loadNx(inputStream),
+                        new BasicDatabaseSerializer.Xml().read(inputStream),
                 (database, credentials, outputStream) ->
-                        new BasicDatabaseSerializer.Xml().saveNx((BasicDatabase) database, outputStream),
+                        new BasicDatabaseSerializer.Xml().write((BasicDatabase) database, outputStream),
                 (credentials) -> null);
     }
 }

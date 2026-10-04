@@ -37,9 +37,9 @@ public class BasicDatabaseKdbxTest         extends
     public BasicDatabaseKdbxTest(){
         super(BasicDatabase::new,
                 (credentials, inputStream) ->
-                        new BasicDatabaseSerializer.Xml().loadNx(inputStream),
+                        new BasicDatabaseSerializer.Xml().read(inputStream),
                 (database, credentials, outputStream) ->
-                        new BasicDatabaseSerializer.Xml().saveNx((BasicDatabase) database, outputStream),
+                        new BasicDatabaseSerializer.Xml().write((BasicDatabase) database, outputStream),
                 (credentials) -> null);
     }
 
@@ -51,13 +51,17 @@ public class BasicDatabaseKdbxTest         extends
                 .addProperty(PASSWORD,"password")
                 .addProperty(URL,"http://example.com")
                 .addProperty(USER_NAME,"user");
-        db.save(new KdbxStreamFormat(), new KdbxCredentials("123".getBytes()), new FileOutputStream(Path.of(OUTPUT_DIRECTORY_PATH, "test.kdbx").toFile()));
+        try (OutputStream outputStream = new FileOutputStream(Path.of(OUTPUT_DIRECTORY_PATH, "test.kdbx").toFile())) {
+            db.write(new KdbxStreamFormat(), new KdbxCredentials("123".getBytes()), outputStream);
+        }
 
         KdbxHeader header = new KdbxHeader();
-        InputStream unencryptedInputStream = KdbxSerializer.createUnencryptedInputStream(new KdbxCredentials("123".getBytes()),
-                header, new FileInputStream(Path.of(OUTPUT_DIRECTORY_PATH, "test.kdbx").toFile()));
-        BasicDatabaseSerializer.Xml xml = new BasicDatabaseSerializer.Xml(header.getInnerStreamEncryptor());
-        Database db2 = xml.load(unencryptedInputStream);
+        Database db2;
+        try (InputStream unencryptedInputStream = KdbxSerializer.createUnencryptedInputStream(new KdbxCredentials("123".getBytes()),
+                header, new FileInputStream(Path.of(OUTPUT_DIRECTORY_PATH, "test.kdbx").toFile()))) {
+            BasicDatabaseSerializer.Xml xml = new BasicDatabaseSerializer.Xml(header.getInnerStreamEncryptor());
+            db2 = xml.read(unencryptedInputStream);
+        }
         assertEquals(db.getName(), db2.getName());
         assertEquals(db2.getRootGroup().findEntries(e -> true, true).size(), db.getRootGroup().findEntries(e -> true, true).size());
         assertEquals("password", db2.getRootGroup().findEntries(e -> e.getTitle().equals("test"), true).get(0).getPropertyValue(PASSWORD).getValueAsString());

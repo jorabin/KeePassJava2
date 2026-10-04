@@ -17,6 +17,8 @@
 
 package org.linguafranca.pwdb;
 
+import org.linguafranca.pwdb.io.NonClosingInputStream;
+import org.linguafranca.pwdb.io.NonClosingOutputStream;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 
 import java.io.IOException;
@@ -35,18 +37,32 @@ public interface StreamFormat <C extends StreamConfiguration>{
     class None implements StreamFormat<StreamConfiguration.None> {
 
         @Override
-        public void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream inputStream) throws IOException {
+        public void read(SerializableDatabase serializableDatabase, Credentials credentials, InputStream inputStream) throws IOException {
             serializableDatabase.setEncryption(new StreamEncryptor.None());
-            serializableDatabase.load(inputStream);
-            inputStream.close();
+            serializableDatabase.read(inputStream);
         }
 
         @Override
-        public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream outputStream) throws IOException {
+        public void write(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream outputStream) throws IOException {
             serializableDatabase.setEncryption(new StreamEncryptor.None());
-            serializableDatabase.save(outputStream);
+            serializableDatabase.write(outputStream);
             outputStream.flush();
-            outputStream.close();
+        }
+
+        @Override
+        @Deprecated
+        public void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream inputStream) throws IOException {
+            try (inputStream) {
+                read(serializableDatabase, credentials, inputStream);
+            }
+        }
+
+        @Override
+        @Deprecated
+        public void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream outputStream) throws IOException {
+            try (outputStream) {
+                write(serializableDatabase, credentials, outputStream);
+            }
         }
 
         @Override
@@ -60,8 +76,44 @@ public interface StreamFormat <C extends StreamConfiguration>{
         }
     }
 
+    /**
+     * Read a database from a stream in this format, leaving the stream open
+     *
+     * @param serializableDatabase the database to read into
+     * @param credentials credentials to use
+     * @param encryptedInputStream where to read from - the caller closes it
+     * @since 3.1.0
+     */
+    default void read(SerializableDatabase serializableDatabase, Credentials credentials, InputStream encryptedInputStream) throws IOException {
+        load(serializableDatabase, credentials, new NonClosingInputStream(encryptedInputStream));
+    }
+
+    /**
+     * Write a database to a stream in this format, leaving the stream open
+     *
+     * @param serializableDatabase the database to write
+     * @param credentials credentials to use
+     * @param encryptedOutputStream where to write to - the caller closes it
+     * @since 3.1.0
+     */
+    default void write(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream encryptedOutputStream) throws IOException {
+        save(serializableDatabase, credentials, new NonClosingOutputStream(encryptedOutputStream));
+    }
+
+    /**
+     * Load a database from a stream in this format and close the stream
+     *
+     * @deprecated closes a stream the caller opened; use {@link #read(SerializableDatabase, Credentials, InputStream)} (issue #109)
+     */
+    @Deprecated
     void load(SerializableDatabase serializableDatabase, Credentials credentials, InputStream encryptedInputStream) throws IOException;
 
+    /**
+     * Save a database to a stream in this format and close the stream
+     *
+     * @deprecated closes a stream the caller opened; use {@link #write(SerializableDatabase, Credentials, OutputStream)} (issue #109)
+     */
+    @Deprecated
     void save(SerializableDatabase serializableDatabase, Credentials credentials, OutputStream encryptedOutputStream) throws IOException;
 
     C getStreamConfiguration();

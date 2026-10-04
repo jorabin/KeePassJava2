@@ -44,8 +44,10 @@ public class KdbxDatabaseLoadTest {
 
     @Test
     public void loadXml() throws Exception {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("ExampleDatabase.xml");
-        KdbxDatabase database = KdbxDatabase.loadXml(inputStream);
+        KdbxDatabase database;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("ExampleDatabase.xml")) {
+            database = KdbxDatabase.readXml(inputStream);
+        }
         database.visit(new Visitor.Print(printStream));
         PropertyValue password = database.findEntries("Sample Entry #2").get(0).getPropertyValue(Entry.STANDARD_PROPERTY_NAME_PASSWORD);
         assertTrue(password.isProtected());
@@ -54,19 +56,23 @@ public class KdbxDatabaseLoadTest {
 
     @Test
     public void loadXmlWithEncryptedProtectedValues() throws Exception {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("xml/V4-AES-AES.xml");
-        KdbxDatabase database = KdbxDatabase.loadXml(inputStream);
+        KdbxDatabase database;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("xml/V4-AES-AES.xml")) {
+            database = KdbxDatabase.readXml(inputStream);
+        }
         database.visit(new Visitor.Print(printStream));
     }
 
     @Test
     public void loadStreamFormatNone() throws Exception {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx");
-        KdbxDatabase database = KdbxDatabase.load(new KdbxCredentials("123".getBytes()), inputStream);
+        KdbxDatabase database;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx")) {
+            database = KdbxDatabase.read(new KdbxCredentials("123".getBytes()), inputStream);
+        }
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        database.save(new StreamFormat.None(), new Credentials.None(), outputStream);
+        database.write(new StreamFormat.None(), new Credentials.None(), outputStream);
 
-        KdbxDatabase xmlDatabase = KdbxDatabase.load(new StreamFormat.None(), new Credentials.None(),
+        KdbxDatabase xmlDatabase = KdbxDatabase.read(new StreamFormat.None(), new Credentials.None(),
                 new ByteArrayInputStream(outputStream.toByteArray()));
         PropertyValue password = xmlDatabase.findEntries("Sample Entry #2").get(0).getPropertyValue(Entry.STANDARD_PROPERTY_NAME_PASSWORD);
         assertTrue(password.isProtected());
@@ -75,15 +81,19 @@ public class KdbxDatabaseLoadTest {
 
     @Test
     public void loadKdbx() throws Exception {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx");
-        KdbxDatabase database = KdbxDatabase.load(new KdbxCredentials("123".getBytes()), inputStream);
+        KdbxDatabase database;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdbx")) {
+            database = KdbxDatabase.read(new KdbxCredentials("123".getBytes()), inputStream);
+        }
         database.visit(new Visitor.Print(printStream));
     }
 
     @Test
     public void loadKdbxV4() throws Exception {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx");
-        KdbxDatabase database = KdbxDatabase.load(new KdbxCredentials("123".getBytes()), inputStream);
+        KdbxDatabase database;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx")) {
+            database = KdbxDatabase.read(new KdbxCredentials("123".getBytes()), inputStream);
+        }
         database.visit(new Visitor.Print(printStream));
         // test what happens to dates in V4
         database.visit(new Visitor.Default(){
@@ -99,8 +109,10 @@ public class KdbxDatabaseLoadTest {
      */
     @Test
     public void loadGroupTimes() throws Exception {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx");
-        KdbxDatabase database = KdbxDatabase.load(new KdbxCredentials("123".getBytes()), inputStream);
+        KdbxDatabase database;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("V4-AES-Argon2.kdbx")) {
+            database = KdbxDatabase.read(new KdbxCredentials("123".getBytes()), inputStream);
+        }
         database.visit(new Visitor.Default() {
             @Override
             public void startVisit(Group group) {
@@ -108,7 +120,7 @@ public class KdbxDatabaseLoadTest {
                 assertNotNull(group.getLastModificationTime(), group.getPath());
                 assertNotNull(group.getLastAccessTime(), group.getPath());
                 assertNotNull(group.getExpiryTime(), group.getPath());
-                assertFalse(group.getLastModificationTime().before(group.getCreationTime()), group.getPath());
+                assertFalse(group.getLastModificationTime().isBefore(group.getCreationTime()), group.getPath());
                 assertFalse(group.getExpires(), group.getPath());
             }
         });
@@ -122,8 +134,10 @@ public class KdbxDatabaseLoadTest {
 
     @Test
     public void dbWithDeleted() throws Exception {
-         InputStream inputStream = getClass().getClassLoader().getResourceAsStream("testDeleted.kdbx");
-         KdbxDatabase database = KdbxDatabase.load(new KdbxCredentials("123".getBytes()), inputStream);
+         KdbxDatabase database;
+         try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("testDeleted.kdbx")) {
+             database = KdbxDatabase.read(new KdbxCredentials("123".getBytes()), inputStream);
+         }
          database.visit(new Visitor.Print(printStream));
      }
 

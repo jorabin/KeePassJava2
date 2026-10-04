@@ -24,7 +24,7 @@ import org.linguafranca.pwdb.Icon;
 import org.linguafranca.pwdb.abstractdb.AbstractEntry;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,11 +43,11 @@ public class KdbEntry extends AbstractEntry {
     private Icon icon = new KdbIcon(0);
     private String username = "";
     private String password = "";
-    private Date creationTime = new Date((System.currentTimeMillis())); // to the next lower second
-    private Date lastModificationTime = creationTime;
-    private Date lastAccessTime = creationTime;
+    private Instant creationTime = Instant.now();
+    private Instant lastModificationTime = creationTime;
+    private Instant lastAccessTime = creationTime;
     private boolean expires = false;
-    private Date expiryTime = new Date(Long.MAX_VALUE);
+    private Instant expiryTime = Instant.ofEpochMilli(Long.MAX_VALUE);
     private String binaryDescription = "";
     private byte[] binaryData = new byte[0];
 
@@ -55,7 +55,7 @@ public class KdbEntry extends AbstractEntry {
     public String getProperty(String name) {
         switch (name) {
             case STANDARD_PROPERTY_NAME_USER_NAME: return getUsername();
-            case STANDARD_PROPERTY_NAME_PASSWORD: return getPassword();
+            case STANDARD_PROPERTY_NAME_PASSWORD: return password;
             case STANDARD_PROPERTY_NAME_URL: return getUrl();
             case STANDARD_PROPERTY_NAME_TITLE: return getTitle();
             case STANDARD_PROPERTY_NAME_NOTES: return getNotes();
@@ -67,7 +67,7 @@ public class KdbEntry extends AbstractEntry {
     public Entry setProperty(String name, String value) {
         switch (name) {
             case STANDARD_PROPERTY_NAME_USER_NAME: setUsername(value); break;
-            case STANDARD_PROPERTY_NAME_PASSWORD: setPassword(value); break;
+            case STANDARD_PROPERTY_NAME_PASSWORD: password = value; break;
             case STANDARD_PROPERTY_NAME_URL: setUrl(value); break;
             case STANDARD_PROPERTY_NAME_TITLE: setTitle(value); break;
             case STANDARD_PROPERTY_NAME_NOTES: setNotes(value); break;
@@ -120,12 +120,20 @@ public class KdbEntry extends AbstractEntry {
         this.username = username;
     }
 
+    /**
+     * @deprecated use {@link #getProperty(String)} with {@link #STANDARD_PROPERTY_NAME_PASSWORD}
+     */
     @Override
+    @Deprecated
     public String getPassword() {
         return password;
     }
 
+    /**
+     * @deprecated use {@link #setProperty(String, String)} with {@link #STANDARD_PROPERTY_NAME_PASSWORD}
+     */
     @Override
+    @Deprecated
     public void setPassword(String pass) {
         this.password = pass;
     }
@@ -170,36 +178,36 @@ public class KdbEntry extends AbstractEntry {
         this.icon = icon;
     }
     
-    void setCreationTime(Date creationTime) {
+    void setCreationTime(Instant creationTime) {
         this.creationTime = creationTime;
     }
 
-    public Date getCreationTime() {
+    public Instant getCreationTime() {
         return creationTime;
     }
 
-    void setLastModificationTime(Date lastModificationTime) {
+    void setLastModificationTime(Instant lastModificationTime) {
         this.lastModificationTime = lastModificationTime;
     }
 
-    public Date getLastModificationTime() {
+    public Instant getLastModificationTime() {
         return lastModificationTime;
     }
 
-    void setLastAccessTime(Date lastAccessTime) {
+    void setLastAccessTime(Instant lastAccessTime) {
         this.lastAccessTime = lastAccessTime;
     }
 
-    public Date getLastAccessTime() {
+    public Instant getLastAccessTime() {
         return lastAccessTime;
     }
 
-    public void setExpiryTime(Date expiryTime) {
+    public void setExpiryTime(Instant expiryTime) {
         if (expiryTime == null) throw new IllegalArgumentException("expiryTime may not be null");
         this.expiryTime = expiryTime;
     }
 
-    public Date getExpiryTime() {
+    public Instant getExpiryTime() {
         return expiryTime;
     }
 
@@ -256,6 +264,6 @@ public class KdbEntry extends AbstractEntry {
 
     @Override
     protected void touch() {
-        lastModificationTime = new Date();
+        lastModificationTime = Instant.now();
     }
 }

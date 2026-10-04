@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025. Jo Rabin
+ * Copyright (c) 2026. Jo Rabin
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,19 +15,7 @@
  *
  */
 
-package org.linguafranca.pwdb.kdbx.jackson.converter;
-
-import java.util.Date;
-
-import org.linguafranca.pwdb.format.Helpers;
-
-import com.fasterxml.jackson.databind.util.StdConverter;
-
-public class DateToStringConverter extends StdConverter<Date, String> {
-
-    @Override
-    public String convert(Date date) {
-       return Helpers.fromDate(date);
-    }
-    
-}
+/**
+ * Stream helpers, e.g. for writing and reading databases without closing the caller's stream.
+ */
+package org.linguafranca.pwdb.io;

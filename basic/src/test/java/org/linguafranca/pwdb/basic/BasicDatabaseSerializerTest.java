@@ -96,8 +96,13 @@ class BasicDatabaseSerializerTest {
 
     @Test
     void saveAndLoad() throws IOException {
-        new BasicDatabaseSerializer.Xml(new StreamEncryptor.Salsa20(new byte[0])).save(database, new FileOutputStream(TEST_OUTPUT_DIR + "test.xml"));
-        BasicDatabase loadedDatabase = new BasicDatabaseSerializer.Xml(new StreamEncryptor.Salsa20(new byte[0])).load(new FileInputStream(TEST_OUTPUT_DIR + "test.xml"));
+        try (OutputStream outputStream = new FileOutputStream(TEST_OUTPUT_DIR + "test.xml")) {
+            new BasicDatabaseSerializer.Xml(new StreamEncryptor.Salsa20(new byte[0])).write(database, outputStream);
+        }
+        BasicDatabase loadedDatabase;
+        try (InputStream inputStream = new FileInputStream(TEST_OUTPUT_DIR + "test.xml")) {
+            loadedDatabase = new BasicDatabaseSerializer.Xml(new StreamEncryptor.Salsa20(new byte[0])).read(inputStream);
+        }
         loadedDatabase.visit(visitor);
         out.println(loadedDatabase.getRootGroup().getDatabase().getName());
     }

@@ -40,7 +40,6 @@ import org.linguafranca.pwdb.Icon;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -123,6 +122,21 @@ public interface GroupsAndEntriesTest {
         assertEquals(1, getDatabase().findEntries("entry1").size());
     }
 
+    /**
+     * The deprecated password accessors still work, and agree with the password property
+     */
+    @Test
+    @SuppressWarnings("deprecation")
+    default void testDeprecatedPasswordAccessors() {
+        Entry e1 = getDatabase().newEntry("Entry 1");
+        e1.setPassword("first password");
+        assertEquals("first password", e1.getPassword());
+        assertEquals("first password", e1.getProperty(PASSWORD));
+
+        e1.setProperty(PASSWORD, "second password");
+        assertEquals("second password", e1.getPassword());
+    }
+
     @Test
     default void testSetFields () {
         Entry e1 = getDatabase().newEntry("Entry 1");
@@ -179,42 +193,42 @@ public interface GroupsAndEntriesTest {
 
     @Test
     default void testTimes() {
-        long beforeSecond = Instant.now().toEpochMilli()/1000;
+        long beforeSecond = Instant.now().getEpochSecond();
         Entry entry = getDatabase().newEntry();
-        long afterSecond = Instant.now().toEpochMilli()/1000;
-        long createdSecond = entry.getCreationTime().getTime()/1000;
+        long afterSecond = Instant.now().getEpochSecond();
+        long createdSecond = entry.getCreationTime().getEpochSecond();
 
         assertTrue(createdSecond >= beforeSecond && createdSecond <= afterSecond);
         assertFalse(entry.getExpires());
-        assertTrue(entry.getLastAccessTime().getTime()/1000 <= createdSecond);
-        assertTrue(entry.getLastModificationTime().getTime()/1000 <= createdSecond);
+        assertTrue(entry.getLastAccessTime().getEpochSecond() <= createdSecond);
+        assertTrue(entry.getLastModificationTime().getEpochSecond() <= createdSecond);
 
         entry.setExpires(true);
-        entry.setExpiryTime(new Date(createdSecond*1000));
+        entry.setExpiryTime(Instant.ofEpochSecond(createdSecond));
 
         assertTrue(entry.getExpires());
-        assertEquals(createdSecond, entry.getExpiryTime().getTime()/1000);
+        assertEquals(createdSecond, entry.getExpiryTime().getEpochSecond());
 
 
     }
 
     @Test
     default void testGroupTimes() {
-        long beforeSecond = Instant.now().toEpochMilli()/1000;
+        long beforeSecond = Instant.now().getEpochSecond();
         Group group = getDatabase().newGroup();
-        long afterSecond = Instant.now().toEpochMilli()/1000;
-        long createdSecond = group.getCreationTime().getTime()/1000;
+        long afterSecond = Instant.now().getEpochSecond();
+        long createdSecond = group.getCreationTime().getEpochSecond();
 
         assertTrue(createdSecond >= beforeSecond && createdSecond <= afterSecond);
         assertFalse(group.getExpires());
-        assertTrue(group.getLastAccessTime().getTime()/1000 <= createdSecond);
-        assertTrue(group.getLastModificationTime().getTime()/1000 <= createdSecond);
+        assertTrue(group.getLastAccessTime().getEpochSecond() <= createdSecond);
+        assertTrue(group.getLastModificationTime().getEpochSecond() <= createdSecond);
 
         group.setExpires(true);
-        group.setExpiryTime(new Date(createdSecond*1000));
+        group.setExpiryTime(Instant.ofEpochSecond(createdSecond));
 
         assertTrue(group.getExpires());
-        assertEquals(createdSecond, group.getExpiryTime().getTime()/1000);
+        assertEquals(createdSecond, group.getExpiryTime().getEpochSecond());
         assertThrows(IllegalArgumentException.class, () -> group.setExpiryTime(null));
     }
 

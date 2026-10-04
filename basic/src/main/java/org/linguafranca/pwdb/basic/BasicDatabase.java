@@ -22,6 +22,7 @@ import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.format.KdbxHeader;
 import org.linguafranca.pwdb.format.KdbxSerializer;
 import org.linguafranca.pwdb.format.KdbxStreamFormat;
+import org.linguafranca.pwdb.io.NonClosingOutputStream;
 import org.linguafranca.pwdb.protect.ProtectedDatabase;
 
 import java.io.IOException;
@@ -99,22 +100,44 @@ public class BasicDatabase extends ProtectedDatabase {
     }
 
     @Override
-    public void save(Credentials credentials, OutputStream outputStream) throws IOException {
+    public void write(Credentials credentials, OutputStream outputStream) throws IOException {
         if (Objects.isNull(streamFormat)) {
             streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
         }
-        save(streamFormat, credentials, outputStream);
+        write(streamFormat, credentials, outputStream);
     }
 
     @Override
+    public <C extends StreamConfiguration> void write(StreamFormat<C> streamFormat,
+                                                      Credentials credentials,
+                                                      OutputStream outputStream) throws IOException {
+        KdbxStreamFormat kdbxStreamFormat = (KdbxStreamFormat) streamFormat;
+        KdbxHeader header = kdbxStreamFormat.getStreamConfiguration();
+        // the encryption chain must be closed to finish, and closing it closes the stream under it,
+        // so shield the caller's stream
+        try (OutputStream encryptedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, header,
+                new NonClosingOutputStream(outputStream))) {
+            BasicDatabaseSerializer bds = new BasicDatabaseSerializer.Xml(header.getInnerStreamEncryptor());
+            bds.write(this, encryptedOutputStream);
+        }
+    }
+
+    @Override
+    @Deprecated
+    public void save(Credentials credentials, OutputStream outputStream) throws IOException {
+        try (outputStream) {
+            write(credentials, outputStream);
+        }
+    }
+
+    @Override
+    @Deprecated
     public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat,
                                                      Credentials credentials,
                                                      OutputStream outputStream) throws IOException {
-        KdbxStreamFormat kdbxStreamFormat = (KdbxStreamFormat) streamFormat;
-        KdbxHeader header = kdbxStreamFormat.getStreamConfiguration();
-        OutputStream encryptedOutputStream = KdbxSerializer.createEncryptedOutputStream(credentials, header, outputStream);
-        BasicDatabaseSerializer bds = new BasicDatabaseSerializer.Xml(header.getInnerStreamEncryptor());
-        bds.save(this, encryptedOutputStream);
+        try (outputStream) {
+            write(streamFormat, credentials, outputStream);
+        }
     }
 
     @Override

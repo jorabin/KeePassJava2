@@ -44,14 +44,16 @@ public class Issue27Test {
      */
     @Test
     public void testIssue27() throws IOException {
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx");
         KdbxCredentials creds = new KdbxCredentials("passwordless".getBytes());
-        KdbxDatabase db = KdbxDatabase.load(creds, is);
+        KdbxDatabase db;
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("issue-27/bogus-timestamp2.kdbx")) {
+            db = KdbxDatabase.read(creds, is);
+        }
         List<? extends Entry> entries = db.findEntries("testtitle");
 
         for (Entry entry: entries) {
-            printStream.println(Helpers.fromDateV3(entry.getCreationTime()));
-            assertEquals("2021-01-11T09:18:56Z", Helpers.fromDateV3(entry.getCreationTime()));
+            printStream.println(Helpers.fromInstantV3(entry.getCreationTime()));
+            assertEquals("2021-01-11T09:18:56Z", Helpers.fromInstantV3(entry.getCreationTime()));
         }
     }
 
@@ -60,14 +62,16 @@ public class Issue27Test {
      */
     @Test
     public void testV4Date() throws IOException {
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream("V4-AES-AES.kdbx");
         KdbxCredentials creds = new KdbxCredentials("123".getBytes());
-        KdbxDatabase db = KdbxDatabase.load(creds, is);
+        KdbxDatabase db;
+        try (InputStream is = this.getClass().getClassLoader().getResourceAsStream("V4-AES-AES.kdbx")) {
+            db = KdbxDatabase.read(creds, is);
+        }
         List<? extends Entry> entries = db.findEntries("Sample Entry #2 - Copy");
 
         for (Entry entry: entries) {
-            printStream.println(Helpers.fromDate(entry.getCreationTime()));
-            assertEquals("2018-01-26T13:20:58Z", Helpers.fromDateV3(entry.getCreationTime()));
+            printStream.println(Helpers.fromInstant(entry.getCreationTime()));
+            assertEquals("2018-01-26T13:20:58Z", Helpers.fromInstantV3(entry.getCreationTime()));
         }
     }
 

@@ -5,13 +5,13 @@
 
 [![Branch v3-master](https://badgen.net/badge/Branch/v3-master/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/v3-master) [![Version 3.0.0](https://badgen.net/badge/Build/3.0.0/blue?icon=github)](https://github.com/jorabin/KeePassJava2/releases/tag/KeePassJava2-3.0.0) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-master)
 
-[![Branch v3-develop](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/v3-develop) [![Version 3.0.1-SNAPSHOT](https://badgen.net/badge/Build/3.0.1-SNAPSHOT/blue?icon=github)](#snapshot) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop)
+[![Branch v3-develop](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/v3-develop) [![Version 3.1.0-SNAPSHOT](https://badgen.net/badge/Build/3.1.0-SNAPSHOT/blue?icon=github)](#snapshot) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop)
 
 [![Branch master](https://badgen.net/badge/Branch/master/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/master) [![Version 2.2.6](https://badgen.net/badge/Build/2.2.6/blue?icon=github)](https://github.com/jorabin/KeePassJava2/releases/tag/KeePassJava2-2.2.6) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
 
 [![Branch develop](https://badgen.net/badge/Branch/develop/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/develop) [![Version 2.2.7-SNAPSHOT](https://badgen.net/badge/Build/2.2.7-SNAPSHOT/blue?icon=github)](#snapshot) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/develop)
 
-Java 11 API (from version 3.0.0 upwards) for password databases compatible with the renowned [KeePass](http://keepass.info) password
+Java 17 API (from version 3.1.0 upwards) for password databases compatible with the renowned [KeePass](http://keepass.info) password
 safe for Windows. This is a "headless" implementation - if you want something with a UI
 then [KeePassXC](https://keepassxc.org/) and [KeePassDX](https://www.keepassdx.com/) could
 be just the things for you.
@@ -44,14 +44,15 @@ It is licensed under the Apache 2 License and is currently usable.
 ## Current Status
 
 The current code is version 3.0.0 - released to Maven October 2026. This is on branch `v3-master`,
-with development on branch `v3-develop`. See [Build from Source](#build-from-source)
-Upgrade to V3 requires minor changes to V2 code.
+with development on branch `v3-develop`. See [Build from Source](#build-from-source).
+Upgrade to V3 requires minor changes to V2 code, see [Upgrading from 2.x to 3.0](#upgrading-from-2x-to-30)
+and [Upgrading from 3.0 to 3.1](#upgrading-from-30-to-31).
 
 Version 2 is still maintained for now, with bug and security fixes. Its current release is 2.2.6,
 on branch `master`, with development on branch `develop`.
 
 Key updates relative to 2.x
-- Java 11 
+- Java 11 (Java 17 from 3.1.0)
 - Pluggable (protected) data storage model
 - File format version 4 support - with Argon2
 - Removal of SimpleXML, JAXB and DOM database implementations
@@ -61,6 +62,45 @@ Key updates relative to 2.x
 - Updated dependencies
 
 See the [changelog](CHANGELOG.md) for more details.
+
+### Upgrading from 2.x to 3.0
+
+Upgrading from 2.x needs some, mostly minor, changes to your code and build:
+
+- **Java 11** is required (Java 17 from 3.1).
+- **One KDBX implementation.** The Jackson implementation is now *the* KDBX database, `KdbxDatabase` (was `JacksonDatabase`). The Simple, JAXB and DOM implementations are removed.
+- **No generics on the database classes.** `Database`, `Group`, `Entry` and so on are no longer generic, so declarations such as `Database<?,?,?,?>` become plain `Database`.
+- **Renamed classes,** for example `KdbxCreds` is now `KdbxCredentials`.
+- **New artifacts** (group `org.linguafranca.pwdb`):
+
+  | 2.x | 3.x |
+  |---|---|
+  | `KeePassJava2-jackson` | `KeePassJava2.kdbx.database` |
+  | `KeePassJava2-kdbx` | `KeePassJava2.kdbx.io` |
+  | `KeePassJava2-kdb` | `KeePassJava2.kdb` |
+  | `database` | `database` |
+  | `KeePassJava2` (all) | `KeePassJava2` (KDBX and KDB) |
+  | `KeePassJava2-simple`, `-jaxb`, `-dom` | removed |
+
+- **New Java module names** ([issue 93](https://github.com/jorabin/KeePassJava2/issues/93)), deliberately different from 2.x:
+  `org.linguafranca.pwdb.database`, `org.linguafranca.pwdb.kdb`, `org.linguafranca.pwdb.kdbx.io`,
+  `org.linguafranca.pwdb.kdbx.database` and `org.linguafranca.pwdb.all`. Update your `requires` clauses.
+
+See the [Quick Start](#quick-start) for a worked example in the version 3 API.
+
+### Upgrading from 3.0 to 3.1
+
+- Java 17 or later is required.
+- Times on `Entry` and `Group` are `java.time.Instant` rather than `java.util.Date`. Where code needs a `Date`, convert at the call:
+
+      Date created = Date.from(entry.getCreationTime());
+      entry.setExpiryTime(expiryDate.toInstant());
+
+- `load` and `save` are deprecated in favour of `read` and `write`, which leave the stream open, so close it yourself:
+
+      try (InputStream inputStream = Files.newInputStream(path)) {
+          database = KdbxDatabase.read(credentials, inputStream);
+      }
 
 ## Maven Coordinates
 
@@ -83,11 +123,11 @@ For the last 2.x release, see branch [`master`](https://github.com/jorabin/KeePa
 
 ### Snapshot
 
-Snapshot builds are published to the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. The next bug-fix release will be 3.0.1-SNAPSHOT (on branch `v3-develop`), last published October 2026:
+Snapshot builds are published to the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. The next release will be 3.1.0-SNAPSHOT (on branch `v3-develop`), not yet published:
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>3.0.1-SNAPSHOT</version>
+        <version>3.1.0-SNAPSHOT</version>
  
 with appropriate `<repositories>` entry, like:
 
@@ -109,18 +149,27 @@ with appropriate `<repositories>` entry, like:
 
 ## Java Version
 
-Versions 3.0.0 onwards require Java 11. From version 2.2 Java 1.8 is required. Earlier versions require Java 1.7.
+Versions 3.1.0 onwards require Java 17. Version 3.0.0 requires Java 11. From version 2.2 Java 1.8 is required. Earlier versions require Java 1.7.
 
 ## Quick Start
 
-Create credentials and an input stream for the password vault in question:
+Create credentials for the password vault in question, then read the database from an input stream:
 
       KdbxCredentials credentials = new KdbxCredentials("123".getBytes());
-      InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test1.kdbx");
-      
-then load the database:
+      Database database;
+      try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test1.kdbx")) {
+          database = KdbxDatabase.read(credentials, inputStream);
+      }
 
-      Database database = KdbxDatabase.load(credentials, inputStream)
+and write it to an output stream:
+
+      try (OutputStream outputStream = Files.newOutputStream(Path.of("test1.kdbx"))) {
+          database.write(credentials, outputStream);
+      }
+
+> From 3.1.0 `read` and `write` leave the stream open, so whoever opens a stream closes it, as above.
+`load` and `save`, which close the stream they are given, are deprecated
+(see [issue 109](https://github.com/jorabin/KeePassJava2/issues/109)).
 
 > In the past there were a number of different database implementations, at present there
 are two, one for KDBX (`KdbxDatabase` - previously called `JacksonDatabase`, because it uses Jackson for XML serialization)
@@ -217,7 +266,7 @@ It also depends on SLF4J, logback and JUnit 5 for tests.
 
 Included POM is for Maven 3.
 
-It must be built using Java 11 or later (JDK 11+). It compiles with `--release 11`, so the jars it builds run on Java 11 whichever JDK builds them.
+It must be built using Java 17 or later (JDK 17+). It compiles with `--release 17`, so the jars it builds run on Java 17 whichever JDK builds them.
 
 ### Module Structure
 

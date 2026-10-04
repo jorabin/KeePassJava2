@@ -23,12 +23,14 @@ import org.linguafranca.pwdb.test.DatabaseTestBase;
 import org.linguafranca.pwdb.test.GroupsAndEntriesTest;
 import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.test.Test123Test;
+import org.linguafranca.util.CloseTracking;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.linguafranca.util.TestUtil.getTestPrintStream;
 
 /**
@@ -42,7 +44,7 @@ public class KdbDatabaseTest
             Test123Test {
 
     KdbDatabaseTest() {
-        super(KdbDatabase::new, KdbDatabase::loadNx, Database::saveNx, KdbCredentials.Password::new);
+        super(KdbDatabase::new, KdbDatabase::read, Database::write, KdbCredentials.Password::new);
         newDatabase();
     }
 
@@ -66,17 +68,42 @@ public class KdbDatabaseTest
 
     @Test
     public void testCreateKdbDatabase() throws Exception {
-        InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdb");
-        Database database = KdbDatabase.load(new KdbCredentials.Password("123".getBytes()), inputStream);
+        Database database;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdb")) {
+            database = KdbDatabase.read(new KdbCredentials.Password("123".getBytes()), inputStream);
+        }
         database.visit(new Visitor.Print(getTestPrintStream()));
+    }
+
+    /**
+     * Issue 109: read leaves the caller's stream open, the deprecated load closes it
+     */
+    @Test
+    @SuppressWarnings("deprecation")
+    public void readLeavesStreamOpenLoadCloses() throws IOException {
+        byte[] bytes;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("test123.kdb")) {
+            assert inputStream != null;
+            bytes = inputStream.readAllBytes();
+        }
+        CloseTracking.InputStream inputStream = new CloseTracking.InputStream(bytes);
+        KdbDatabase database = KdbDatabase.read(new KdbCredentials.Password("123".getBytes()), inputStream);
+        assertFalse(inputStream.isClosed());
+        assertFalse(database.getRootGroup().getGroups().isEmpty());
+
+        inputStream = new CloseTracking.InputStream(bytes);
+        KdbDatabase.load(new KdbCredentials.Password("123".getBytes()), inputStream);
+        assertTrue(inputStream.isClosed());
     }
 
     @Test
     public void openKdbWithKeyFile() throws IOException {
         InputStream key = getClass().getClassLoader().getResourceAsStream("kdb.key");
         KdbCredentials creds = new KdbCredentials.KeyFile("123".getBytes(), key);
-        InputStream is = getClass().getClassLoader().getResourceAsStream("kdbwithkey.kdb");
-        KdbDatabase db = KdbDatabase.load(creds, is);
+        KdbDatabase db;
+        try (InputStream is = getClass().getClassLoader().getResourceAsStream("kdbwithkey.kdb")) {
+            db = KdbDatabase.read(creds, is);
+        }
         assertEquals(1, db.getRootGroup().getGroupsCount());
         assertEquals("General", db.getRootGroup().getGroups().get(0).getName());
     }

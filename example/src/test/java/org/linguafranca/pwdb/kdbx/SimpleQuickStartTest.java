@@ -24,6 +24,7 @@ import org.linguafranca.pwdb.kdbx.jackson.KdbxDatabase;
 import org.linguafranca.pwdb.security.Encryption;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -70,7 +71,10 @@ public class SimpleQuickStartTest extends QuickStart {
         loadKdbx3SaveKdbx4("test123.kdbx","123".getBytes(), path);
 
         // load newly created V4 database
-        KdbxDatabase db = KdbxDatabase.load(new KdbxCredentials("123".getBytes()), Files.newInputStream(path));
+        KdbxDatabase db;
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            db = KdbxDatabase.read(new KdbxCredentials("123".getBytes()), inputStream);
+        }
         KdbxStreamFormat streamFormat = (KdbxStreamFormat) db.getStreamFormat();
         assertEquals(4, streamFormat.getStreamConfiguration().getVersion());
         assertEquals(Encryption.Cipher.CHA_CHA_20, streamFormat.getStreamConfiguration().getCipherAlgorithm());
@@ -84,7 +88,10 @@ public class SimpleQuickStartTest extends QuickStart {
         loadKdbx4SaveKdbx3("V4-ChaCha20-Argon2-Attachment.kdbx","123".getBytes(), path);
 
         // load newly created V4 database
-        KdbxDatabase db = KdbxDatabase.load(new KdbxCredentials("123".getBytes()), Files.newInputStream(path));
+        KdbxDatabase db;
+        try (InputStream inputStream = Files.newInputStream(path)) {
+            db = KdbxDatabase.read(new KdbxCredentials("123".getBytes()), inputStream);
+        }
         KdbxStreamFormat streamFormat = (KdbxStreamFormat) db.getStreamFormat();
         assertEquals(3, streamFormat.getStreamConfiguration().getVersion());
         assertEquals(Encryption.Cipher.AES, streamFormat.getStreamConfiguration().getCipherAlgorithm());

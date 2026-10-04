@@ -75,18 +75,19 @@ public interface KdbxFileSaveAndReloadTest {
         verifyContents(output);
         //output.save(new StreamFormat.None(), new Credentials.None(), printStream);
 
-        FileOutputStream fos = new FileOutputStream(testOutputPath("test1.kdbx").toFile());
-        saveDatabase(output, getCredentials("123".getBytes()), fos);
+        try (FileOutputStream fos = new FileOutputStream(testOutputPath("test1.kdbx").toFile())) {
+            saveDatabase(output, getCredentials("123".getBytes()), fos);
+        }
         assertFalse(output.isDirty());
-        fos.flush();
-        fos.close();
         // make sure that saving didn't mess up content
         verifyContents(output);
         //output.save(new StreamFormat.None(), new Credentials.None(), printStream);
 
 
-        FileInputStream fis = new FileInputStream(testOutputPath("test1.kdbx").toFile());
-        Database input = loadDatabase(getCredentials("123".getBytes()), fis);
+        Database input;
+        try (FileInputStream fis = new FileInputStream(testOutputPath("test1.kdbx").toFile())) {
+            input = loadDatabase(getCredentials("123".getBytes()), fis);
+        }
         verifyContents(input);
     }
 
@@ -95,8 +96,10 @@ public interface KdbxFileSaveAndReloadTest {
      */
     @Test
     default void saveAndReloadTest2() throws IOException {
-        Database attachment = loadDatabase(getCredentials("123".getBytes()),
-                getClass().getClassLoader().getResourceAsStream("Attachment.kdbx" ));
+        Database attachment;
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("Attachment.kdbx")) {
+            attachment = loadDatabase(getCredentials("123".getBytes()), inputStream);
+        }
 
         Entry entry = attachment.findEntries("Test attachment").get(0);
         assertArrayEquals(new String[] {"letter J.jpeg"}, entry.getBinaryPropertyNames().toArray());
@@ -108,13 +111,14 @@ public interface KdbxFileSaveAndReloadTest {
         entry.setBinaryProperty("letter L.jpeg", content);
         assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
 
-        FileOutputStream fos = new FileOutputStream(testOutputPath("test2.kdbx").toFile());
-        saveDatabase(attachment, getCredentials("123".getBytes()), fos);
-        fos.flush();
-        fos.close();
+        try (FileOutputStream fos = new FileOutputStream(testOutputPath("test2.kdbx").toFile())) {
+            saveDatabase(attachment, getCredentials("123".getBytes()), fos);
+        }
 
-        FileInputStream fis = new FileInputStream(testOutputPath("test2.kdbx").toFile());
-        Database input = loadDatabase(getCredentials("123".getBytes()), fis);
+        Database input;
+        try (FileInputStream fis = new FileInputStream(testOutputPath("test2.kdbx").toFile())) {
+            input = loadDatabase(getCredentials("123".getBytes()), fis);
+        }
 
         entry = input.findEntries("Test attachment").get(0);
         assertArrayEquals(new String[] {"letter J.jpeg", "letter L.jpeg"}, entry.getBinaryPropertyNames().toArray());
@@ -133,14 +137,20 @@ public interface KdbxFileSaveAndReloadTest {
     @Test
     default void saveAndReloadTest3() throws IOException {
         for (String resource: testFiles) {
-            Database database = loadDatabase(this.getCredentials("123".getBytes()),
-                    getClass().getClassLoader().getResourceAsStream(resource));
+            Database database;
+            try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(resource)) {
+                database = loadDatabase(this.getCredentials("123".getBytes()), inputStream);
+            }
             StreamFormat<?> format1 = database.getStreamFormat();
 
-            database.save(getCredentials("123".getBytes()), Files.newOutputStream(testOutputPath("test3.kdbx")));
+            try (OutputStream outputStream = Files.newOutputStream(testOutputPath("test3.kdbx"))) {
+                saveDatabase(database, getCredentials("123".getBytes()), outputStream);
+            }
 
-            FileInputStream fis = new FileInputStream(testOutputPath("test3.kdbx").toFile());
-            Database input = loadDatabase(getCredentials("123".getBytes()), fis);
+            Database input;
+            try (FileInputStream fis = new FileInputStream(testOutputPath("test3.kdbx").toFile())) {
+                input = loadDatabase(getCredentials("123".getBytes()), fis);
+            }
             StreamFormat<?> format2 = input.getStreamFormat();
             assertTrue(verifyStreamFormat(format1, format2));
         }
@@ -197,8 +207,9 @@ public interface KdbxFileSaveAndReloadTest {
     default void saveNewDatabase () throws IOException {
         Database database = createNewDatabase();
 
-        FileOutputStream outputStream = new FileOutputStream("compatibility.kdbx");
-        saveDatabase(database, getCredentials("123".getBytes()), outputStream);
+        try (FileOutputStream outputStream = new FileOutputStream("compatibility.kdbx")) {
+            saveDatabase(database, getCredentials("123".getBytes()), outputStream);
+        }
     }
 
     /**

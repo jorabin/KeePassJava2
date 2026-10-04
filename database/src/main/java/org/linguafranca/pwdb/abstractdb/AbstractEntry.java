@@ -81,12 +81,20 @@ public abstract class AbstractEntry implements Entry {
         touch();
     }
 
+    /**
+     * @deprecated use {@link #getProperty(String)} with {@link #STANDARD_PROPERTY_NAME_PASSWORD}
+     */
     @Override
+    @Deprecated
     public String getPassword() {
         return getProperty(STANDARD_PROPERTY_NAME_PASSWORD);
     }
 
+    /**
+     * @deprecated use {@link #setProperty(String, String)} with {@link #STANDARD_PROPERTY_NAME_PASSWORD}
+     */
     @Override
+    @Deprecated
     public void setPassword(String pass) {
         setProperty(STANDARD_PROPERTY_NAME_PASSWORD, pass);
         touch();

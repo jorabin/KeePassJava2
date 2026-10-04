@@ -20,6 +20,7 @@ package org.linguafranca.pwdb;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -435,12 +436,12 @@ public interface Entry {
      * <p>
      * Implementations SHOULD set this to the creation date or earlier if the entry has never been used.
      */
-    Date getLastAccessTime();
+    Instant getLastAccessTime();
 
     /**
      * Returns the date at which this entry was created
      */
-    Date getCreationTime();
+    Instant getCreationTime();
 
     /**
      * Returns true if this entry is to be considered as expired at some point
@@ -449,7 +450,7 @@ public interface Entry {
 
     /**
      * Set true for the date returned by {@link #getExpiryTime()} to be considered an expiry time
-     * @see #setExpiryTime(Date)
+     * @see #setExpiryTime(Instant)
      */
     void setExpires(boolean expires);
 
@@ -457,19 +458,19 @@ public interface Entry {
      * Returns a date at which the entry should be considered to have expired, if {@link #getExpires()} is true -
      * otherwise returns an arbitrary date.
      */
-    Date getExpiryTime();
+    Instant getExpiryTime();
 
     /**
      * Sets the expiry date of this element.
      * @throws IllegalArgumentException if expiryTime is null.
      * @see  org.linguafranca.pwdb.Entry#setExpires(boolean)
      */
-    void setExpiryTime(Date expiryTime) throws IllegalArgumentException;
+    void setExpiryTime(Instant expiryTime) throws IllegalArgumentException;
 
     /**
      * Returns the date that the entry was last modified
      * <p>
      * Implementations SHOULD set this to the creation date or earlier if the entry has never been used.
      */
-    Date getLastModificationTime();
+    Instant getLastModificationTime();
 }

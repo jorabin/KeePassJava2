@@ -130,14 +130,15 @@ public interface ProtectedPropertyTest2 {
 
             // Save database
 
-            FileOutputStream fos = new FileOutputStream(testOutputPath("test9.kdbx").toFile());
-            saveDatabase(getDatabase(), getCredentials("123".getBytes()), fos);
-            fos.flush();
-            fos.close();
+            try (FileOutputStream fos = new FileOutputStream(testOutputPath("test9.kdbx").toFile())) {
+                saveDatabase(getDatabase(), getCredentials("123".getBytes()), fos);
+            }
 
             // reload database, "random" is still protected even though it's not protected by default
-            FileInputStream fis = new FileInputStream(testOutputPath("test9.kdbx").toFile());
-            Database input = loadDatabase(getCredentials("123".getBytes()), fis);
+            Database input;
+            try (FileInputStream fis = new FileInputStream(testOutputPath("test9.kdbx").toFile())) {
+                input = loadDatabase(getCredentials("123".getBytes()), fis);
+            }
 
             List<? extends Entry> entries = input.findEntries("random");
             assertEquals(1, entries.size());

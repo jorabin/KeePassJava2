@@ -35,7 +35,7 @@ public class Issue87Test {
     public void testCustomIcon() throws IOException {
         KdbxDatabase database;
         try (InputStream inputStream = Issue87Test.class.getClassLoader().getResourceAsStream(TEST_RESOURCE1)) {
-            database = KdbxDatabase.load(CREDENTIALS1, inputStream);
+            database = KdbxDatabase.read(CREDENTIALS1, inputStream);
         }
 
         List<Entry> entries = database.findEntries("Michael321");
@@ -49,7 +49,7 @@ public class Issue87Test {
 
         Path path = testOutputPath("Issue87.kdbx");
         try (OutputStream outputStream = Files.newOutputStream(path)) {
-            database.save(CREDENTIALS1, outputStream);
+            database.write(CREDENTIALS1, outputStream);
         }
 
         // output the XML of the file we just saved, to check that the custom icon is still there
@@ -62,7 +62,7 @@ public class Issue87Test {
 
         // now load the newly written database and check the custom icon is the same as the original
         try (InputStream is = Files.newInputStream(path)) {
-            KdbxDatabase database1 = KdbxDatabase.load(CREDENTIALS1, is);
+            KdbxDatabase database1 = KdbxDatabase.read(CREDENTIALS1, is);
             List<Entry> entries1 = database1.findEntries("Michael321");
             assertEquals(1, entries1.size());
             KdbxEntry entry1 = (KdbxEntry) entries1.get(0);

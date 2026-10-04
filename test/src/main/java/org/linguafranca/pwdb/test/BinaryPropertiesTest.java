@@ -133,9 +133,14 @@ public interface BinaryPropertiesTest {
     @Test
     default void saveAndReloadCheck() throws IOException {
         Path file = Files.createTempFile("test8", "tmp");
-        saveDatabase(getDatabase(), getCredentials("123".getBytes()), Files.newOutputStream(file));
+        try (OutputStream outputStream = Files.newOutputStream(file)) {
+            saveDatabase(getDatabase(), getCredentials("123".getBytes()), outputStream);
+        }
 
-        Database db = loadDatabase(getCredentials("123".getBytes()), Files.newInputStream(file));
+        Database db;
+        try (InputStream inputStream = Files.newInputStream(file)) {
+            db = loadDatabase(getCredentials("123".getBytes()), inputStream);
+        }
         Entry newEntry = db.findEntries("Test attachment").get(0);
         assertArrayEquals(new String[]{"letter J.jpeg"}, newEntry.getBinaryPropertyNames().toArray());
         Entry oldEntry = getDatabase().findEntries("Test attachment").get(0);
@@ -162,9 +167,14 @@ public interface BinaryPropertiesTest {
         assert testFile != null;
         byte[] letterJ = ByteStreams.toByteArray(testFile);
         entry.setBinaryProperty("letter J.jpeg", letterJ);
-        saveDatabase(database1, getCredentials("123".getBytes()), Files.newOutputStream(file));
+        try (OutputStream outputStream = Files.newOutputStream(file)) {
+            saveDatabase(database1, getCredentials("123".getBytes()), outputStream);
+        }
 
-        Database db = loadDatabase(getCredentials("123".getBytes()), Files.newInputStream(file));
+        Database db;
+        try (InputStream inputStream = Files.newInputStream(file)) {
+            db = loadDatabase(getCredentials("123".getBytes()), inputStream);
+        }
         Entry entry1 = db.findEntries("Test attachment").get(0);
         // just one property
         assertArrayEquals(new String[]{"letter J.jpeg"}, entry1.getBinaryPropertyNames().toArray());

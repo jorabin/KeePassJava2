@@ -41,14 +41,14 @@ public class Issue70Test {
     @Test
     public void testCustomData() throws IOException {
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(TEST_RESOURCE1)) {
-            KdbxDatabase database = KdbxDatabase.load(CREDENTIALS1, inputStream);
+            KdbxDatabase database = KdbxDatabase.read(CREDENTIALS1, inputStream);
         }
     }
 
     @Test
     public void testFileFormat_4_1() throws IOException {
        try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(TEST_RESOURCE2)){
-            KdbxDatabase database = KdbxDatabase.load(CREDENTIALS2, inputStream);
+            KdbxDatabase database = KdbxDatabase.read(CREDENTIALS2, inputStream);
        }
     }
 
@@ -56,7 +56,7 @@ public class Issue70Test {
     @Test
     public void testCustomData2() throws IOException {
         try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(TEST_RESOURCE3)){
-            KdbxDatabase database = KdbxDatabase.load(CREDENTIALS3, inputStream);
+            KdbxDatabase database = KdbxDatabase.read(CREDENTIALS3, inputStream);
         }
     }
 

@@ -21,7 +21,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -121,13 +120,13 @@ class BasicEntryTest {
 
     @Test
     void testGetLastAccessTime() {
-        Date lastAccessTime = entry.getLastAccessTime();
+        Instant lastAccessTime = entry.getLastAccessTime();
         assertNotNull(lastAccessTime);
     }
 
     @Test
     void testGetCreationTime() {
-        Date creationTime = entry.getCreationTime();
+        Instant creationTime = entry.getCreationTime();
         assertNotNull(creationTime);
     }
 
@@ -149,7 +148,7 @@ class BasicEntryTest {
 
     @Test
     void testSetExpiryTime() {
-        Date expiryTime = Date.from(Instant.now());
+        Instant expiryTime = Instant.now();
         entry.setExpiryTime(expiryTime);
         assertEquals(expiryTime, entry.getExpiryTime());
     }

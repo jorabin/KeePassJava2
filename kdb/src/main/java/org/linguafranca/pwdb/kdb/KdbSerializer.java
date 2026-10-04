@@ -19,6 +19,7 @@ package org.linguafranca.pwdb.kdb;
 
 import com.google.common.io.LittleEndianDataInputStream;
 import org.linguafranca.pwdb.Credentials;
+import org.linguafranca.pwdb.Entry;
 import org.linguafranca.pwdb.Group;
 import org.linguafranca.pwdb.security.Encryption;
 
@@ -28,6 +29,9 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 /**
@@ -258,7 +262,7 @@ public class KdbSerializer {
                     entry.setUsername(readString(dataInput));
                     break;
                 case 0x0007:
-                    entry.setPassword(readString(dataInput));
+                    entry.setProperty(Entry.STANDARD_PROPERTY_NAME_PASSWORD, readString(dataInput));
                     break;
                 case 0x0008:
                     // these are not really notes, they are things like properties from KDBX databases
@@ -334,7 +338,7 @@ public class KdbSerializer {
      * @param buffer 5 bytes containing a packed date
      * @return a date constructed from the buffer
      */
-    public static Date unpackDate(byte[] buffer) {
+    public static Instant unpackDate(byte[] buffer) {
         // copy passed buffer into the less significant bytes of 8 bytes
         byte[] buffer8 = new byte[8];
         System.arraycopy(buffer, 0, buffer8, 3, 5);
@@ -361,21 +365,21 @@ public class KdbSerializer {
 
         int year = (int) longValue & 0xFFF;
 
-        // just to work around the deprecation on the similar Date constructor
-        GregorianCalendar cal = new GregorianCalendar();
         // I think the time is stored in local time but anyway, let's say it's UTC for the sake of argument
-        cal.setTimeZone(TimeZone.getTimeZone("UTC"));
-        //noinspection MagicConstant
-        cal.set(year, month - 1, day, hour, minute, second);
-        // otherwise we seem to end up with arbitrary millis
-        cal.set(GregorianCalendar.MILLISECOND, 0);
-        return cal.getTime();
+        // add the fields rather than LocalDateTime.of, which would reject out of range values
+        return LocalDateTime.of(year, 1, 1, 0, 0)
+                .plusMonths(month - 1)
+                .plusDays(day - 1)
+                .plusHours(hour)
+                .plusMinutes(minute)
+                .plusSeconds(second)
+                .toInstant(ZoneOffset.UTC);
     }
 
     /****
      * Utility methods to read and consume from the stream according to the data type we need.
      ****/
-    private static Date readDate(DataInput dataInput) throws IOException {
+    private static Instant readDate(DataInput dataInput) throws IOException {
         if (dataInput.readInt() != 5) {
             throw new IllegalStateException("Date must be 5 bytes");
         }

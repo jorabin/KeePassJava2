@@ -60,7 +60,12 @@ public class Issue33Test {
 
     @Test
     public void testJacksonDatabase() throws IOException {
-        KdbxDatabase database = KdbxDatabase.load(CREDENTIALS, inputStream);
-        database.save(new StreamFormat.None(), new Credentials.None(), Files.newOutputStream(Paths.get(TEST_OUTPUT_DIR, "Issue33Jackson.xml")));
+        KdbxDatabase database;
+        try (InputStream in = inputStream) {
+            database = KdbxDatabase.read(CREDENTIALS, in);
+        }
+        try (OutputStream outputStream = Files.newOutputStream(Paths.get(TEST_OUTPUT_DIR, "Issue33Jackson.xml"))) {
+            database.write(new StreamFormat.None(), new Credentials.None(), outputStream);
+        }
     }
 }

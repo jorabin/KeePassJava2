@@ -21,10 +21,8 @@ import org.junit.jupiter.api.Test;
 import org.linguafranca.pwdb.format.Helpers;
 
 import java.io.PrintStream;
-import java.text.ParseException;
 import java.time.Instant;
 import java.time.ZonedDateTime;
-import java.util.Date;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.linguafranca.pwdb.format.Helpers.dateTimeFormatter;
@@ -35,50 +33,50 @@ public class HelpersTest {
     static PrintStream printStream = getTestPrintStream();
 
     public String testDate = "2023-05-09T16:11:29Z";
-    public Date testDateAsDate = Date.from(ZonedDateTime.parse(testDate, dateTimeFormatter).toInstant());
+    public Instant testInstant = ZonedDateTime.parse(testDate, dateTimeFormatter).toInstant();
     public String v4Encoding = "sWfs2w4AAAA=";
 
     @Test
-    public void toDate() throws ParseException {
-        Date date = Helpers.toDate(v4Encoding);
-        assertEquals(testDateAsDate.getTime(), date.getTime());
+    public void toInstantV4() {
+        assertEquals(testInstant, Helpers.toInstant(v4Encoding));
     }
 
     @Test
-    public void toDate2() throws ParseException {
-        Date date = Helpers.toDate(testDate);
-        assertEquals(testDateAsDate, date);
+    public void toInstantV3() {
+        assertEquals(testInstant, Helpers.toInstant(testDate));
     }
 
     @Test
-    public void toDate3() throws ParseException {
-        ZonedDateTime zdt = ZonedDateTime.parse(testDate, dateTimeFormatter);
-        printStream.println(zdt);
-        Instant instant = zdt.toInstant();
-        printStream.println(instant);
-        Date date = Date.from(instant);
-        printStream.println(date.clone());
-        assertEquals(instant.toEpochMilli(), date.getTime());
-        assertEquals(instant.toEpochMilli(), testDateAsDate.getTime());
+    public void fromInstant() {
+        try {
+            Helpers.isV4.set(false);
+            assertEquals(testDate, Helpers.fromInstant(testInstant));
+            Helpers.isV4.set(true);
+            assertEquals(v4Encoding, Helpers.fromInstant(testInstant));
+        } finally {
+            Helpers.isV4.set(false);
+        }
     }
 
     @Test
-    public void fromDate() throws ParseException {
-        Helpers.isV4.set(false);
-        assertEquals(testDate, Helpers.fromDate(testDateAsDate));
-        Helpers.isV4.set(true);
-        assertEquals(v4Encoding, Helpers.fromDate(testDateAsDate));
+    public void fromInstantV3() {
+        assertEquals(testDate, Helpers.fromInstantV3(testInstant));
     }
 
     @Test
-    public void fromDateV3() throws ParseException {
-        assertEquals(testDate, Helpers.fromDateV3(testDateAsDate));
-    }
-
-    @Test
-    public void fromDateV4() throws ParseException {
-        String base64 = Helpers.fromDateV4(testDateAsDate);
-        printStream.println(Helpers.toDate(base64));
+    public void fromInstantV4() {
+        String base64 = Helpers.fromInstantV4(testInstant);
+        printStream.println(Helpers.toInstant(base64));
         assertEquals(v4Encoding, base64);
+    }
+
+    /**
+     * KDBX times are whole seconds, fractions are dropped
+     */
+    @Test
+    public void fractionsOfASecond() {
+        Instant withFraction = testInstant.plusMillis(999);
+        assertEquals(testDate, Helpers.fromInstantV3(withFraction));
+        assertEquals(v4Encoding, Helpers.fromInstantV4(withFraction));
     }
 }

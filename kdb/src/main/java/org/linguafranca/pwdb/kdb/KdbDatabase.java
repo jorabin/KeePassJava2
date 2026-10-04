@@ -19,11 +19,13 @@ package org.linguafranca.pwdb.kdb;
 
 import org.linguafranca.pwdb.*;
 import org.linguafranca.pwdb.abstractdb.AbstractDatabase;
+import org.linguafranca.pwdb.io.NonClosingInputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 /**
@@ -35,7 +37,8 @@ public class KdbDatabase extends AbstractDatabase {
     private String description;
     private final KdbGroup rootGroup;
 
-    static SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    // local time, as KDB files are thought to hold local times
+    static final DateTimeFormatter isoDateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss").withZone(ZoneId.systemDefault());
 
     public KdbDatabase() {
         // KDB files don't have a single root group, this is a synthetic surrogate
@@ -46,10 +49,37 @@ public class KdbDatabase extends AbstractDatabase {
         rootGroup.setUuid(UUID.randomUUID());
     }
 
-    public static KdbDatabase load(Credentials credentials, InputStream inputStream) throws IOException {
-        return KdbSerializer.createKdbDatabase(credentials, new KdbHeader(), inputStream);
+    /**
+     * Read a KDB file, leaving the stream open
+     *
+     * @param credentials credentials to use
+     * @param inputStream where to read from - the caller closes it
+     * @return a new database
+     * @since 3.1.0
+     */
+    public static KdbDatabase read(Credentials credentials, InputStream inputStream) throws IOException {
+        // the serializer closes its decryption chain, which closes the stream under it
+        return KdbSerializer.createKdbDatabase(credentials, new KdbHeader(), new NonClosingInputStream(inputStream));
     }
 
+    /**
+     * Load a KDB file and close the stream
+     *
+     * @deprecated use {@link #read(Credentials, InputStream)} (issue #109)
+     */
+    @Deprecated
+    public static KdbDatabase load(Credentials credentials, InputStream inputStream) throws IOException {
+        try (inputStream) {
+            return read(credentials, inputStream);
+        }
+    }
+
+    /**
+     * Load a KDB file - avoiding checked exceptions
+     *
+     * @deprecated use {@link #read(Credentials, InputStream)} (issue #109)
+     */
+    @Deprecated
     public static KdbDatabase loadNx(Credentials credentials, InputStream inputStream) {
         try {
             return KdbDatabase.load(credentials, inputStream);
@@ -108,11 +138,24 @@ public class KdbDatabase extends AbstractDatabase {
     }
 
     @Override
+    public void write(Credentials credentials, OutputStream outputStream) {
+        throw new UnsupportedOperationException("Cannot write KDB files in this implementation");
+    }
+
+    @Override
+    public <C extends StreamConfiguration> void write(StreamFormat<C> streamFormat, Credentials credentials,
+                                                      OutputStream outputStream) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    @Deprecated
     public void save(Credentials credentials, OutputStream outputStream) {
         throw new UnsupportedOperationException("Cannot save KDB files in this implementation");
     }
 
     @Override
+    @Deprecated
     public <C extends StreamConfiguration> void save(StreamFormat<C> streamFormat, Credentials credentials,
                                                      OutputStream outputStream) {
         throw new UnsupportedOperationException();

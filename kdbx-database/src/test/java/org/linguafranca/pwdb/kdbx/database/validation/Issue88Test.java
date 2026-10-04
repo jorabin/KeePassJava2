@@ -29,12 +29,12 @@ public class Issue88Test {
     public void testDefaultAutoType() throws IOException {
         KdbxDatabase database;
         try (InputStream inputStream = Issue88Test.class.getClassLoader().getResourceAsStream(TEST_RESOURCE1)) {
-            database = KdbxDatabase.load(CREDENTIALS1, inputStream);
+            database = KdbxDatabase.read(CREDENTIALS1, inputStream);
         }
 
         Path path = testOutputPath("Issue88.kdbx");
         try (OutputStream outputStream = Files.newOutputStream(path)) {
-            database.save(CREDENTIALS1, outputStream);
+            database.write(CREDENTIALS1, outputStream);
         }
 
         // output the XML of the file we just saved, to check that the empty element is serialized

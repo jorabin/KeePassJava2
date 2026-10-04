@@ -17,6 +17,8 @@
 
 package org.linguafranca.pwdb;
 
+import org.linguafranca.pwdb.io.NonClosingInputStream;
+import org.linguafranca.pwdb.io.NonClosingOutputStream;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 
 import java.io.IOException;
@@ -40,8 +42,40 @@ import java.io.OutputStream;
  */
 public interface SerializableDatabase {
 
+    /**
+     * Read the database from a stream, leaving the stream open
+     *
+     * @param inputStream where to read from - the caller closes it
+     * @since 3.1.0
+     */
+    default SerializableDatabase read(InputStream inputStream) throws IOException {
+        return load(new NonClosingInputStream(inputStream));
+    }
+
+    /**
+     * Write the database to a stream, leaving the stream open
+     *
+     * @param outputStream where to write to - the caller closes it
+     * @since 3.1.0
+     */
+    default void write(OutputStream outputStream) throws IOException {
+        save(new NonClosingOutputStream(outputStream));
+    }
+
+    /**
+     * Load the database from a stream and close the stream
+     *
+     * @deprecated closes a stream the caller opened; use {@link #read(InputStream)} (issue #109)
+     */
+    @Deprecated
     SerializableDatabase load(InputStream inputStream) throws IOException;
 
+    /**
+     * Save the database to a stream and close the stream
+     *
+     * @deprecated closes a stream the caller opened; use {@link #write(OutputStream)} (issue #109)
+     */
+    @Deprecated
     void save(OutputStream outputStream) throws IOException;
 
     StreamEncryptor getEncryption();

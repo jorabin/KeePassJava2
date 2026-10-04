@@ -29,6 +29,8 @@ import com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.linguafranca.pwdb.PropertyValue;
 import org.linguafranca.pwdb.StreamFormat;
+import org.linguafranca.pwdb.io.NonClosingInputStream;
+import org.linguafranca.pwdb.io.NonClosingOutputStream;
 import org.linguafranca.pwdb.protect.ProtectedDatabase;
 import org.linguafranca.pwdb.security.StreamEncryptor;
 
@@ -43,24 +45,53 @@ import java.util.List;
 public interface BasicDatabaseSerializer {
 
     /**
-     * Serialize a BasicDatabase to a stream
+     * Serialize a BasicDatabase to a stream, leaving the stream open
+     *
+     * @param database     the database to serialize
+     * @param outputStream the stream to serialize to - the caller closes it
+     * @since 3.1.0
+     */
+    default void write(BasicDatabase database, OutputStream outputStream) throws IOException {
+        save(database, new NonClosingOutputStream(outputStream));
+    }
+
+    /**
+     * Deserialize a BasicDatabase from a stream, leaving the stream open
+     *
+     * @param inputStream the serialized form of the database - the caller closes it
+     * @return the deserialized database
+     * @since 3.1.0
+     */
+    default BasicDatabase read(InputStream inputStream) throws IOException {
+        return load(new NonClosingInputStream(inputStream));
+    }
+
+    /**
+     * Serialize a BasicDatabase to a stream and close the stream
      *
      * @param database     the database to serialize
      * @param outputStream the stream to serialize to
+     * @deprecated use {@link #write(BasicDatabase, OutputStream)} (issue #109)
      */
+    @Deprecated
     void save(BasicDatabase database, OutputStream outputStream) throws IOException;
 
     /**
-     * Deserialize a BasicDatabase from a stream
+     * Deserialize a BasicDatabase from a stream and close the stream
      *
      * @param inputStream the serialized form of the database
      * @return the deserialized database
+     * @deprecated use {@link #read(InputStream)} (issue #109)
      */
+    @Deprecated
     BasicDatabase load(InputStream inputStream) throws IOException;
 
     /**
      * Serialize a BasicDatabase to a stream, with a runtime exception thrown if an IOException occurs
+     *
+     * @deprecated use {@link #write(BasicDatabase, OutputStream)} (issue #109)
      */
+    @Deprecated
     default void saveNx(BasicDatabase database, OutputStream outputStream){
         try {
             save(database, outputStream);
@@ -71,7 +102,10 @@ public interface BasicDatabaseSerializer {
 
     /**
      * Deserialize a BasicDatabase from a stream, with a runtime exception thrown if an IOException occurs
+     *
+     * @deprecated use {@link #read(InputStream)} (issue #109)
      */
+    @Deprecated
     default BasicDatabase loadNx(InputStream inputStream){
         try {
             return load(inputStream);
@@ -96,15 +130,33 @@ public interface BasicDatabaseSerializer {
         }
 
         @Override
-        public void save(BasicDatabase database, OutputStream outputStream) throws IOException {
-            objectMapper.writer().withRootName("database").writeValue(outputStream, database);
+        public void write(BasicDatabase database, OutputStream outputStream) throws IOException {
+            // Jackson closes the stream it writes to
+            objectMapper.writer().withRootName("database").writeValue(new NonClosingOutputStream(outputStream), database);
         }
 
         @Override
-        public BasicDatabase load(InputStream inputStream) throws IOException {
-            BasicDatabase database2 = objectMapper.readValue(inputStream, BasicDatabase.class);
+        public BasicDatabase read(InputStream inputStream) throws IOException {
+            // Jackson closes the stream it reads from
+            BasicDatabase database2 = objectMapper.readValue(new NonClosingInputStream(inputStream), BasicDatabase.class);
             database2.fixUp((BasicGroup) database2.getRootGroup());
             return database2;
+        }
+
+        @Override
+        @Deprecated
+        public void save(BasicDatabase database, OutputStream outputStream) throws IOException {
+            try (outputStream) {
+                write(database, outputStream);
+            }
+        }
+
+        @Override
+        @Deprecated
+        public BasicDatabase load(InputStream inputStream) throws IOException {
+            try (inputStream) {
+                return read(inputStream);
+            }
         }
 
         private ObjectMapper init() {
@@ -138,7 +190,7 @@ public interface BasicDatabaseSerializer {
                     // pretty print
                     .enable(SerializationFeature.INDENT_OUTPUT)
                     // suppress empty fields
-                    .setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+                    .setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
 
             return mapper;
         }
