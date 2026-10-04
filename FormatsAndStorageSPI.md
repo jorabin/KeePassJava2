@@ -1,11 +1,11 @@
 # Formats and Storage SPI (draft)
 
-Design for [issue 110](https://github.com/jorabin/KeePassJava2/issues/110), planned for 3.1.0.
+Design for [issue 110](https://github.com/jorabin/KeePassJava2/issues/110), planned for release 3.2.0.
 The aim, from the issue:
 
 > **Load any format, store it any way, and make everything available to users through the standard interfaces.**
 
-The SPI is **experimental** in 3.1.0: it will change as more formats are added (LastPass and Bitwarden
+The SPI is **experimental** in 3.2.0: it will change as more formats are added (LastPass and Bitwarden
 exports, for example) and show what it needs. The user API (`Database`, `Group` and `Entry`) stays as it is,
 apart from the additions and fixes described under [Unsupported features](#unsupported-features),
 [Presence and absence](#presence-and-absence) and [Additions to the API](#additions-to-the-api). A separate,
@@ -199,11 +199,18 @@ an option for KDB.)
 
 ## KDBX 3.1 and 4
 
-**One set of KDBX extensions covers both.** Comparing the XSDs, 4.x only adds optional elements:
-`SettingsChanged` and `MasterKeyChangeForceOnce` in Meta, `PreviousParentGroup` and `QualityCheck` on
-entries, `Name` and `LastModificationTime` on custom icons, `LastModificationTime` on CustomData items, and
-group `Tags`. The 3.1 writer leaves them out, as the Jackson serializer does now. `Meta/Binaries`,
-`HeaderHash` and the KDBX 4 inner header are format details and don't appear in the SPI.
+**One set of KDBX extensions covers both.** Later versions only add optional elements. Following KeePass's
+descriptions of [KDBX 4](https://keepass.info/help/kb/kdbx_4.html) and
+[KDBX 4.1](https://keepass.info/help/kb/kdbx_4.1.html):
+
+- 4.0 adds CustomData on groups and entries, and `SettingsChanged` in Meta;
+- 4.1 adds `Tags` and `PreviousParentGroup` on groups, `QualityCheck` and `PreviousParentGroup` on entries,
+  `Name` and `LastModificationTime` on custom icons, and `LastModificationTime` on CustomData items.
+
+(Which version added `MasterKeyChangeForceOnce` isn't documented, so it is always written.) As KeePass does,
+a KDBX 4 database is written as 4.1 only if it uses 4.1 features, unless a version is set, and writing a
+version that can't hold some of the content leaves it out of the file, keeps it in the database, and reports
+it. `Meta/Binaries`, `HeaderHash` and the KDBX 4 inner header are format details and don't appear in the SPI.
 
 ## Jackson
 
@@ -342,7 +349,7 @@ Agreed on 2026-10-03:
 3. **Property descriptors** have `name`, `required` and `protectedByDefault`, until a format needs a kind
    (typed items in LastPass or Bitwarden exports may be the first).
 4. **Dropped data** is reported through an optional `Consumer<String>` callback on writers and sinks.
-5. **`Instant`** replaces `Date` in `Entry` and `Group`.
+5. **`Instant`** replaces `Date` in `Entry` and `Group` (released in 3.1.0).
 6. **Order:** first `supports(Feature)` and the presence and absence fixes to the existing interfaces; then the
    experimental SPI, property descriptors, the group 1 API additions, the KDBX and KDB extensions,
    `KdbxDatabase` as source and sink, Basic as storage, the KDB reader as a source, and the tests. SQL
@@ -354,5 +361,6 @@ Agreed on 2026-10-03:
 10. **History in the API** is read only; storage adds history when an entry changes, if the database's policy
     says so.
 
-The release that carries the SPI is open: possibly 3.2, with prototype releases for comment, and 3.1.0 limited
-to Java 17 and `read`/`write`.
+**Releases** (decided 2026-10-04): 3.1.0 is Java 17, `read`/`write` and `Instant`. `supports(Feature)`, the
+presence and absence fixes, the KDBX version handling and the SPI are in 3.2.0, possibly with prototype releases
+for comment.
