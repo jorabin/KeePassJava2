@@ -22,7 +22,7 @@
 
 	<groupId>org.linguafranca.pwdb</groupId>
 	<artifactId>KeePassJava2.parent</artifactId>
-	<version>3.1.0</version>
+	<version>3.2.0-SNAPSHOT</version>
 	<modules>
 		<module>database</module>
 		<module>test</module>
@@ -51,7 +51,7 @@
 		<connection>scm:git:git://github.com/jorabin/KeePassJava2.git</connection>
 		<developerConnection>scm:git:git@github.com:jorabin/KeePassJava2.git</developerConnection>
 		<url>https://github.com/jorabin/KeePassJava2</url>
-		<tag>KeePassJava2-3.1.0</tag>
+		<tag>KeePassJava2-3.2.0</tag>
 	</scm>
 
 	<developers>

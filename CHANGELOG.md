@@ -2,6 +2,8 @@
 
 Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.com) and [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [3.2.0] Unreleased
+
 ## [3.1.0] 2026-10-05
 
 ### Changed
