@@ -26,4 +26,5 @@ public class KdbxDatabaseTest
             GroupsAndEntriesTest,
             RecycleBinTest,
             ProtectedPropertyTest,
-            ProtectedPropertyTest2 { }
+            ProtectedPropertyTest2,
+            FeatureSupportTest { }

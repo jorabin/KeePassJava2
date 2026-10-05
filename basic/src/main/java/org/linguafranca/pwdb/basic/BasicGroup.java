@@ -200,7 +200,8 @@ public class BasicGroup extends AbstractGroup {
 
     @Override
     public Instant getExpiryTime() {
-        return this.expiryTime;
+        // as in KDBX, the creation time until an expiry time is set
+        return this.expiryTime == null ? this.creationTime : this.expiryTime;
     }
 
     @Override

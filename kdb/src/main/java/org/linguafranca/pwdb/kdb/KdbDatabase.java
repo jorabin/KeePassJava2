@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -34,7 +35,8 @@ import java.util.UUID;
  * @author jo
  */
 public class KdbDatabase extends AbstractDatabase {
-    private String description;
+    private String description = "";
+    private KdbStreamFormat streamFormat = new KdbStreamFormat();
     private final KdbGroup rootGroup;
 
     // local time, as KDB files are thought to hold local times
@@ -43,6 +45,7 @@ public class KdbDatabase extends AbstractDatabase {
     public KdbDatabase() {
         // KDB files don't have a single root group, this is a synthetic surrogate
         this.rootGroup = new KdbGroup();
+        rootGroup.database = this;
         rootGroup.setRoot(true);
         rootGroup.setName("Root");
         rootGroup.setIcon(new KdbIcon(1));
@@ -59,7 +62,10 @@ public class KdbDatabase extends AbstractDatabase {
      */
     public static KdbDatabase read(Credentials credentials, InputStream inputStream) throws IOException {
         // the serializer closes its decryption chain, which closes the stream under it
-        return KdbSerializer.createKdbDatabase(credentials, new KdbHeader(), new NonClosingInputStream(inputStream));
+        KdbHeader kdbHeader = new KdbHeader();
+        KdbDatabase database = KdbSerializer.createKdbDatabase(credentials, kdbHeader, new NonClosingInputStream(inputStream));
+        database.streamFormat = new KdbStreamFormat(kdbHeader);
+        return database;
     }
 
     /**
@@ -109,12 +115,16 @@ public class KdbDatabase extends AbstractDatabase {
 
     @Override
     public KdbGroup newGroup() {
-        return new KdbGroup();
+        KdbGroup group = new KdbGroup();
+        group.database = this;
+        return group;
     }
 
     @Override
     public KdbEntry newEntry() {
-        return new KdbEntry();
+        KdbEntry entry = new KdbEntry();
+        entry.database = this;
+        return entry;
     }
 
     @Override
@@ -134,7 +144,7 @@ public class KdbDatabase extends AbstractDatabase {
 
     @Override
     public void setDescription(String description) {
-        this.description = description;
+        this.description = Objects.requireNonNullElse(description, "");
     }
 
     @Override
@@ -168,11 +178,14 @@ public class KdbDatabase extends AbstractDatabase {
 
     @Override
     public String getName() {
-        return null;
+        return "";
     }
 
     @Override
     public void setName(String s) {
+        if (s != null && !s.isEmpty()) {
+            throw new UnsupportedOperationException("KDB databases don't have a name");
+        }
 
     }
 
@@ -219,7 +232,18 @@ public class KdbDatabase extends AbstractDatabase {
 
     @Override
     public boolean supportsBinaryProperties() {
-        return false;
+        return true;
+    }
+
+    /**
+     * KDB databases have no name, and an entry has at most one attachment
+     */
+    @Override
+    public boolean supports(Feature feature) {
+        return switch (feature) {
+            case DATABASE_NAME, MULTIPLE_BINARY_PROPERTIES -> false;
+            default -> super.supports(feature);
+        };
     }
 
     @SuppressWarnings("RedundantMethodOverride")
@@ -229,7 +253,8 @@ public class KdbDatabase extends AbstractDatabase {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <C extends StreamConfiguration> StreamFormat<C> getStreamFormat(){
-        return null;
+        return (StreamFormat<C>) streamFormat;
     }
 }

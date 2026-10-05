@@ -59,8 +59,12 @@ public class KdbxHeader implements StreamConfiguration {
     private final List<Integer> allowableVersions = new ArrayList<>(Arrays.asList(3, 4));
 
 
-    /* version of the file - most significant 2 bytes i.e. 0x0302 is version 3 */
+    /* major version of the file - most significant 2 bytes of the file version, e.g. 3 in 0x00030001 */
     private int version;
+    /* minor version of the file - least significant 2 bytes of the file version, e.g. 1 in 0x00030001 */
+    private int minorVersion;
+    /* for version 4, whether the minor version is chosen when writing, as the lowest that holds the content */
+    private boolean minorVersionAutomatic;
 
     protected UUID cipherUuid;
     private byte[] masterSeed;
@@ -118,6 +122,7 @@ public class KdbxHeader implements StreamConfiguration {
      */
     interface KdbxHeaderOptions {
         int getVersion();
+        int getMinorVersion();
         CipherAlgorithm getCipherAlgorithm();
         KeyDerivationFunction getKeyDerivationFunction();
         Encryption.ProtectedStreamAlgorithm getProtectedStreamAlgorithm();
@@ -127,18 +132,24 @@ public class KdbxHeader implements StreamConfiguration {
      * Default values for crypto options
      */
     public enum KdbxHeaderOpts implements KdbxHeaderOptions{
-        V3_AES_SALSA_20(3, Encryption.Cipher.AES, Encryption.KeyDerivationFunction.AES, Encryption.ProtectedStreamAlgorithm.SALSA_20),
-        V4_AES_ARGON_CHA_CHA (4, Encryption.Cipher.AES, Encryption.KeyDerivationFunction.ARGON2, Encryption.ProtectedStreamAlgorithm.CHA_CHA_20);
+        /** KDBX 3.1 */
+        V3_AES_SALSA_20(3, 1, Encryption.Cipher.AES, Encryption.KeyDerivationFunction.AES, Encryption.ProtectedStreamAlgorithm.SALSA_20),
+        /** KDBX 4.0 */
+        V4_AES_ARGON_CHA_CHA (4, 0, Encryption.Cipher.AES, Encryption.KeyDerivationFunction.ARGON2, Encryption.ProtectedStreamAlgorithm.CHA_CHA_20),
+        /** KDBX 4.1 */
+        V4_1_AES_ARGON_CHA_CHA (4, 1, Encryption.Cipher.AES, Encryption.KeyDerivationFunction.ARGON2, Encryption.ProtectedStreamAlgorithm.CHA_CHA_20);
 
         //<editor-fold desc="Fields, Getters and Setters for this class">
         final int version;
+        final int minorVersion;
         final CipherAlgorithm algorithm;
         final KeyDerivationFunction kdf;
         final Encryption.ProtectedStreamAlgorithm protectedStreamAlgorithm;
 
 
-        KdbxHeaderOpts(int version, Encryption.Cipher cipher, Encryption.KeyDerivationFunction kdf, Encryption.ProtectedStreamAlgorithm protectedStreamAlgorithm) {
+        KdbxHeaderOpts(int version, int minorVersion, Encryption.Cipher cipher, Encryption.KeyDerivationFunction kdf, Encryption.ProtectedStreamAlgorithm protectedStreamAlgorithm) {
             this.version = version;
+            this.minorVersion = minorVersion;
             this.algorithm = cipher;
             this.kdf = kdf;
             this.protectedStreamAlgorithm = protectedStreamAlgorithm;
@@ -147,6 +158,11 @@ public class KdbxHeader implements StreamConfiguration {
         @Override
         public int getVersion() {
             return version;
+        }
+
+        @Override
+        public int getMinorVersion() {
+            return minorVersion;
         }
 
         @Override
@@ -174,15 +190,19 @@ public class KdbxHeader implements StreamConfiguration {
     }
 
     /**
-     * Construct a default KDBX header with AES/AES/SALSA_20
+     * Construct a default KDBX header for the major version given: 3.1 with AES/AES/SALSA_20, or 4 with
+     * AES/ARGON2/CHA_CHA_20, written as 4.1 if the content needs it and otherwise as 4.0, as KeePass does
+     * @see #isMinorVersionAutomatic()
      */
     public KdbxHeader(int version) {
         this(version ==3 ? KdbxHeaderOpts.V3_AES_SALSA_20 : KdbxHeaderOpts.V4_AES_ARGON_CHA_CHA);
+        this.minorVersionAutomatic = version != 3;
     }
 
 
     public KdbxHeader(KdbxHeaderOptions opts) {
         this.version = opts.getVersion();
+        this.minorVersion = opts.getMinorVersion();
         setCipherAlgorithm(opts.getCipherAlgorithm());
         setKeyDerivationFunction(opts.getKeyDerivationFunction());
         setProtectedStreamAlgorithm(opts.getProtectedStreamAlgorithm());
@@ -331,8 +351,19 @@ public class KdbxHeader implements StreamConfiguration {
         return headerHash;
     }
 
+    /**
+     * @return the major version, 3 or 4
+     */
     public int getVersion() {
         return version;
+    }
+
+    /**
+     * @return the minor version, e.g. 1 for KDBX 4.1
+     * @since 3.1.0
+     */
+    public int getMinorVersion() {
+        return minorVersion;
     }
 
     // V4
@@ -412,11 +443,45 @@ public class KdbxHeader implements StreamConfiguration {
         this.headerHash = headerHash;
     }
 
+    /**
+     * Sets the major version. For 3 the minor version is 1, for 4 it is chosen when writing
+     * (see {@link #isMinorVersionAutomatic()})
+     * @param version 3 or 4
+     */
     public void setVersion(int version) {
         if (!allowableVersions.contains(version)) {
             throw new IllegalStateException("File version must be in " + allowableVersions);
         }
         this.version = version;
+        this.minorVersion = version == 3 ? 1 : 0;
+        this.minorVersionAutomatic = version != 3;
+    }
+
+    /**
+     * Sets the minor version, e.g. 0 for KDBX 4.0, which is then written whatever the content
+     * @param minorVersion the minor version
+     * @since 3.1.0
+     */
+    public void setMinorVersion(int minorVersion) {
+        this.minorVersion = minorVersion;
+        this.minorVersionAutomatic = false;
+    }
+
+    /**
+     * Whether the minor version is chosen when writing, as the lowest that holds the content
+     * (4.1 if any 4.1 features are used, otherwise 4.0), as KeePass does. True for headers made with
+     * {@link #KdbxHeader(int)} or {@link #setVersion(int)} for version 4; false after
+     * {@link #setMinorVersion(int)}, for headers made from {@link KdbxHeaderOpts}, and for headers that
+     * were read, so that a database keeps its version.
+     * @since 3.1.0
+     */
+    public boolean isMinorVersionAutomatic() {
+        return minorVersionAutomatic;
+    }
+
+    /* choose the minor version when writing, leaving it automatic */
+    void chooseMinorVersion(int minorVersion) {
+        this.minorVersion = minorVersion;
     }
 
     /**

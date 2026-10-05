@@ -37,7 +37,8 @@ public class BasicDatabase extends ProtectedDatabase {
     private final BasicGroup root = new BasicGroup(this, "Root");
     private String databaseName = "New Database";
     private String databaseDescription = "Database created on " + Instant.now().toString();
-    private StreamFormat<?> streamFormat;
+    // written as KDBX 4
+    private StreamFormat<?> streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
 
     @Override
     public Group getRootGroup() {
@@ -71,7 +72,9 @@ public class BasicDatabase extends ProtectedDatabase {
 
     @Override
     public void enableRecycleBin(boolean enable) {
-        throw new UnsupportedOperationException();
+        if (enable) {
+            throw new UnsupportedOperationException("Basic databases don't have a recycle bin");
+        }
     }
 
     @Override
@@ -86,7 +89,7 @@ public class BasicDatabase extends ProtectedDatabase {
 
     @Override
     public void setName(String name) {
-        this.databaseName = name;
+        this.databaseName = Objects.requireNonNullElse(name, "");
     }
 
     @Override
@@ -96,14 +99,11 @@ public class BasicDatabase extends ProtectedDatabase {
 
     @Override
     public void setDescription(String description) {
-        this.databaseDescription = description;
+        this.databaseDescription = Objects.requireNonNullElse(description, "");
     }
 
     @Override
     public void write(Credentials credentials, OutputStream outputStream) throws IOException {
-        if (Objects.isNull(streamFormat)) {
-            streamFormat = new KdbxStreamFormat(new KdbxHeader(4));
-        }
         write(streamFormat, credentials, outputStream);
     }
 
@@ -143,6 +143,18 @@ public class BasicDatabase extends ProtectedDatabase {
     @Override
     public StreamFormat<?> getStreamFormat() {
         return streamFormat;
+    }
+
+    /**
+     * Basic databases are written in KDBX format
+     * @throws IllegalArgumentException if the format is null or not a {@link KdbxStreamFormat}
+     */
+    @Override
+    public <C extends StreamConfiguration> void setStreamFormat(StreamFormat<C> streamFormat) {
+        if (!(streamFormat instanceof KdbxStreamFormat)) {
+            throw new IllegalArgumentException("Basic databases are written in KDBX format");
+        }
+        this.streamFormat = streamFormat;
     }
 
 

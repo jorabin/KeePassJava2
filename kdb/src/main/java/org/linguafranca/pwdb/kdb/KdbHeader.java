@@ -17,6 +17,7 @@
 
 package org.linguafranca.pwdb.kdb;
 
+import org.linguafranca.pwdb.StreamConfiguration;
 import org.linguafranca.pwdb.security.Aes;
 
 import javax.crypto.Cipher;
@@ -32,7 +33,7 @@ import static org.linguafranca.pwdb.security.Encryption.getSha256MessageDigestIn
  * @author jo
  */
 @SuppressWarnings("unused")
-public class KdbHeader {
+public class KdbHeader implements StreamConfiguration {
 
     // flags for possible encryption of the KDB stream
     public static final int FLAG_SHA2 = 1;

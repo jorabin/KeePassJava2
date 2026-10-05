@@ -17,7 +17,9 @@
 
 package org.linguafranca.pwdb;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -71,7 +73,7 @@ public interface Group {
      *
      * @return a modifiable list of groups
      */
-    List<Group> getGroups();
+    @NotNull List<Group> getGroups();
 
     /**
      * Returns the number of groups that are direct children of this group
@@ -90,7 +92,7 @@ public interface Group {
      * @param group the group to add
      * @return the group added
      */
-    Group addGroup(Group group);
+    @NotNull Group addGroup(Group group);
 
     /**
      * Create a new group in this database with the name provided and add it to the group
@@ -98,7 +100,7 @@ public interface Group {
      * @param name the name of the group to add
      * @return the group added
      */
-    Group addGroup(String name);
+    @NotNull Group addGroup(String name);
 
     /**
      * Returns a list of child Groups whose name exactly matches that supplied.
@@ -108,7 +110,7 @@ public interface Group {
      * @param groupName the name of the groups sought
      * @return a modifiable list
      */
-    List<Group> findGroups(String groupName);
+    @NotNull List<Group> findGroups(String groupName);
 
     /**
      * Removes the group supplied from this group. The group removed
@@ -122,12 +124,12 @@ public interface Group {
      * @return the group passed for removal
      * @throws IllegalArgumentException if the group is not a child of this group
      */
-    Group removeGroup(Group group);
+    @NotNull Group removeGroup(Group group);
 
     /**
      * Returns a modifiable by the caller list of entries contained in this group.
      */
-    List<Entry> getEntries();
+    @NotNull List<Entry> getEntries();
 
     /**
      * Returns the number of entries in this group
@@ -150,7 +152,7 @@ public interface Group {
      * @return a modifiable-by-caller list
      * @see Entry#match(String)
      */
-    List<Entry> findEntries(String match, boolean recursive);
+    @NotNull List<Entry> findEntries(String match, boolean recursive);
 
     /**
      * Finds all entries in this group that match using the matcher supplied.
@@ -165,7 +167,7 @@ public interface Group {
      * @return a modifiable-by-caller list
      * @see Entry#match(Entry.Matcher)
      */
-    List<Entry> findEntries(Entry.Matcher matcher, boolean recursive);
+    @NotNull List<Entry> findEntries(Entry.Matcher matcher, boolean recursive);
 
     /**
      * Adds an entry to this group removing it from another group
@@ -173,20 +175,20 @@ public interface Group {
      * @param entry the entry to add
      * @return the entry added
      */
-    Entry addEntry(Entry entry);
+    @NotNull Entry addEntry(Entry entry);
 
     /**
      * Adds a new entry to this group
      * @return the entry added
      */
-    Entry addEntry();
+    @NotNull Entry addEntry();
 
     /**
      * Adds a new entry to this group
      * @param title the title of the entry to add
      * @return the entry added
      */
-    Entry addEntry(String title);
+    @NotNull Entry addEntry(String title);
 
     /**
      * Remove an entry from this group and hence from the database.
@@ -194,7 +196,7 @@ public interface Group {
      * @return the entry removed
      * @throws IllegalArgumentException if the Entry is not in the group
      */
-    Entry removeEntry(Entry entry);
+    @NotNull Entry removeEntry(Entry entry);
 
     /**
      * Make a deep copy of the children a group and add to this group. Does not copy the parent group.
@@ -206,12 +208,12 @@ public interface Group {
      * Returns an XPath-like string of the names of Groups from the Root
      * to this Group.
      */
-    String getPath();
+    @NotNull String getPath();
 
     /**
      * Get the name of this group
      */
-    String getName();
+    @NotNull String getName();
 
     /**
      * Set the name of this group
@@ -221,12 +223,12 @@ public interface Group {
     /**
      * Get the UUID of this group
      */
-    UUID getUuid();
+    @NotNull UUID getUuid();
 
     /**
      * Get the Icon of this group
      */
-    Icon getIcon();
+    @NotNull Icon getIcon();
 
     /**
      * Set the Icon of this group
@@ -234,21 +236,21 @@ public interface Group {
     void setIcon(Icon icon);
 
     /**
-     * Get the database this group is part of, null if the group is not part of a database
+     * Get the database this group is part of
      */
-    Database getDatabase();
+    @NotNull Database getDatabase();
 
     /**
      * Returns the date at which this group was last accessed.
      * <p>
      * Implementations SHOULD set this to the creation date or earlier if the group has never been used.
      */
-    Instant getLastAccessTime();
+    @NotNull Instant getLastAccessTime();
 
     /**
      * Returns the date at which this group was created
      */
-    Instant getCreationTime();
+    @NotNull Instant getCreationTime();
 
     /**
      * Returns true if this group is to be considered as expired at some point
@@ -265,7 +267,7 @@ public interface Group {
      * Returns a date at which the group should be considered to have expired, if {@link #getExpires()} is true -
      * otherwise returns an arbitrary date.
      */
-    Instant getExpiryTime();
+    @NotNull Instant getExpiryTime();
 
     /**
      * Sets the expiry date of this group.
@@ -279,5 +281,5 @@ public interface Group {
      * <p>
      * Implementations SHOULD set this to the creation date or earlier if the group has never been modified.
      */
-    Instant getLastModificationTime();
+    @NotNull Instant getLastModificationTime();
 }

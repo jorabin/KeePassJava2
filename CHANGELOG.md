@@ -4,6 +4,17 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 
 ## [3.2.0] Unreleased
 
+### Changed
+
+- `Database.supports(Feature)` says which optional features a database has (`DATABASE_NAME`, `AD_HOC_PROPERTIES`, `BINARY_PROPERTIES`, `MULTIPLE_BINARY_PROPERTIES`, `RECYCLE_BIN`, `PROPERTY_VALUE_STRATEGY`); the existing `supports…()` methods still work
+- Consistent handling of unsupported features and missing values: getters no longer throw for an unsupported feature but answer as if nothing were there, setters throw `UnsupportedOperationException` except when setting "nothing", attribute getters never return null (database name and description are `""` when there is none, expiry times are never null), and the interfaces are annotated `@NotNull` or `@Nullable`
+- KDB entries' attachment is available as a binary property (KDB allows one per entry); KDB property values can be read and set as `PropertyValue`s (unprotected)
+- Removing a property or binary property that isn't there returns false rather than throwing, whether or not the database supports it
+- KDBX minor versions: `KdbxHeader` has a minor version, so a database keeps its version when it is written (a 4.1 file was written back as 4.0). New KDBX 4 databases are written as 4.1 only if they use 4.1 features and otherwise as 4.0, as KeePass does (`KdbxHeader.isMinorVersionAutomatic()`); `KdbxHeaderOpts.V4_1_AES_ARGON_CHA_CHA` is added to choose 4.1
+- When writing a KDBX version that can't hold some of the content (4.1 features in 4.0, 4.x features in 3.1), that content is left out of the file, kept in the database, and reported as a warning through `System.Logger`. `SerializableDatabase` has new default methods `getMinimumMinorVersion` and `setFormatVersion` for this
+- `getStreamFormat()` is never null: a new KDBX or Basic database has the KDBX 4 format, and a KDB database has the new `KdbStreamFormat`, holding the `KdbHeader` it was read with. The new `setStreamFormat` sets the format `write(Credentials, OutputStream)` uses
+- `getDatabase()` on KDB groups and entries is never null (the root group and new groups and entries had none)
+
 ## [3.1.0] 2026-10-05
 
 ### Changed

@@ -18,10 +18,13 @@
 package org.linguafranca.pwdb.kdb;
 
 import org.linguafranca.pwdb.Database;
+import org.linguafranca.pwdb.Feature;
+import org.linguafranca.pwdb.StreamFormat;
 import org.linguafranca.pwdb.Visitor;
 import org.linguafranca.pwdb.test.DatabaseTestBase;
 import org.linguafranca.pwdb.test.GroupsAndEntriesTest;
 import org.junit.jupiter.api.Test;
+import org.linguafranca.pwdb.test.FeatureSupportTest;
 import org.linguafranca.pwdb.test.Test123Test;
 import org.linguafranca.util.CloseTracking;
 
@@ -41,7 +44,8 @@ public class KdbDatabaseTest
             DatabaseTestBase
         implements
             GroupsAndEntriesTest,
-            Test123Test {
+            Test123Test,
+            FeatureSupportTest {
 
     KdbDatabaseTest() {
         super(KdbDatabase::new, KdbDatabase::read, Database::write, KdbCredentials.Password::new);
@@ -60,7 +64,11 @@ public class KdbDatabaseTest
 
     @Test
     public void supportedFunctionalityTest(){
-        assertFalse(getDatabase().supportsBinaryProperties());
+        // one attachment per entry
+        assertTrue(getDatabase().supportsBinaryProperties());
+        assertTrue(getDatabase().supports(Feature.BINARY_PROPERTIES));
+        assertFalse(getDatabase().supports(Feature.MULTIPLE_BINARY_PROPERTIES));
+        assertFalse(getDatabase().supports(Feature.DATABASE_NAME));
         assertFalse(getDatabase().supportsNonStandardPropertyNames());
         assertFalse(getDatabase().supportsRecycleBin());
         assertFalse(getDatabase().supportsPropertyValueStrategy());
@@ -73,6 +81,10 @@ public class KdbDatabaseTest
             database = KdbDatabase.read(new KdbCredentials.Password("123".getBytes()), inputStream);
         }
         database.visit(new Visitor.Print(getTestPrintStream()));
+        // the stream format holds the header that was read
+        StreamFormat<?> streamFormat = database.getStreamFormat();
+        KdbHeader header = ((KdbStreamFormat) streamFormat).getStreamConfiguration();
+        assertTrue(header.getGroupCount() > 0);
     }
 
     /**

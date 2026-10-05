@@ -143,7 +143,8 @@ class BasicEntryTest {
 
     @Test
     void testGetExpiryTime() {
-        assertNull(entry.getExpiryTime());
+        // never null: the creation time until an expiry time is set
+        assertEquals(entry.getCreationTime(), entry.getExpiryTime());
     }
 
     @Test

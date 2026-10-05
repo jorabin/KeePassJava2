@@ -133,24 +133,40 @@ public abstract class AbstractEntry implements Entry {
         touch();
     }
 
+    /**
+     * For databases without a property value strategy, the property as a string value
+     */
     @Override
     public PropertyValue getPropertyValue(String name) {
-        throw new UnsupportedOperationException();
+        String value = getProperty(name);
+        return value == null ? null : new PropertyValue.StringStore(value);
+    }
+
+    /**
+     * For databases without a property value strategy, sets the property from the string value
+     */
+    @Override
+    public Entry setPropertyValue(String name, PropertyValue value) {
+        if (value == null) {
+            throw new IllegalArgumentException("value may not be null");
+        }
+        setProperty(name, value.getValueAsString());
+        return this;
     }
 
     @Override
-    public Entry setPropertyValue(String name, PropertyValue value) {
-        throw new UnsupportedOperationException();
+    public Entry addProperty(String name, byte[] value){
+        return setPropertyValue(name, new PropertyValue.StringStore(value));
     }
 
-    public Entry addProperty(String name, byte[] value){
-        throw new UnsupportedOperationException();
-    }
+    @Override
     public Entry addProperty(String name, char[] value){
-        throw new UnsupportedOperationException();
+        return setPropertyValue(name, new PropertyValue.StringStore(value));
     }
+
+    @Override
     public Entry addProperty(String name, CharSequence value){
-        throw new UnsupportedOperationException();
+        return setPropertyValue(name, new PropertyValue.StringStore(value));
     }
 
     public Entry addEntry(){

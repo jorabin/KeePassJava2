@@ -80,12 +80,9 @@ public class BasicEntry extends AbstractEntry {
     }
 
     @Override
-    public boolean removeProperty(String name) throws IllegalArgumentException, UnsupportedOperationException {
+    public boolean removeProperty(String name) throws IllegalArgumentException {
         if (Entry.STANDARD_PROPERTY_NAMES.contains(name)) {
             throw new IllegalArgumentException("Cannot remove standard property");
-        }
-        if (!database.supportsNonStandardPropertyNames()) {
-            throw new UnsupportedOperationException("Database does not support non-standard properties");
         }
         boolean exists = properties.containsKey(name);
         if (exists) {
@@ -140,7 +137,7 @@ public class BasicEntry extends AbstractEntry {
     }
 
     @Override
-    public boolean removeBinaryProperty(String name) throws UnsupportedOperationException {
+    public boolean removeBinaryProperty(String name) {
         boolean exists = binaries.containsKey(name);
         if (exists) {updateModifiedTime();}
         binaries.remove(name);
@@ -149,7 +146,7 @@ public class BasicEntry extends AbstractEntry {
 
     @Override
     public List<String> getBinaryPropertyNames() {
-        return List.of(binaries.keySet().toArray(String[]::new));
+        return new ArrayList<>(binaries.keySet());
     }
 
     @Override
@@ -202,7 +199,8 @@ public class BasicEntry extends AbstractEntry {
 
     @Override
     public Instant getExpiryTime() {
-        return this.expiryTime;
+        // as in KDBX, the creation time until an expiry time is set
+        return this.expiryTime == null ? this.creationTime : this.expiryTime;
     }
 
     @Override
