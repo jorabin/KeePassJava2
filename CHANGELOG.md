@@ -14,6 +14,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - When writing a KDBX version that can't hold some of the content (4.1 features in 4.0, 4.x features in 3.1), that content is left out of the file, kept in the database, and reported as a warning through `System.Logger`. `SerializableDatabase` has new default methods `getMinimumMinorVersion` and `setFormatVersion` for this
 - `getStreamFormat()` is never null: a new KDBX or Basic database has the KDBX 4 format, and a KDB database has the new `KdbStreamFormat`, holding the `KdbHeader` it was read with. The new `setStreamFormat` sets the format `write(Credentials, OutputStream)` uses
 - `getDatabase()` on KDB groups and entries is never null (the root group and new groups and entries had none)
+- The `all` module's Javadoc shows the module structure diagram (it linked to a 2.x GitHub page rather than the image) and links to the v3 readme; the stray empty paragraph is gone
 
 ## [3.1.0] 2026-10-05
 
