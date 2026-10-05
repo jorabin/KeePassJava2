@@ -3,9 +3,9 @@
 [![Maven Central Version](https://img.shields.io/maven-central/v/org.linguafranca.pwdb/KeePassJava2.parent)](https://central.sonatype.com/artifact/org.linguafranca.pwdb/KeePassJava2)
 [![javadoc](https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2/javadoc.svg)](https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2)
 
-[![Branch v3-master](https://badgen.net/badge/Branch/v3-master/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/v3-master) [![Version 3.0.0](https://badgen.net/badge/Build/3.0.0/blue?icon=github)](https://github.com/jorabin/KeePassJava2/releases/tag/KeePassJava2-3.0.0) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-master)
+[![Branch v3-master](https://badgen.net/badge/Branch/v3-master/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/v3-master) [![Version 3.1.0](https://badgen.net/badge/Build/3.1.0/blue?icon=github)](https://github.com/jorabin/KeePassJava2/releases/tag/KeePassJava2-3.1.0) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-master)
 
-[![Branch v3-develop](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/v3-develop) [![Version 3.1.0-SNAPSHOT](https://badgen.net/badge/Build/3.1.0-SNAPSHOT/blue?icon=github)](#snapshot) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop)
+[![Branch v3-develop](https://badgen.net/badge/Branch/v3-develop/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/v3-develop) [![Version 3.1.0](https://badgen.net/badge/Build/3.1.0/blue?icon=github)](https://github.com/jorabin/KeePassJava2/releases/tag/KeePassJava2-3.1.0) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/v3-develop.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/v3-develop)
 
 [![Branch master](https://badgen.net/badge/Branch/master/yellow?icon=github)](https://github.com/jorabin/KeePassJava2/tree/master) [![Version 2.2.6](https://badgen.net/badge/Build/2.2.6/blue?icon=github)](https://github.com/jorabin/KeePassJava2/releases/tag/KeePassJava2-2.2.6) [![CircleCI](https://dl.circleci.com/status-badge/img/gh/jorabin/KeePassJava2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/jorabin/KeePassJava2/tree/master)
 
@@ -43,7 +43,7 @@ It is licensed under the Apache 2 License and is currently usable.
 
 ## Current Status
 
-The current code is version 3.0.0 - released to Maven October 2026. This is on branch `v3-master`,
+The current code is version 3.1.0 - released to Maven October 2026. This is on branch `v3-master`,
 with development on branch `v3-develop`. See [Build from Source](#build-from-source).
 Upgrade to V3 requires minor changes to V2 code, see [Upgrading from 2.x to 3.0](#upgrading-from-2x-to-30)
 and [Upgrading from 3.0 to 3.1](#upgrading-from-30-to-31).
@@ -106,28 +106,28 @@ See the [Quick Start](#quick-start) for a worked example in the version 3 API.
 
 ### Release
 
-The POM for the last release (3.0.0), Java 11 compatible, is
+The POM for the last release (3.1.0), Java 17 compatible, is
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2.kdbx.database</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
 
 at Maven Central. This provides access to the KDBX database implementation. There is also a
 composite POM that provides access to the KDBX and KDB implementations:
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>3.0.0</version>
+        <version>3.1.0</version>
 
 For the last 2.x release, see branch [`master`](https://github.com/jorabin/KeePassJava2/tree/master).
 
 ### Snapshot
 
-Snapshot builds are published to the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. The next release will be 3.1.0-SNAPSHOT (on branch `v3-develop`), not yet published:
+Snapshot builds are published to the Maven Central snapshot repository, `https://central.sonatype.com/repository/maven-snapshots/`, which deletes them after about 90 days. The next release will be 3.2.0-SNAPSHOT (on branch `v3-develop`), not yet published:
 
         <groupId>org.linguafranca.pwdb</groupId>
         <artifactId>KeePassJava2</artifactId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>3.2.0-SNAPSHOT</version>
  
 with appropriate `<repositories>` entry, like:
 
@@ -252,7 +252,7 @@ by [this test](https://github.com/jorabin/KeePassJava2/blob/master/example/src/m
 
 ## Dependencies
 
-Aside from the JRE, at release 3.0.0, the API depends on:
+Aside from the JRE, at release 3.1.0, the API depends on:
 
 - [Google Guava](https://github.com/google/guava/wiki) ([Apache 2 license](https://github.com/google/guava/blob/master/COPYING)).
 - [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/) ([Apache 2 license](http://www.apache.org/licenses/LICENSE-2.0)).
