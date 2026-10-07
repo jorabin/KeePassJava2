@@ -4,6 +4,8 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 
 # [2.2.7] Unreleased
 
+- [Issue 108] Tests that write to `testOutput` create it first (`TestUtil.testOutputPath` in the `util` module), so they pass in any order and when run on their own; this completes the fix in [PR 85] for issue 83, which did it only for `QuickStart`
+
 # [2.2.6] 2026-10-03
 
 - [Issue 104] With a default encoding other than UTF-8, the Jackson implementation wrote the database XML in that encoding, so non-ASCII content could not be loaded back
