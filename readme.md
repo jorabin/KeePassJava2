@@ -198,9 +198,9 @@ another database without being converted:
     database.newGroup(groupToCopy);
 
 The class Javadoc on Interface classes
-[Database](http://javadoc.io/page/org.linguafranca.pwdb/database/latest/org/linguafranca/pwdb/Database.html), 
-[Group](http://javadoc.io/page/org.linguafranca.pwdb/database/latest/org/linguafranca/pwdb/Group.html) and 
-[Entry](http://javadoc.io/page/org.linguafranca.pwdb/database/latest/org/linguafranca/pwdb/Entry.html) describe
+[Database](https://javadoc.io/doc/org.linguafranca.pwdb/database/latest/org.linguafranca.pwdb.database/org/linguafranca/pwdb/Database.html), 
+[Group](https://javadoc.io/doc/org.linguafranca.pwdb/database/latest/org.linguafranca.pwdb.database/org/linguafranca/pwdb/Group.html) and 
+[Entry](https://javadoc.io/doc/org.linguafranca.pwdb/database/latest/org.linguafranca.pwdb.database/org/linguafranca/pwdb/Entry.html) describe
 how to use the methods of those classes to create and modify entries. These classes
 provide the basis of all implementations of the various database formats,
 KDBX 3.1, 4 and 4.1 (KeePass 2) as well as KDB (KeePass 1), file formats.
@@ -232,7 +232,7 @@ For the sake of
 clarification and my own satisfaction I have written about my understanding of 
 KeePass formats in the following locations:
 
-1. The Javadoc header to [KdbxSerializer](http://javadoc.io/page/org.linguafranca.pwdb/KeePassJava2-kdbx/latest/org/linguafranca/pwdb/kdbx/stream_3_1/KdbxSerializer.html) describes KDBX stream formatting.
+1. The Javadoc header to [KdbxSerializer](https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2.kdbx.io/latest/org.linguafranca.pwdb.kdbx.io/org/linguafranca/pwdb/format/KdbxSerializer.html) describes KDBX stream formatting.
 2. The XSD Schema [KDBX.4.1.xsd](./XSD/KDBX.4.1.xsd) documents my understanding of the Keepass XML, and also my 
    lack of understanding, in parts. 
 3. The following graphic illustrates KDBX 3.1 and 4 file formats:
