@@ -79,7 +79,7 @@ time we need to access or manipulate just one of them would add significant over
 If the data is to be encrypted, then we need to find some way of storing the encryption key 
 that is not open to simple inspection.
 
-## KeePassJava2 2.2.3 Property Value Strategy
+## Property Value Strategy (from KeePassJava2 2.2.3)
 
 In the end it's up to the user of the library to decide what is the right approach to the 
 trade-off between vulnerability, risk and increased resource consumption.
@@ -119,13 +119,15 @@ interface  Factory<P extends PropertyValue> {
     P of (byte [] value);
 }
 ```
-which is an inner class of `Property Value`. Storage implementations will 
+which is an inner interface of `PropertyValue`. Storage implementations will 
 implement `PropertyValue` and will implement a `Factory` for their creation. They may wish 
 to provide creation of the Factory as a static member on the class being created e.g.
 
 ```Java
-public class SpecialPropertyValue {
-    public static Factory<SpecialPropertyValue> getFactory(); 
+public class SpecialPropertyValue implements PropertyValue {
+    public static PropertyValue.Factory<SpecialPropertyValue> getFactory() {
+        // ...
+    }
     // ...
 }
 
@@ -137,13 +139,17 @@ so a caller is free to create a protected value where one is not called for by d
 any implementation or strategy to store a value.
 
 On save of the database, property values are saved to the inner stream as protected if the 
-`isProtected()` method of their implementation returns `true`. On reload, they will be stored
-using the class defined by the Strategy appropriate to whether they are protected or not. 
+`isProtected()` method of their implementation returns `true`. On reload, they are stored
+using the classes defined by `PropertyValue.Strategy.Default`, as appropriate to whether they were
+saved as protected or not: reading a database always uses the default strategy. A different strategy
+set on the database afterwards applies to values set from then on.
 
 When a database is 
 reloaded the default protected properties when it was saved will not be reloaded. Other than for the default properties
-of `Title`, `URL`, `UserName`, `Title` and `Notes` this information can't be saved in a standardized
-way in the KDBX format, and as noted below this information is ignored by the Windows KeePass implementation.
+of `Title`, `UserName`, `Password`, `URL` and `Notes` this information can't be saved in a standardized
+way in the KDBX format (the `MemoryProtection` element in `Meta`), and as noted below this information is ignored
+by the Windows KeePass implementation. KeePassJava2 keeps `MemoryProtection` as it was read and writes it back,
+but doesn't use it.
 
 Changing the strategy doesn't alter the way that existing values are stored in the database.
 
@@ -189,23 +195,26 @@ There are three default implementations of `PropertyValue`:
 and stores the key using a `ByteBuffer` obtained using the `ByteBuffer.allocateDirect()` method
 in order to try to have the key stored off-heap
 
-#### Default Implementation of Strategy
+#### Default Implementations of Strategy
 `PropertyValue.Strategy.Default` defines `Password` as the only protected value and `BytesStore` and 
-`SealedStore` as the unprotected and protected `PropertyValue` implementations.
+`SealedStore` as the unprotected and protected `PropertyValue` implementations. Its list of protected
+properties can't be changed, so while it is the database's strategy a call of `Database.setShouldProtect`
+that would change the list throws `UnsupportedOperationException`.
+
+`PropertyValue.Strategy.MutableProtectionStrategy` is the same, except that its list of protected
+properties can be changed, e.g.
+
+```Java
+database.setPropertyValueStrategy(new PropertyValue.Strategy.MutableProtectionStrategy());
+database.setShouldProtect(Entry.STANDARD_PROPERTY_NAME_USER_NAME, true);
+```
 
 ### Implementation in Databases
-From KeepassJava2 2.2.3 the Jackson implementation supports setting and getting of `PropertyValue`s 
-from an `Entry`. 
+From KeePassJava2 2.2.3 the KDBX database supports setting and getting of `PropertyValue`s 
+from an `Entry`, and setting and getting of the `Strategy` from the database. In KeePassJava2 3.x
+the KDBX database is `KdbxDatabase` (called `JacksonDatabase` in 2.x). The experimental, unpublished
+`BasicDatabase` supports them too.
 
-It supports setting and getting of `Strategy` from `JacksonDatabase`.
-
-For other database implementations `Database.supportsPropertyValueStrategy()` returns false, 
-and attempts to use any methods associated with PropertyValue
+For the KDB database, `KdbDatabase`, `Database.supportsPropertyValueStrategy()` returns false,
+`shouldProtect` returns false, and attempts to use any other methods associated with `PropertyValue`
 cause an `UnsupportedOperationException` to be raised.
-
-
-
-
-
-
-
