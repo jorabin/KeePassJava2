@@ -278,41 +278,37 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 
 <table>
 <thead>
-<tr><th>Module</th><th>ArtifactId</th><th>JavaDoc<th>Description</th></tr>
+<tr><th>Module</th><th>ArtifactId</th><th>JavaDoc</th><th>Description</th></tr>
 </thead>
 <tbody>
 
 <tr><td><a href="database">database</a></td><td>database</td>
-<td>
-<a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/database"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/database.svg" alt="Javadocs"></a>
-</td>
+<td><a href="https://javadoc.io/doc/org.linguafranca.pwdb/database"><img src="https://javadoc.io/badge2/org.linguafranca.pwdb/database/javadoc.svg" alt="Javadocs"></a></td>
 <td>Base definition of the Database APIs.</td></tr>
-<tr><td><a href="">example</a></td><td>example</td>
-<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/example"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/example.svg" alt="Javadocs"></a></td>
-<td>Worked examples of loading, saving, splicing etc. using the APIs</td></tr>
 
+<tr><td><a href="example">example</a></td><td>(not published)</td>
+<td>(not published)</td>
+<td>Worked examples of loading, saving, splicing etc. using the APIs.</td></tr>
 
 <tr><td><a href="all">all</a></td><td><strong>KeePassJava2</strong></td>
-<td>(no JavaDoc)</td>
+<td><a href="https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2"><img src="https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2/javadoc.svg" alt="Javadocs"></a></td>
 <td>This is the main KeePassJava2 Maven dependency. Provides a route to all artifacts (other than test and examples) via transitive dependency.</td></tr>
 
-<tr><td><a href="kdb">kdb</a></td><td>KeePassJava2-kdb</td>
-<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdb"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdb.svg" alt="Javadocs"></a></td>
+<tr><td><a href="kdb">kdb</a></td><td>KeePassJava2.kdb</td>
+<td><a href="https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2.kdb"><img src="https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2.kdb/javadoc.svg" alt="Javadocs"></a></td>
 <td>An implementation of the Database APIs supporting KeePass KDB format.</td></tr>
 
-<tr><td><a href="kdbx-io">kdbx-io</a></td><td>KeePassJava2-kdbx-io</td>
-<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-kdbx"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx-io.svg" alt="Javadocs"></a></td>
+<tr><td><a href="kdbx-io">kdbx-io</a></td><td>KeePassJava2.kdbx.io</td>
+<td><a href="https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2.kdbx.io"><img src="https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2.kdbx.io/javadoc.svg" alt="Javadocs"></a></td>
 <td>Provides support for KDBX streaming and security.</td></tr>
 
-
-<tr><td><a href="kdbx-database">kdbx-database</a></td><td>KeePassJava2-kdbx-database</td>
-<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/KeePassJava2-kdbx-database.svg" alt="Javadocs"></a></td>
+<tr><td><a href="kdbx-database">kdbx-database</a></td><td>KeePassJava2.kdbx.database</td>
+<td><a href="https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2.kdbx.database"><img src="https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2.kdbx.database/javadoc.svg" alt="Javadocs"></a></td>
 <td>Provides support for KDBX data access and memory protection.</td></tr>
 
-<tr><td><a href="basic">basic</a></td><td>basic</td>
-<td><a href="https://www.javadoc.io/doc/org.linguafranca.pwdb/basic">
-<img src="http://www.javadoc.io/badge/org.linguafranca.pwdb/basic.svg" alt="Javadocs"></a></td>
-<td>A basic lightweight database implementation. Has memory protection.</td></tr>
+<tr><td><a href="basic">basic</a></td><td>(not published)</td>
+<td>(not published)</td>
+<td>Experimental: a prototype database implementation, used for experimenting and testing. It may change or be removed.</td></tr>
 </tbody>
 </table>
 
