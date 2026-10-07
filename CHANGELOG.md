@@ -29,6 +29,7 @@ Trying to follow the suggestions at [Keep a Change Log](http://keepachangelog.co
 - Replace Jackson's deprecated `setSerializationInclusion` with `setDefaultPropertyInclusion`, which does the same
 - Implementations of the deprecated `Entry.getPassword`/`setPassword` are marked deprecated too, the KDB reader no longer uses them, and they are tested
 - The readme has upgrade notes, from 2.x to 3.0 (as in the 3.0.0 release note) and from 3.0 to 3.1
+- [Issue 108] Tests that write to `testOutput` create it first (`TestUtil.testOutputPath` in the `test` module), so they pass in any order and when run on their own; this completes the fix in [PR 85] for issue 83, which did it only for `QuickStart`
 
 ## [3.0.0] 2026-10-03
 
