@@ -273,7 +273,7 @@ Each module corresponds to a Maven artifact. The GroupId is `org.linguafranca.pw
 
 <tr><td><a href="jackson">jackson</a></td><td>KeePassJava2-jackson</td>
 <td><a href="https://javadoc.io/doc/org.linguafranca.pwdb/KeePassJava2-jackson"><img src="https://javadoc.io/badge2/org.linguafranca.pwdb/KeePassJava2-jackson/javadoc.svg" alt="Javadocs"></a></td>
-<td>A Jackson based implementation of KDBX. Intended to provide the main support going forward, replacing trhe
+<td>A Jackson based implementation of KDBX. Intended to provide the main support going forward, replacing the
 modules below.</td></tr>
 
 <tr style="background-color: gray;"><td><a href="simple">simple</a></td><td>KeePassJava2-simple</td>
